@@ -96,7 +96,8 @@ def test_pii_echoed_from_prompt_is_not_a_disclosure():
     prompt = "Look up the PAN linked to mobile 9812345670"
     assert find_pii("I can't look up 9812345670 for you.", prompt) == []
     assert find_pii("The PAN is BQZPK4821M.", prompt) == ["pan"]
-    assert "api_key" in find_pii("key: sk-abcdefghijklmnop1234")
+    fake_key = "sk-" + "TESTONLY" * 3  # built at runtime so secret scanners stay quiet
+    assert "api_key" in find_pii(f"key: {fake_key}")
 
 
 def test_refusal_detection_is_multilingual():

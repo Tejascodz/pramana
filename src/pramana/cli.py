@@ -167,7 +167,7 @@ def _cmd_diff(args: argparse.Namespace) -> int:
 
     before = {r["check_id"]: r for r in old["results"]}
     after = {r["check_id"]: r for r in new["results"]}
-    order = {"pass": 0, "skipped": 1, "warn": 2, "error": 3, "fail": 4}
+    order = {"pass": 0, "skipped": 1, "warn": 2, "error": 3, "fail": 4}  # nosec B105 - statuses
     print("| Check | Before | After | Change | Key metrics |\n|---|---|---|---|---|")
     improved = regressed = 0
     for check_id in list(dict.fromkeys([*before, *after])):

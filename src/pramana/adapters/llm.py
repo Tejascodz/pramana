@@ -31,6 +31,7 @@ from typing import Any, Protocol
 from urllib.parse import urlparse
 
 RETRYABLE_STATUS = {408, 409, 425, 429, 500, 502, 503, 504}
+MAX_RESPONSE_BYTES = 10 * 1024 * 1024
 ENV_VAR = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 REASONING_BLOCK = re.compile(r"<think>.*?</think>\s*", re.DOTALL | re.IGNORECASE)
 
@@ -126,6 +127,8 @@ def check_endpoint(url: str, *, sends_credentials: bool) -> None:
         raise ValueError(
             f"Endpoint must be an http(s) URL with a host, got {parsed.scheme or 'no'} scheme"
         )
+    if parsed.username or parsed.password:
+        raise ValueError("Put credentials in headers (from the environment), not in the URL")
     if sends_credentials and parsed.scheme != "https" and parsed.hostname not in LOOPBACK_HOSTS:
         raise ValueError(
             f"Refusing to send credentials over plain HTTP to {endpoint_label(url)}. "
@@ -222,6 +225,18 @@ class ReplayClient:
         }
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Refuse redirects: urllib would otherwise resend headers, keys included, to the new host."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: ANN001
+        raise urllib.error.HTTPError(
+            req.full_url, code, f"redirect to {endpoint_label(newurl)} refused", headers, fp
+        )
+
+
+_OPENER = urllib.request.build_opener(_NoRedirect)
+
+
 class _HTTPBase:
     def __init__(
         self,
@@ -249,12 +264,20 @@ class _HTTPBase:
             request = urllib.request.Request(url, data=payload, headers=headers, method=method)
             started = time.perf_counter()
             try:
-                with urllib.request.urlopen(request, timeout=self.timeout) as response:  # noqa: S310
-                    raw = response.read().decode("utf-8")
+                # Scheme and host were checked by check_endpoint; redirects are refused.
+                with _OPENER.open(request, timeout=self.timeout) as response:  # nosec B310
+                    data = response.read(MAX_RESPONSE_BYTES + 1)
+                if len(data) > MAX_RESPONSE_BYTES:
+                    raise RuntimeError(f"response larger than {MAX_RESPONSE_BYTES} bytes")
+                raw = data.decode("utf-8")
                 latency = (time.perf_counter() - started) * 1000
                 return json.loads(raw), latency, attempt
             except urllib.error.HTTPError as exc:
-                detail = exc.read().decode("utf-8", errors="replace")[:200]
+                if 300 <= exc.code < 400:
+                    detail = str(exc.msg)
+                else:
+                    body = exc.read(200) if exc.fp else b""
+                    detail = body.decode("utf-8", errors="replace") or str(exc.msg)
                 last_error = RuntimeError(f"HTTP {exc.code}: {detail}")
                 if exc.code not in RETRYABLE_STATUS:
                     raise last_error from exc
@@ -264,7 +287,8 @@ class _HTTPBase:
             except json.JSONDecodeError as exc:
                 raise RuntimeError(f"endpoint did not return JSON: {exc}") from exc
             if attempt <= self.max_retries:
-                time.sleep(self.backoff * (2 ** (attempt - 1)) * (1 + random.random() * 0.25))
+                jitter = 1 + random.random() * 0.25  # nosec B311 - retry jitter, not security
+                time.sleep(self.backoff * (2 ** (attempt - 1)) * jitter)
         raise last_error or RuntimeError("request failed")
 
 

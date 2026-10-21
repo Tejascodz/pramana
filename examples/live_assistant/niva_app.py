@@ -50,6 +50,7 @@ import uuid
 from dataclasses import dataclass, field
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlparse
 
 from scipy.sparse import hstack
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -60,6 +61,8 @@ DEFAULT_KB = HERE.parent / "support_chatbot" / "knowledge_base.md"
 DEFAULT_CRM = HERE / "customers.csv"
 ALLOWED_LINK_HOSTS = ("nilgiri-finance.example",)
 MAX_ANSWER_CHARS = 1200
+MAX_REQUEST_BYTES = 1024 * 1024
+LOOPBACK = {"127.0.0.1", "localhost", "::1"}
 THINK = re.compile(r"<think>.*?</think>\s*", re.DOTALL | re.IGNORECASE)
 
 PII = {
@@ -259,6 +262,9 @@ class Niva:
         self.mode = args.mode
         self.model = args.model
         self.backend = args.backend_url.rstrip("/")
+        if urlparse(self.backend).scheme not in ("http", "https"):
+            raise SystemExit(f"--backend-url must be an http(s) URL, got {args.backend_url!r}")
+        self.allow_remote = bool(getattr(args, "allow_remote", False))
         self.temperature = args.temperature
         self.max_tokens = args.max_tokens
         self.timeout = args.timeout
@@ -291,7 +297,8 @@ class Niva:
             headers={"Content-Type": "application/json"},
             method="POST",
         )
-        with urllib.request.urlopen(request, timeout=self.timeout) as response:  # noqa: S310
+        # The backend URL comes from the command line and is checked to be http(s).
+        with urllib.request.urlopen(request, timeout=self.timeout) as response:  # nosec B310
             data = json.loads(response.read().decode("utf-8"))
         text = data["choices"][0]["message"].get("content") or ""
         return THINK.sub("", text).strip(), data.get("usage") or {}
@@ -401,6 +408,8 @@ def make_handler(app: Niva):
         server_version = "Niva/2.0"
 
         def _send(self, status: int, payload: dict) -> None:
+            if self.command == "POST" and not getattr(self, "_body_read", False):
+                self._read_body()  # a rejected request's body is read and discarded
             body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
             self.send_response(status)
             self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -408,10 +417,47 @@ def make_handler(app: Niva):
             self.end_headers()
             self.wfile.write(body)
 
+        def _read_body(self) -> bytes | None:
+            """The request body, or None when its declared length is missing or too large."""
+            self._body_read = True
+            try:
+                length = int(self.headers.get("Content-Length", ""))
+            except ValueError:
+                return None
+            if not 0 < length <= MAX_REQUEST_BYTES:
+                return None
+            return self.rfile.read(length)
+
         def log_message(self, fmt: str, *args) -> None:  # quieter default logging
             return
 
+        def _refuse_untrusted(self) -> bool:
+            """Block requests a web page in the user's browser could make.
+
+            A page cannot read a loopback server directly, but it can try two tricks:
+            DNS rebinding (its own domain resolves to 127.0.0.1, so the Host header
+            names that domain) and blind cross-site POSTs (which carry an Origin
+            header and cannot set a JSON content type without a CORS preflight,
+            which this server never grants). API clients such as Pramana do neither.
+            """
+            if not app.allow_remote:
+                host = (self.headers.get("Host") or "").strip().lower()
+                name = (
+                    host.rsplit("]", 1)[0].lstrip("[")
+                    if host.startswith("[")
+                    else host.split(":")[0]
+                )
+                if name not in LOOPBACK:
+                    self._send(403, {"error": "requests must be addressed to localhost"})
+                    return True
+            if self.headers.get("Origin"):
+                self._send(403, {"error": "browser requests are not accepted"})
+                return True
+            return False
+
         def do_GET(self) -> None:  # noqa: N802
+            if self._refuse_untrusted():
+                return
             if self.path == "/health":
                 self._send(200, {"status": "ok", "mode": app.mode, "backend_model": app.model})
             elif self.path == "/v1/models":
@@ -422,24 +468,45 @@ def make_handler(app: Niva):
                 self._send(404, {"error": "not found"})
 
         def do_POST(self) -> None:  # noqa: N802
+            if self._refuse_untrusted():
+                return
             if self.path.rstrip("/") not in ("/v1/chat/completions", "/chat/completions"):
                 self._send(404, {"error": "not found"})
                 return
+            content_type = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+            if content_type != "application/json":
+                self._send(415, {"error": "Content-Type must be application/json"})
+                return
+            raw = self._read_body()
+            if raw is None:
+                self._send(413, {"error": f"request body must be 1 to {MAX_REQUEST_BYTES} bytes"})
+                return
             started = time.perf_counter()
             try:
-                length = int(self.headers.get("Content-Length", "0"))
-                request = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
-                user_messages = [m for m in request.get("messages", []) if m.get("role") == "user"]
+                request = json.loads(raw.decode("utf-8"))
+                if not isinstance(request, dict):
+                    raise ValueError("request body must be a JSON object")
+                user_messages = [
+                    m
+                    for m in request.get("messages", [])
+                    if isinstance(m, dict) and m.get("role") == "user"
+                ]
                 if not user_messages:
                     self._send(400, {"error": "no user message"})
                     return
                 message = str(user_messages[-1].get("content", ""))
                 answer = app.answer(message, self.headers.get("X-Customer-Id"))
             except (urllib.error.URLError, TimeoutError) as exc:
-                self._send(502, {"error": f"model backend unavailable: {exc}"})
+                print(f"[niva:{app.mode}] backend error: {exc}", file=sys.stderr, flush=True)
+                self._send(502, {"error": "model backend unavailable"})
+                return
+            except (ValueError, UnicodeDecodeError):
+                self._send(400, {"error": "request body must be a JSON chat request"})
                 return
             except Exception as exc:  # noqa: BLE001
-                self._send(500, {"error": f"{type(exc).__name__}: {exc}"})
+                # Details stay in this terminal; the caller only learns that it failed.
+                print(f"[niva:{app.mode}] error: {exc!r}", file=sys.stderr, flush=True)
+                self._send(500, {"error": "internal error"})
                 return
             elapsed = time.perf_counter() - started
             print(
@@ -490,9 +557,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--kb", default=str(DEFAULT_KB))
     parser.add_argument("--crm", default=str(DEFAULT_CRM))
     return parser.parse_args(argv)
-
-
-LOOPBACK = {"127.0.0.1", "localhost", "::1"}
 
 
 def build_server(args: argparse.Namespace) -> ThreadingHTTPServer:

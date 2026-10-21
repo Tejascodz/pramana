@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -19,6 +20,12 @@ import pandas as pd
 import streamlit as st
 
 STATE_ORDER = ["evidenced", "partial", "deficient", "not tested"]
+MARKDOWN_SPECIAL = re.compile(r"([\\`*_{}\[\]()#+\-.!|<>~])")
+
+
+def plain(value: object) -> str:
+    """Show text from a pack as text: no links, images or formatting from its contents."""
+    return MARKDOWN_SPECIAL.sub(r"\\\1", str(value))
 
 
 def load_results() -> dict | None:
@@ -45,8 +52,8 @@ def main() -> None:
         return
 
     system = data["system"]
-    st.title(f"{system['name']} v{system['version']}")
-    st.caption(f"Audit {data['audit_id']} · {data['audit_date']} · owner {system['owner']}")
+    st.title(plain(f"{system['name']} v{system['version']}"))
+    st.caption(plain(f"Audit {data['audit_id']} · {data['audit_date']} · owner {system['owner']}"))
 
     risks = pd.DataFrame(data["risks"])
     open_risks = risks[~risks["accepted"]] if not risks.empty else risks
@@ -90,12 +97,13 @@ def main() -> None:
             "Status", ["fail", "warn", "pass", "skipped", "error"], default=["fail", "warn"]
         )
         for _, row in results[results["status"].isin(statuses)].iterrows():
-            with st.expander(f"[{row['status'].upper()}] {row['title']} · {row['check_id']}"):
-                st.write(row["summary"])
+            label = plain(f"[{row['status'].upper()}] {row['title']} · {row['check_id']}")
+            with st.expander(label):
+                st.markdown(plain(row["summary"]))
                 if row["recommendation"]:
-                    st.markdown(f"**Recommendation.** {row['recommendation']}")
+                    st.markdown(f"**Recommendation.** {plain(row['recommendation'])}")
                 if row["controls"]:
-                    st.caption("Controls: " + ", ".join(row["controls"]))
+                    st.caption(plain("Controls: " + ", ".join(row["controls"])))
                 if row["metrics"]:
                     st.json(row["metrics"], expanded=False)
 

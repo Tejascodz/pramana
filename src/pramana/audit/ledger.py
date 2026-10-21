@@ -131,6 +131,7 @@ def verify_pack(pack_dir: Path) -> tuple[bool, list[str]]:
     if not ledger.exists():
         return False, [f"{LEDGER_NAME} not found"]
     problems: list[str] = []
+    root = pack_dir.resolve()
     prev = None
     lines = [line for line in ledger.read_text(encoding="utf-8").splitlines() if line.strip()]
     for expected_seq, line in enumerate(lines, 1):
@@ -143,8 +144,10 @@ def verify_pack(pack_dir: Path) -> tuple[bool, list[str]]:
         if _entry_hash(entry) != entry.get("entry_hash"):
             problems.append(f"{label}: entry was modified")
         if entry.get("kind") == "evidence":
-            target = pack_dir / entry["path"]
-            if not target.exists():
+            target = (pack_dir / entry["path"]).resolve()
+            if not target.is_relative_to(root):
+                problems.append(f"{label}: evidence path points outside the pack")
+            elif not target.exists():
                 problems.append(f"{label}: evidence file missing")
             elif sha256_file(target) != entry["sha256"]:
                 problems.append(f"{label}: evidence file content changed")

@@ -15,7 +15,9 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
       - name: Pramana audit
         id: pramana
         uses: ./
@@ -23,4 +25,7 @@ jobs:
           spec: examples/support_chatbot/audit.yaml
           out: pramana-audit
           enforce: "false"   # set to "true" to fail the job on BLOCK
-      - run: echo "Gate decision was ${{ steps.pramana.outputs.decision }}"
+      - name: Show decision
+        env:
+          DECISION: ${{ steps.pramana.outputs.decision }}
+        run: echo "Gate decision was $DECISION"

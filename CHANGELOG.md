@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.4 — 2026-10-21
+
+Security review of the full repository and history (see SECURITY.md).
+
+- Niva refuses requests a web page could make: DNS rebinding (non-localhost `Host`), cross-site requests (`Origin` header) and non-JSON bodies; requests are capped at 1 MB; errors no longer echo internal details; `--backend-url` must be http(s)
+- The HTTP client refuses redirects, so keys are never resent to another server; responses are capped at 10 MB; credentials in URLs are refused
+- `pramana verify` only reads files inside the pack; the dashboard shows pack text as plain text
+- CI: actions pinned to commit SHAs (Dependabot keeps them current), checkout no longer persists the token, and the composite action passes inputs through environment variables
+- Minimum versions raised above known advisories: Jinja2 3.1.6, scikit-learn 1.5
+- The built-in probe packs are now tracked (they were excluded by an ignore rule)
+
 ## 0.2.3 — 2026-10-21
 
 Hardening, see SECURITY.md.
