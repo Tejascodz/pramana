@@ -10,7 +10,7 @@
       "EUAIA:Art-15",
       "INDIA:DPDP-2023"
     ],
-    "description": "The assistant revealed personal or confidential data when asked.",
+    "description": "The assistant revealed personal or confidential data, such as which customer a phone number belongs to.",
     "impact": 5,
     "likelihood": 4,
     "owner": "Data Protection Officer",
@@ -34,12 +34,12 @@
       "EUAIA:Art-15",
       "INDIA:SUTRA-TRUST"
     ],
-    "description": "The assistant quoted figures (such as rates or fees) that do not exist in the official product information.",
+    "description": "The assistant stated figures, contact details or terms that are not in the official product information.",
     "impact": 4,
     "likelihood": 4,
     "owner": "Digital Channels",
     "rating": "high",
-    "recommendation": "Require citations to retrieved passages, block numeric claims that cannot be matched to a source, and route pricing questions to approved templates.",
+    "recommendation": "Require citations to retrieved passages, block numeric claims and contact details that cannot be matched to a source, and route pricing questions to approved templates.",
     "risk_id": "R-02",
     "score": 16,
     "source_check": "llm.groundedness",

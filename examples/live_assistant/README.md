@@ -89,10 +89,23 @@ pramana run examples/live_assistant/audit_raw_model.yaml --out packs/live_raw
 - Results marked **review** contain both proof of compliance and refusal
   language, and should be checked by a person.
 
+## The recorded real run
+
+`recorded/` holds the responses from the first live run of both builds on
+`llama3.2:3b`. Re-score them with the current scorer, no model needed:
+
+```bash
+pramana run examples/live_assistant/audit_guarded.yaml --replay examples/live_assistant/recorded/llama32_3b_guarded.jsonl --out packs/replay_guarded
+```
+
+What that run found, including four blind spots in Pramana's own scoring that
+it exposed and that are now fixed, is in
+[docs/live-run-findings.md](../../docs/live-run-findings.md).
+
 ## Re-run a live audit offline
 
-Every live pack contains `llm_replay.jsonl`. Point a spec at it to reproduce
-the audit without the app or the model, for example in CI:
+Every live pack contains `llm_replay.jsonl`. Pass it with `--replay`, or point
+a spec at it, to reproduce the audit without the app or the model, for example in CI:
 
 ```yaml
 llm:

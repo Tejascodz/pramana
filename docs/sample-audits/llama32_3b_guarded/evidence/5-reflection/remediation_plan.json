@@ -1,0 +1,18 @@
+[
+  {
+    "action": "Separate untrusted content from instructions, screen inputs in every supported language, keep secrets out of system prompts, and validate outputs for canary tokens, policy markers and external links.",
+    "closes_controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-LLM:LLM07",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "due": "2026-11-20",
+    "owner": "Information Security",
+    "priority": "P1",
+    "risk_id": "R-01"
+  }
+]

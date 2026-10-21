@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.1 — 2026-10-21
+
+Scoring fixes from the first real-model run (`llama3.2:3b`), see docs/live-run-findings.md.
+
+- Marker matching across whitespace and one-character near-matches (flagged for review)
+- Data canaries: `sensitive_records` / `sensitive_values` catch name and account-number leaks, scanned across every probe
+- Groundedness fails on unsupported e-mail addresses, links and phone numbers, and on `must_not_include` contradictions
+- Recorded real-model responses added as regression tests
+
 ## 0.2.0 — 2026-10-21
 
 Live red-teaming of LLM applications.

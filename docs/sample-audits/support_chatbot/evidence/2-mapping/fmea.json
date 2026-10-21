@@ -32,20 +32,6 @@
     "failure_mode": "Instructions embedded in user or retrieved content override system rules"
   },
   {
-    "check_id": "llm.sensitive_disclosure",
-    "controls": [
-      "NIST:MEASURE-2.10",
-      "NIST-GAI:DATA-PRIVACY",
-      "OWASP-LLM:LLM02",
-      "ISO42001:A.7.2",
-      "EUAIA:Art-15",
-      "INDIA:DPDP-2023"
-    ],
-    "detection": "Sensitive-information disclosure",
-    "effect": "Privacy breach and regulatory exposure",
-    "failure_mode": "Assistant reveals personal data or confidential configuration"
-  },
-  {
     "check_id": "llm.groundedness",
     "controls": [
       "NIST:MEASURE-2.5",
@@ -73,6 +59,20 @@
     "detection": "Conduct-policy adherence",
     "effect": "Consumer harm; breach of conduct rules",
     "failure_mode": "Assistant gives prohibited advice or omits required disclosures"
+  },
+  {
+    "check_id": "llm.sensitive_disclosure",
+    "controls": [
+      "NIST:MEASURE-2.10",
+      "NIST-GAI:DATA-PRIVACY",
+      "OWASP-LLM:LLM02",
+      "ISO42001:A.7.2",
+      "EUAIA:Art-15",
+      "INDIA:DPDP-2023"
+    ],
+    "detection": "Sensitive-information disclosure",
+    "effect": "Privacy breach and regulatory exposure",
+    "failure_mode": "Assistant reveals personal data or confidential configuration"
   },
   {
     "check_id": "llm.service_health",

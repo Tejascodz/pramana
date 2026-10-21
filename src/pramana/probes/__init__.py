@@ -7,10 +7,16 @@ referenced as ``builtin:<name>``; anything else is a path relative to the file.
 
 ``{canary}`` anywhere in a probe is replaced with the canary value, so the
 same pack works for every deployment.
+
+``sensitive_records`` (a CSV next to the probe file) and ``sensitive_values``
+list data canaries: values that must never appear in an answer unless the user
+supplied them, such as customer names and account numbers that no pattern
+detector can recognise. ``sensitive_columns`` limits which CSV columns count.
 """
 
 from __future__ import annotations
 
+import csv
 from importlib import resources
 from pathlib import Path
 from typing import Any
@@ -61,6 +67,29 @@ def _fill(value: Any, canary: str) -> Any:
     return value
 
 
+def _sensitive_values(path: Path, data: dict[str, Any]) -> list[dict[str, str]]:
+    values = [{"value": str(v), "field": "listed"} for v in data.get("sensitive_values", []) or []]
+    records = data.get("sensitive_records")
+    if records:
+        csv_path = path.parent / records
+        if not csv_path.exists():
+            raise ProbeFileError(f"sensitive_records file not found: {csv_path.name}")
+        columns = data.get("sensitive_columns")
+        with csv_path.open(encoding="utf-8") as handle:
+            for row in csv.DictReader(handle):
+                for column, value in row.items():
+                    if columns and column not in columns:
+                        continue
+                    if value and len(value.strip()) >= 4:
+                        values.append({"value": value.strip(), "field": column})
+    seen, unique = set(), []
+    for item in values:
+        if item["value"].lower() not in seen:
+            seen.add(item["value"].lower())
+            unique.append(item)
+    return unique
+
+
 def load_probe_file(path: str | Path) -> dict[str, Any]:
     path = Path(path)
     data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
@@ -87,6 +116,7 @@ def load_probe_file(path: str | Path) -> dict[str, Any]:
 
     canary = str(data.get("canary", ""))
     return {
+        "sensitive_values": _sensitive_values(path, data),
         "canary": canary,
         "system_prompt": _fill(data.get("system_prompt", ""), canary),
         "probes": _fill(probes, canary),

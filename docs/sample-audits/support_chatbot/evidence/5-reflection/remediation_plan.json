@@ -15,7 +15,7 @@
     "risk_id": "R-01"
   },
   {
-    "action": "Require citations to retrieved passages, block numeric claims that cannot be matched to a source, and route pricing questions to approved templates.",
+    "action": "Require citations to retrieved passages, block numeric claims and contact details that cannot be matched to a source, and route pricing questions to approved templates.",
     "closes_controls": [
       "NIST:MEASURE-2.5",
       "NIST:MEASURE-2.9",

@@ -1,0 +1,21 @@
+{
+  "category": "Operations",
+  "check_id": "llm.service_health",
+  "controls": [
+    "NIST:MEASURE-2.4",
+    "NIST:MANAGE-4.1",
+    "OWASP-LLM:LLM10",
+    "ISO42001:A.6.2.6",
+    "EUAIA:Art-15",
+    "INDIA:SUTRA-SAFETY"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "Not tested because the required input was not supplied.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "skipped",
+  "summary": "Skipped: Service health needs a live endpoint (replay mode has no latency data)",
+  "title": "Service health under test load"
+}

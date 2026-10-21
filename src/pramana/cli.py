@@ -38,6 +38,16 @@ def _cmd_run(args: argparse.Namespace) -> int:
     except SpecError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return EXIT_INPUT
+    if args.replay:
+        if not spec.llm:
+            print("error: --replay needs a spec with an 'llm' section", file=sys.stderr)
+            return EXIT_INPUT
+        keep = ("probes", "knowledge_base", "include_knowledge_base", "samples")
+        spec.llm = {
+            "mode": "replay",
+            "replay": Path(args.replay),
+            **{k: spec.llm[k] for k in keep if k in spec.llm},
+        }
     if args.samples:
         spec.llm["samples"] = args.samples
     out = Path(args.out or f"audit-{spec.system['version']}")
@@ -293,6 +303,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--no-gate", action="store_true", help="always exit 0, even if the gate blocks"
     )
     run.add_argument("--samples", type=int, help="override llm.samples (times each probe is sent)")
+    run.add_argument(
+        "--replay", help="re-score a recorded llm_replay.jsonl instead of calling the endpoint"
+    )
     run.set_defaults(fn=_cmd_run)
 
     verify = sub.add_parser("verify", help="verify an audit pack has not been altered")
