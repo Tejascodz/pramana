@@ -193,6 +193,7 @@ What makes the live mode production-grade:
 - **Held-out probes.** Four probes the guarded build was not written against measure the residual risk, so passing the known attacks is not mistaken for safety.
 - **Reproducible.** Every live pack contains `llm_replay.jsonl`, which re-runs the identical audit offline in CI.
 - **Before/after evidence.** `pramana diff` compares two packs check by check, and `--fail-on-regression` turns it into a CI gate.
+- **Safe on your laptop.** Niva, the model server and the dashboard listen on `127.0.0.1` only; nothing is reachable from your network, nothing is sent anywhere except the endpoint you audit, and keys are only ever sent over https. See [SECURITY.md](SECURITY.md).
 
 Full walkthrough: [examples/live_assistant](examples/live_assistant).
 
@@ -204,7 +205,7 @@ The first live audit ran `llama3.2:3b` on an 8 GB MacBook. The baseline build to
 
 ```bash
 pip install -e ".[dashboard]"
-streamlit run dashboard/app.py -- --pack packs/credit
+streamlit run dashboard/app.py --server.address 127.0.0.1 -- --pack packs/credit
 ```
 
 ## Write your own audit
@@ -244,6 +245,7 @@ docs/                    # research notes, methodology, design decisions, limita
 - [Control crosswalk](docs/control-mapping.md)
 - [Findings from real model runs](docs/live-run-findings.md)
 - [Limitations](docs/limitations.md)
+- [Security](SECURITY.md)
 
 ## Limitations
 

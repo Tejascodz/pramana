@@ -1,0 +1,7 @@
+# Keep the dashboard on this computer only, and send no usage statistics.
+[server]
+address = "127.0.0.1"
+
+[browser]
+serverAddress = "localhost"
+gatherUsageStats = false

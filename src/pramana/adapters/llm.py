@@ -74,7 +74,12 @@ def strip_reasoning(text: str) -> str:
 
 
 def expand_env(value: str) -> str:
-    """Replace ${VAR} with the environment value, so secrets never sit in the spec."""
+    """Replace ${VAR} with the environment value, so secrets never sit in the spec.
+
+    Applied to request headers only. URLs and request bodies are sent exactly as
+    written, so a spec cannot copy environment variables (keys, paths, tokens)
+    into a request to an endpoint of its choosing.
+    """
     return ENV_VAR.sub(lambda m: os.environ.get(m.group(1), ""), value)
 
 
@@ -98,12 +103,34 @@ def _fill(template: Any, values: dict[str, Any]) -> Any:
         out = template
         for key, val in values.items():
             out = out.replace(f"{{{key}}}", str(val))
-        return expand_env(out)
+        return out
     if isinstance(template, list):
         return [_fill(v, values) for v in template]
     if isinstance(template, dict):
         return {k: _fill(v, values) for k, v in template.items()}
     return template
+
+
+LOOPBACK_HOSTS = {"127.0.0.1", "localhost", "::1"}
+CREDENTIAL_HEADERS = {"authorization", "proxy-authorization", "x-api-key", "api-key", "cookie"}
+
+
+def check_endpoint(url: str, *, sends_credentials: bool) -> None:
+    """Refuse endpoints that could read local files or leak credentials in transit.
+
+    Only http and https are allowed (urllib would otherwise open file:// and ftp://
+    URLs). Credentials are only sent over https, or to this computer.
+    """
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https") or not parsed.hostname:
+        raise ValueError(
+            f"Endpoint must be an http(s) URL with a host, got {parsed.scheme or 'no'} scheme"
+        )
+    if sends_credentials and parsed.scheme != "https" and parsed.hostname not in LOOPBACK_HOSTS:
+        raise ValueError(
+            f"Refusing to send credentials over plain HTTP to {endpoint_label(url)}. "
+            "Use an https URL, or an endpoint on this computer."
+        )
 
 
 def endpoint_label(url: str) -> str:
@@ -207,7 +234,11 @@ class _HTTPBase:
         self.timeout = float(timeout)
         self.max_retries = int(max_retries)
         self.backoff = float(backoff)
-        self.headers = {k: expand_env(str(v)) for k, v in (headers or {}).items()}
+        raw = {k: str(v) for k, v in (headers or {}).items()}
+        self.headers = {k: expand_env(v) for k, v in raw.items()}
+        self.sends_credentials = any(
+            k.lower() in CREDENTIAL_HEADERS or ENV_VAR.search(v) for k, v in raw.items()
+        )
 
     def _post(self, url: str, body: dict[str, Any], method: str = "POST") -> tuple[Any, float, int]:
         """POST JSON with retries. Returns (parsed JSON, latency ms of last attempt, attempts)."""
@@ -258,6 +289,7 @@ class OpenAICompatibleClient(_HTTPBase):
             headers["Authorization"] = f"Bearer {os.environ[api_key_env]}"
         super().__init__(headers=headers, **kwargs)
         self.base_url = base_url.rstrip("/")
+        check_endpoint(self.base_url, sends_credentials=self.sends_credentials)
         self.model = model
         self.temperature = temperature
         self.max_tokens = max_tokens
@@ -324,7 +356,8 @@ class HTTPJSONClient(_HTTPBase):
         **kwargs: Any,
     ):
         super().__init__(**kwargs)
-        self.url = expand_env(url)
+        self.url = url
+        check_endpoint(self.url, sends_credentials=self.sends_credentials)
         self.body = body
         self.response_path = response_path
         self.model_path = model_path
@@ -376,7 +409,7 @@ def build_client(config: dict[str, Any]) -> LLMClient:
             if not config.get(key):
                 raise ValueError(f"llm.{key} is required in openai_compatible mode")
         return OpenAICompatibleClient(
-            base_url=expand_env(config["base_url"]),
+            base_url=config["base_url"],
             model=config["model"],
             api_key_env=config.get("api_key_env"),
             temperature=float(config.get("temperature", 0.0)),

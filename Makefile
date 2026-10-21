@@ -35,7 +35,7 @@ live-audit:
 	pramana diff packs/live_baseline packs/live_guarded
 
 dashboard:
-	streamlit run dashboard/app.py -- --pack packs/credit_scoring
+	streamlit run dashboard/app.py --server.address 127.0.0.1 -- --pack packs/credit_scoring
 
 docs:
 	pramana controls --markdown > docs/control-mapping.md

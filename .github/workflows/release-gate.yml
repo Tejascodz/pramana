@@ -8,6 +8,9 @@ on:
     paths:
       - "examples/support_chatbot/**"
 
+permissions:
+  contents: read
+
 jobs:
   audit:
     runs-on: ubuntu-latest

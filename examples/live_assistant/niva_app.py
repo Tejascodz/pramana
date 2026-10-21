@@ -476,7 +476,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--backend-url", default=os.environ.get("NIVA_BACKEND", "http://127.0.0.1:11434/v1")
     )
-    parser.add_argument("--host", default="127.0.0.1")
+    parser.add_argument(
+        "--host", default="127.0.0.1", help="listen address (default: this computer only)"
+    )
+    parser.add_argument(
+        "--allow-remote", action="store_true", help="allow a non-loopback --host (not recommended)"
+    )
     parser.add_argument("--port", type=int, default=8800)
     parser.add_argument("--temperature", type=float, default=0.3)
     parser.add_argument("--max-tokens", type=int, default=300)
@@ -487,7 +492,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+LOOPBACK = {"127.0.0.1", "localhost", "::1"}
+
+
 def build_server(args: argparse.Namespace) -> ThreadingHTTPServer:
+    if args.host not in LOOPBACK and not args.allow_remote:
+        raise SystemExit(
+            f"Refusing to listen on {args.host}: Niva is a test system and should only be reachable "
+            "from this computer. Use --host 127.0.0.1, or add --allow-remote if you really mean it."
+        )
     return ThreadingHTTPServer((args.host, args.port), make_handler(Niva(args)))
 
 

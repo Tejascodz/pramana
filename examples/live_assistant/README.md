@@ -45,6 +45,10 @@ python examples/live_assistant/niva_app.py --mode guarded --port 8801
 ```
 
 Each window prints one line per request with the guardrail actions taken.
+Both builds listen on `127.0.0.1` only, so nothing on your network can reach
+them or, through them, your model. Ollama does the same by default: leave its
+*Expose Ollama to the network* setting off. Stop the builds with `Ctrl+C`
+when you are done.
 
 **3. Audit both** (a third window)
 
@@ -91,14 +95,14 @@ pramana run examples/live_assistant/audit_raw_model.yaml --out packs/live_raw
 
 ## The recorded real run
 
-`recorded/` holds the responses from the first live run of both builds on
-`llama3.2:3b`. Re-score them with the current scorer, no model needed:
+`recorded/` holds the responses from both live runs of the two builds on
+`llama3.2:3b`: Pramana's synthetic probes and Niva's answers, nothing else. Re-score them with the current scorer, no model needed:
 
 ```bash
 pramana run examples/live_assistant/audit_guarded.yaml --replay examples/live_assistant/recorded/llama32_3b_guarded.json --out packs/replay_guarded
 ```
 
-What that run found, including four blind spots in Pramana's own scoring that
+What the runs found, including five blind spots in Pramana's own scoring that
 it exposed and that are now fixed, is in
 [docs/live-run-findings.md](../../docs/live-run-findings.md).
 
@@ -124,7 +128,7 @@ Any service with an OpenAI-compatible chat endpoint works with
 llm:
   mode: http
   url: https://my-app.example/api/chat
-  headers: {Authorization: "Bearer ${MY_APP_TOKEN}"}   # read from the environment
+  headers: {Authorization: "Bearer ${MY_APP_TOKEN}"}   # read from the environment; sent over https only
   body: {question: "{prompt}", session: "audit-{sample}"}
   response_path: data.answer
   probes: probes.yaml

@@ -1,7 +1,9 @@
 """Interactive viewer for Pramana audit packs.
 
     pip install -e ".[dashboard]"
-    streamlit run dashboard/app.py -- --pack path/to/audit-pack
+    streamlit run dashboard/app.py --server.address 127.0.0.1 -- --pack path/to/audit-pack
+
+The dashboard listens on this computer only (also set in .streamlit/config.toml).
 
 Without --pack, upload a results.json from any audit pack.
 """

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.3 — 2026-10-21
+
+Hardening, see SECURITY.md.
+
+- The dashboard listens on `127.0.0.1` only and sends no usage statistics (`.streamlit/config.toml`)
+- The Niva reference app refuses to listen on a non-loopback address unless `--allow-remote` is given
+- `${VAR}` is expanded in request headers only, never in URLs or request bodies
+- Credentials are only sent over https or to this computer; only `http(s)` endpoints are accepted
+- CI workflows run with a read-only token
+- Tests for each of these, and for HTML escaping of hostile model output in the report
+
 ## 0.2.2 — 2026-10-21
 
 Second real-model run (3 samples per probe, 258 calls), see docs/live-run-findings.md.

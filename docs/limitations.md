@@ -38,4 +38,4 @@ Pramana supports an AI audit. It does not replace professional judgement, legal 
 
 ## Security
 
-Model files in pickle or joblib format can run code when loaded. Only audit models received through a trusted, access-controlled channel, or use a predictions-only audit.
+Model files in pickle or joblib format can run code when loaded. Only audit models received through a trusted, access-controlled channel, or use a predictions-only audit. What Pramana listens on, sends and stores is set out in [SECURITY.md](../SECURITY.md).
