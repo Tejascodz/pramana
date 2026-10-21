@@ -88,8 +88,8 @@ Ollama applies its own origin and host checks; keep them by leaving
 
 - Workflows run with a read-only token (`permissions: contents: read`), use no
   repository secrets, and do not run on `pull_request_target`.
-- Third-party actions are pinned to full commit SHAs, and Dependabot proposes
-  updates to them.
+- Third-party actions are pinned to full commit SHAs of their official
+  releases, so a moved tag cannot change what runs.
 - `actions/checkout` does not keep the token in the working copy
   (`persist-credentials: false`), so it cannot end up in an uploaded artifact.
 - The composite action passes its inputs to the shell as environment

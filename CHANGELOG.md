@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.5 — 2026-10-21
+
+- CI actions updated to their current releases, still pinned by commit SHA: checkout 7.0.1, setup-python 7.0.0, upload-artifact 7.0.2
+- Dependabot configuration removed; updates are applied directly to `main`
+
 ## 0.2.4 — 2026-10-21
 
 Security review of the full repository and history (see SECURITY.md).
