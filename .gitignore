@@ -13,9 +13,9 @@ venv/
 examples/credit_scoring/data/
 examples/credit_scoring/model.joblib
 
-# Audit packs produced locally
+# Audit packs produced locally (root only: src/pramana/probes/packs is source)
 audit-*/
-packs/
+/packs/
 pramana-audit/
 
 # OS and editors
