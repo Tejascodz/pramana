@@ -1,0 +1,64 @@
+[
+  {
+    "action": "Separate untrusted content from instructions, screen inputs in every supported language, keep secrets out of system prompts, and validate outputs for canary tokens, policy markers and external links.",
+    "closes_controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-LLM:LLM07",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "due": "2026-11-04",
+    "owner": "Information Security",
+    "priority": "P1",
+    "risk_id": "R-01"
+  },
+  {
+    "action": "Enforce record-level authorisation in retrieval, redact identifiers before they reach the model, and scan outputs for personal data and secrets before display.",
+    "closes_controls": [
+      "NIST:MEASURE-2.10",
+      "NIST-GAI:DATA-PRIVACY",
+      "OWASP-LLM:LLM02",
+      "ISO42001:A.7.2",
+      "EUAIA:Art-15",
+      "INDIA:DPDP-2023"
+    ],
+    "due": "2026-11-04",
+    "owner": "Data Protection Officer",
+    "priority": "P1",
+    "risk_id": "R-02"
+  },
+  {
+    "action": "Require citations to retrieved passages, block numeric claims and contact details that cannot be matched to a source, and route pricing questions to approved templates.",
+    "closes_controls": [
+      "NIST:MEASURE-2.5",
+      "NIST:MEASURE-2.9",
+      "NIST-GAI:CONFABULATION",
+      "NIST-GAI:INFO-INTEGRITY",
+      "OWASP-LLM:LLM09",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-TRUST"
+    ],
+    "due": "2026-11-20",
+    "owner": "Digital Channels",
+    "priority": "P1",
+    "risk_id": "R-03"
+  },
+  {
+    "action": "Route regulated topics (approval, pricing, investment, complaints) to approved response templates, add the breached rules to an output guardrail, and keep these probes in the release regression suite.",
+    "closes_controls": [
+      "NIST:MEASURE-2.6",
+      "NIST-GAI:HUMAN-AI-CONFIG",
+      "NIST-GAI:DANGEROUS-CONTENT",
+      "OWASP-LLM:LLM05",
+      "EUAIA:Art-50",
+      "INDIA:SUTRA-PEOPLE-FIRST"
+    ],
+    "due": "2026-11-20",
+    "owner": "Digital Channels",
+    "priority": "P1",
+    "risk_id": "R-04"
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "category": "Governance",
+  "check_id": "audit.process",
+  "controls": [
+    "NIST:MEASURE-1.1",
+    "NIST:MEASURE-2.1",
+    "NIST:MAP-5.1",
+    "NIST:MANAGE-1.1",
+    "NIST:MANAGE-1.2",
+    "NIST:MANAGE-1.3",
+    "NIST:MANAGE-1.4",
+    "ISO42001:A.5.3",
+    "EUAIA:Art-9",
+    "INDIA:PILLAR-RISK-MITIGATION"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "A documented, risk-based release decision exists for this version.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "pass",
+  "summary": "Test plan (FMEA, 7 failure modes), scored risk register (1 risks), treatment plan and release-gate decision (BLOCK) recorded in this audit pack.",
+  "title": "Documented go/no-go decision"
+}

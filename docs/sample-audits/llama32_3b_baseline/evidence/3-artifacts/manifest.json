@@ -12,8 +12,8 @@
     },
     {
       "artifact": "llm_replay",
-      "file": "llama32_3b_baseline.jsonl",
-      "sha256": "9ea525fdf7e5fae26a26c73e2680e12db000fc412095efee895fab857ad6c4e7"
+      "file": "llama32_3b_baseline.json",
+      "sha256": "ec70c1918a0fbbce419af6d47063d8e977c907bdc247880f8bdbfb512fda2fb2"
     },
     {
       "artifact": "llm_knowledge_base",

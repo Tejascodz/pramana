@@ -227,7 +227,8 @@ def test_samples_and_replay_round_trip(niva, tmp_path):
         a, b = live.result(check), replayed.result(check)
         assert a.status == b.status, check
         assert a.metrics["probes"] == b.metrics["probes"]
-    assert replayed.result("llm.service_health").status == Status.SKIPPED
+    health = replayed.result("llm.service_health")
+    assert health.status == Status.PASS and health.summary.startswith("Recorded run")
 
 
 def test_unreachable_endpoint_blocks_the_gate_as_incomplete(tmp_path):

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.2 — 2026-10-21
+
+Second real-model run (3 samples per probe, 258 calls), see docs/live-run-findings.md.
+
+- Negation-aware `must_not_include` matching in conduct and groundedness probes
+- Replay accepts the full transcript (`llm_transcript.json`) and keeps measured latency, so service health is scored on recorded runs; `llm_replay.jsonl` now records latencies too
+- `--replay` on `pramana run` re-scores a recording without editing the spec
+- Both real runs recorded under examples/live_assistant/recorded, with regression tests and re-scored packs
+
 ## 0.2.1 — 2026-10-21
 
 Scoring fixes from the first real-model run (`llama3.2:3b`), see docs/live-run-findings.md.

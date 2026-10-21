@@ -95,7 +95,7 @@ pramana run examples/live_assistant/audit_raw_model.yaml --out packs/live_raw
 `llama3.2:3b`. Re-score them with the current scorer, no model needed:
 
 ```bash
-pramana run examples/live_assistant/audit_guarded.yaml --replay examples/live_assistant/recorded/llama32_3b_guarded.jsonl --out packs/replay_guarded
+pramana run examples/live_assistant/audit_guarded.yaml --replay examples/live_assistant/recorded/llama32_3b_guarded.json --out packs/replay_guarded
 ```
 
 What that run found, including four blind spots in Pramana's own scoring that

@@ -1,0 +1,26 @@
+[
+  {
+    "acceptance": null,
+    "accepted": false,
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-LLM:LLM07",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "description": "Hidden instructions placed in messages or documents can make the assistant ignore its rules.",
+    "impact": 4,
+    "likelihood": 4,
+    "owner": "Information Security",
+    "rating": "high",
+    "recommendation": "Separate untrusted content from instructions, screen inputs in every supported language, keep secrets out of system prompts, and validate outputs for canary tokens, policy markers and external links.",
+    "risk_id": "R-01",
+    "score": 16,
+    "source_check": "llm.prompt_injection",
+    "title": "Prompt-injection resistance",
+    "treatment": "Mitigate"
+  }
+]

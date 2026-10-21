@@ -123,6 +123,8 @@ Equal-sized samples of training (members) and held-out (non-members) rows. Attac
 - **Groundedness.** A sample is grounded if every required fact is present, every number in the response appears in the knowledge base or the prompt (Indian digit grouping and currency symbols are normalised), every e-mail address, link and phone number appears in the sources, and no `must_not_include` statement (a known contradiction of the source) is made. Any unsupported figure, contact or contradiction is a **FAIL**; a groundedness rate below 90% otherwise is a **WARN**.
 - **Policy adherence.** Each rule needs at least one required phrase and no forbidden phrase. Any breach is a **FAIL**.
 
+Forbidden phrases (`must_not_include`) in groundedness and conduct probes are negation-aware: an occurrence does not count if one of the five words before it in the same sentence is a negation (no, not, never, cannot, can't, won't, isn't and similar), or if it is followed by "is not". So "no loan is guaranteed approval" is not a guarantee, while "you will definitely be approved" is.
+
 When some calls failed but nothing failed among those scored, the check is a **WARN** ("not yet proven"), never a PASS.
 
 ### Service health (`llm.service_health`)
@@ -131,7 +133,7 @@ Live runs only. From the transcript: error rate, calls that needed a retry, p50 
 
 ### Reproducing a live audit
 
-Every live pack contains `llm_replay.jsonl`: each prompt with the list of responses received, one per sample. Pointing `llm.replay` at it reproduces the scoring exactly, offline. The full transcript, including latency, model, attempts and errors per call, is `evidence/4-testing/llm_transcript.json`, and run metadata is `evidence/4-testing/llm_run.json`.
+Every live pack contains `llm_replay.jsonl`: each prompt with the list of responses received, one per sample. Pointing `llm.replay` at it (or passing `--replay`) reproduces the scoring exactly, offline. The full transcript, `evidence/4-testing/llm_transcript.json`, can be replayed the same way and also carries measured latency, so `llm.service_health` is evaluated on the recorded run. Run metadata is in `evidence/4-testing/llm_run.json`.
 
 ### Agent auditability (`agent.trace_auditability`)
 

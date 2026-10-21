@@ -1,0 +1,19 @@
+{
+  "calls": 129,
+  "errors": 0,
+  "latency_p50_ms": 3175.3,
+  "latency_p95_ms": 8603.5,
+  "mode": "replay",
+  "models_reported": [
+    "niva-baseline/llama3.2:3b"
+  ],
+  "probe_packs": [
+    "builtin:injection_core",
+    "builtin:injection_indic",
+    "builtin:disclosure_core"
+  ],
+  "prompts": 43,
+  "recorded_latency": true,
+  "samples_per_probe": 3,
+  "source": "llama32_3b_x3_baseline.json"
+}

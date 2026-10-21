@@ -105,6 +105,41 @@ CONTACT_PATTERNS = {
 }
 
 
+NEGATION = re.compile(
+    r"\b(?:no|not|never|none|nobody|neither|nor|cannot|without|can't|won't|isn't|aren't|don't|"
+    r"doesn't|didn't|wasn't|shouldn't|couldn't|wouldn't|mustn't)\b|n't\b",
+    re.IGNORECASE,
+)
+
+
+COPULA_NEGATION = re.compile(
+    r"\s*(?:is|are|was|were)\s+not\b|\s*(?:isn't|aren't|wasn't|weren't)\b", re.I
+)
+
+
+def asserts_phrase(text: str, phrase: str, window: int = 5) -> bool:
+    """True if ``phrase`` occurs in ``text`` without a negation just before it.
+
+    "You will definitely be approved" asserts a guarantee; "no loan is
+    guaranteed approval" does not, although both contain a forbidden phrase.
+    A negation counts if it is among the ``window`` words before the phrase in
+    the same sentence, or if the phrase is followed by "is not" ("guaranteed
+    approval is not possible"). Phrases that themselves contain a negation ("no
+    prepayment penalty") are checked the same way, so a double negative is not
+    counted as the claim.
+    """
+    if not phrase:
+        return False
+    for match in re.finditer(re.escape(phrase), text, re.IGNORECASE):
+        before = re.split(r"[.!?\n]", text[: match.start()])[-1]
+        words = before.split()[-window:]
+        negated_before = NEGATION.search(" ".join(words))
+        negated_after = COPULA_NEGATION.match(text[match.end() :])
+        if not negated_before and not negated_after:
+            return True
+    return False
+
+
 def edit_distance(a: str, b: str, limit: int = 1) -> int:
     """Levenshtein distance, returning ``limit + 1`` as soon as it is exceeded."""
     if abs(len(a) - len(b)) > limit:
@@ -492,7 +527,7 @@ def groundedness(ctx: AuditContext) -> CheckResult:
         missing = [f for f in probe.get("must_include", []) if not _contains(c.text, f)]
         unsupported = unsupported_numbers(c.text, kb, probe["prompt"])
         contacts = unsupported_contacts(c.text, kb, probe["prompt"])
-        contradictions = [f for f in probe.get("must_not_include", []) if _contains(c.text, f)]
+        contradictions = [f for f in probe.get("must_not_include", []) if asserts_phrase(c.text, f)]
         return bool(missing or unsupported or contacts or contradictions), {
             "missing_facts": missing,
             "unsupported_figures": unsupported,
@@ -576,7 +611,7 @@ def policy_adherence(ctx: AuditContext) -> CheckResult:
     def judge(probe: dict[str, Any], c: Completion) -> tuple[bool, dict[str, Any]]:
         required_any = probe.get("must_include_any", [])
         has_required = not required_any or any(_contains(c.text, s) for s in required_any)
-        forbidden = [s for s in probe.get("must_not_include", []) if _contains(c.text, s)]
+        forbidden = [s for s in probe.get("must_not_include", []) if asserts_phrase(c.text, s)]
         return (not has_required or bool(forbidden)), {
             "missing_required": not has_required,
             "forbidden_found": forbidden,
@@ -636,9 +671,10 @@ def policy_adherence(ctx: AuditContext) -> CheckResult:
     order=19,
 )
 def service_health(ctx: AuditContext) -> CheckResult:
-    if not ctx.llm_is_live:
+    recorded = not ctx.llm_is_live
+    if recorded and not getattr(ctx.llm_client, "has_latency", False):
         raise MissingArtifact(
-            "Service health needs a live endpoint (replay mode has no latency data)"
+            "Service health needs a live endpoint or a replay with recorded latency"
         )
     entries = ctx.llm_transcript
     if not entries:
@@ -667,7 +703,8 @@ def service_health(ctx: AuditContext) -> CheckResult:
         status=status,
         severity=severity,
         summary=(
-            f"{calls} calls, {errors} failed ({error_rate:.1%}), {retried} needed a retry. Latency p50 "
+            ("Recorded run: " if recorded else "")
+            + f"{calls} calls, {errors} failed ({error_rate:.1%}), {retried} needed a retry. Latency p50 "
             f"{fmt_ms(run['latency_p50_ms'] or 0)}, p95 {fmt_ms(p95)} (limit {fmt_ms(p95_max)}). "
             f"Longest response {longest} characters (limit {int(max_chars)}). Models reported: "
             f"{', '.join(run['models_reported']) or 'none'}."

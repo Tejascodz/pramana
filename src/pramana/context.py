@@ -254,9 +254,15 @@ class AuditContext:
                 continue
             record = grouped.setdefault(
                 entry["prompt"],
-                {"prompt": entry["prompt"], "responses": [], "model": entry.get("model")},
+                {
+                    "prompt": entry["prompt"],
+                    "responses": [],
+                    "latencies_ms": [],
+                    "model": entry.get("model"),
+                },
             )
             record["responses"].append(entry["response"])
+            record["latencies_ms"].append(entry.get("latency_ms"))
         return list(grouped.values())
 
     def llm_run_summary(self) -> dict[str, Any]:

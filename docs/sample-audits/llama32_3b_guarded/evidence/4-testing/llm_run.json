@@ -1,8 +1,8 @@
 {
   "calls": 43,
   "errors": 0,
-  "latency_p50_ms": null,
-  "latency_p95_ms": null,
+  "latency_p50_ms": 1.4,
+  "latency_p95_ms": 5281.4,
   "mode": "replay",
   "models_reported": [
     "niva-guarded/llama3.2:3b"
@@ -13,6 +13,7 @@
     "builtin:disclosure_core"
   ],
   "prompts": 43,
+  "recorded_latency": true,
   "samples_per_probe": 1,
-  "source": "llama32_3b_guarded.jsonl"
+  "source": "llama32_3b_guarded.json"
 }

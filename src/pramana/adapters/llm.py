@@ -115,8 +115,16 @@ def endpoint_label(url: str) -> str:
 class ReplayClient:
     """Returns recorded responses keyed by the exact user prompt.
 
-    Each JSONL line holds ``prompt`` and either ``response`` or ``responses``
-    (one per sample). Repeated samples cycle through the recorded list.
+    Accepts either format Pramana writes into an audit pack:
+
+    * ``llm_replay.jsonl``: one line per prompt with ``response`` or
+      ``responses`` (one per sample) and optional ``latencies_ms``;
+    * ``evidence/4-testing/llm_transcript.json``: the full transcript, one
+      entry per call, including measured latency.
+
+    Repeated samples cycle through the recorded list. Recorded latencies are
+    returned with each response, so a re-scored audit keeps its service-health
+    evidence.
     """
 
     name = "replay"
@@ -124,27 +132,67 @@ class ReplayClient:
     def __init__(self, path: Path):
         self.path = Path(path)
         self._responses: dict[str, list[str]] = {}
+        self._latencies: dict[str, list[float | None]] = {}
         self._models: dict[str, str] = {}
-        for line_no, line in enumerate(self.path.read_text(encoding="utf-8").splitlines(), 1):
+        text = self.path.read_text(encoding="utf-8")
+        if self.path.suffix == ".json":
+            self._load_transcript(json.loads(text))
+        else:
+            self._load_jsonl(text)
+
+    def _add(self, prompt: str, response: str, latency: float | None, model: str | None) -> None:
+        key = prompt.strip()
+        self._responses.setdefault(key, []).append(str(response))
+        self._latencies.setdefault(key, []).append(latency)
+        if model:
+            self._models[key] = model
+
+    def _load_jsonl(self, text: str) -> None:
+        for line_no, line in enumerate(text.splitlines(), 1):
             if not line.strip():
                 continue
             record = json.loads(line)
             if "prompt" not in record or not ({"response", "responses"} & record.keys()):
                 raise ValueError(f"{self.path.name}:{line_no} needs 'prompt' and 'response(s)'")
             responses = record.get("responses") or [record["response"]]
-            self._responses[record["prompt"].strip()] = [str(r) for r in responses]
-            if record.get("model"):
-                self._models[record["prompt"].strip()] = record["model"]
+            latencies = record.get("latencies_ms") or [None] * len(responses)
+            for response, latency in zip(responses, latencies, strict=False):
+                self._add(record["prompt"], response, latency, record.get("model"))
+
+    def _load_transcript(self, entries: list[dict[str, Any]]) -> None:
+        if not isinstance(entries, list):
+            raise ValueError(f"{self.path.name} is not a transcript (expected a JSON list)")
+        for entry in sorted(entries, key=lambda e: (e.get("prompt", ""), e.get("sample", 0))):
+            if entry.get("error") or "prompt" not in entry:
+                continue
+            self._add(
+                entry["prompt"],
+                entry.get("response", ""),
+                entry.get("latency_ms"),
+                entry.get("model"),
+            )
 
     def complete(self, system: str, user: str, sample: int = 0) -> Completion:
         key = user.strip()
         if key not in self._responses:
             return Completion(text="", error=f"no recorded response for prompt: {key[:60]!r}")
         responses = self._responses[key]
-        return Completion(text=responses[sample % len(responses)], model=self._models.get(key))
+        i = sample % len(responses)
+        return Completion(
+            text=responses[i], model=self._models.get(key), latency_ms=self._latencies[key][i]
+        )
+
+    @property
+    def has_latency(self) -> bool:
+        return any(v is not None for values in self._latencies.values() for v in values)
 
     def describe(self) -> dict[str, Any]:
-        return {"mode": self.name, "source": self.path.name, "prompts": len(self._responses)}
+        return {
+            "mode": self.name,
+            "source": self.path.name,
+            "prompts": len(self._responses),
+            "recorded_latency": self.has_latency,
+        }
 
 
 class _HTTPBase:

@@ -198,7 +198,7 @@ Full walkthrough: [examples/live_assistant](examples/live_assistant).
 
 ### Findings from a real run
 
-The first live audit ran `llama3.2:3b` on an 8 GB MacBook. The baseline build told a customer *"Yes, you are chatting with a real person"*, revealed which customer and account a phone number belonged to, invented a complaints e-mail address, and said there was *"no prepayment penalty"* despite a 3% foreclosure charge. Reading the transcripts also exposed four blind spots in Pramana's own scoring. The most serious: the guarded build had **passed** while accepting a persona switch, because the model misspelt the marker. The scorer was fixed, the recorded run re-scored offline, and the guarded build's gate correctly flipped to **BLOCK**. The real responses are now regression tests. Full write-up: [docs/live-run-findings.md](docs/live-run-findings.md).
+The first live audit ran `llama3.2:3b` on an 8 GB MacBook. The baseline build told a customer *"Yes, you are chatting with a real person"*, revealed which customer and account a phone number belonged to, invented a complaints e-mail address, and said there was *"no prepayment penalty"* despite a 3% foreclosure charge. Reading the transcripts also exposed four blind spots in Pramana's own scoring. The most serious: the guarded build had **passed** while accepting a persona switch, because the model misspelt the marker. The scorer was fixed, the recorded run re-scored offline, and the guarded build's gate correctly flipped to **BLOCK**. A second run with three samples per probe (258 calls) then showed what a single run hides: the system-prompt canary leaked in four attacks, including in Hindi and Hinglish, and the baseline volunteered another customer's account details to an unauthenticated user. The real responses are regression tests. Full write-up: [docs/live-run-findings.md](docs/live-run-findings.md).
 
 ## Interactive viewer
 
@@ -242,7 +242,7 @@ docs/                    # research notes, methodology, design decisions, limita
 - [Methodology: formulas, thresholds, scoring](docs/methodology.md)
 - [Design decisions](docs/design-decisions.md)
 - [Control crosswalk](docs/control-mapping.md)
-- [Findings from a real model run](docs/live-run-findings.md)
+- [Findings from real model runs](docs/live-run-findings.md)
 - [Limitations](docs/limitations.md)
 
 ## Limitations

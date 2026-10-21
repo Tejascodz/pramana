@@ -1,0 +1,25 @@
+{
+  "artifacts": [
+    {
+      "artifact": "documentation",
+      "file": "model_card.yaml",
+      "sha256": "6852c9c4993ca7112f728de32a25b86cb162c4f481d5363a66a509647a708f2c"
+    },
+    {
+      "artifact": "llm_probes",
+      "file": "probes.yaml",
+      "sha256": "88803ce2e6fb8d92a6599dec5fed1b165b24284bb4a0d591db580cfb0148048f"
+    },
+    {
+      "artifact": "llm_replay",
+      "file": "llama32_3b_x3_baseline.json",
+      "sha256": "f4c50a6cdfe19ab35fff36890fd156eb8051e7d7fa07722a5509bd1f614dac95"
+    },
+    {
+      "artifact": "llm_knowledge_base",
+      "file": "knowledge_base.md",
+      "sha256": "334ce409e8a05bcbd9076337e5e638aa44e9cba55203d60e8af632d71f11109e"
+    }
+  ],
+  "manual_evidence": []
+}

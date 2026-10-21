@@ -494,14 +494,16 @@
       "title": "Performance is measured and demonstrated for deployment-like conditions"
     },
     {
-      "checks": [],
+      "checks": [
+        "llm.service_health"
+      ],
       "evidence_type": "technical",
       "framework": "NIST",
       "group": "MEASURE",
       "id": "MEASURE-2.4",
       "manual_evidence": [],
       "ref": "NIST:MEASURE-2.4",
-      "state": "not tested",
+      "state": "evidenced",
       "title": "System functionality and behaviour are monitored in production"
     },
     {
@@ -800,14 +802,16 @@
       "title": "Pre-trained models used in development are monitored"
     },
     {
-      "checks": [],
+      "checks": [
+        "llm.service_health"
+      ],
       "evidence_type": "both",
       "framework": "NIST",
       "group": "MANAGE",
       "id": "MANAGE-4.1",
       "manual_evidence": [],
       "ref": "NIST:MANAGE-4.1",
-      "state": "not tested",
+      "state": "evidenced",
       "title": "Post-deployment monitoring plans are implemented"
     },
     {
@@ -1205,14 +1209,16 @@
       "title": "Deployment"
     },
     {
-      "checks": [],
+      "checks": [
+        "llm.service_health"
+      ],
       "evidence_type": "technical",
       "framework": "ISO42001",
       "group": "A.6 Life cycle",
       "id": "A.6.2.6",
       "manual_evidence": [],
       "ref": "ISO42001:A.6.2.6",
-      "state": "not tested",
+      "state": "evidenced",
       "title": "Operation and monitoring"
     },
     {
@@ -1679,7 +1685,8 @@
     },
     {
       "checks": [
-        "llm.prompt_injection"
+        "llm.prompt_injection",
+        "llm.service_health"
       ],
       "evidence_type": "technical",
       "framework": "INDIA",
@@ -1838,14 +1845,16 @@
       "title": "Misinformation"
     },
     {
-      "checks": [],
+      "checks": [
+        "llm.service_health"
+      ],
       "evidence_type": "technical",
       "framework": "OWASP-LLM",
       "group": "Top 10",
       "id": "LLM10",
       "manual_evidence": [],
       "ref": "OWASP-LLM:LLM10",
-      "state": "not tested",
+      "state": "evidenced",
       "title": "Unbounded consumption"
     }
   ],
@@ -1997,9 +2006,9 @@
         },
         "A.6 Life cycle": {
           "deficient": 1,
-          "evidenced": 2,
+          "evidenced": 3,
           "not applicable": 0,
-          "not tested": 6,
+          "not tested": 5,
           "partial": 0
         },
         "A.7 Data": {
@@ -2028,9 +2037,9 @@
       "source": "https://www.iso.org/standard/81230.html",
       "totals": {
         "deficient": 1,
-        "evidenced": 7,
+        "evidenced": 8,
         "not applicable": 0,
-        "not tested": 30,
+        "not tested": 29,
         "partial": 0
       },
       "version": "2023"
@@ -2047,9 +2056,9 @@
         },
         "MANAGE": {
           "deficient": 0,
-          "evidenced": 4,
+          "evidenced": 5,
           "not applicable": 0,
-          "not tested": 9,
+          "not tested": 8,
           "partial": 0
         },
         "MAP": {
@@ -2061,9 +2070,9 @@
         },
         "MEASURE": {
           "deficient": 1,
-          "evidenced": 7,
+          "evidenced": 8,
           "not applicable": 0,
-          "not tested": 14,
+          "not tested": 13,
           "partial": 0
         }
       },
@@ -2071,9 +2080,9 @@
       "source": "https://www.nist.gov/itl/ai-risk-management-framework",
       "totals": {
         "deficient": 1,
-        "evidenced": 19,
+        "evidenced": 21,
         "not applicable": 0,
-        "not tested": 52,
+        "not tested": 50,
         "partial": 0
       },
       "version": "AI 100-1 (1.0)"
@@ -2105,9 +2114,9 @@
       "groups": {
         "Top 10": {
           "deficient": 2,
-          "evidenced": 3,
+          "evidenced": 4,
           "not applicable": 0,
-          "not tested": 5,
+          "not tested": 4,
           "partial": 0
         }
       },
@@ -2115,9 +2124,9 @@
       "source": "https://genai.owasp.org/llm-top-10/",
       "totals": {
         "deficient": 2,
-        "evidenced": 3,
+        "evidenced": 4,
         "not applicable": 0,
-        "not tested": 5,
+        "not tested": 4,
         "partial": 0
       },
       "version": "2025"

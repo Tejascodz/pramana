@@ -1,6 +1,6 @@
 # Model card: Niva Customer Assistant (baseline build)
 
-Audit PRM-20261021-B0332C · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-5ADF5B · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 2.0.0-baseline
@@ -40,4 +40,4 @@ Small local models follow instructions less reliably than large hosted models. A
 - **R-03 (high):** The assistant broke a customer-protection rule, for example must disclose it is an ai when asked.
 - **R-04 (high):** Hidden instructions placed in messages or documents can make the assistant ignore its rules.
 
-_Evidence root hash: `164694aeb781feba12d71a0f58410d53d1bd722b263d14b3413b0a05927d5a63`_
+_Evidence root hash: `0e4f7565c04429d66248ae9bc417eb236ac762056ee98562ece88a9bf4eeeaf3`_

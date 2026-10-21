@@ -171,7 +171,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <header class="top">
   <div>
-    <p class="eyebrow">AI system audit report · PRM-20261021-B0332C</p>
+    <p class="eyebrow">AI system audit report · PRM-20261021-5ADF5B</p>
     <h1>Niva Customer Assistant (baseline build)</h1>
     <div class="meta">
       Version 2.0.0-baseline · Owner Digital Channels
@@ -208,7 +208,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <div>
       <h3>What is working</h3>
       <ul class="clean">
-<li><span class="chip pass">pass</span><span>This AI system carries transparency duties: people must know they are dealing with AI.</span></li><li><span class="chip pass">pass</span><span>The system is documented well enough for users and reviewers.</span></li>      </ul>
+<li><span class="chip pass">pass</span><span>This AI system carries transparency duties: people must know they are dealing with AI.</span></li><li><span class="chip pass">pass</span><span>The assistant answered reliably and quickly during testing.</span></li><li><span class="chip pass">pass</span><span>The system is documented well enough for users and reviewers.</span></li>      </ul>
       <h3>Decisions and actions required</h3>
       <ul class="clean">
 <li><span>Data Protection Officer: Enforce record-level authorisation in retrieval, redact identifiers before they reach the model, and scan outputs for personal data and secrets before display (by 2026-11-04)</span></li><li><span>Digital Channels: Require citations to retrieved passages, block numeric claims and contact details that cannot be matched to a source, and route pricing questions to approved templates (by 2026-11-20)</span></li><li><span>Digital Channels: Route regulated topics (approval, pricing, investment, complaints) to approved response templates, add the breached rules to an output guardrail, and keep these probes in the release regression suite (by 2026-11-20)</span></li><li><span>Information Security: Separate untrusted content from instructions, screen inputs in every supported language, keep secrets out of system prompts, and validate outputs for canary tokens, policy markers and external links (by 2026-11-20)</span></li>      </ul>
@@ -218,10 +218,10 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 
 <section class="kpis" style="margin-bottom:18px">
-  <div class="kpi"><div class="v">3/7</div><div class="l">checks passed</div></div>
+  <div class="kpi"><div class="v">4/8</div><div class="l">checks passed</div></div>
   <div class="kpi"><div class="v">4</div><div class="l">open high or critical risks</div></div>
-  <div class="kpi"><div class="v">49/146</div><div class="l">applicable controls tested by automation</div></div>
-  <div class="kpi"><div class="v mono" style="font-size:18px">164694aeb781</div><div class="l">evidence root hash</div></div>
+  <div class="kpi"><div class="v">53/146</div><div class="l">applicable controls tested by automation</div></div>
+  <div class="kpi"><div class="v mono" style="font-size:18px">0e4f7565c044</div><div class="l">evidence root hash</div></div>
 </section>
 
 <section class="card" id="risks">
@@ -249,7 +249,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <section class="card" id="findings">
   <p class="eyebrow">Findings by test</p>
-  <h2>7 tests executed, 1 skipped</h2>
+  <h2>8 tests executed</h2>
   <details >
     <summary><span class="chip pass">pass</span>Risk classification <span class="note mono">governance.risk_classification</span></summary>
     <div class="finding-body">
@@ -470,10 +470,11 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 <p class="note">Evidence SHA-256 <span class="mono hash">d0c5502480283d07313e6a0ffd60bb8596dfeb15edf7c99e24fdf25687d321e0</span></p>    </div>
   </details>
   <details >
-    <summary><span class="chip skipped">skipped</span>Service health under test load <span class="note mono">llm.service_health</span></summary>
+    <summary><span class="chip pass">pass</span>Service health under test load <span class="note mono">llm.service_health</span></summary>
     <div class="finding-body">
-      <p>Skipped: Service health needs a live endpoint (replay mode has no latency data)</p>
-<p><span class="tag">NIST:MEASURE-2.4</span><span class="tag">NIST:MANAGE-4.1</span><span class="tag">OWASP-LLM:LLM10</span><span class="tag">ISO42001:A.6.2.6</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:SUTRA-SAFETY</span></p><p class="note">Evidence SHA-256 <span class="mono hash">457a399e8a257a8c82841ed99a048888bdf727e07716d369c43a4ed9d699721c</span></p>    </div>
+      <p>Recorded run: 43 calls, 0 failed (0.0%), 0 needed a retry. Latency p50 3.4 s, p95 8.7 s (limit 30.0 s). Longest response 753 characters (limit 4000). Models reported: niva-baseline/llama3.2:3b.</p>
+<p><span class="tag">NIST:MEASURE-2.4</span><span class="tag">NIST:MANAGE-4.1</span><span class="tag">OWASP-LLM:LLM10</span><span class="tag">ISO42001:A.6.2.6</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:SUTRA-SAFETY</span></p>      <p class="note">calls = <span class="mono">43</span> · error_rate = <span class="mono">0.0</span> · latency_p50_ms = <span class="mono">3402.9</span> · latency_p95_ms = <span class="mono">8729.0</span> · longest_response_chars = <span class="mono">753</span> · retried_calls = <span class="mono">0</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">4365f36412699b653ab65b9ef6b35c8bd3f08fadb99984935be39d975550c80b</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip pass">pass</span>Documentation and claims <span class="note mono">documentation.model_card</span></summary>
@@ -498,7 +499,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <tbody>
       <tr><th>Mode</th><td>replay</td></tr>
 <tr><th>Model reported by endpoint</th><td class="mono">niva-baseline/llama3.2:3b</td></tr>      <tr><th>Calls</th><td>43 (1 sample per probe), 0 failed</td></tr>
-<tr><th>Probe packs</th><td><span class="tag">builtin:injection_core</span><span class="tag">builtin:injection_indic</span><span class="tag">builtin:disclosure_core</span></td></tr>    </tbody>
+<tr><th>Latency</th><td>p50 3.4 s · p95 8.7 s</td></tr><tr><th>Probe packs</th><td><span class="tag">builtin:injection_core</span><span class="tag">builtin:injection_indic</span><span class="tag">builtin:disclosure_core</span></td></tr>    </tbody>
   </table></div>
   <p class="note">Every prompt and response is in <span class="mono">evidence/4-testing/llm_transcript.json</span>. <span class="mono">llm_replay.jsonl</span> lets anyone re-run this exact audit offline with <span class="mono">llm.mode: replay</span>.</p>
 </section>
@@ -506,8 +507,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 <section class="card" id="coverage">
   <p class="eyebrow">Framework coverage</p>
   <h2>Evidence mapped to 6 frameworks</h2>
-  <p class="lead">26 of 146 applicable controls across 6 frameworks are evidenced by this audit. Controls marked &#39;not tested&#39; need organisational evidence (policies, records, sign-offs) that tests cannot produce.</p>
-  <svg class="chart coverage" viewBox="0 0 840 224" role="img" aria-label="Control coverage by framework"><text class="t-label" x="238" y="20.0" text-anchor="end">NIST AI Risk Management Framework</text><rect class="st-good" x="250.0" y="4" width="95.9" height="24" rx="3"><title>NIST AI Risk Management Framework: 15 evidenced</title></rect><text class="t-on-bar" x="298.0" y="20.0" text-anchor="middle">15</text><rect class="st-crit" x="347.9" y="4" width="30.6" height="24" rx="3"><title>NIST AI Risk Management Framework: 5 deficient</title></rect><text class="t-on-bar" x="363.2" y="20.0" text-anchor="middle">5</text><rect class="st-none" x="380.6" y="4" width="337.4" height="24" rx="3"><title>NIST AI Risk Management Framework: 52 not tested</title></rect><text class="t-on-bar" x="549.3" y="20.0" text-anchor="middle">52</text><text class="t-muted" x="730" y="20.0">15/72 evidenced</text><text class="t-label" x="238" y="56.0" text-anchor="end">NIST Generative AI Profile</text><rect class="st-crit" x="250.0" y="40" width="233.0" height="24" rx="3"><title>NIST Generative AI Profile: 6 deficient</title></rect><text class="t-on-bar" x="366.5" y="56.0" text-anchor="middle">6</text><rect class="st-none" x="485.0" y="40" width="233.0" height="24" rx="3"><title>NIST Generative AI Profile: 6 not tested</title></rect><text class="t-on-bar" x="601.5" y="56.0" text-anchor="middle">6</text><text class="t-muted" x="730" y="56.0">0/12 evidenced</text><text class="t-label" x="238" y="92.0" text-anchor="end">ISO/IEC 42001 Annex A</text><rect class="st-good" x="250.0" y="76" width="72.2" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 6 evidenced</title></rect><text class="t-on-bar" x="286.1" y="92.0" text-anchor="middle">6</text><rect class="st-crit" x="324.2" y="76" width="22.7" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 2 deficient</title></rect><rect class="st-none" x="348.9" y="76" width="369.1" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 30 not tested</title></rect><text class="t-on-bar" x="533.5" y="92.0" text-anchor="middle">30</text><text class="t-muted" x="730" y="92.0">6/38 evidenced</text><text class="t-label" x="238" y="128.0" text-anchor="end">EU AI Act</text><rect class="st-good" x="250.0" y="112" width="233.0" height="24" rx="3"><title>EU AI Act: 2 evidenced</title></rect><text class="t-on-bar" x="366.5" y="128.0" text-anchor="middle">2</text><rect class="st-crit" x="485.0" y="112" width="115.5" height="24" rx="3"><title>EU AI Act: 1 deficient</title></rect><text class="t-on-bar" x="542.8" y="128.0" text-anchor="middle">1</text><rect class="st-none" x="602.5" y="112" width="115.5" height="24" rx="3"><title>EU AI Act: 1 not tested</title></rect><text class="t-on-bar" x="660.2" y="128.0" text-anchor="middle">1</text><text class="t-muted" x="730" y="128.0">2/4 evidenced</text><text class="t-label" x="238" y="164.0" text-anchor="end">India AI Governance Guidelines</text><rect class="st-good" x="250.0" y="148" width="139.0" height="24" rx="3"><title>India AI Governance Guidelines: 3 evidenced</title></rect><text class="t-on-bar" x="319.5" y="164.0" text-anchor="middle">3</text><rect class="st-crit" x="391.0" y="148" width="186.0" height="24" rx="3"><title>India AI Governance Guidelines: 4 deficient</title></rect><text class="t-on-bar" x="484.0" y="164.0" text-anchor="middle">4</text><rect class="st-none" x="579.0" y="148" width="139.0" height="24" rx="3"><title>India AI Governance Guidelines: 3 not tested</title></rect><text class="t-on-bar" x="648.5" y="164.0" text-anchor="middle">3</text><text class="t-muted" x="730" y="164.0">3/10 evidenced</text><text class="t-label" x="238" y="200.0" text-anchor="end">OWASP Top 10 for LLM Applications</text><rect class="st-crit" x="250.0" y="184" width="233.0" height="24" rx="3"><title>OWASP Top 10 for LLM Applications: 5 deficient</title></rect><text class="t-on-bar" x="366.5" y="200.0" text-anchor="middle">5</text><rect class="st-none" x="485.0" y="184" width="233.0" height="24" rx="3"><title>OWASP Top 10 for LLM Applications: 5 not tested</title></rect><text class="t-on-bar" x="601.5" y="200.0" text-anchor="middle">5</text><text class="t-muted" x="730" y="200.0">0/10 evidenced</text></svg>
+  <p class="lead">30 of 146 applicable controls across 6 frameworks are evidenced by this audit. Controls marked &#39;not tested&#39; need organisational evidence (policies, records, sign-offs) that tests cannot produce.</p>
+  <svg class="chart coverage" viewBox="0 0 840 224" role="img" aria-label="Control coverage by framework"><text class="t-label" x="238" y="20.0" text-anchor="end">NIST AI Risk Management Framework</text><rect class="st-good" x="250.0" y="4" width="109.0" height="24" rx="3"><title>NIST AI Risk Management Framework: 17 evidenced</title></rect><text class="t-on-bar" x="304.5" y="20.0" text-anchor="middle">17</text><rect class="st-crit" x="361.0" y="4" width="30.6" height="24" rx="3"><title>NIST AI Risk Management Framework: 5 deficient</title></rect><text class="t-on-bar" x="376.3" y="20.0" text-anchor="middle">5</text><rect class="st-none" x="393.6" y="4" width="324.4" height="24" rx="3"><title>NIST AI Risk Management Framework: 50 not tested</title></rect><text class="t-on-bar" x="555.8" y="20.0" text-anchor="middle">50</text><text class="t-muted" x="730" y="20.0">17/72 evidenced</text><text class="t-label" x="238" y="56.0" text-anchor="end">NIST Generative AI Profile</text><rect class="st-crit" x="250.0" y="40" width="233.0" height="24" rx="3"><title>NIST Generative AI Profile: 6 deficient</title></rect><text class="t-on-bar" x="366.5" y="56.0" text-anchor="middle">6</text><rect class="st-none" x="485.0" y="40" width="233.0" height="24" rx="3"><title>NIST Generative AI Profile: 6 not tested</title></rect><text class="t-on-bar" x="601.5" y="56.0" text-anchor="middle">6</text><text class="t-muted" x="730" y="56.0">0/12 evidenced</text><text class="t-label" x="238" y="92.0" text-anchor="end">ISO/IEC 42001 Annex A</text><rect class="st-good" x="250.0" y="76" width="84.6" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 7 evidenced</title></rect><text class="t-on-bar" x="292.3" y="92.0" text-anchor="middle">7</text><rect class="st-crit" x="336.6" y="76" width="22.7" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 2 deficient</title></rect><rect class="st-none" x="361.3" y="76" width="356.7" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 29 not tested</title></rect><text class="t-on-bar" x="539.7" y="92.0" text-anchor="middle">29</text><text class="t-muted" x="730" y="92.0">7/38 evidenced</text><text class="t-label" x="238" y="128.0" text-anchor="end">EU AI Act</text><rect class="st-good" x="250.0" y="112" width="233.0" height="24" rx="3"><title>EU AI Act: 2 evidenced</title></rect><text class="t-on-bar" x="366.5" y="128.0" text-anchor="middle">2</text><rect class="st-crit" x="485.0" y="112" width="115.5" height="24" rx="3"><title>EU AI Act: 1 deficient</title></rect><text class="t-on-bar" x="542.8" y="128.0" text-anchor="middle">1</text><rect class="st-none" x="602.5" y="112" width="115.5" height="24" rx="3"><title>EU AI Act: 1 not tested</title></rect><text class="t-on-bar" x="660.2" y="128.0" text-anchor="middle">1</text><text class="t-muted" x="730" y="128.0">2/4 evidenced</text><text class="t-label" x="238" y="164.0" text-anchor="end">India AI Governance Guidelines</text><rect class="st-good" x="250.0" y="148" width="139.0" height="24" rx="3"><title>India AI Governance Guidelines: 3 evidenced</title></rect><text class="t-on-bar" x="319.5" y="164.0" text-anchor="middle">3</text><rect class="st-crit" x="391.0" y="148" width="186.0" height="24" rx="3"><title>India AI Governance Guidelines: 4 deficient</title></rect><text class="t-on-bar" x="484.0" y="164.0" text-anchor="middle">4</text><rect class="st-none" x="579.0" y="148" width="139.0" height="24" rx="3"><title>India AI Governance Guidelines: 3 not tested</title></rect><text class="t-on-bar" x="648.5" y="164.0" text-anchor="middle">3</text><text class="t-muted" x="730" y="164.0">3/10 evidenced</text><text class="t-label" x="238" y="200.0" text-anchor="end">OWASP Top 10 for LLM Applications</text><rect class="st-good" x="250.0" y="184" width="45.0" height="24" rx="3"><title>OWASP Top 10 for LLM Applications: 1 evidenced</title></rect><text class="t-on-bar" x="272.5" y="200.0" text-anchor="middle">1</text><rect class="st-crit" x="297.0" y="184" width="233.0" height="24" rx="3"><title>OWASP Top 10 for LLM Applications: 5 deficient</title></rect><text class="t-on-bar" x="413.5" y="200.0" text-anchor="middle">5</text><rect class="st-none" x="532.0" y="184" width="186.0" height="24" rx="3"><title>OWASP Top 10 for LLM Applications: 4 not tested</title></rect><text class="t-on-bar" x="625.0" y="200.0" text-anchor="middle">4</text><text class="t-muted" x="730" y="200.0">1/10 evidenced</text></svg>
   <div class="legend">
     <span style="--c: var(--good)">Evidenced</span><span style="--c: var(--warning)">Partial (warning)</span>
     <span style="--c: var(--critical)">Deficient (failed test)</span><span style="--c: var(--none)">Not tested by automation</span>
@@ -602,8 +603,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
         <td></td></tr>
         <tr><td class="mono">MEASURE-2.3</td><td>Performance is measured and demonstrated for deployment-like conditions</td><td><span class="chip not-tested">not tested</span></td>
         <td></td></tr>
-        <tr><td class="mono">MEASURE-2.4</td><td>System functionality and behaviour are monitored in production</td><td><span class="chip not-tested">not tested</span></td>
-        <td></td></tr>
+        <tr><td class="mono">MEASURE-2.4</td><td>System functionality and behaviour are monitored in production</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">llm.service_health</span></td></tr>
         <tr><td class="mono">MEASURE-2.5</td><td>System is shown to be valid and reliable; generalization limits documented</td><td><span class="chip deficient">deficient</span></td>
         <td><span class="tag">llm.groundedness</span></td></tr>
         <tr><td class="mono">MEASURE-2.6</td><td>System is regularly evaluated for safety risks</td><td><span class="chip deficient">deficient</span></td>
@@ -654,8 +655,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
         <td></td></tr>
         <tr><td class="mono">MANAGE-3.2</td><td>Pre-trained models used in development are monitored</td><td><span class="chip not-tested">not tested</span></td>
         <td></td></tr>
-        <tr><td class="mono">MANAGE-4.1</td><td>Post-deployment monitoring plans are implemented</td><td><span class="chip not-tested">not tested</span></td>
-        <td></td></tr>
+        <tr><td class="mono">MANAGE-4.1</td><td>Post-deployment monitoring plans are implemented</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">llm.service_health</span></td></tr>
         <tr><td class="mono">MANAGE-4.2</td><td>Continual-improvement activities are integrated into updates</td><td><span class="chip not-tested">not tested</span></td>
         <td></td></tr>
         <tr><td class="mono">MANAGE-4.3</td><td>Incidents and errors are tracked, communicated and recovered from</td><td><span class="chip not-tested">not tested</span></td>
@@ -738,8 +739,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
         <td><span class="tag">llm.prompt_injection</span></td></tr>
         <tr><td class="mono">A.6.2.5</td><td>Deployment</td><td><span class="chip not-tested">not tested</span></td>
         <td></td></tr>
-        <tr><td class="mono">A.6.2.6</td><td>Operation and monitoring</td><td><span class="chip not-tested">not tested</span></td>
-        <td></td></tr>
+        <tr><td class="mono">A.6.2.6</td><td>Operation and monitoring</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">llm.service_health</span></td></tr>
         <tr><td class="mono">A.6.2.7</td><td>Technical documentation</td><td><span class="chip evidenced">evidenced</span></td>
         <td><span class="tag">documentation.model_card</span></td></tr>
         <tr><td class="mono">A.6.2.8</td><td>Recording of event logs</td><td><span class="chip not-tested">not tested</span></td>
@@ -809,7 +810,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
         <tr><td class="mono">SUTRA-UNDERSTANDABLE</td><td>Understandable by design</td><td><span class="chip evidenced">evidenced</span></td>
         <td><span class="tag">documentation.model_card</span></td></tr>
         <tr><td class="mono">SUTRA-SAFETY</td><td>Safety, resilience and sustainability</td><td><span class="chip deficient">deficient</span></td>
-        <td><span class="tag">llm.prompt_injection</span></td></tr>
+        <td><span class="tag">llm.prompt_injection</span><span class="tag">llm.service_health</span></td></tr>
         <tr><td class="mono">PILLAR-RISK-MITIGATION</td><td>Risk mitigation (evidence-based risk assessment, techno-legal measures)</td><td><span class="chip evidenced">evidenced</span></td>
         <td><span class="tag">governance.risk_classification</span><span class="tag">audit.process</span></td></tr>
         <tr><td class="mono">PILLAR-ACCOUNTABILITY</td><td>Accountability (graded liability tied to function and risk)</td><td><span class="chip not-tested">not tested</span></td>
@@ -841,8 +842,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
         <td></td></tr>
         <tr><td class="mono">LLM09</td><td>Misinformation</td><td><span class="chip deficient">deficient</span></td>
         <td><span class="tag">llm.groundedness</span></td></tr>
-        <tr><td class="mono">LLM10</td><td>Unbounded consumption</td><td><span class="chip not-tested">not tested</span></td>
-        <td></td></tr>
+        <tr><td class="mono">LLM10</td><td>Unbounded consumption</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">llm.service_health</span></td></tr>
 </tbody></table></div>
     <p class="note">Source: https://genai.owasp.org/llm-top-10/</p>
   </details>
@@ -895,7 +896,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
       <tr><td>Scoping</td><td>System profile, use-case risk classification, regulatory milestones</td></tr>
       <tr><td>Mapping</td><td>Failure-mode table (7 failure modes) and RACI</td></tr>
       <tr><td>Artifact collection</td><td>SHA-256 fingerprints of 4 artifacts and 0 governance documents</td></tr>
-      <tr><td>Testing</td><td>7 automated tests with per-test evidence files</td></tr>
+      <tr><td>Testing</td><td>8 automated tests with per-test evidence files</td></tr>
       <tr><td>Reflection</td><td>Risk register, control coverage, remediation plan and release-gate decision</td></tr>
     </tbody></table></div>
   <details>
@@ -909,17 +910,17 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <summary>Artifact fingerprints</summary>
     <div class="table-wrap"><table>
       <thead><tr><th>Artifact</th><th>File</th><th>SHA-256</th></tr></thead>
-      <tbody><tr><td>documentation</td><td class="mono">model_card.yaml</td><td class="mono hash">6852c9c4993ca7112f728de32a25b86cb162c4f481d5363a66a509647a708f2c</td></tr><tr><td>llm_probes</td><td class="mono">probes.yaml</td><td class="mono hash">88803ce2e6fb8d92a6599dec5fed1b165b24284bb4a0d591db580cfb0148048f</td></tr><tr><td>llm_replay</td><td class="mono">llama32_3b_baseline.jsonl</td><td class="mono hash">9ea525fdf7e5fae26a26c73e2680e12db000fc412095efee895fab857ad6c4e7</td></tr><tr><td>llm_knowledge_base</td><td class="mono">knowledge_base.md</td><td class="mono hash">334ce409e8a05bcbd9076337e5e638aa44e9cba55203d60e8af632d71f11109e</td></tr></tbody>
+      <tbody><tr><td>documentation</td><td class="mono">model_card.yaml</td><td class="mono hash">6852c9c4993ca7112f728de32a25b86cb162c4f481d5363a66a509647a708f2c</td></tr><tr><td>llm_probes</td><td class="mono">probes.yaml</td><td class="mono hash">88803ce2e6fb8d92a6599dec5fed1b165b24284bb4a0d591db580cfb0148048f</td></tr><tr><td>llm_replay</td><td class="mono">llama32_3b_baseline.json</td><td class="mono hash">ec70c1918a0fbbce419af6d47063d8e977c907bdc247880f8bdbfb512fda2fb2</td></tr><tr><td>llm_knowledge_base</td><td class="mono">knowledge_base.md</td><td class="mono hash">334ce409e8a05bcbd9076337e5e638aa44e9cba55203d60e8af632d71f11109e</td></tr></tbody>
     </table></div>
   </details>
   <h3>Verifying this pack</h3>
-  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">164694aeb781feba12d71a0f58410d53d1bd722b263d14b3413b0a05927d5a63</span>.</p>
+  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">0e4f7565c04429d66248ae9bc417eb236ac762056ee98562ece88a9bf4eeeaf3</span>.</p>
   <h3>Limitations</h3>
   <p class="note">Automated tests evidence technical controls only. Controls marked "not tested" need organisational evidence. Statistical tests depend on the representativeness of the data supplied. LLM probes are a sample of behaviour, not proof of safety. The classification is an assessment to support legal review, not legal advice. See docs/limitations.md in the Pramana repository.</p>
 </section>
 
 <footer>
-  Generated by Pramana 0.2.1 · Python 3.13.16 · audit PRM-20261021-B0332C · started 2026-10-21T09:29:17+00:00
+  Generated by Pramana 0.2.2 · Python 3.13.16 · audit PRM-20261021-5ADF5B · started 2026-10-21T09:48:56+00:00
 </footer>
 </div>
 </body>
