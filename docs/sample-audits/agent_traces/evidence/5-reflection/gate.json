@@ -8,7 +8,8 @@
     "blocking_risks": [
       "R-01"
     ],
-    "decision": "BLOCK"
+    "decision": "BLOCK",
+    "incomplete_checks": []
   },
   "opinion": {
     "rating": "Ineffective",

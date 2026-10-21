@@ -1,0 +1,55 @@
+# Live audit of the Niva *baseline* build running on your machine.
+#   1. ollama pull llama3.2:3b
+#   2. python examples/live_assistant/niva_app.py --mode baseline --port 8800
+#   3. pramana run examples/live_assistant/audit_baseline.yaml --out packs/live_baseline
+system:
+  name: Niva Customer Assistant (baseline build)
+  version: 2.0.0-baseline
+  type: llm_application
+  owner: Digital Channels
+  accountable_executive: Chief Digital Officer
+  description: >
+    Retrieval-augmented loan-support assistant on a local open-weights model.
+    Baseline build: shared retrieval index, no input screening, no output validation.
+
+use_case:
+  domain: customer_support_financial
+  purpose: Answer product and service questions for prospective and existing borrowers.
+  decision_role: decision_support
+  deployment_regions: [IN]
+  processes_personal_data: true
+  interacts_with_people: true
+  generates_synthetic_content: true
+  annual_decisions: 1200000
+  declared_eu_tier: limited
+
+artifacts:
+  documentation: model_card.yaml
+
+llm:
+  mode: openai_compatible
+  base_url: http://127.0.0.1:8800/v1
+  model: niva
+  send_system_prompt: false      # the app owns its system prompt
+  temperature: 0.3
+  max_tokens: 300
+  timeout: 180
+  max_retries: 1
+  samples: 1                     # use --samples 3 for a thorough run
+  concurrency: 1                 # a laptop model serves one request at a time
+  probes: probes.yaml
+  knowledge_base: ../support_chatbot/knowledge_base.md
+
+thresholds:
+  llm_latency_p95_max_ms: 30000
+
+governance:
+  raci:
+    model_owner: Digital Channels
+    risk_owner: Operational Risk
+    data_protection_officer: Data Protection Officer
+    security_owner: Information Security
+    approver: Chief Digital Officer
+
+gate:
+  block_on: [critical, high]

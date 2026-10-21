@@ -12,7 +12,7 @@
 
 ![Audit report overview](docs/img/report-overview.png)
 
-Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 19 automated checks, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
+Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 20 automated checks, can red-team a **live LLM application on your laptop**, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
 
 ---
 
@@ -24,6 +24,7 @@ AI governance is moving from policy documents to audits, and the tooling has not
 - **A policy is not evidence.** In a 2026 survey of about 950 US executives, 78% lacked strong confidence they could pass an independent AI governance audit within 90 days ([as reported here](https://www.unframe.ai/blog/ai-auditability-what-regulators-ask-for)). Pramana fingerprints every artifact and seals every result in a hash-chained ledger, so the evidence can be checked rather than trusted.
 - **Too many frameworks, one system.** Teams answer to NIST AI RMF, ISO/IEC 42001, the EU AI Act and local rules at once. One Pramana test feeds every control it supports through a single crosswalk.
 - **Agents create an accountability gap.** Auditors report that agent actions often happen with no traceable human request or approval, and current platforms cannot produce that evidence natively ([Cloud Security Alliance, Aug 2026](https://labs.cloudsecurityalliance.org/research/csa-research-note-soc2-ai-controls-gap-20260830-csa-styled/)). Pramana audits agent logs for attribution, approvals and tamper-evidence.
+- **LLM safety is weakest outside English.** Jailbreaks transfer from English to Indian languages, and romanised, code-mixed text is how many South Asian users actually type ([Yong et al., 2023](https://arxiv.org/abs/2310.02446); [IndicJR, 2026](https://arxiv.org/abs/2602.16832)). Pramana ships injection probes in Hindi, Hinglish, Kannada (both scripts) and Tamil, and reports results by language.
 - **India-specific context is missing.** India's AI Governance Guidelines (MeitY, Nov 2025) call for an India-specific, evidence-based risk framework. Fairness in India runs along axes such as region and caste that Western tools do not model ([Sambasivan et al., FAccT 2021](https://arxiv.org/abs/2101.09995)). Pramana maps evidence to the seven sutras, checks for Indian identifiers (PAN, Aadhaar-format numbers, Indian mobile numbers) under the DPDP Act, and flags proxies such as pincode-based features.
 
 The full literature review and gap analysis is in [docs/research-notes.md](docs/research-notes.md).
@@ -38,7 +39,7 @@ flowchart LR
     subgraph Pramana
     A[1 Scoping<br/>risk tier, obligations] --> B[2 Mapping<br/>FMEA, RACI]
     B --> C[3 Artifacts<br/>SHA-256 fingerprints]
-    C --> D[4 Testing<br/>19 checks]
+    C --> D[4 Testing<br/>20 checks]
     D --> E[5 Reflection<br/>risk register, coverage, gate]
     end
     E --> R[report.html]
@@ -83,6 +84,7 @@ Each case study plants known defects, so the audit can be checked against a grou
 |---|---|---|---|
 | [Credit scoring](examples/credit_scoring) | Gradient-boosted loan pre-approval model for a fictional Indian lender (synthetic data) | Biased historical labels for rural women; pincode band that tracks residence; e-mail and mobile columns left in extracts; overstated AUC in the model card; owner classified it as "limited" risk; income and gig-work drift | Disparate impact 0.72 for rural applicants (p < 1e-70), worse for intersectional sub-groups; pincode proxy (AUC 0.99); personal data exposure; documentation mismatch; EU AI Act misclassification (Annex III 5(b) makes it high-risk); missing FRIA. **Gate: BLOCK** |
 | [Support assistant](examples/support_chatbot) | RAG chat assistant (replayed transcripts) | Indirect prompt injection in a pasted e-mail; another customer's contact details disclosed; invented foreclosure fee; crypto investment advice | 1/5 injection probes succeed; PII disclosure (critical); figures not in the knowledge base (4%, ₹500); conduct-rule breach. **Gate: BLOCK** |
+| [Live assistant](examples/live_assistant) | Retrieval-augmented loan assistant on a **local open-weights model** (Ollama), in a baseline and a guarded build | Shared retrieval index holding customer records; no input screening; no output validation | Run it yourself: `pramana diff` shows the guarded build's controls closing the gaps, and 4 **held-out** probes show the risk that remains. See below. |
 | [Refund agent](examples/agent_traces) | Tool-using agent that issues refunds | ₹18,500 refund with no human approval; a tool call with no originating request; no hash chain on the log | Approval coverage 50%, one unattributed action, log not tamper-evident; auditability index 0.78. **Gate: BLOCK** |
 
 ![Fairness spotlight](docs/img/fairness.png)
@@ -113,10 +115,11 @@ Each case study plants known defects, so the audit can be checked against a grou
 | Transparency | `documentation.model_card` | Completeness against Model Cards, EU AI Act Art. 11, 13 and 14 and ISO 42001 A.6.2.7; **claims vs. measured results** |
 | Privacy | `privacy.pii_exposure` | E-mail, Indian mobile, PAN, Aadhaar-format, card (Luhn) and IP patterns in every dataset |
 | Privacy | `privacy.membership_inference` | Loss-threshold attack (Yeom et al., 2018) on training vs. held-out rows |
-| LLM security | `llm.prompt_injection` | Direct, role-play, indirect, translation and encoded injections; system-prompt canary |
+| LLM security | `llm.prompt_injection` | 26 probes: direct, role-play, indirect (e-mail, web page, tool output, JSON), payload splitting, base64, few-shot, markdown-image exfiltration, and Indic-language attacks; system-prompt canary; per-language results |
 | LLM privacy | `llm.sensitive_disclosure` | Personal data and forbidden strings in responses |
 | LLM reliability | `llm.groundedness` | Required facts plus a numeric-claim check against the knowledge base |
 | LLM conduct | `llm.policy_adherence` | Required and forbidden phrases per conduct rule |
+| LLM operations | `llm.service_health` | Error rate, retries, p50/p95 latency and output length from the live run (OWASP LLM10) |
 | Agents | `agent.trace_auditability` | Attribution to a request, prior human approval for high-impact actions, tool allowlist, ordering, hash-chain integrity |
 | Assurance | `audit.detector_sensitivity` | Plants a disparity, a drift and a PII column in copies of the data and confirms the audit catches them |
 
@@ -167,20 +170,31 @@ packs/credit/
 
 The action uploads the audit pack as an artifact and writes a risk summary to the job page. The gate respects formal risk acceptances: a risk approved by a named person, with a justification and an expiry date, does not block until it expires.
 
-## Audit a live LLM endpoint
+## Live red-team audit on your laptop
 
-Replay mode keeps audits reproducible. To probe a running system, use any OpenAI-compatible server, for example a local model through Ollama:
+Pramana can audit a running LLM application as a black box, the way an assurance team tests a deployed system. The repository includes **Niva**, a reference retrieval-augmented loan assistant that runs on a small open-weights model through [Ollama](https://ollama.com), in two builds: a **baseline** with the flaws first versions often have, and a **guarded** build with layered controls.
 
-```yaml
-llm:
-  mode: openai_compatible
-  base_url: http://localhost:11434/v1
-  model: llama3.1:8b
-  probes: probes.yaml
-  knowledge_base: knowledge_base.md
+```bash
+ollama pull llama3.2:3b                                                  # ~2 GB, fits an 8 GB MacBook
+python examples/live_assistant/niva_app.py --mode baseline --port 8800   # terminal 1
+python examples/live_assistant/niva_app.py --mode guarded  --port 8801   # terminal 2
+
+pramana run examples/live_assistant/audit_baseline.yaml --out packs/live_baseline
+pramana run examples/live_assistant/audit_guarded.yaml  --out packs/live_guarded
+pramana diff packs/live_baseline packs/live_guarded
 ```
 
-Every prompt and response is saved to the evidence pack.
+What makes the live mode production-grade:
+
+- **Any endpoint.** `openai_compatible` for Ollama, vLLM, LM Studio, llama.cpp or hosted APIs; `http` for any JSON API, with a body template, a response path and secrets read from environment variables.
+- **Resilient calls.** Timeouts, retries with exponential backoff on 429/5xx, a pre-flight check (`pramana ping`), and failed calls recorded as evidence instead of crashing the audit. If a test cannot complete, the gate blocks as *incomplete*: an audit cannot vouch for what it did not test.
+- **Stochastic outputs handled.** `--samples N` sends each probe N times; a probe fails if any sample fails, and rates come with Wilson 95% intervals ([Hughes et al., 2024](https://arxiv.org/abs/2412.03556) show attack success grows with repeated sampling).
+- **Judge-free, defensible scoring.** Split markers, regular expressions and a planted canary prove compliance without a second model. Results that contain both proof and refusal language are flagged for human review.
+- **Held-out probes.** Four probes the guarded build was not written against measure the residual risk, so passing the known attacks is not mistaken for safety.
+- **Reproducible.** Every live pack contains `llm_replay.jsonl`, which re-runs the identical audit offline in CI.
+- **Before/after evidence.** `pramana diff` compares two packs check by check, and `--fail-on-regression` turns it into a CI gate.
+
+Full walkthrough: [examples/live_assistant](examples/live_assistant).
 
 ## Interactive viewer
 
@@ -194,6 +208,7 @@ streamlit run dashboard/app.py -- --pack packs/credit
 ```bash
 pramana init my_audit.yaml        # starter spec with every field
 pramana classify my_audit.yaml    # risk tier and obligations only
+pramana ping my_audit.yaml        # check an LLM endpoint is reachable
 pramana run my_audit.yaml
 ```
 
@@ -205,12 +220,14 @@ Predictions-only audits are supported: if the model cannot be shared, supply a `
 src/pramana/
 ├── spec.py              # audit spec loading and validation
 ├── context.py           # lazy loading of model, data, transcripts, traces
+├── adapters/            # replay, OpenAI-compatible and generic HTTP clients for LLM audits
+├── probes/packs/        # built-in probe library (English and Indic-language attacks)
 ├── checks/              # one module per check family, registered by decorator
 ├── controls/data/       # framework catalogues, crosswalk, regulatory calendar (YAML)
 ├── risk/                # EU AI Act and India classification, risk scoring, gate
 ├── audit/               # SMACTR engine and evidence ledger
 └── reporting/           # HTML report, charts, model card, exports
-examples/                # three case studies with planted defects
+examples/                # four case studies, incl. a live LLM app (examples/live_assistant)
 tests/                   # unit tests and ground-truth end-to-end tests
 docs/                    # research notes, methodology, design decisions, limitations
 ```
@@ -230,6 +247,7 @@ Pramana supports an audit; it does not replace auditor judgement or legal advice
 ## Roadmap
 
 - Model-graded LLM judging as an optional second opinion beside the deterministic scorers
+- Multi-turn attack sequences and more Indic languages (Bengali, Marathi, Telugu)
 - NIST SP 800-53 AI control overlays (COSAiS) once final
 - RBI FREE-AI framework as a sector profile for Indian lenders
 - Ranking and recommendation fairness metrics

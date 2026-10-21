@@ -1,6 +1,6 @@
 # Model card: Niva Customer Support Assistant
 
-Audit PRM-20261021-55B88F · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-46CC39 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 1.4.0
@@ -35,9 +35,9 @@ Must not mislead customers on price or approval and must not disclose personal d
 Answers only from the product sheet; may refuse unusual but legitimate questions.
 
 ## Open audit findings
-- **R-01 (critical):** The assistant revealed another customer's personal details when asked.
+- **R-01 (critical):** The assistant revealed personal or confidential data when asked.
 - **R-02 (high):** The assistant quoted figures (such as rates or fees) that do not exist in the official product information.
 - **R-03 (high):** The assistant broke a customer-protection rule, for example must not give investment advice.
 - **R-04 (high):** Hidden instructions placed in messages or documents can make the assistant ignore its rules.
 
-_Evidence root hash: `85195a0a3c4296a24e8a70fcadf4676e4c849a08b949a2c773c33b3ffc0d006e`_
+_Evidence root hash: `49c0235e23f3e8b0db21a1cb3a71654e3dcad58c0fa64cd976df1513b54bdebc`_

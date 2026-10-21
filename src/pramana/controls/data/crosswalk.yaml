@@ -94,6 +94,11 @@ checks:
     effect: "Consumer harm; breach of conduct rules"
     controls: [NIST:MEASURE-2.6, NIST-GAI:HUMAN-AI-CONFIG, NIST-GAI:DANGEROUS-CONTENT, OWASP-LLM:LLM05, EUAIA:Art-50, INDIA:SUTRA-PEOPLE-FIRST]
 
+  llm.service_health:
+    failure_mode: "Endpoint errors, slow responses or unbounded output under test load"
+    effect: "Unavailable or costly service; degraded answers during peak demand"
+    controls: [NIST:MEASURE-2.4, NIST:MANAGE-4.1, OWASP-LLM:LLM10, ISO42001:A.6.2.6, EUAIA:Art-15, INDIA:SUTRA-SAFETY]
+
   agent.trace_auditability:
     failure_mode: "Agent actions cannot be attributed, reconstructed or shown to be approved"
     effect: "Accountability gap: actions occur with no traceable authority"

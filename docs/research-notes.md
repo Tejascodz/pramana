@@ -20,6 +20,8 @@ These notes record the research behind Pramana: what the literature and the 2025
 | G4 | Agent actions lack traceable authority | The Cloud Security Alliance (Aug 2026) reports that SOC 2 auditors are improvising for AI, and that agents can act without a discrete human request, which current platforms cannot evidence natively. The *Auditable Agents* position paper (arXiv:2604.05485) makes a similar argument about an auditability gap in public agent ecosystems. | `agent.trace_auditability` checks attribution of every tool call to a request, prior human approval for high-impact actions, tool allowlists, ordering and hash-chain integrity. |
 | G5 | Western defaults in fairness and privacy | Sambasivan et al. (FAccT 2021) show that fairness in India runs along axes such as caste, religion and region, with different data gaps and proxies. India's AI Governance Guidelines (Nov 2025) call for an India-specific, evidence-based risk framework. | India sutra mapping, an India context-sensitivity rating (documented as a heuristic, not an official tier), Indian identifier patterns (PAN, Aadhaar format, Indian mobile) linked to the DPDP Act, and proxy screening that catches pincode-style features. |
 | G6 | Who audits the auditor? | Costanza-Chock, Raji and Buolamwini (FAccT 2022) found weak standards and quality control across the audit field. The CSA note above also reports warnings about templated, look-alike audit reports. | `audit.detector_sensitivity` plants defects of known size and fails if the tests miss them. The case studies double as ground-truth regression tests. |
+| G8 | LLM safety is tested in English only | Low-resource-language translations jailbreak frontier models (Yong et al., 2023), and multilingual jailbreaks rise as language resources fall (Deng et al., ICLR 2024). IndicJR (Pattnayak and Chowdhuri, 2026) covers 12 South Asian languages and finds English attacks transfer strongly; code-mixed Hinglish with phonetic misspellings reached 99% attack success on several small open models (Aswal and Jaiswal, 2025). | A built-in Indic pack (Hindi, Hinglish, Kannada in both scripts, Tamil) and per-language results in the report. |
+| G9 | Single-run red-teaming understates risk | Best-of-N sampling shows attack success grows with repeated attempts on the same prompt (Hughes et al., NeurIPS 2025). | `samples` repeats probes; any failing sample fails the probe; rates carry Wilson intervals. |
 | G7 | Results do not reach decision makers | Birhane et al. (SaTML 2024) argue that audits only produce accountability when their findings lead to consequences for the audited party. | Plain-English executive summary, an internal-audit style opinion (Effective / Partially effective / Ineffective), named owners and dates, and a release gate. |
 
 ## 3. Technical methods and their sources
@@ -35,6 +37,10 @@ These notes record the research behind Pramana: what the literature and the 2025
 | Loss-threshold membership inference | `privacy.membership_inference` | Yeom et al. (CSF 2018); Shokri et al. (IEEE S&P 2017) |
 | Indirect prompt injection | `llm.prompt_injection` | Greshake et al. (AISec 2023) |
 | Multi-metric, scenario-based LLM evaluation | LLM checks | Liang et al., HELM (TMLR 2023) |
+| Judge-free detectors for jailbreak scoring | `llm.prompt_injection` | Pattnayak and Chowdhuri, IndicJR (2026) |
+| Spotlighting untrusted input | Niva guarded build | Hines et al. (2024) |
+| Canary tokens to detect prompt leakage | probe packs, Niva guarded build | Common practice in prompt-injection defences (e.g. canary words in open-source guard tools) |
+| Wilson score interval | LLM rates | Wilson (1927); recommended over the normal interval for small n by Brown, Cai and DasGupta (2001) |
 | Permutation feature importance | `explainability.feature_importance` | Breiman (2001), model-agnostic implementation in scikit-learn |
 
 ## 4. Regulatory state as of October 2026
@@ -73,6 +79,14 @@ Casper et al. (FAccT 2024) show that black-box access limits what an audit can e
 19. Shokri, R., Stronati, M., Song, C., Shmatikov, V. *Membership Inference Attacks against Machine Learning Models.* IEEE S&P 2017. [arXiv:1610.05820](https://arxiv.org/abs/1610.05820)
 20. Greshake, K., et al. *Not What You've Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection.* AISec 2023. [arXiv:2302.12173](https://arxiv.org/abs/2302.12173)
 21. Liang, P., et al. *Holistic Evaluation of Language Models.* TMLR 2023. [arXiv:2211.09110](https://arxiv.org/abs/2211.09110)
+
+22. Yong, Z.-X., Menghini, C., Bach, S. H. *Low-Resource Languages Jailbreak GPT-4.* 2023. [arXiv:2310.02446](https://arxiv.org/abs/2310.02446)
+23. Deng, Y., Zhang, W., Pan, S. J., Bing, L. *Multilingual Jailbreak Challenges in Large Language Models.* ICLR 2024. [arXiv:2310.06474](https://arxiv.org/abs/2310.06474)
+24. Pattnayak, P., Chowdhuri, S. *IndicJR: A Judge-Free Benchmark of Jailbreak Robustness in South Asian Languages.* 2026. [arXiv:2602.16832](https://arxiv.org/abs/2602.16832)
+25. Aswal, D., Jaiswal, S. D. *"Haet Bhasha aur Diskrimineshun": Phonetic Perturbations in Code-Mixed Hinglish to Red-Team LLMs.* 2025. [arXiv:2505.14226](https://arxiv.org/abs/2505.14226)
+26. Hughes, J., et al. *Best-of-N Jailbreaking.* NeurIPS 2025. [arXiv:2412.03556](https://arxiv.org/abs/2412.03556)
+27. Hines, K., et al. *Defending Against Indirect Prompt Injection Attacks With Spotlighting.* 2024. [arXiv:2403.14720](https://arxiv.org/abs/2403.14720)
+28. Brown, L. D., Cai, T. T., DasGupta, A. *Interval Estimation for a Binomial Proportion.* Statistical Science, 2001.
 
 ### Standards, regulation and industry sources
 

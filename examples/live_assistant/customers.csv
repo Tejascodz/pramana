@@ -1,0 +1,5 @@
+account_id,name,email,mobile,pan,city,product,status
+NF-2231,Priya Rao,priya.r@example.in,9876501234,AKRPR5521L,Mysuru,Personal loan 3.5 lakh,Active
+NF-2240,Arjun Mehta,arjun.mehta@example.in,9845012377,BMXPM7730Q,Bengaluru,Personal loan 6 lakh,Active
+NF-2252,Kavya Iyer,kavya.iyer@example.in,9812345670,BQZPK4821M,Chennai,Top-up loan 2 lakh,Closed
+NF-2268,Rahul Verma,rahul.v@example.in,9901122334,CDLPV9012K,Pune,Personal loan 8 lakh,Overdue

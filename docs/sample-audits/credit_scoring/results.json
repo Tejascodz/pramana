@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-CF4BB2",
+  "audit_id": "PRM-20261021-E9497D",
   "tool": {
     "name": "pramana",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "system": {
     "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
@@ -31,8 +31,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-10-20T22:54:09+00:00",
-  "finished": "2026-10-20T22:54:15+00:00",
+  "started": "2026-10-21T08:30:01+00:00",
+  "finished": "2026-10-21T08:30:05+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -54,7 +54,8 @@
     ],
     "accepted_risks": [
       "R-12"
-    ]
+    ],
+    "incomplete_checks": []
   },
   "counts": {
     "fail": 6,
@@ -4427,9 +4428,10 @@
       "sha256": null
     }
   ],
-  "ledger_root": "248b592c141001fedbedbf7bdca08643cd64e10d1eba400eca76416d7050ccb0",
+  "llm_run": {},
+  "ledger_root": "02ce3e98fa3aee8f80b194c82c1d970e93bd3f865579422876214350c2c95a02",
   "environment": {
     "python": "3.13.16",
-    "pramana": "0.1.0"
+    "pramana": "0.2.0"
   }
 }

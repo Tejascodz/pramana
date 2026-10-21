@@ -1,0 +1,12 @@
+{
+  "calls": 18,
+  "errors": 0,
+  "latency_p50_ms": null,
+  "latency_p95_ms": null,
+  "mode": "replay",
+  "models_reported": [],
+  "probe_packs": [],
+  "prompts": 18,
+  "samples_per_probe": 1,
+  "source": "transcripts.jsonl"
+}

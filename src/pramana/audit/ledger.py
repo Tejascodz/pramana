@@ -84,6 +84,18 @@ class EvidenceLedger:
         )
         return digest
 
+    def add_text(self, stage: str, name: str, rel_path: str, text: str) -> str:
+        """Write a text file inside the pack (e.g. a JSONL replay file) and record its hash."""
+        target = self.pack_dir / rel_path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        payload = text.encode("utf-8")
+        target.write_bytes(payload)
+        digest = sha256_bytes(payload)
+        self._append(
+            {"stage": stage, "kind": "evidence", "name": name, "path": rel_path, "sha256": digest}
+        )
+        return digest
+
     def add_pack_file(self, stage: str, name: str, rel_path: str) -> str:
         """Record a file already written inside the pack (e.g. the report)."""
         digest = sha256_file(self.pack_dir / rel_path)

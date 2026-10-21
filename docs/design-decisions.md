@@ -59,3 +59,24 @@ Short records of the main choices in Pramana and the alternatives that were reje
 
 **Decision.** The ledger stores only file names for external artifacts, and error details record only file and line.
 **Why.** Audit packs are shared with reviewers and regulators. Local paths leak usernames and machine layout and make packs non-portable. A test enforces this.
+
+### 12. The system under audit is separate from the auditor
+
+**Decision.** The live case study ships a real application (Niva) that Pramana reaches only over HTTP, like any external endpoint.
+**Why.** Auditing a raw model shows what the model does; auditing the application shows what customers experience, including retrieval, authorisation and output handling. Keeping the app outside Pramana's code means the audit cannot accidentally rely on internals, and the same spec works against any service.
+
+### 13. Held-out probes beside the known packs
+
+**Decision.** The live probe set includes probes the guarded build was not written against, and the report tags them.
+**Why.** Guardrails tuned on a known test set pass that test set. Held-out probes measure generalisation, which is what matters for an attacker who has not read the test suite. This mirrors the train/test split auditors expect for any model.
+
+### 14. Failed calls are evidence, and incomplete audits block
+
+**Decision.** Adapters return errors instead of raising; checks with failed calls cannot PASS; any errored check blocks the gate as *incomplete*.
+**Why.** A security test that silently skips half its probes would otherwise look like a pass. Treating "could not test" as "cannot vouch" is the conservative assurance position.
+
+### 15. Repeated sampling with intervals, not single runs
+
+**Decision.** `samples` repeats each probe, any failing sample fails the probe, and rates carry Wilson intervals.
+**Why.** LLM outputs vary between calls, and attackers can retry. Worst-case per probe matches how an attacker benefits from retries, while the sample rate and interval show how often the failure happens.
+

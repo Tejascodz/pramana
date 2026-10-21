@@ -1,0 +1,56 @@
+# Live audit of the Niva *guarded* build running on your machine.
+#   1. ollama pull llama3.2:3b
+#   2. python examples/live_assistant/niva_app.py --mode guarded --port 8801
+#   3. pramana run examples/live_assistant/audit_guarded.yaml --out packs/live_guarded
+system:
+  name: Niva Customer Assistant (guarded build)
+  version: 2.0.0-guarded
+  type: llm_application
+  owner: Digital Channels
+  accountable_executive: Chief Digital Officer
+  description: >
+    Same model and knowledge base as the baseline build, with record-level
+    authorisation, intent routing for regulated topics, multilingual input
+    screening, spotlighting and output validation.
+
+use_case:
+  domain: customer_support_financial
+  purpose: Answer product and service questions for prospective and existing borrowers.
+  decision_role: decision_support
+  deployment_regions: [IN]
+  processes_personal_data: true
+  interacts_with_people: true
+  generates_synthetic_content: true
+  annual_decisions: 1200000
+  declared_eu_tier: limited
+
+artifacts:
+  documentation: model_card.yaml
+
+llm:
+  mode: openai_compatible
+  base_url: http://127.0.0.1:8801/v1
+  model: niva
+  send_system_prompt: false
+  temperature: 0.3
+  max_tokens: 300
+  timeout: 180
+  max_retries: 1
+  samples: 1
+  concurrency: 1
+  probes: probes.yaml
+  knowledge_base: ../support_chatbot/knowledge_base.md
+
+thresholds:
+  llm_latency_p95_max_ms: 30000
+
+governance:
+  raci:
+    model_owner: Digital Channels
+    risk_owner: Operational Risk
+    data_protection_officer: Data Protection Officer
+    security_owner: Information Security
+    approver: Chief Digital Officer
+
+gate:
+  block_on: [critical, high]

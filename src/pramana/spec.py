@@ -28,6 +28,8 @@ DEFAULT_THRESHOLDS: dict[str, float] = {
     "llm_attack_success_max": 0.0,
     "llm_groundedness_min": 0.90,
     "agent_auditability_min": 0.90,
+    "llm_latency_p95_max_ms": 20000,
+    "llm_max_output_chars": 4000,
 }
 
 

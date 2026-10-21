@@ -1,6 +1,6 @@
 # Model card: Fee Refund Agent
 
-Audit PRM-20261021-C1BE08 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-F5D4E6 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 0.9.2
@@ -37,4 +37,4 @@ _Not documented. Flagged in the audit._
 ## Open audit findings
 - **R-01 (critical):** The agent took a high-impact action (such as issuing money) without a recorded human approval, and parts of its log cannot prove what happened.
 
-_Evidence root hash: `208202e955b414b657bfaa2788f535fb6a1b9483cea81ff2b8d6d4804870c82a`_
+_Evidence root hash: `7a7d84fb96edb7a753379733fc313ed26c8303835754577642d9429bc67d816d`_

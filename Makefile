@@ -1,4 +1,4 @@
-.PHONY: install test lint example audits verify dashboard docs clean
+.PHONY: install test lint example audits verify dashboard docs clean live-model live-baseline live-guarded live-audit
 
 install:
 	pip install -e ".[dev,dashboard]"
@@ -19,6 +19,20 @@ audits: example
 
 verify:
 	for p in packs/*; do pramana verify $$p; done
+
+live-model:
+	ollama pull llama3.2:3b
+
+live-baseline:
+	python examples/live_assistant/niva_app.py --mode baseline --port 8800
+
+live-guarded:
+	python examples/live_assistant/niva_app.py --mode guarded --port 8801
+
+live-audit:
+	-pramana run examples/live_assistant/audit_baseline.yaml --out packs/live_baseline
+	-pramana run examples/live_assistant/audit_guarded.yaml --out packs/live_guarded
+	pramana diff packs/live_baseline packs/live_guarded
 
 dashboard:
 	streamlit run dashboard/app.py -- --pack packs/credit_scoring

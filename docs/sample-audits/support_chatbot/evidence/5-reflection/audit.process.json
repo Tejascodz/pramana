@@ -20,6 +20,6 @@
   "recommendation": "",
   "severity": "info",
   "status": "pass",
-  "summary": "Test plan (FMEA, 6 failure modes), scored risk register (4 risks), treatment plan and release-gate decision (BLOCK) recorded in this audit pack.",
+  "summary": "Test plan (FMEA, 7 failure modes), scored risk register (4 risks), treatment plan and release-gate decision (BLOCK) recorded in this audit pack.",
   "title": "Documented go/no-go decision"
 }

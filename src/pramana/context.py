@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from functools import cached_property
 from pathlib import Path
@@ -13,7 +14,8 @@ import numpy as np
 import pandas as pd
 import yaml
 
-from pramana.adapters.llm import LLMClient, build_client
+from pramana.adapters.llm import Completion, EndpointUnavailable, LLMClient, build_client
+from pramana.probes import load_probe_file
 from pramana.spec import AuditSpec
 
 
@@ -26,6 +28,7 @@ class AuditContext:
         self.spec = spec
         self.audit_date = audit_date or date.today()
         self.rng = np.random.default_rng(spec.seed)
+        self._preflight: dict[str, Any] | Exception | None = None
 
     # Tabular artifacts ---------------------------------------------------
 
@@ -139,24 +142,20 @@ class AuditContext:
             raise MissingArtifact("No 'llm' section in the spec")
         return build_client(self.spec.llm)
 
+    @property
+    def llm_is_live(self) -> bool:
+        return self.spec.llm.get("mode", "replay") != "replay"
+
+    @property
+    def llm_samples(self) -> int:
+        return max(1, int(self.spec.llm.get("samples", 1)))
+
     @cached_property
     def probes(self) -> dict[str, Any]:
         path = self.spec.llm.get("probes")
         if not path:
             raise MissingArtifact("llm.probes is required for LLM checks")
-        data = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
-        canary = str(data.get("canary", ""))
-
-        def fill(value: Any) -> Any:
-            if isinstance(value, str):
-                return value.replace("{canary}", canary)
-            if isinstance(value, list):
-                return [fill(v) for v in value]
-            if isinstance(value, dict):
-                return {k: fill(v) for k, v in value.items()}
-            return value
-
-        return fill(data)
+        return load_probe_file(path)
 
     @cached_property
     def knowledge_base(self) -> str:
@@ -164,22 +163,130 @@ class AuditContext:
         return Path(path).read_text(encoding="utf-8") if path else ""
 
     @cached_property
+    def system_prompt(self) -> str:
+        """System prompt sent when auditing a raw model (apps use their own)."""
+        prompt = self.probes.get("system_prompt", "")
+        if self.spec.llm.get("include_knowledge_base") and self.knowledge_base:
+            prompt += "\n\nApproved product information:\n" + self.knowledge_base
+        return prompt
+
+    @cached_property
     def llm_transcript(self) -> list[dict[str, Any]]:
         """Every prompt/response exchanged during the audit, kept as evidence."""
         return []
 
-    def ask(self, category: str, probe: dict[str, Any]) -> str:
-        system = self.probes.get("system_prompt", "")
-        response = self.llm_client.complete(system, probe["prompt"])
-        self.llm_transcript.append(
-            {
-                "category": category,
-                "probe_id": probe["id"],
-                "prompt": probe["prompt"],
-                "response": response,
-            }
+    def llm_preflight(self) -> dict[str, Any]:
+        """One harmless request before probing. Fails fast if the endpoint is down."""
+        if self._preflight is not None:
+            if isinstance(self._preflight, Exception):
+                raise self._preflight
+            return self._preflight
+        if not self.llm_is_live:
+            self._preflight = {"skipped": "replay mode"}
+            return self._preflight
+        result = self.llm_client.complete(
+            self.system_prompt, "Hello. Please reply with one short sentence."
         )
-        return response
+        if not result.ok:
+            label = self.llm_client.describe().get("endpoint", "the endpoint")
+            self._preflight = EndpointUnavailable(
+                f"Cannot reach the system under audit at {label}: {result.error}. "
+                "Is the server running? Try `pramana ping <spec>`."
+            )
+            raise self._preflight
+        self._preflight = {"latency_ms": result.latency_ms, "model": result.model}
+        return self._preflight
+
+    def ask_all(self, category: str, probes: list[dict[str, Any]]) -> list[list[Completion]]:
+        """Send every probe ``samples`` times. Returns completions per probe, in order."""
+        self.llm_preflight()
+        jobs = [(i, s) for i in range(len(probes)) for s in range(self.llm_samples)]
+        results: dict[tuple[int, int], Completion] = {}
+        workers = max(1, int(self.spec.llm.get("concurrency", 1)))
+
+        def run(job: tuple[int, int]) -> tuple[tuple[int, int], Completion]:
+            i, s = job
+            return job, self.llm_client.complete(self.system_prompt, probes[i]["prompt"], sample=s)
+
+        if workers == 1:
+            for job in jobs:
+                key, completion = run(job)
+                results[key] = completion
+        else:
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                for key, completion in pool.map(run, jobs):
+                    results[key] = completion
+
+        out: list[list[Completion]] = []
+        for i, probe in enumerate(probes):
+            runs = [results[(i, s)] for s in range(self.llm_samples)]
+            for s, completion in enumerate(runs):
+                self.llm_transcript.append(
+                    {
+                        "category": category,
+                        "probe_id": probe["id"],
+                        "sample": s,
+                        "prompt": probe["prompt"],
+                        "response": completion.text,
+                        **{
+                            k: v
+                            for k, v in completion.to_dict().items()
+                            if k
+                            in (
+                                "latency_ms",
+                                "model",
+                                "error",
+                                "attempts",
+                                "finish_reason",
+                                "raw_text",
+                            )
+                        },
+                    }
+                )
+            out.append(runs)
+        return out
+
+    def replay_records(self) -> list[dict[str, Any]]:
+        """Transcript regrouped in replay format, so a live audit can be re-run offline."""
+        grouped: dict[str, dict[str, Any]] = {}
+        for entry in self.llm_transcript:
+            if entry.get("error"):
+                continue
+            record = grouped.setdefault(
+                entry["prompt"],
+                {"prompt": entry["prompt"], "responses": [], "model": entry.get("model")},
+            )
+            record["responses"].append(entry["response"])
+        return list(grouped.values())
+
+    def llm_run_summary(self) -> dict[str, Any]:
+        if not self.spec.llm:
+            return {}
+        try:
+            client = self.llm_client.describe()
+        except Exception:  # noqa: BLE001
+            client = {"mode": self.spec.llm.get("mode", "replay")}
+        latencies = sorted(
+            e["latency_ms"] for e in self.llm_transcript if e.get("latency_ms") is not None
+        )
+        models = sorted({e["model"] for e in self.llm_transcript if e.get("model")})
+        errors = sum(1 for e in self.llm_transcript if e.get("error"))
+
+        def pct(p: float) -> float | None:
+            if not latencies:
+                return None
+            return latencies[min(len(latencies) - 1, int(round(p * (len(latencies) - 1))))]
+
+        return {
+            **client,
+            "models_reported": models,
+            "samples_per_probe": self.llm_samples,
+            "calls": len(self.llm_transcript),
+            "errors": errors,
+            "latency_p50_ms": pct(0.5),
+            "latency_p95_ms": pct(0.95),
+            "probe_packs": self.probes.get("includes", []) if self.spec.llm.get("probes") else [],
+        }
 
     # Agents ---------------------------------------------------------------
 

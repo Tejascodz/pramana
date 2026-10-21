@@ -262,6 +262,20 @@ failure mode it targets and the framework controls its evidence supports.
 | EU AI Act | Art-50 | Transparency for systems that interact with people or generate content |
 | India AI Governance Guidelines | SUTRA-PEOPLE-FIRST | People first (human-centric design and oversight) |
 
+## `llm.service_health`
+
+- **Failure mode:** Endpoint errors, slow responses or unbounded output under test load
+- **Effect if missed:** Unavailable or costly service; degraded answers during peak demand
+
+| Framework | Control | Title |
+|---|---|---|
+| NIST AI Risk Management Framework | MEASURE-2.4 | System functionality and behaviour are monitored in production |
+| NIST AI Risk Management Framework | MANAGE-4.1 | Post-deployment monitoring plans are implemented |
+| OWASP Top 10 for LLM Applications | LLM10 | Unbounded consumption |
+| ISO/IEC 42001 Annex A | A.6.2.6 | Operation and monitoring |
+| EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
+| India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
+
 ## `agent.trace_auditability`
 
 - **Failure mode:** Agent actions cannot be attributed, reconstructed or shown to be approved

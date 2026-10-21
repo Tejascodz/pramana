@@ -24,7 +24,13 @@ def executive_summary(result) -> dict[str, Any]:
     applicable = sum(1 for c in result.coverage["controls"] if c["state"] != "not applicable")
     evidenced = sum(1 for c in result.coverage["controls"] if c["state"] == "evidenced")
 
-    if result.gate["decision"] == "BLOCK":
+    incomplete = result.gate.get("incomplete_checks", [])
+    if result.gate["decision"] == "BLOCK" and incomplete and not serious:
+        headline = (
+            f"Release is blocked: {len(incomplete)} test{'s' if len(incomplete) != 1 else ''} could not "
+            f"be completed for {spec.name} v{spec.system['version']}, so the audit cannot vouch for it yet."
+        )
+    elif result.gate["decision"] == "BLOCK":
         headline = (
             f"Release is blocked: {len(serious)} high or critical "
             f"{'risks need' if len(serious) != 1 else 'risk needs'} treatment before {spec.name} "

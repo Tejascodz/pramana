@@ -92,22 +92,37 @@ def build_register(
     return risks
 
 
-def gate_decision(risks: list[Risk], gate: dict[str, Any]) -> dict[str, Any]:
+def gate_decision(
+    risks: list[Risk], gate: dict[str, Any], incomplete: list[str] | None = None
+) -> dict[str, Any]:
+    """BLOCK if any open risk is in ``block_on``, or if a check could not complete.
+
+    An audit that could not run a test cannot vouch for that control, so errored
+    checks block release unless ``gate.allow_incomplete`` is set.
+    """
     block_on = {Severity(s) for s in gate.get("block_on", ["critical", "high"])}
     blocking = [r for r in risks if not r.accepted and r.rating in block_on]
     accepted = [r for r in risks if r.accepted]
+    incomplete = list(incomplete or [])
+    blocked_by_incomplete = bool(incomplete) and not gate.get("allow_incomplete", False)
     return {
-        "decision": "BLOCK" if blocking else "PASS",
+        "decision": "BLOCK" if blocking or blocked_by_incomplete else "PASS",
         "block_on": sorted(s.value for s in block_on),
         "blocking_risks": [r.risk_id for r in blocking],
         "accepted_risks": [r.risk_id for r in accepted],
+        "incomplete_checks": incomplete,
     }
 
 
-def audit_opinion(risks: list[Risk]) -> dict[str, str]:
+def audit_opinion(risks: list[Risk], incomplete: list[str] | None = None) -> dict[str, str]:
     """Overall rating in the style of an internal-audit report."""
     open_risks = [r for r in risks if not r.accepted]
     worst = max((r.rating for r in open_risks), key=lambda s: s.rank, default=Severity.INFO)
+    if incomplete and worst.rank < Severity.HIGH.rank:
+        return {
+            "rating": "Incomplete",
+            "statement": f"{len(incomplete)} test(s) could not be completed, so no opinion can be given on the controls they cover. Re-run once the inputs or endpoint are available.",
+        }
     if worst.rank >= Severity.HIGH.rank:
         return {
             "rating": "Ineffective",

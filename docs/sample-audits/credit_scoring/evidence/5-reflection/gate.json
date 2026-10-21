@@ -16,7 +16,8 @@
       "R-06",
       "R-07"
     ],
-    "decision": "BLOCK"
+    "decision": "BLOCK",
+    "incomplete_checks": []
   },
   "opinion": {
     "rating": "Ineffective",

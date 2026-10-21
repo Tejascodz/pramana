@@ -8,6 +8,7 @@ not only what was found but how the audit reached it.
 
 from __future__ import annotations
 
+import json
 import platform
 import traceback
 import uuid
@@ -48,6 +49,7 @@ class AuditResult:
     artifacts: list[dict[str, Any]]
     manual_evidence: list[dict[str, Any]]
     llm_transcript: list[dict[str, Any]] = field(default_factory=list)
+    llm_run: dict[str, Any] = field(default_factory=dict)
     ledger_root: str | None = None
     environment: dict[str, str] = field(default_factory=dict)
     ledger: EvidenceLedger | None = field(default=None, repr=False)
@@ -79,6 +81,7 @@ class AuditResult:
             "remediation": self.remediation,
             "artifacts": self.artifacts,
             "manual_evidence": self.manual_evidence,
+            "llm_run": self.llm_run,
             "ledger_root": self.ledger_root,
             "environment": self.environment,
         }
@@ -350,8 +353,12 @@ def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) ->
     for r in results:
         r.controls = library.controls_for_check(r.check_id)
         r.evidence_hash = ledger.add_json("4-testing", r.check_id, r.to_dict())
+    llm_run = ctx.llm_run_summary() if spec.llm else {}
     if ctx.llm_transcript:
         ledger.add_json("4-testing", "llm_transcript", ctx.llm_transcript)
+        ledger.add_json("4-testing", "llm_run", llm_run)
+        replay = "\n".join(json.dumps(r, ensure_ascii=False) for r in ctx.replay_records()) + "\n"
+        ledger.add_text("4-testing", "llm_replay", "llm_replay.jsonl", replay)
 
     # 5. Reflection ---------------------------------------------------------
     today = ctx.audit_date
@@ -362,8 +369,9 @@ def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) ->
         acceptances=spec.governance.get("risk_acceptances", []) or [],
         today=today,
     )
-    gate = gate_decision(risks, spec.gate)
-    opinion = audit_opinion(risks)
+    incomplete = [r.check_id for r in results if r.status == Status.ERROR]
+    gate = gate_decision(risks, spec.gate, incomplete)
+    opinion = audit_opinion(risks, incomplete)
     process = CheckResult(
         check_id="audit.process",
         title="Documented go/no-go decision",
@@ -405,6 +413,7 @@ def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) ->
         artifacts=artifacts,
         manual_evidence=manual,
         llm_transcript=list(ctx.llm_transcript),
+        llm_run=llm_run,
         ledger_root=ledger.root_hash,
         environment={"python": platform.python_version(), "pramana": __version__},
         ledger=ledger,

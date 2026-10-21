@@ -189,6 +189,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 <nav class="toc">
   <a href="#summary">Executive summary</a><a href="#risks">Risk register</a><a href="#findings">Findings</a>
   {% if fairness %}<a href="#fairness">Fairness</a>{% endif %}
+  {% if r.llm_run.get('calls') %}<a href="#live-run">Live test run</a>{% endif %}
   <a href="#coverage">Framework coverage</a><a href="#regulatory">Regulatory context</a>
   <a href="#remediation">Remediation plan</a><a href="#method">Method and evidence</a>
 </nav>
@@ -218,6 +219,13 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     </div>
   </div>
 </section>
+
+{% if r.gate.get('incomplete_checks') %}
+<section class="card" style="border-color: var(--critical)">
+  <p class="eyebrow">Audit incomplete</p>
+  <p>These tests could not be completed, so the release gate blocks until they are re-run: {% for c in r.gate.incomplete_checks %}<span class="tag">{{ c }}</span>{% endfor %}</p>
+</section>
+{% endif %}
 
 <section class="kpis" style="margin-bottom:18px">
   <div class="kpi"><div class="v">{{ counts.get('pass', 0) }}/{{ executed }}</div><div class="l">checks passed</div></div>
@@ -257,10 +265,15 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
       {% if c.controls %}<p>{% for ref in c.controls %}<span class="tag">{{ ref }}</span>{% endfor %}</p>{% endif %}
       {% if c.details.probes %}
       <div class="table-wrap"><table>
-        <thead><tr><th>Probe</th><th>Result</th><th>Response excerpt</th></tr></thead>
+        <thead><tr><th>Probe</th><th>Result</th>{% if multi_sample %}<th class="num">Samples failed</th>{% endif %}<th>Technique</th><th>Response excerpt</th></tr></thead>
         <tbody>{% for p in c.details.probes %}
-          {% set bad = p.get('succeeded') or p.get('disclosed') or (p.get('grounded') == False) or (p.get('compliant') == False) %}
-          <tr><td class="mono">{{ p.probe_id }}</td><td><span class="chip {{ 'fail' if bad else 'pass' }}">{{ 'fail' if bad else 'pass' }}</span></td><td>{{ p.response_excerpt }}</td></tr>
+          {% set bad = p.get('failed', p.get('succeeded') or p.get('disclosed') or (p.get('grounded') == False) or (p.get('compliant') == False)) %}
+          {% set state = 'error' if p.get('samples_evaluated', 1) == 0 else ('fail' if bad else 'pass') %}
+          <tr><td class="mono">{{ p.probe_id }}</td>
+          <td><span class="chip {{ state }}">{{ state }}</span>{% if p.get('needs_review') %} <span class="chip warn">review</span>{% endif %}</td>
+          {% if multi_sample %}<td class="num">{{ p.get('samples_failed', 0) }}/{{ p.get('samples_evaluated', 1) }}</td>{% endif %}
+          <td class="note">{{ p.get('technique') or p.get('rule') or '' }}{% if p.get('language') %} · {{ p.language }}{% endif %}{% if p.get('source') == 'held-out' %} · held out{% endif %}</td>
+          <td>{{ p.response_excerpt }}</td></tr>
         {% endfor %}</tbody></table></div>
       {% endif %}
       {% if c.metrics %}
@@ -292,6 +305,25 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
       <tr><td>{{ g.group }}{% if not g.adequate_sample %} <span class="note">(small sample)</span>{% endif %}</td><td class="num">{{ g.n }}</td><td class="num">{{ '%.1f%%' % (g.selection_rate * 100) }}</td></tr>
     {% endfor %}</tbody></table></div>
   {% endif %}
+</section>
+{% endif %}
+
+{% if r.llm_run.get('calls') %}
+<section class="card" id="live-run">
+  <p class="eyebrow">Test run</p>
+  <h2>{{ 'Live run against ' ~ r.llm_run.get('endpoint') if r.llm_run.get('endpoint') else 'Replayed transcript' }}</h2>
+  <div class="table-wrap"><table>
+    <tbody>
+      <tr><th>Mode</th><td>{{ r.llm_run.get('mode') }}</td></tr>
+      {% if r.llm_run.get('models_reported') %}<tr><th>Model reported by endpoint</th><td class="mono">{{ r.llm_run.models_reported | join(', ') }}</td></tr>{% endif %}
+      {% if r.llm_run.get('model_requested') %}<tr><th>Model requested</th><td class="mono">{{ r.llm_run.model_requested }}</td></tr>{% endif %}
+      <tr><th>Calls</th><td>{{ r.llm_run.calls }} ({{ r.llm_run.samples_per_probe }} sample{{ '' if r.llm_run.samples_per_probe == 1 else 's' }} per probe), {{ r.llm_run.errors }} failed</td></tr>
+      {% if r.llm_run.get('latency_p50_ms') is not none %}<tr><th>Latency</th><td>p50 {{ r.llm_run.latency_p50_ms | ms }} · p95 {{ r.llm_run.latency_p95_ms | ms }}</td></tr>{% endif %}
+      {% if r.llm_run.get('temperature') is not none %}<tr><th>Sampling</th><td>temperature {{ r.llm_run.temperature }}{% if r.llm_run.get('seed') is not none %}, seed {{ r.llm_run.seed }}{% endif %}, max tokens {{ r.llm_run.max_tokens }}</td></tr>{% endif %}
+      {% if r.llm_run.get('probe_packs') %}<tr><th>Probe packs</th><td>{% for pk in r.llm_run.probe_packs %}<span class="tag">{{ pk }}</span>{% endfor %}</td></tr>{% endif %}
+    </tbody>
+  </table></div>
+  <p class="note">Every prompt and response is in <span class="mono">evidence/4-testing/llm_transcript.json</span>. <span class="mono">llm_replay.jsonl</span> lets anyone re-run this exact audit offline with <span class="mono">llm.mode: replay</span>.</p>
 </section>
 {% endif %}
 

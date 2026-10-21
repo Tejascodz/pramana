@@ -19,6 +19,12 @@ Pramana supports an AI audit. It does not replace professional judgement, legal 
 
 ## LLM and agent testing
 
+- LLM outputs are stochastic. A single sample per probe can miss failures that appear on other runs; use `--samples` and read the confidence intervals. Repeated sampling raises attack success over time (Hughes et al., 2024), so a clean result is evidence for the tested budget only.
+- The guarded Niva build's input screen was written with knowledge of the built-in packs, so it is expected to stop them. Its real strength is measured by the held-out probes. Audits of production systems should always include probes the system's builders have not seen.
+- Small local models (3–4B parameters) behave differently from large hosted models. A result for `llama3.2:3b` says nothing about another model; record the model and re-audit after any change.
+- The probe library is small compared with research benchmarks and covers five Indian languages and scripts. It is a regression suite and a starting point, not a complete red-team.
+- The test suite uses a deliberately naive stand-in model so it can run offline. Its results test Pramana's plumbing and scoring, not any real model.
+
 - Probe sets are samples. Passing every probe does not prove safety; failing one proves a problem exists.
 - Deterministic scoring can miss paraphrased leaks or harmful content that avoids the configured markers, and can flag harmless numbers that are not in the knowledge base.
 - Replay mode audits the recorded behaviour, not the current deployment. Live mode depends on the endpoint behaving the same way in production.

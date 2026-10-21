@@ -12,6 +12,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 
 from pramana import __version__
 from pramana.audit.ledger import EvidenceLedger
+from pramana.checks.llm import fmt_ms
 from pramana.controls import load_library
 from pramana.reporting.charts import coverage_bars, group_bars, risk_heatmap
 from pramana.reporting.model_card import render_model_card
@@ -64,6 +65,7 @@ def render_html(result) -> str:
         trim_blocks=True,
         lstrip_blocks=True,
     )
+    env.filters["ms"] = fmt_ms
     template = env.get_template("report.html.j2")
     counts = Counter(r.status.value for r in result.results)
     executed = sum(1 for r in result.results if r.status not in (Status.SKIPPED,))
@@ -96,6 +98,7 @@ def render_html(result) -> str:
         intersectional=intersectional,
         min_group=int(result.spec.threshold("min_group_size")),
         frameworks_shown=frameworks_shown,
+        multi_sample=int(result.llm_run.get("samples_per_probe") or 1) > 1,
         calendar_reviewed=load_library().calendar.get("last_reviewed"),
         version=__version__,
     )

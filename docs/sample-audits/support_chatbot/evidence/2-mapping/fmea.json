@@ -75,6 +75,20 @@
     "failure_mode": "Assistant gives prohibited advice or omits required disclosures"
   },
   {
+    "check_id": "llm.service_health",
+    "controls": [
+      "NIST:MEASURE-2.4",
+      "NIST:MANAGE-4.1",
+      "OWASP-LLM:LLM10",
+      "ISO42001:A.6.2.6",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "detection": "Service health under test load",
+    "effect": "Unavailable or costly service; degraded answers during peak demand",
+    "failure_mode": "Endpoint errors, slow responses or unbounded output under test load"
+  },
+  {
     "check_id": "documentation.model_card",
     "controls": [
       "NIST:MAP-2.2",
