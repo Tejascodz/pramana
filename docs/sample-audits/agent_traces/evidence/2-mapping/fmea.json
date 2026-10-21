@@ -1,0 +1,57 @@
+[
+  {
+    "check_id": "governance.risk_classification",
+    "controls": [
+      "NIST:MAP-1.1",
+      "NIST:MAP-3.3",
+      "NIST:MAP-1.5",
+      "NIST:GOVERN-1.1",
+      "ISO42001:A.9.4",
+      "ISO42001:A.5.2",
+      "EUAIA:Art-5",
+      "EUAIA:Art-6",
+      "INDIA:PILLAR-RISK-MITIGATION"
+    ],
+    "detection": "Risk classification",
+    "effect": "Wrong obligations applied; high-risk duties missed",
+    "failure_mode": "System deployed without a documented risk classification"
+  },
+  {
+    "check_id": "agent.trace_auditability",
+    "controls": [
+      "NIST:MEASURE-2.8",
+      "NIST:GOVERN-3.2",
+      "NIST:MANAGE-4.3",
+      "NIST:MAP-3.5",
+      "ISO42001:A.6.2.8",
+      "OWASP-LLM:LLM06",
+      "EUAIA:Art-12",
+      "EUAIA:Art-14",
+      "INDIA:SUTRA-ACCOUNTABILITY",
+      "INDIA:PILLAR-ACCOUNTABILITY"
+    ],
+    "detection": "Agent action auditability",
+    "effect": "Accountability gap: actions occur with no traceable authority",
+    "failure_mode": "Agent actions cannot be attributed, reconstructed or shown to be approved"
+  },
+  {
+    "check_id": "documentation.model_card",
+    "controls": [
+      "NIST:MAP-2.2",
+      "NIST:MAP-3.5",
+      "NIST:GOVERN-4.2",
+      "NIST:MEASURE-2.8",
+      "ISO42001:A.6.2.3",
+      "ISO42001:A.6.2.7",
+      "ISO42001:A.8.2",
+      "EUAIA:Art-11",
+      "EUAIA:Art-13",
+      "EUAIA:Art-14",
+      "INDIA:SUTRA-UNDERSTANDABLE",
+      "INDIA:SUTRA-ACCOUNTABILITY"
+    ],
+    "detection": "Documentation and claims",
+    "effect": "Misuse outside scope; failed technical-documentation review",
+    "failure_mode": "Intended use, limitations and oversight measures are not documented"
+  }
+]

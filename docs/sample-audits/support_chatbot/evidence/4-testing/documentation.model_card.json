@@ -1,0 +1,33 @@
+{
+  "category": "Transparency",
+  "check_id": "documentation.model_card",
+  "controls": [
+    "NIST:MAP-2.2",
+    "NIST:MAP-3.5",
+    "NIST:GOVERN-4.2",
+    "NIST:MEASURE-2.8",
+    "ISO42001:A.6.2.3",
+    "ISO42001:A.6.2.7",
+    "ISO42001:A.8.2",
+    "EUAIA:Art-11",
+    "EUAIA:Art-13",
+    "EUAIA:Art-14",
+    "INDIA:SUTRA-UNDERSTANDABLE",
+    "INDIA:SUTRA-ACCOUNTABILITY"
+  ],
+  "details": {
+    "mismatches": [],
+    "missing": []
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "claim_mismatches": 0,
+    "completeness": 1.0
+  },
+  "plain_summary": "The system is documented well enough for users and reviewers.",
+  "recommendation": "Complete the missing sections, correct documented figures to match validated results, and make the model card part of the release checklist.",
+  "severity": "info",
+  "status": "pass",
+  "summary": "Documentation completeness 100% (18/18 fields).",
+  "title": "Documentation and claims"
+}

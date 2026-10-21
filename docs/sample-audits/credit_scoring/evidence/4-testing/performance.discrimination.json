@@ -1,0 +1,36 @@
+{
+  "category": "Performance",
+  "check_id": "performance.discrimination",
+  "controls": [
+    "NIST:MEASURE-2.3",
+    "NIST:MEASURE-2.5",
+    "NIST:MEASURE-2.1",
+    "NIST:MANAGE-1.1",
+    "ISO42001:A.6.2.4",
+    "EUAIA:Art-15",
+    "INDIA:SUTRA-SAFETY"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {
+    "accuracy": 0.773,
+    "auc": 0.7475,
+    "auc_ci_high": 0.7651,
+    "auc_ci_low": 0.7308,
+    "f1": 0.8592,
+    "generalization_gap": 0.2037,
+    "min_auc": 0.7,
+    "n_eval": 3660,
+    "positive_rate_observed": 0.7514,
+    "positive_rate_predicted": 0.8615,
+    "precision": 0.8043,
+    "recall": 0.9222,
+    "train_auc": 0.9512
+  },
+  "plain_summary": "The model tells good and bad outcomes apart correctly about 75% of the time, which meets the bar set for this use.",
+  "recommendation": "Track AUC in production monitoring with an alert at the declared minimum.",
+  "severity": "low",
+  "status": "warn",
+  "summary": "AUC 0.748 (95% CI 0.731-0.765) on 3660 held-out rows is above the declared minimum of 0.70. Accuracy 0.773, F1 0.859 at threshold 0.5. Training AUC is 0.951, 0.204 higher than on held-out data, which suggests overfitting.",
+  "title": "Predictive performance"
+}

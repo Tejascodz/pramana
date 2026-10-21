@@ -1,0 +1,99 @@
+{
+  "category": "Fairness",
+  "check_id": "fairness.proxy_features",
+  "controls": [
+    "NIST:MEASURE-2.11",
+    "NIST:MAP-2.3",
+    "ISO42001:A.7.4",
+    "ISO42001:A.7.6",
+    "EUAIA:Art-10",
+    "INDIA:SUTRA-FAIRNESS"
+  ],
+  "details": {
+    "flagged": [
+      {
+        "attribute": "residence",
+        "auc": 0.9882,
+        "feature": "pincode_risk_band"
+      },
+      {
+        "attribute": "residence",
+        "auc": 0.846,
+        "feature": "monthly_income"
+      },
+      {
+        "attribute": "age_band",
+        "auc": 0.8256,
+        "feature": "credit_history_months"
+      },
+      {
+        "attribute": "residence",
+        "auc": 0.7597,
+        "feature": "loan_amount"
+      },
+      {
+        "attribute": "residence",
+        "auc": 0.7252,
+        "feature": "employment_type"
+      }
+    ],
+    "matrix": {
+      "bureau_score": {
+        "age_band": 0.5555,
+        "gender": 0.5163,
+        "residence": 0.5103
+      },
+      "credit_history_months": {
+        "age_band": 0.8256,
+        "gender": 0.5065,
+        "residence": 0.5142
+      },
+      "debt_to_income": {
+        "age_band": 0.5269,
+        "gender": 0.5121,
+        "residence": 0.5217
+      },
+      "employment_type": {
+        "age_band": 0.5387,
+        "gender": 0.6151,
+        "residence": 0.7252
+      },
+      "existing_emis": {
+        "age_band": 0.5175,
+        "gender": 0.512,
+        "residence": 0.5297
+      },
+      "loan_amount": {
+        "age_band": 0.5263,
+        "gender": 0.5047,
+        "residence": 0.7597
+      },
+      "monthly_income": {
+        "age_band": 0.5067,
+        "gender": 0.5196,
+        "residence": 0.846
+      },
+      "pincode_risk_band": {
+        "age_band": 0.5323,
+        "gender": 0.5196,
+        "residence": 0.9882
+      },
+      "years_at_address": {
+        "age_band": 0.5538,
+        "gender": 0.5003,
+        "residence": 0.5127
+      }
+    }
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "direct_sensitive_inputs": 0,
+    "flagged_pairs": 5
+  },
+  "plain_summary": "Some inputs (e.g. 'pincode_risk_band') closely track 'residence', so the model can discriminate indirectly even though that attribute is excluded.",
+  "recommendation": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them.",
+  "severity": "high",
+  "status": "fail",
+  "summary": "5 feature/attribute pairs exceed proxy AUC 0.7: pincode_risk_band→residence (AUC 0.99), monthly_income→residence (AUC 0.85), credit_history_months→age_band (AUC 0.83), loan_amount→residence (AUC 0.76), employment_type→residence (AUC 0.73).",
+  "title": "Proxy-feature screening"
+}

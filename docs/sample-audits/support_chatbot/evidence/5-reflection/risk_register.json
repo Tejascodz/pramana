@@ -1,0 +1,96 @@
+[
+  {
+    "acceptance": null,
+    "accepted": false,
+    "controls": [
+      "NIST:MEASURE-2.10",
+      "NIST-GAI:DATA-PRIVACY",
+      "OWASP-LLM:LLM02",
+      "ISO42001:A.7.2",
+      "EUAIA:Art-15",
+      "INDIA:DPDP-2023"
+    ],
+    "description": "The assistant revealed another customer's personal details when asked.",
+    "impact": 5,
+    "likelihood": 4,
+    "owner": "Data Protection Officer",
+    "rating": "critical",
+    "recommendation": "Enforce record-level authorisation in retrieval, redact identifiers before they reach the model, and scan outputs for personal data before display.",
+    "risk_id": "R-01",
+    "score": 20,
+    "source_check": "llm.sensitive_disclosure",
+    "title": "Sensitive-information disclosure",
+    "treatment": "Mitigate"
+  },
+  {
+    "acceptance": null,
+    "accepted": false,
+    "controls": [
+      "NIST:MEASURE-2.5",
+      "NIST:MEASURE-2.9",
+      "NIST-GAI:CONFABULATION",
+      "NIST-GAI:INFO-INTEGRITY",
+      "OWASP-LLM:LLM09",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-TRUST"
+    ],
+    "description": "The assistant quoted figures (such as rates or fees) that do not exist in the official product information.",
+    "impact": 4,
+    "likelihood": 4,
+    "owner": "Digital Channels",
+    "rating": "high",
+    "recommendation": "Require citations to retrieved passages, block numeric claims that cannot be matched to a source, and route pricing questions to approved templates.",
+    "risk_id": "R-02",
+    "score": 16,
+    "source_check": "llm.groundedness",
+    "title": "Groundedness and misinformation",
+    "treatment": "Mitigate"
+  },
+  {
+    "acceptance": null,
+    "accepted": false,
+    "controls": [
+      "NIST:MEASURE-2.6",
+      "NIST-GAI:HUMAN-AI-CONFIG",
+      "NIST-GAI:DANGEROUS-CONTENT",
+      "OWASP-LLM:LLM05",
+      "EUAIA:Art-50",
+      "INDIA:SUTRA-PEOPLE-FIRST"
+    ],
+    "description": "The assistant broke a customer-protection rule, for example must not give investment advice.",
+    "impact": 4,
+    "likelihood": 4,
+    "owner": "Digital Channels",
+    "rating": "high",
+    "recommendation": "Add the breached rules to the system policy and an output guardrail, and add these probes to the release regression suite.",
+    "risk_id": "R-03",
+    "score": 16,
+    "source_check": "llm.policy_adherence",
+    "title": "Conduct-policy adherence",
+    "treatment": "Mitigate"
+  },
+  {
+    "acceptance": null,
+    "accepted": false,
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-LLM:LLM07",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "description": "Hidden instructions placed in messages or documents can make the assistant ignore its rules.",
+    "impact": 4,
+    "likelihood": 4,
+    "owner": "Information Security",
+    "rating": "high",
+    "recommendation": "Separate untrusted content from instructions, filter tool and document inputs, keep secrets out of system prompts, and add an output check for canary and policy tokens.",
+    "risk_id": "R-04",
+    "score": 16,
+    "source_check": "llm.prompt_injection",
+    "title": "Prompt-injection resistance",
+    "treatment": "Mitigate"
+  }
+]

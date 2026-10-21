@@ -1,0 +1,44 @@
+{
+  "category": "Data",
+  "check_id": "data_quality.integrity",
+  "controls": [
+    "NIST:MAP-2.3",
+    "NIST:MEASURE-2.1",
+    "ISO42001:A.7.4",
+    "ISO42001:A.7.6",
+    "ISO42001:A.4.3",
+    "EUAIA:Art-10"
+  ],
+  "details": {
+    "datasets": {
+      "evaluation_data": {
+        "duplicate_rate": 0.0164,
+        "high_missing": {
+          "bureau_score": 0.0661
+        },
+        "positive_rate": 0.7514,
+        "rows": 3660
+      },
+      "reference_data": {
+        "duplicate_rate": 0.0,
+        "high_missing": {
+          "bureau_score": 0.0702
+        },
+        "positive_rate": 0.7501,
+        "rows": 8400
+      }
+    },
+    "leakage": []
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "issues": 3,
+    "leakage_suspects": 0
+  },
+  "plain_summary": "Some input data is incomplete or duplicated, which can skew test results.",
+  "recommendation": "Document how missing values are handled, de-duplicate records, and confirm no input is recorded after the outcome it predicts.",
+  "severity": "low",
+  "status": "warn",
+  "summary": "Issues: evaluation_data: missing values above 5% in bureau_score; evaluation_data: 1.6% duplicate rows; reference_data: missing values above 5% in bureau_score.",
+  "title": "Data quality"
+}

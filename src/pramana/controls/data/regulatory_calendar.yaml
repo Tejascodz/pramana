@@ -1,0 +1,63 @@
+# Regulatory milestones used in the Scoping stage. Dates change; each entry has
+# a source and the date it was last checked. Update this file, not the code.
+last_reviewed: "2026-10-21"
+
+milestones:
+  - date: "2025-02-02"
+    regime: EU AI Act
+    obligation: "Prohibited practices (Art. 5) and AI literacy (Art. 4) apply"
+    tiers: [all]
+    source: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+  - date: "2025-08-02"
+    regime: EU AI Act
+    obligation: "Obligations for providers of general-purpose AI models apply"
+    tiers: [gpai]
+    source: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+
+  - date: "2026-08-02"
+    regime: EU AI Act
+    obligation: "Art. 50 transparency obligations and GPAI enforcement powers apply"
+    tiers: [limited, high, gpai]
+    source: https://www.processexcellencenetwork.com/ai/articles/eu-ai-act-2026-what-actually-changed-and-what-deployers-still-must-do
+
+  - date: "2026-12-02"
+    regime: EU AI Act
+    obligation: "Digital Omnibus: new prohibited practices apply; end of Art. 50(2) marking grace period for systems already on the market"
+    tiers: [all, limited, gpai]
+    source: https://pasqualepillitteri.it/en/news/5190/digital-omnibus-ai-act-eu-parliament
+
+  - date: "2027-12-02"
+    regime: EU AI Act
+    obligation: "High-risk obligations for stand-alone Annex III systems apply (deferred by Digital Omnibus)"
+    tiers: [high]
+    source: https://www.jdsupra.com/legalnews/eu-legislators-agree-to-delay-for-high-5617765/
+
+  - date: "2028-08-02"
+    regime: EU AI Act
+    obligation: "High-risk obligations for AI embedded in Annex I regulated products apply"
+    tiers: [high]
+    source: https://www.jdsupra.com/legalnews/eu-legislators-agree-to-delay-for-high-5617765/
+
+  - date: "2025-11-05"
+    regime: India AI Governance Guidelines
+    obligation: "Voluntary, principle-based guidelines published (seven sutras, six pillars)"
+    tiers: [all]
+    jurisdiction: IN
+    source: https://ianslive.in/govt-unveils-india-ai-governance-guidelines-to-ensure-safe-inclusive-adoption--20251105175148
+
+  - date: "2025-11-14"
+    regime: India DPDP Rules 2025
+    obligation: "DPDP Rules notified; obligations phase in over 12 to 18 months"
+    tiers: [all]
+    jurisdiction: IN
+    personal_data_only: true
+    source: https://www.deccanherald.com/india/centre-notifies-dpdp-rules-implementation-planned-in-phases-spread-over-12-18-months-3798465
+
+  - date: "2026-04-17"
+    regime: US SR 26-2 (Fed, OCC, FDIC)
+    obligation: "Revised model risk management guidance supersedes SR 11-7 for banking organizations"
+    tiers: [all]
+    jurisdiction: US
+    sector: financial_services
+    source: https://www.federalreserve.gov/supervisionreg/srletters/sr2602.htm

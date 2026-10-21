@@ -1,0 +1,39 @@
+{
+  "category": "Assurance",
+  "check_id": "audit.detector_sensitivity",
+  "controls": [
+    "NIST:MEASURE-2.13",
+    "NIST:MEASURE-1.2",
+    "ISO42001:A.6.2.4"
+  ],
+  "details": {
+    "canaries": [
+      {
+        "canary": "halve favourable decisions for gender=male",
+        "detected": true,
+        "observed": "DI 0.52"
+      },
+      {
+        "canary": "shift monthly_income by 1.5 standard deviations",
+        "detected": true,
+        "observed": "PSI 7.26"
+      },
+      {
+        "canary": "plant an email column in a copy of the data",
+        "detected": true,
+        "observed": "scanner run on planted column"
+      }
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "canaries": 3,
+    "missed": 0
+  },
+  "plain_summary": "The audit tests caught every defect deliberately planted to check them.",
+  "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
+  "severity": "info",
+  "status": "pass",
+  "summary": "3/3 planted defects detected. halve favourable decisions for gender=male: DI 0.52; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.",
+  "title": "Audit self-test (canaries)"
+}

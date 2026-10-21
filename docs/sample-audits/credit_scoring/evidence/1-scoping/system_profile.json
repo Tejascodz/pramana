@@ -1,0 +1,141 @@
+{
+  "audit_id": "PRM-20261021-CF4BB2",
+  "classification": {
+    "eu_applicable": true,
+    "eu_basis": [
+      "Art. 6(2) and Annex III point 5(b): Creditworthiness or credit scoring of natural persons"
+    ],
+    "eu_tier": "high",
+    "india_factors": [
+      "affects access to essential services, livelihood or rights (+3)",
+      "decisions are automated without human review (+2)",
+      "processes personal data under the DPDP Act (+1)",
+      "operates at large scale (+1)"
+    ],
+    "india_score": 7,
+    "india_sensitivity": "high",
+    "obligations": [
+      {
+        "date": "2025-02-02",
+        "days_remaining": 0,
+        "obligation": "Prohibited practices (Art. 5) and AI literacy (Art. 4) apply",
+        "regime": "EU AI Act",
+        "source": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+        "status": "in force"
+      },
+      {
+        "date": "2025-11-05",
+        "days_remaining": 0,
+        "obligation": "Voluntary, principle-based guidelines published (seven sutras, six pillars)",
+        "regime": "India AI Governance Guidelines",
+        "source": "https://ianslive.in/govt-unveils-india-ai-governance-guidelines-to-ensure-safe-inclusive-adoption--20251105175148",
+        "status": "in force"
+      },
+      {
+        "date": "2025-11-14",
+        "days_remaining": 0,
+        "obligation": "DPDP Rules notified; obligations phase in over 12 to 18 months",
+        "regime": "India DPDP Rules 2025",
+        "source": "https://www.deccanherald.com/india/centre-notifies-dpdp-rules-implementation-planned-in-phases-spread-over-12-18-months-3798465",
+        "status": "in force"
+      },
+      {
+        "date": "2026-08-02",
+        "days_remaining": 0,
+        "obligation": "Art. 50 transparency obligations and GPAI enforcement powers apply",
+        "regime": "EU AI Act",
+        "source": "https://www.processexcellencenetwork.com/ai/articles/eu-ai-act-2026-what-actually-changed-and-what-deployers-still-must-do",
+        "status": "in force"
+      },
+      {
+        "date": "2026-12-02",
+        "days_remaining": 42,
+        "obligation": "Digital Omnibus: new prohibited practices apply; end of Art. 50(2) marking grace period for systems already on the market",
+        "regime": "EU AI Act",
+        "source": "https://pasqualepillitteri.it/en/news/5190/digital-omnibus-ai-act-eu-parliament",
+        "status": "upcoming"
+      },
+      {
+        "date": "2027-12-02",
+        "days_remaining": 407,
+        "obligation": "High-risk obligations for stand-alone Annex III systems apply (deferred by Digital Omnibus)",
+        "regime": "EU AI Act",
+        "source": "https://www.jdsupra.com/legalnews/eu-legislators-agree-to-delay-for-high-5617765/",
+        "status": "upcoming"
+      },
+      {
+        "date": "2028-08-02",
+        "days_remaining": 651,
+        "obligation": "High-risk obligations for AI embedded in Annex I regulated products apply",
+        "regime": "EU AI Act",
+        "source": "https://www.jdsupra.com/legalnews/eu-legislators-agree-to-delay-for-high-5617765/",
+        "status": "upcoming"
+      }
+    ],
+    "sector_notes": [
+      "Regulated lending in India: the RBI FREE-AI framework (Aug 2025) is the sector reference; the India AI Governance Guidelines' seven sutras are adapted from it.",
+      "Personal data of Indian data principals: DPDP Act 2023 and DPDP Rules 2025 apply."
+    ]
+  },
+  "planned_checks": [
+    "governance.risk_classification",
+    "data_quality.integrity",
+    "performance.discrimination",
+    "calibration.reliability",
+    "fairness.group_parity",
+    "fairness.intersectional",
+    "fairness.proxy_features",
+    "robustness.perturbation",
+    "drift.population_stability",
+    "explainability.feature_importance",
+    "privacy.pii_exposure",
+    "privacy.membership_inference",
+    "documentation.model_card",
+    "audit.detector_sensitivity"
+  ],
+  "system": {
+    "accountable_executive": "Chief Risk Officer",
+    "description": "Gradient-boosted model that estimates the probability an applicant repays a personal loan. Applications scoring at or above the threshold are pre-approved; the rest go to manual underwriting.\n",
+    "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
+    "owner": "Credit Risk Analytics",
+    "type": "tabular_classifier",
+    "version": "2.3.0"
+  },
+  "thresholds": {
+    "agent_auditability_min": 0.9,
+    "disparate_impact_min": 0.8,
+    "duplicate_rate_max": 0.01,
+    "ece_max": 0.05,
+    "equalized_odds_max": 0.1,
+    "leakage_auc_max": 0.95,
+    "llm_attack_success_max": 0.0,
+    "llm_groundedness_min": 0.9,
+    "mia_auc_max": 0.6,
+    "min_auc": 0.7,
+    "min_group_size": 30,
+    "missing_rate_max": 0.05,
+    "model_card_min_completeness": 0.85,
+    "noise_flip_rate_max": 0.05,
+    "proxy_auc_max": 0.7,
+    "psi_fail": 0.25,
+    "psi_warn": 0.1
+  },
+  "use_case": {
+    "affected_persons": "Retail loan applicants in India and NRI applicants in the EU",
+    "annual_decisions": 240000,
+    "contestability": "medium",
+    "decision_role": "automated_decision",
+    "declared_eu_tier": "limited",
+    "deployment_regions": [
+      "IN",
+      "EU"
+    ],
+    "domain": "credit_scoring",
+    "generates_synthetic_content": false,
+    "interacts_with_people": false,
+    "processes_personal_data": true,
+    "prohibited_practice_flags": [],
+    "purpose": "Pre-approve unsecured personal loans for retail applicants.",
+    "vulnerable_groups": false
+  }
+}

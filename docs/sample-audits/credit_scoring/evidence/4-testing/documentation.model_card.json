@@ -1,0 +1,39 @@
+{
+  "category": "Transparency",
+  "check_id": "documentation.model_card",
+  "controls": [
+    "NIST:MAP-2.2",
+    "NIST:MAP-3.5",
+    "NIST:GOVERN-4.2",
+    "NIST:MEASURE-2.8",
+    "ISO42001:A.6.2.3",
+    "ISO42001:A.6.2.7",
+    "ISO42001:A.8.2",
+    "EUAIA:Art-11",
+    "EUAIA:Art-13",
+    "EUAIA:Art-14",
+    "INDIA:SUTRA-UNDERSTANDABLE",
+    "INDIA:SUTRA-ACCOUNTABILITY"
+  ],
+  "details": {
+    "mismatches": [
+      "documented AUC 0.81 but measured 0.748"
+    ],
+    "missing": [
+      "Out-of-scope uses",
+      "Override / appeal process",
+      "Impact assessment reference"
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "claim_mismatches": 1,
+    "completeness": 0.85
+  },
+  "plain_summary": "The documentation overstates or contradicts what the audit measured.",
+  "recommendation": "Complete the missing sections, correct documented figures to match validated results, and make the model card part of the release checklist.",
+  "severity": "medium",
+  "status": "fail",
+  "summary": "Documentation completeness 85% (17/20 fields). Missing: Out-of-scope uses, Override / appeal process, Impact assessment reference. Claims that do not match evidence: documented AUC 0.81 but measured 0.748.",
+  "title": "Documentation and claims"
+}

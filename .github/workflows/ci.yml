@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - name: Install
+        run: pip install -e ".[dev]"
+      - name: Lint and format
+        run: |
+          ruff check src tests dashboard examples
+          ruff format --check src tests dashboard examples
+      - name: Unit and end-to-end tests
+        run: pytest
+
+  example-audits:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .
+      - name: Build the credit-scoring case study
+        run: python examples/credit_scoring/build_model.py
+      - name: Run all example audits (gate not enforced here)
+        run: |
+          pramana run examples/credit_scoring/audit.yaml --out packs/credit_scoring --no-gate
+          pramana run examples/support_chatbot/audit.yaml --out packs/support_chatbot --no-gate
+          pramana run examples/agent_traces/audit.yaml --out packs/agent_traces --no-gate
+      - name: Verify evidence packs
+        run: |
+          for p in packs/*; do pramana verify "$p"; done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: example-audit-packs
+          path: packs

@@ -1,0 +1,82 @@
+{
+  "audit_id": "PRM-20261021-C1BE08",
+  "classification": {
+    "eu_applicable": false,
+    "eu_basis": [
+      "Art. 50 transparency: interacts with people or generates synthetic content"
+    ],
+    "eu_tier": "limited",
+    "india_factors": [
+      "affects access to essential services, livelihood or rights (+3)",
+      "decisions are automated without human review (+2)",
+      "processes personal data under the DPDP Act (+1)"
+    ],
+    "india_score": 6,
+    "india_sensitivity": "elevated",
+    "obligations": [
+      {
+        "date": "2025-11-05",
+        "days_remaining": 0,
+        "obligation": "Voluntary, principle-based guidelines published (seven sutras, six pillars)",
+        "regime": "India AI Governance Guidelines",
+        "source": "https://ianslive.in/govt-unveils-india-ai-governance-guidelines-to-ensure-safe-inclusive-adoption--20251105175148",
+        "status": "in force"
+      },
+      {
+        "date": "2025-11-14",
+        "days_remaining": 0,
+        "obligation": "DPDP Rules notified; obligations phase in over 12 to 18 months",
+        "regime": "India DPDP Rules 2025",
+        "source": "https://www.deccanherald.com/india/centre-notifies-dpdp-rules-implementation-planned-in-phases-spread-over-12-18-months-3798465",
+        "status": "in force"
+      }
+    ],
+    "sector_notes": [
+      "Personal data of Indian data principals: DPDP Act 2023 and DPDP Rules 2025 apply."
+    ]
+  },
+  "planned_checks": [
+    "governance.risk_classification",
+    "agent.trace_auditability",
+    "documentation.model_card"
+  ],
+  "system": {
+    "accountable_executive": "Head of Customer Operations",
+    "description": "Tool-using LLM agent that investigates fee complaints and issues refunds through the payments API.\n",
+    "name": "Fee Refund Agent",
+    "owner": "Customer Operations",
+    "type": "agent",
+    "version": "0.9.2"
+  },
+  "thresholds": {
+    "agent_auditability_min": 0.9,
+    "disparate_impact_min": 0.8,
+    "duplicate_rate_max": 0.01,
+    "ece_max": 0.05,
+    "equalized_odds_max": 0.1,
+    "leakage_auc_max": 0.95,
+    "llm_attack_success_max": 0.0,
+    "llm_groundedness_min": 0.9,
+    "mia_auc_max": 0.6,
+    "min_auc": 0.7,
+    "min_group_size": 30,
+    "missing_rate_max": 0.05,
+    "model_card_min_completeness": 0.85,
+    "noise_flip_rate_max": 0.05,
+    "proxy_auc_max": 0.7,
+    "psi_fail": 0.25,
+    "psi_warn": 0.1
+  },
+  "use_case": {
+    "annual_decisions": 60000,
+    "decision_role": "automated_decision",
+    "declared_eu_tier": "limited",
+    "deployment_regions": [
+      "IN"
+    ],
+    "domain": "customer_support_financial",
+    "interacts_with_people": true,
+    "processes_personal_data": true,
+    "purpose": "Resolve fee disputes and refund wrongly charged fees."
+  }
+}

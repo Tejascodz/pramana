@@ -1,0 +1,2126 @@
+{
+  "controls": [
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-1.1",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-1.1",
+      "state": "evidenced",
+      "title": "Legal and regulatory requirements for AI are understood, managed and documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-1.2",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-1.2",
+      "state": "not tested",
+      "title": "Trustworthy-AI characteristics are built into policies, processes and practices"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-1.3",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-1.3",
+      "state": "not tested",
+      "title": "Level of risk-management activity is set according to organizational risk tolerance"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-1.4",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-1.4",
+      "state": "not tested",
+      "title": "Risk-management process and outcomes are established through transparent policies and controls"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-1.5",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-1.5",
+      "state": "not tested",
+      "title": "Ongoing monitoring and periodic review of the risk process are planned, with clear roles"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-1.6",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-1.6",
+      "state": "not tested",
+      "title": "Mechanisms exist to inventory AI systems"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-1.7",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-1.7",
+      "state": "not tested",
+      "title": "Processes exist to decommission and phase out AI systems safely"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-2.1",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-2.1",
+      "state": "not tested",
+      "title": "Roles, responsibilities and lines of communication for AI risk are documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-2.2",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-2.2",
+      "state": "not tested",
+      "title": "Personnel and partners receive AI risk-management training"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-2.3",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-2.3",
+      "state": "not tested",
+      "title": "Executive leadership takes responsibility for decisions about AI risk"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-3.1",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-3.1",
+      "state": "not tested",
+      "title": "AI risk decisions are informed by a diverse team"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-3.2",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-3.2",
+      "state": "not tested",
+      "title": "Roles for human-AI configurations and oversight are defined"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-4.1",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-4.1",
+      "state": "not tested",
+      "title": "Practices foster critical thinking and a safety-first mindset"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-4.2",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-4.2",
+      "state": "evidenced",
+      "title": "Teams document risks and impacts of the AI they build and use, and communicate them"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-4.3",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-4.3",
+      "state": "not tested",
+      "title": "Practices enable AI testing, incident identification and information sharing"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-5.1",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-5.1",
+      "state": "not tested",
+      "title": "Feedback from external stakeholders is collected and integrated"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-5.2",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-5.2",
+      "state": "not tested",
+      "title": "Adjudicated feedback from AI actors is regularly incorporated into design"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-6.1",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-6.1",
+      "state": "not tested",
+      "title": "Policies address risks from third-party entities, including IP"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "GOVERN",
+      "id": "GOVERN-6.2",
+      "manual_evidence": [],
+      "ref": "NIST:GOVERN-6.2",
+      "state": "not tested",
+      "title": "Contingency processes handle failures in high-risk third-party data or AI"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-1.1",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-1.1",
+      "state": "evidenced",
+      "title": "Intended purpose, context, applicable laws and deployment setting are documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-1.2",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-1.2",
+      "state": "not tested",
+      "title": "Interdisciplinary and diverse actors establish context"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-1.3",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-1.3",
+      "state": "not tested",
+      "title": "Organizational mission and goals for the AI are documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-1.4",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-1.4",
+      "state": "not tested",
+      "title": "Business value or context of use is clearly defined"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-1.5",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-1.5",
+      "state": "evidenced",
+      "title": "Organizational risk tolerances are determined and documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-1.6",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-1.6",
+      "state": "not tested",
+      "title": "System requirements are elicited and understood by relevant actors"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-2.1",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-2.1",
+      "state": "not tested",
+      "title": "Tasks and methods the AI system supports are defined"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-2.2",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-2.2",
+      "state": "evidenced",
+      "title": "Knowledge limits and how outputs are used and overseen by humans are documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-2.3",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-2.3",
+      "state": "not tested",
+      "title": "Scientific integrity and TEVV considerations are identified and documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-3.1",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-3.1",
+      "state": "not tested",
+      "title": "Potential benefits of the system are examined and documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-3.2",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-3.2",
+      "state": "not tested",
+      "title": "Potential costs of AI errors, including non-monetary costs, are documented"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-3.3",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-3.3",
+      "state": "evidenced",
+      "title": "Targeted application scope is specified based on capability and categorization"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-3.4",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-3.4",
+      "state": "not tested",
+      "title": "Operator and practitioner proficiency processes are defined and assessed"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-3.5",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-3.5",
+      "state": "evidenced",
+      "title": "Human oversight processes are defined, assessed and documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-4.1",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-4.1",
+      "state": "not tested",
+      "title": "Technology and legal risks of components, incl. third-party data/software, are mapped"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-4.2",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-4.2",
+      "state": "not tested",
+      "title": "Internal risk controls for system components are identified and documented"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-5.1",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-5.1",
+      "state": "evidenced",
+      "title": "Likelihood and magnitude of each identified impact are documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MAP",
+      "id": "MAP-5.2",
+      "manual_evidence": [],
+      "ref": "NIST:MAP-5.2",
+      "state": "not tested",
+      "title": "Engagement with AI actors about positive and negative impacts is in place"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-1.1",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-1.1",
+      "state": "evidenced",
+      "title": "Metrics for the most significant mapped risks are selected and implemented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-1.2",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-1.2",
+      "state": "not tested",
+      "title": "Appropriateness of metrics and effectiveness of controls are regularly reassessed"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-1.3",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-1.3",
+      "state": "not tested",
+      "title": "Independent assessors or non-developer experts are involved in assessments"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.1",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.1",
+      "state": "evidenced",
+      "title": "Test sets, metrics and TEVV tool details are documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.2",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.2",
+      "state": "not tested",
+      "title": "Human-subject evaluations meet requirements and represent the population"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.3",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.3",
+      "state": "not tested",
+      "title": "Performance is measured and demonstrated for deployment-like conditions"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.4",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.4",
+      "state": "not tested",
+      "title": "System functionality and behaviour are monitored in production"
+    },
+    {
+      "checks": [
+        "llm.groundedness"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.5",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.5",
+      "state": "deficient",
+      "title": "System is shown to be valid and reliable; generalization limits documented"
+    },
+    {
+      "checks": [
+        "llm.policy_adherence"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.6",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.6",
+      "state": "deficient",
+      "title": "System is regularly evaluated for safety risks"
+    },
+    {
+      "checks": [
+        "llm.prompt_injection"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.7",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.7",
+      "state": "deficient",
+      "title": "Security and resilience are evaluated and documented"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.8",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.8",
+      "state": "evidenced",
+      "title": "Transparency and accountability risks are examined and documented"
+    },
+    {
+      "checks": [
+        "llm.groundedness"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.9",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.9",
+      "state": "deficient",
+      "title": "Model is explained, validated and documented; outputs interpreted in context"
+    },
+    {
+      "checks": [
+        "llm.sensitive_disclosure"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.10",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.10",
+      "state": "deficient",
+      "title": "Privacy risk is examined and documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.11",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.11",
+      "state": "not tested",
+      "title": "Fairness and bias are evaluated and results documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.12",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.12",
+      "state": "not tested",
+      "title": "Environmental impact and sustainability are assessed"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-2.13",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-2.13",
+      "state": "not tested",
+      "title": "Effectiveness of TEVV metrics and processes is evaluated"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-3.1",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-3.1",
+      "state": "not tested",
+      "title": "Existing, unanticipated and emergent risks are regularly tracked"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-3.2",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-3.2",
+      "state": "not tested",
+      "title": "Risk tracking is considered where risks are hard to measure"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-3.3",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-3.3",
+      "state": "not tested",
+      "title": "Feedback and appeal processes for users and affected communities exist"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-4.1",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-4.1",
+      "state": "not tested",
+      "title": "Measurement approaches are connected to deployment context with domain input"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-4.2",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-4.2",
+      "state": "not tested",
+      "title": "Trustworthiness results in deployment are validated with domain experts"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "NIST",
+      "group": "MEASURE",
+      "id": "MEASURE-4.3",
+      "manual_evidence": [],
+      "ref": "NIST:MEASURE-4.3",
+      "state": "not tested",
+      "title": "Measurable performance improvements or declines are identified and documented"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-1.1",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-1.1",
+      "state": "evidenced",
+      "title": "A go/no-go determination is made on whether deployment should proceed"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-1.2",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-1.2",
+      "state": "evidenced",
+      "title": "Risk treatment is prioritized by impact, likelihood and resources"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-1.3",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-1.3",
+      "state": "evidenced",
+      "title": "Responses to high-priority risks are planned and documented"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-1.4",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-1.4",
+      "state": "evidenced",
+      "title": "Negative residual risks are documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-2.1",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-2.1",
+      "state": "not tested",
+      "title": "Resources to manage risk and non-AI alternatives are considered"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-2.2",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-2.2",
+      "state": "not tested",
+      "title": "Mechanisms sustain the value of deployed AI systems"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-2.3",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-2.3",
+      "state": "not tested",
+      "title": "Procedures exist to respond to previously unknown risks"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-2.4",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-2.4",
+      "state": "not tested",
+      "title": "Mechanisms exist to supersede, disengage or deactivate misbehaving systems"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-3.1",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-3.1",
+      "state": "not tested",
+      "title": "Third-party AI risks are monitored and controls documented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-3.2",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-3.2",
+      "state": "not tested",
+      "title": "Pre-trained models used in development are monitored"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-4.1",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-4.1",
+      "state": "not tested",
+      "title": "Post-deployment monitoring plans are implemented"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-4.2",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-4.2",
+      "state": "not tested",
+      "title": "Continual-improvement activities are integrated into updates"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST",
+      "group": "MANAGE",
+      "id": "MANAGE-4.3",
+      "manual_evidence": [],
+      "ref": "NIST:MANAGE-4.3",
+      "state": "not tested",
+      "title": "Incidents and errors are tracked, communicated and recovered from"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "CBRN",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:CBRN",
+      "state": "not tested",
+      "title": "CBRN information or capabilities"
+    },
+    {
+      "checks": [
+        "llm.groundedness"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "CONFABULATION",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:CONFABULATION",
+      "state": "deficient",
+      "title": "Confabulation (confidently stated false content)"
+    },
+    {
+      "checks": [
+        "llm.policy_adherence"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "DANGEROUS-CONTENT",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:DANGEROUS-CONTENT",
+      "state": "deficient",
+      "title": "Dangerous, violent or hateful content"
+    },
+    {
+      "checks": [
+        "llm.sensitive_disclosure"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "DATA-PRIVACY",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:DATA-PRIVACY",
+      "state": "deficient",
+      "title": "Data privacy (leakage or inference of personal data)"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "ENVIRONMENTAL",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:ENVIRONMENTAL",
+      "state": "not tested",
+      "title": "Environmental impacts"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "HARMFUL-BIAS",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:HARMFUL-BIAS",
+      "state": "not tested",
+      "title": "Harmful bias and homogenization"
+    },
+    {
+      "checks": [
+        "llm.policy_adherence"
+      ],
+      "evidence_type": "both",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "HUMAN-AI-CONFIG",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:HUMAN-AI-CONFIG",
+      "state": "deficient",
+      "title": "Human-AI configuration (over-reliance, anthropomorphism)"
+    },
+    {
+      "checks": [
+        "llm.groundedness"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "INFO-INTEGRITY",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:INFO-INTEGRITY",
+      "state": "deficient",
+      "title": "Information integrity"
+    },
+    {
+      "checks": [
+        "llm.prompt_injection"
+      ],
+      "evidence_type": "technical",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "INFO-SECURITY",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:INFO-SECURITY",
+      "state": "deficient",
+      "title": "Information security (e.g. prompt injection)"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "IP",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:IP",
+      "state": "not tested",
+      "title": "Intellectual property"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "OBSCENE-CONTENT",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:OBSCENE-CONTENT",
+      "state": "not tested",
+      "title": "Obscene, degrading or abusive content"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "NIST-GAI",
+      "group": "GenAI risk",
+      "id": "VALUE-CHAIN",
+      "manual_evidence": [],
+      "ref": "NIST-GAI:VALUE-CHAIN",
+      "state": "not tested",
+      "title": "Value chain and component integration"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.2 AI policy",
+      "id": "A.2.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.2.2",
+      "state": "not tested",
+      "title": "AI policy"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.2 AI policy",
+      "id": "A.2.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.2.3",
+      "state": "not tested",
+      "title": "Alignment with other organizational policies"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.2 AI policy",
+      "id": "A.2.4",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.2.4",
+      "state": "not tested",
+      "title": "Review of the AI policy"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.3 Internal organization",
+      "id": "A.3.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.3.2",
+      "state": "not tested",
+      "title": "AI roles and responsibilities"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.3 Internal organization",
+      "id": "A.3.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.3.3",
+      "state": "not tested",
+      "title": "Reporting of concerns"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.4 Resources",
+      "id": "A.4.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.4.2",
+      "state": "not tested",
+      "title": "Resource documentation"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.4 Resources",
+      "id": "A.4.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.4.3",
+      "state": "not tested",
+      "title": "Data resources"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.4 Resources",
+      "id": "A.4.4",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.4.4",
+      "state": "not tested",
+      "title": "Tooling resources"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.4 Resources",
+      "id": "A.4.5",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.4.5",
+      "state": "not tested",
+      "title": "System and computing resources"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.4 Resources",
+      "id": "A.4.6",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.4.6",
+      "state": "not tested",
+      "title": "Human resources"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.5 Impact assessment",
+      "id": "A.5.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.5.2",
+      "state": "evidenced",
+      "title": "AI system impact assessment process"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.5 Impact assessment",
+      "id": "A.5.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.5.3",
+      "state": "evidenced",
+      "title": "Documentation of impact assessments"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.5 Impact assessment",
+      "id": "A.5.4",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.5.4",
+      "state": "not tested",
+      "title": "Impact on individuals or groups of individuals"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.5 Impact assessment",
+      "id": "A.5.5",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.5.5",
+      "state": "not tested",
+      "title": "Societal impacts of AI systems"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.1.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.1.2",
+      "state": "not tested",
+      "title": "Objectives for responsible development"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.1.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.1.3",
+      "state": "not tested",
+      "title": "Processes for responsible design and development"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.2.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.2.2",
+      "state": "not tested",
+      "title": "System requirements and specification"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.2.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.2.3",
+      "state": "evidenced",
+      "title": "Documentation of design and development"
+    },
+    {
+      "checks": [
+        "llm.prompt_injection"
+      ],
+      "evidence_type": "technical",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.2.4",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.2.4",
+      "state": "deficient",
+      "title": "Verification and validation"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.2.5",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.2.5",
+      "state": "not tested",
+      "title": "Deployment"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.2.6",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.2.6",
+      "state": "not tested",
+      "title": "Operation and monitoring"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.2.7",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.2.7",
+      "state": "evidenced",
+      "title": "Technical documentation"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "ISO42001",
+      "group": "A.6 Life cycle",
+      "id": "A.6.2.8",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.6.2.8",
+      "state": "not tested",
+      "title": "Recording of event logs"
+    },
+    {
+      "checks": [
+        "llm.sensitive_disclosure"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.7 Data",
+      "id": "A.7.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.7.2",
+      "state": "deficient",
+      "title": "Data for development and enhancement"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.7 Data",
+      "id": "A.7.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.7.3",
+      "state": "not tested",
+      "title": "Acquisition of data"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "ISO42001",
+      "group": "A.7 Data",
+      "id": "A.7.4",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.7.4",
+      "state": "not tested",
+      "title": "Quality of data"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.7 Data",
+      "id": "A.7.5",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.7.5",
+      "state": "not tested",
+      "title": "Data provenance"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.7 Data",
+      "id": "A.7.6",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.7.6",
+      "state": "not tested",
+      "title": "Data preparation"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.8 Information for interested parties",
+      "id": "A.8.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.8.2",
+      "state": "evidenced",
+      "title": "System documentation and information for users"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.8 Information for interested parties",
+      "id": "A.8.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.8.3",
+      "state": "not tested",
+      "title": "External reporting"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.8 Information for interested parties",
+      "id": "A.8.4",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.8.4",
+      "state": "not tested",
+      "title": "Communication of incidents"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.8 Information for interested parties",
+      "id": "A.8.5",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.8.5",
+      "state": "not tested",
+      "title": "Information for interested parties"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.9 Use of AI systems",
+      "id": "A.9.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.9.2",
+      "state": "not tested",
+      "title": "Processes for responsible use"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.9 Use of AI systems",
+      "id": "A.9.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.9.3",
+      "state": "not tested",
+      "title": "Objectives for responsible use"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42001",
+      "group": "A.9 Use of AI systems",
+      "id": "A.9.4",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.9.4",
+      "state": "evidenced",
+      "title": "Intended use of the AI system"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.10 Third parties",
+      "id": "A.10.2",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.10.2",
+      "state": "not tested",
+      "title": "Allocating responsibilities"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.10 Third parties",
+      "id": "A.10.3",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.10.3",
+      "state": "not tested",
+      "title": "Suppliers"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42001",
+      "group": "A.10 Third parties",
+      "id": "A.10.4",
+      "manual_evidence": [],
+      "ref": "ISO42001:A.10.4",
+      "state": "not tested",
+      "title": "Customers"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "EUAIA",
+      "group": "General provisions",
+      "id": "Art-4",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-4",
+      "state": "not tested",
+      "title": "AI literacy of staff and operators"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "organizational",
+      "framework": "EUAIA",
+      "group": "Prohibited practices",
+      "id": "Art-5",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-5",
+      "state": "evidenced",
+      "title": "Prohibited AI practices"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "both",
+      "framework": "EUAIA",
+      "group": "High-risk systems",
+      "id": "Art-6",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-6",
+      "state": "evidenced",
+      "title": "Classification rules for high-risk AI systems"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "EUAIA",
+      "group": "High-risk systems",
+      "id": "Art-9",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-9",
+      "state": "not applicable",
+      "title": "Risk management system"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "EUAIA",
+      "group": "High-risk systems",
+      "id": "Art-10",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-10",
+      "state": "not applicable",
+      "title": "Data and data governance (quality, relevance, bias examination)"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "EUAIA",
+      "group": "High-risk systems",
+      "id": "Art-11",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-11",
+      "state": "not applicable",
+      "title": "Technical documentation (Annex IV)"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "EUAIA",
+      "group": "High-risk systems",
+      "id": "Art-12",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-12",
+      "state": "not applicable",
+      "title": "Record-keeping and automatic event logging"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "EUAIA",
+      "group": "High-risk systems",
+      "id": "Art-13",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-13",
+      "state": "not applicable",
+      "title": "Transparency and information to deployers"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "EUAIA",
+      "group": "High-risk systems",
+      "id": "Art-14",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-14",
+      "state": "not applicable",
+      "title": "Human oversight"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "EUAIA",
+      "group": "High-risk systems",
+      "id": "Art-15",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-15",
+      "state": "not applicable",
+      "title": "Accuracy, robustness and cybersecurity"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "EUAIA",
+      "group": "Provider obligations",
+      "id": "Art-17",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-17",
+      "state": "not applicable",
+      "title": "Quality management system"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "EUAIA",
+      "group": "Deployer obligations",
+      "id": "Art-26",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-26",
+      "state": "not applicable",
+      "title": "Obligations of deployers of high-risk systems"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "EUAIA",
+      "group": "Deployer obligations",
+      "id": "Art-27",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-27",
+      "state": "not applicable",
+      "title": "Fundamental rights impact assessment"
+    },
+    {
+      "checks": [
+        "llm.policy_adherence"
+      ],
+      "evidence_type": "both",
+      "framework": "EUAIA",
+      "group": "Transparency",
+      "id": "Art-50",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-50",
+      "state": "deficient",
+      "title": "Transparency for systems that interact with people or generate content"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "EUAIA",
+      "group": "General-purpose AI",
+      "id": "Art-53",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-53",
+      "state": "not applicable",
+      "title": "Obligations for providers of general-purpose AI models"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "EUAIA",
+      "group": "Post-market",
+      "id": "Art-72",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-72",
+      "state": "not applicable",
+      "title": "Post-market monitoring"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "EUAIA",
+      "group": "Post-market",
+      "id": "Art-73",
+      "manual_evidence": [],
+      "ref": "EUAIA:Art-73",
+      "state": "not applicable",
+      "title": "Reporting of serious incidents"
+    },
+    {
+      "checks": [
+        "llm.groundedness"
+      ],
+      "evidence_type": "both",
+      "framework": "INDIA",
+      "group": "Sutras",
+      "id": "SUTRA-TRUST",
+      "manual_evidence": [],
+      "ref": "INDIA:SUTRA-TRUST",
+      "state": "deficient",
+      "title": "Trust is the foundation"
+    },
+    {
+      "checks": [
+        "llm.policy_adherence"
+      ],
+      "evidence_type": "both",
+      "framework": "INDIA",
+      "group": "Sutras",
+      "id": "SUTRA-PEOPLE-FIRST",
+      "manual_evidence": [],
+      "ref": "INDIA:SUTRA-PEOPLE-FIRST",
+      "state": "deficient",
+      "title": "People first (human-centric design and oversight)"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "INDIA",
+      "group": "Sutras",
+      "id": "SUTRA-INNOVATION",
+      "manual_evidence": [],
+      "ref": "INDIA:SUTRA-INNOVATION",
+      "state": "not tested",
+      "title": "Innovation over restraint"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "INDIA",
+      "group": "Sutras",
+      "id": "SUTRA-FAIRNESS",
+      "manual_evidence": [],
+      "ref": "INDIA:SUTRA-FAIRNESS",
+      "state": "not tested",
+      "title": "Fairness and equity"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "INDIA",
+      "group": "Sutras",
+      "id": "SUTRA-ACCOUNTABILITY",
+      "manual_evidence": [],
+      "ref": "INDIA:SUTRA-ACCOUNTABILITY",
+      "state": "evidenced",
+      "title": "Accountability"
+    },
+    {
+      "checks": [
+        "documentation.model_card"
+      ],
+      "evidence_type": "both",
+      "framework": "INDIA",
+      "group": "Sutras",
+      "id": "SUTRA-UNDERSTANDABLE",
+      "manual_evidence": [],
+      "ref": "INDIA:SUTRA-UNDERSTANDABLE",
+      "state": "evidenced",
+      "title": "Understandable by design"
+    },
+    {
+      "checks": [
+        "llm.prompt_injection"
+      ],
+      "evidence_type": "technical",
+      "framework": "INDIA",
+      "group": "Sutras",
+      "id": "SUTRA-SAFETY",
+      "manual_evidence": [],
+      "ref": "INDIA:SUTRA-SAFETY",
+      "state": "deficient",
+      "title": "Safety, resilience and sustainability"
+    },
+    {
+      "checks": [
+        "governance.risk_classification",
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "INDIA",
+      "group": "Pillars",
+      "id": "PILLAR-RISK-MITIGATION",
+      "manual_evidence": [],
+      "ref": "INDIA:PILLAR-RISK-MITIGATION",
+      "state": "evidenced",
+      "title": "Risk mitigation (evidence-based risk assessment, techno-legal measures)"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "INDIA",
+      "group": "Pillars",
+      "id": "PILLAR-ACCOUNTABILITY",
+      "manual_evidence": [],
+      "ref": "INDIA:PILLAR-ACCOUNTABILITY",
+      "state": "not tested",
+      "title": "Accountability (graded liability tied to function and risk)"
+    },
+    {
+      "checks": [
+        "llm.sensitive_disclosure"
+      ],
+      "evidence_type": "both",
+      "framework": "INDIA",
+      "group": "Related law",
+      "id": "DPDP-2023",
+      "manual_evidence": [],
+      "ref": "INDIA:DPDP-2023",
+      "state": "deficient",
+      "title": "Digital Personal Data Protection Act 2023 and DPDP Rules 2025"
+    },
+    {
+      "checks": [
+        "llm.prompt_injection"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM01",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM01",
+      "state": "deficient",
+      "title": "Prompt injection"
+    },
+    {
+      "checks": [
+        "llm.sensitive_disclosure"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM02",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM02",
+      "state": "deficient",
+      "title": "Sensitive information disclosure"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM03",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM03",
+      "state": "not tested",
+      "title": "Supply chain"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM04",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM04",
+      "state": "not tested",
+      "title": "Data and model poisoning"
+    },
+    {
+      "checks": [
+        "llm.policy_adherence"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM05",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM05",
+      "state": "deficient",
+      "title": "Improper output handling"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM06",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM06",
+      "state": "not tested",
+      "title": "Excessive agency"
+    },
+    {
+      "checks": [
+        "llm.prompt_injection"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM07",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM07",
+      "state": "deficient",
+      "title": "System prompt leakage"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM08",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM08",
+      "state": "not tested",
+      "title": "Vector and embedding weaknesses"
+    },
+    {
+      "checks": [
+        "llm.groundedness"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM09",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM09",
+      "state": "deficient",
+      "title": "Misinformation"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "OWASP-LLM",
+      "group": "Top 10",
+      "id": "LLM10",
+      "manual_evidence": [],
+      "ref": "OWASP-LLM:LLM10",
+      "state": "not tested",
+      "title": "Unbounded consumption"
+    }
+  ],
+  "frameworks": {
+    "EUAIA": {
+      "group_label": "Chapter",
+      "groups": {
+        "Deployer obligations": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 2,
+          "not tested": 0,
+          "partial": 0
+        },
+        "General provisions": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 1,
+          "partial": 0
+        },
+        "General-purpose AI": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 1,
+          "not tested": 0,
+          "partial": 0
+        },
+        "High-risk systems": {
+          "deficient": 0,
+          "evidenced": 1,
+          "not applicable": 7,
+          "not tested": 0,
+          "partial": 0
+        },
+        "Post-market": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 2,
+          "not tested": 0,
+          "partial": 0
+        },
+        "Prohibited practices": {
+          "deficient": 0,
+          "evidenced": 1,
+          "not applicable": 0,
+          "not tested": 0,
+          "partial": 0
+        },
+        "Provider obligations": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 1,
+          "not tested": 0,
+          "partial": 0
+        },
+        "Transparency": {
+          "deficient": 1,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 0,
+          "partial": 0
+        }
+      },
+      "name": "EU AI Act",
+      "source": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+      "totals": {
+        "deficient": 1,
+        "evidenced": 2,
+        "not applicable": 13,
+        "not tested": 1,
+        "partial": 0
+      },
+      "version": "2024/1689 as amended by 2026/1744"
+    },
+    "INDIA": {
+      "group_label": "Element",
+      "groups": {
+        "Pillars": {
+          "deficient": 0,
+          "evidenced": 1,
+          "not applicable": 0,
+          "not tested": 1,
+          "partial": 0
+        },
+        "Related law": {
+          "deficient": 1,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 0,
+          "partial": 0
+        },
+        "Sutras": {
+          "deficient": 3,
+          "evidenced": 2,
+          "not applicable": 0,
+          "not tested": 2,
+          "partial": 0
+        }
+      },
+      "name": "India AI Governance Guidelines",
+      "source": "https://indiaai.gov.in/",
+      "totals": {
+        "deficient": 4,
+        "evidenced": 3,
+        "not applicable": 0,
+        "not tested": 3,
+        "partial": 0
+      },
+      "version": "MeitY, Nov 2025"
+    },
+    "ISO42001": {
+      "group_label": "Objective",
+      "groups": {
+        "A.10 Third parties": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 3,
+          "partial": 0
+        },
+        "A.2 AI policy": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 3,
+          "partial": 0
+        },
+        "A.3 Internal organization": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 2,
+          "partial": 0
+        },
+        "A.4 Resources": {
+          "deficient": 0,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 5,
+          "partial": 0
+        },
+        "A.5 Impact assessment": {
+          "deficient": 0,
+          "evidenced": 2,
+          "not applicable": 0,
+          "not tested": 2,
+          "partial": 0
+        },
+        "A.6 Life cycle": {
+          "deficient": 1,
+          "evidenced": 2,
+          "not applicable": 0,
+          "not tested": 6,
+          "partial": 0
+        },
+        "A.7 Data": {
+          "deficient": 1,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 4,
+          "partial": 0
+        },
+        "A.8 Information for interested parties": {
+          "deficient": 0,
+          "evidenced": 1,
+          "not applicable": 0,
+          "not tested": 3,
+          "partial": 0
+        },
+        "A.9 Use of AI systems": {
+          "deficient": 0,
+          "evidenced": 1,
+          "not applicable": 0,
+          "not tested": 2,
+          "partial": 0
+        }
+      },
+      "name": "ISO/IEC 42001 Annex A",
+      "source": "https://www.iso.org/standard/81230.html",
+      "totals": {
+        "deficient": 2,
+        "evidenced": 6,
+        "not applicable": 0,
+        "not tested": 30,
+        "partial": 0
+      },
+      "version": "2023"
+    },
+    "NIST": {
+      "group_label": "Function",
+      "groups": {
+        "GOVERN": {
+          "deficient": 0,
+          "evidenced": 2,
+          "not applicable": 0,
+          "not tested": 17,
+          "partial": 0
+        },
+        "MANAGE": {
+          "deficient": 0,
+          "evidenced": 4,
+          "not applicable": 0,
+          "not tested": 9,
+          "partial": 0
+        },
+        "MAP": {
+          "deficient": 0,
+          "evidenced": 6,
+          "not applicable": 0,
+          "not tested": 12,
+          "partial": 0
+        },
+        "MEASURE": {
+          "deficient": 5,
+          "evidenced": 3,
+          "not applicable": 0,
+          "not tested": 14,
+          "partial": 0
+        }
+      },
+      "name": "NIST AI Risk Management Framework",
+      "source": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "totals": {
+        "deficient": 5,
+        "evidenced": 15,
+        "not applicable": 0,
+        "not tested": 52,
+        "partial": 0
+      },
+      "version": "AI 100-1 (1.0)"
+    },
+    "NIST-GAI": {
+      "group_label": "Risk",
+      "groups": {
+        "GenAI risk": {
+          "deficient": 6,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 6,
+          "partial": 0
+        }
+      },
+      "name": "NIST Generative AI Profile",
+      "source": "https://doi.org/10.6028/NIST.AI.600-1",
+      "totals": {
+        "deficient": 6,
+        "evidenced": 0,
+        "not applicable": 0,
+        "not tested": 6,
+        "partial": 0
+      },
+      "version": "AI 600-1"
+    },
+    "OWASP-LLM": {
+      "group_label": "Category",
+      "groups": {
+        "Top 10": {
+          "deficient": 5,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 5,
+          "partial": 0
+        }
+      },
+      "name": "OWASP Top 10 for LLM Applications",
+      "source": "https://genai.owasp.org/llm-top-10/",
+      "totals": {
+        "deficient": 5,
+        "evidenced": 0,
+        "not applicable": 0,
+        "not tested": 5,
+        "partial": 0
+      },
+      "version": "2025"
+    }
+  }
+}

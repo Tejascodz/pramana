@@ -1,0 +1,60 @@
+name: Pramana AI audit gate
+description: Run a Pramana audit on an AI system and fail the job when the release gate blocks.
+branding:
+  icon: shield
+  color: blue
+
+inputs:
+  spec:
+    description: Path to the Pramana audit spec YAML
+    required: true
+  out:
+    description: Output folder for the audit pack
+    required: false
+    default: pramana-audit
+  python-version:
+    description: Python version to use
+    required: false
+    default: "3.12"
+  enforce:
+    description: Fail the job when the gate decision is BLOCK
+    required: false
+    default: "true"
+
+outputs:
+  decision:
+    description: Release-gate decision (PASS or BLOCK)
+    value: ${{ steps.audit.outputs.decision }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install Pramana
+      shell: bash
+      run: pip install "${{ github.action_path }}"
+    - name: Run audit
+      id: audit
+      shell: bash
+      run: |
+        set +e
+        pramana run "${{ inputs.spec }}" --out "${{ inputs.out }}"
+        code=$?
+        set -e
+        if [ "$code" = "1" ]; then echo "decision=BLOCK" >> "$GITHUB_OUTPUT"; elif [ "$code" = "0" ]; then echo "decision=PASS" >> "$GITHUB_OUTPUT"; else exit "$code"; fi
+        pramana verify "${{ inputs.out }}"
+        pramana summary "${{ inputs.out }}" >> "$GITHUB_STEP_SUMMARY"
+    - name: Upload audit pack
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: pramana-audit-pack
+        path: ${{ inputs.out }}
+    - name: Enforce gate
+      if: inputs.enforce == 'true' && steps.audit.outputs.decision == 'BLOCK'
+      shell: bash
+      run: |
+        echo "::error::Pramana release gate blocked this change. See the audit pack artifact."
+        exit 1

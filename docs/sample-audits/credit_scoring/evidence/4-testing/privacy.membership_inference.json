@@ -1,0 +1,23 @@
+{
+  "category": "Privacy",
+  "check_id": "privacy.membership_inference",
+  "controls": [
+    "NIST:MEASURE-2.10",
+    "NIST:MEASURE-2.7",
+    "ISO42001:A.6.2.4",
+    "EUAIA:Art-15",
+    "INDIA:DPDP-2023"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {
+    "attack_auc": 0.5672,
+    "membership_advantage": 0.1345
+  },
+  "plain_summary": "The model does not reveal who was in its training data beyond chance level.",
+  "recommendation": "Reduce overfitting (regularisation, fewer trees, early stopping) or train with differential privacy, then re-run this test.",
+  "severity": "info",
+  "status": "pass",
+  "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows.",
+  "title": "Membership-inference risk"
+}

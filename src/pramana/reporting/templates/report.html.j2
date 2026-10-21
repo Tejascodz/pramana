@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Audit Report · {{ r.spec.name }}</title>
+<style>
+:root {
+  color-scheme: light;
+  --surface-0: #f4f3f0;
+  --surface-1: #fcfcfb;
+  --surface-2: #f0efec;
+  --border: #dddcd7;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #6e6d68;
+  --accent: #1c5cab;
+  --series-1: #2a78d6;
+  --good: #0ca30c;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --none: #c9c8c2;
+  --good-ink: #0a6b0a;
+  --warning-ink: #8a5a00;
+  --serious-ink: #a4461f;
+  --critical-ink: #a8272a;
+  --chip-good: #e3f4e3;
+  --chip-warning: #fdf1d6;
+  --chip-serious: #fbe5dc;
+  --chip-critical: #f8dede;
+  --chip-none: #ecebe8;
+  --hm-low: #e3f4e3;
+  --hm-med: #fdf1d6;
+  --hm-high: #fbe0d2;
+  --hm-crit: #f6d0d0;
+}
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    color-scheme: dark;
+    --surface-0: #121211;
+    --surface-1: #1a1a19;
+    --surface-2: #232321;
+    --border: #383835;
+    --text-primary: #f0efec;
+    --text-secondary: #c3c2b7;
+    --text-muted: #9a998f;
+    --accent: #6da7ec;
+    --series-1: #3987e5;
+    --none: #4a4a46;
+    --good-ink: #5fd35f;
+    --warning-ink: #f5c454;
+    --serious-ink: #f0a383;
+    --critical-ink: #f08a8a;
+    --chip-good: #17301a;
+    --chip-warning: #3a2e10;
+    --chip-serious: #3d2418;
+    --chip-critical: #3f1b1b;
+    --chip-none: #2c2c29;
+    --hm-low: #17301a;
+    --hm-med: #3a2e10;
+    --hm-high: #3d2418;
+    --hm-crit: #4a1d1d;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface-0: #121211; --surface-1: #1a1a19; --surface-2: #232321; --border: #383835;
+  --text-primary: #f0efec; --text-secondary: #c3c2b7; --text-muted: #9a998f; --accent: #6da7ec;
+  --series-1: #3987e5; --none: #4a4a46;
+  --good-ink: #5fd35f; --warning-ink: #f5c454; --serious-ink: #f0a383; --critical-ink: #f08a8a;
+  --chip-good: #17301a; --chip-warning: #3a2e10; --chip-serious: #3d2418; --chip-critical: #3f1b1b; --chip-none: #2c2c29;
+  --hm-low: #17301a; --hm-med: #3a2e10; --hm-high: #3d2418; --hm-crit: #4a1d1d;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--surface-0); color: var(--text-primary);
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.page { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
+header.top { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: 12px; color: var(--text-muted); margin: 0 0 6px; }
+h1 { font-size: 28px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 20px; margin: 0 0 14px; letter-spacing: -0.005em; }
+h3 { font-size: 15px; margin: 18px 0 8px; }
+.meta { color: var(--text-secondary); font-size: 13px; }
+.badges { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge { border-radius: 8px; padding: 8px 14px; font-weight: 600; font-size: 13px; border: 1px solid var(--border); background: var(--surface-1); }
+.badge small { display: block; font-weight: 500; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.badge.block { border-color: var(--critical); color: var(--critical-ink); }
+.badge.pass { border-color: var(--good); color: var(--good-ink); }
+section.card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 22px 24px; margin-bottom: 18px; }
+.headline { font-size: 19px; font-weight: 600; margin: 0 0 8px; }
+.lead { color: var(--text-secondary); margin: 0 0 16px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+ul.clean { list-style: none; padding: 0; margin: 0; }
+ul.clean li { padding: 8px 0; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: baseline; }
+ul.clean li:first-child { border-top: none; }
+.chip { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 1px 9px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.chip.critical, .chip.fail, .chip.deficient, .chip.BLOCK { background: var(--chip-critical); color: var(--critical-ink); }
+.chip.high { background: var(--chip-serious); color: var(--serious-ink); }
+.chip.medium, .chip.warn, .chip.partial { background: var(--chip-warning); color: var(--warning-ink); }
+.chip.low, .chip.info, .chip.pass, .chip.evidenced, .chip.PASS { background: var(--chip-good); color: var(--good-ink); }
+.chip.skipped, .chip.error, .chip.not-tested, .chip.not-applicable, .chip.accepted { background: var(--chip-none); color: var(--text-secondary); }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+.kpi { border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; background: var(--surface-1); }
+.kpi .v { font-size: 26px; font-weight: 650; line-height: 1.1; }
+.kpi .l { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--text-secondary); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; background: var(--surface-2); }
+td.num, th.num { text-align: right; }
+.table-wrap { overflow-x: auto; }
+code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; }
+.hash { word-break: break-all; color: var(--text-secondary); }
+details { border-top: 1px solid var(--border); padding: 10px 0; }
+details > summary { cursor: pointer; list-style: none; display: flex; gap: 10px; align-items: center; font-weight: 600; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary::after { content: "+"; margin-left: auto; color: var(--text-muted); font-weight: 400; }
+details[open] > summary::after { content: "–"; }
+.finding-body { padding: 8px 0 4px; color: var(--text-secondary); }
+.finding-body p { margin: 6px 0; }
+.tag { display: inline-block; border: 1px solid var(--border); border-radius: 6px; padding: 0 6px; margin: 2px 4px 2px 0; font-size: 11.5px; color: var(--text-secondary); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.chart { width: 100%; height: auto; display: block; }
+.chart.coverage { max-width: 860px; }
+.chart.bars { max-width: 620px; margin: 0 auto 12px; }
+.chart.heat { max-width: 380px; }
+td.mono, td.nowrap { white-space: nowrap; }
+.chart text { font: 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+.chart .t-label { fill: var(--text-primary); }
+.chart .t-muted { fill: var(--text-muted); }
+.chart .t-value { fill: var(--text-primary); font-weight: 600; }
+.chart .t-on-bar { fill: #0b0b0b; font-weight: 600; }
+.chart .t-in-bar { fill: #ffffff; font-weight: 650; }
+.chart .t-in-flag { fill: #0b0b0b; font-weight: 650; }
+.chart .t-ref { fill: var(--critical-ink); font-weight: 600; }
+.chart .grid { stroke: var(--border); stroke-width: 1; }
+.chart .ref { stroke: var(--critical); stroke-width: 2; stroke-dasharray: 6 4; }
+.chart .bar { fill: var(--series-1); }
+.chart .bar-flag { fill: var(--serious); }
+.chart .st-good { fill: var(--good); }
+.chart .st-warn { fill: var(--warning); }
+.chart .st-crit { fill: var(--critical); }
+.chart .st-none { fill: var(--none); }
+.chart.heat .hm-low { fill: var(--hm-low); }
+.chart.heat .hm-med { fill: var(--hm-med); }
+.chart.heat .hm-high { fill: var(--hm-high); }
+.chart.heat .hm-crit { fill: var(--hm-crit); }
+.chart .hm-id { fill: var(--text-primary); font-weight: 650; font-size: 11.5px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--text-secondary); margin: 10px 0 0; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+.note { font-size: 12.5px; color: var(--text-muted); }
+nav.toc { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; margin: 0 0 18px; }
+nav.toc a { color: var(--accent); text-decoration: none; }
+footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
+@media print {
+  body { background: #fff; }
+  section.card { break-inside: avoid; border-color: #ccc; }
+  details { display: block; }
+  details > summary::after { content: ""; }
+  nav.toc { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="top">
+  <div>
+    <p class="eyebrow">AI system audit report · {{ r.audit_id }}</p>
+    <h1>{{ r.spec.name }}</h1>
+    <div class="meta">
+      Version {{ r.spec.system.version }} · Owner {{ r.spec.system.owner }}
+      {% if r.spec.system.accountable_executive %}· Accountable: {{ r.spec.system.accountable_executive }}{% endif %}
+      · Audit date {{ r.audit_date.isoformat() }}
+    </div>
+  </div>
+  <div class="badges">
+    <div class="badge {{ 'block' if r.gate.decision == 'BLOCK' else 'pass' }}"><small>Release gate</small>{{ r.gate.decision }}</div>
+    <div class="badge"><small>Audit opinion</small>{{ r.opinion.rating }}</div>
+    <div class="badge"><small>EU AI Act tier</small>{{ r.classification.eu_tier | title }}</div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#summary">Executive summary</a><a href="#risks">Risk register</a><a href="#findings">Findings</a>
+  {% if fairness %}<a href="#fairness">Fairness</a>{% endif %}
+  <a href="#coverage">Framework coverage</a><a href="#regulatory">Regulatory context</a>
+  <a href="#remediation">Remediation plan</a><a href="#method">Method and evidence</a>
+</nav>
+
+<section class="card" id="summary">
+  <p class="eyebrow">Executive summary</p>
+  <p class="headline">{{ s.headline }}</p>
+  <p class="lead">{{ r.opinion.statement }} {{ s.context }}</p>
+  <div class="grid2">
+    <div>
+      <h3>What needs attention</h3>
+      <ul class="clean">
+        {% for f in s.key_findings %}
+        <li><span class="chip {{ f.rating }}">{{ f.rating }}</span><span><strong>{{ f.risk_id }}</strong> {{ f.text }} <span class="note">Owner: {{ f.owner }}</span></span></li>
+        {% else %}<li>No open findings.</li>{% endfor %}
+      </ul>
+    </div>
+    <div>
+      <h3>What is working</h3>
+      <ul class="clean">
+        {% for w in s.working %}<li><span class="chip pass">pass</span><span>{{ w }}</span></li>{% else %}<li>No checks passed outright.</li>{% endfor %}
+      </ul>
+      <h3>Decisions and actions required</h3>
+      <ul class="clean">
+        {% for d in s.decisions %}<li><span>{{ d }}</span></li>{% else %}<li>None.</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="kpis" style="margin-bottom:18px">
+  <div class="kpi"><div class="v">{{ counts.get('pass', 0) }}/{{ executed }}</div><div class="l">checks passed</div></div>
+  <div class="kpi"><div class="v">{{ open_by_rating.critical + open_by_rating.high }}</div><div class="l">open high or critical risks</div></div>
+  <div class="kpi"><div class="v">{{ tested_controls }}/{{ applicable_controls }}</div><div class="l">applicable controls tested by automation</div></div>
+  <div class="kpi"><div class="v mono" style="font-size:18px">{{ (r.ledger_root or '')[:12] }}</div><div class="l">evidence root hash</div></div>
+</section>
+
+<section class="card" id="risks">
+  <p class="eyebrow">Risk register</p>
+  <h2>{{ r.risks | length }} risk{{ '' if r.risks | length == 1 else 's' }} from {{ findings_count }} finding{{ '' if findings_count == 1 else 's' }}</h2>
+  <div class="grid2" style="grid-template-columns: 380px 1fr; align-items:start">
+    <div>{{ heatmap | safe }}<p class="note">Score = likelihood × impact. * marks a formally accepted risk.</p></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Risk</th><th class="num">L×I</th><th>Rating</th><th>Owner</th><th>Treatment</th></tr></thead>
+        <tbody>
+        {% for k in r.risks %}
+          <tr><td class="mono">{{ k.risk_id }}</td><td>{{ k.title }}</td><td class="num">{{ k.likelihood }}×{{ k.impact }}={{ k.score }}</td>
+          <td><span class="chip {{ 'accepted' if k.accepted else k.rating.value }}">{{ k.rating.value }}{% if k.accepted %} · accepted{% endif %}</span></td><td>{{ k.owner }}</td><td>{{ k.treatment }}</td></tr>
+        {% else %}<tr><td colspan="6">No risks identified.</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="card" id="findings">
+  <p class="eyebrow">Findings by test</p>
+  <h2>{{ executed }} tests executed{% if counts.get('skipped') %}, {{ counts.skipped }} skipped{% endif %}</h2>
+  {% for c in r.results %}
+  <details {% if c.status.value in ('fail',) %}open{% endif %}>
+    <summary><span class="chip {{ c.status.value }}">{{ c.status.value }}</span>{{ c.title }} <span class="note mono">{{ c.check_id }}</span></summary>
+    <div class="finding-body">
+      <p>{{ c.summary }}</p>
+      {% if c.recommendation and c.status.value in ('fail','warn','error') %}<p><strong>Recommendation.</strong> {{ c.recommendation }}</p>{% endif %}
+      {% if c.controls %}<p>{% for ref in c.controls %}<span class="tag">{{ ref }}</span>{% endfor %}</p>{% endif %}
+      {% if c.details.probes %}
+      <div class="table-wrap"><table>
+        <thead><tr><th>Probe</th><th>Result</th><th>Response excerpt</th></tr></thead>
+        <tbody>{% for p in c.details.probes %}
+          {% set bad = p.get('succeeded') or p.get('disclosed') or (p.get('grounded') == False) or (p.get('compliant') == False) %}
+          <tr><td class="mono">{{ p.probe_id }}</td><td><span class="chip {{ 'fail' if bad else 'pass' }}">{{ 'fail' if bad else 'pass' }}</span></td><td>{{ p.response_excerpt }}</td></tr>
+        {% endfor %}</tbody></table></div>
+      {% endif %}
+      {% if c.metrics %}
+      <p class="note">{% for k, v in c.metrics.items() %}{{ k }} = <span class="mono">{{ v }}</span>{% if not loop.last %} · {% endif %}{% endfor %}</p>
+      {% endif %}
+      {% if c.evidence_hash %}<p class="note">Evidence SHA-256 <span class="mono hash">{{ c.evidence_hash }}</span></p>{% endif %}
+    </div>
+  </details>
+  {% endfor %}
+</section>
+
+{% if fairness %}
+<section class="card" id="fairness">
+  <p class="eyebrow">Fairness spotlight</p>
+  <h2>Favourable-outcome rate by {{ fairness.attribute }}</h2>
+  <p class="lead">Groups whose rate falls below four-fifths of the most favoured group are shown in orange. Groups smaller than {{ min_group }} are excluded from the comparison.</p>
+  {{ fairness.chart | safe }}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Group</th><th class="num">n</th><th class="num">Favourable rate</th><th class="num">TPR</th><th class="num">FPR</th><th class="num">AUC</th></tr></thead>
+    <tbody>{% for g in fairness.groups %}
+      <tr><td>{{ g.group }}</td><td class="num">{{ g.n }}</td><td class="num">{{ '%.1f%%' % (g.selection_rate * 100) }}</td>
+      <td class="num">{{ '%.3f' % g.tpr }}</td><td class="num">{{ '%.3f' % g.fpr }}</td><td class="num">{{ '%.3f' % g.auc }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% if intersectional %}
+  <h3>Intersectional view: {{ intersectional.pair }}</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Subgroup</th><th class="num">n</th><th class="num">Favourable rate</th></tr></thead>
+    <tbody>{% for g in intersectional.groups %}
+      <tr><td>{{ g.group }}{% if not g.adequate_sample %} <span class="note">(small sample)</span>{% endif %}</td><td class="num">{{ g.n }}</td><td class="num">{{ '%.1f%%' % (g.selection_rate * 100) }}</td></tr>
+    {% endfor %}</tbody></table></div>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="card" id="coverage">
+  <p class="eyebrow">Framework coverage</p>
+  <h2>Evidence mapped to {{ frameworks_shown }} frameworks</h2>
+  <p class="lead">{{ s.coverage_line }}</p>
+  {{ coverage_chart | safe }}
+  <div class="legend">
+    <span style="--c: var(--good)">Evidenced</span><span style="--c: var(--warning)">Partial (warning)</span>
+    <span style="--c: var(--critical)">Deficient (failed test)</span><span style="--c: var(--none)">Not tested by automation</span>
+  </div>
+  {% for fid, fw in r.coverage.frameworks.items() %}
+  {% set applicable = fw.totals.evidenced + fw.totals.partial + fw.totals.deficient + fw.totals['not tested'] %}
+  {% if applicable %}
+  <details>
+    <summary>{{ fw.name }} <span class="note">{{ fw.version }}</span></summary>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Control</th><th>Title</th><th>State</th><th>Evidence</th></tr></thead>
+      <tbody>{% for c in r.coverage.controls if c.framework == fid and c.state != 'not applicable' %}
+        <tr><td class="mono">{{ c.id }}</td><td>{{ c.title }}</td><td><span class="chip {{ c.state | replace(' ', '-') }}">{{ c.state }}</span></td>
+        <td>{% for ch in c.checks %}<span class="tag">{{ ch }}</span>{% endfor %}{% for m in c.manual_evidence %}<span class="tag">{{ m }}</span>{% endfor %}</td></tr>
+      {% endfor %}</tbody></table></div>
+    <p class="note">Source: {{ fw.source }}</p>
+  </details>
+  {% endif %}
+  {% endfor %}
+</section>
+
+<section class="card" id="regulatory">
+  <p class="eyebrow">Regulatory context</p>
+  <h2>Classification and obligations</h2>
+  <div class="grid2">
+    <div>
+      <h3>EU AI Act: {{ r.classification.eu_tier }}</h3>
+      <ul class="clean">{% for b in r.classification.eu_basis %}<li>{{ b }}</li>{% endfor %}</ul>
+      {% if r.spec.use_case.declared_eu_tier %}<p class="note">Tier declared by the owner: {{ r.spec.use_case.declared_eu_tier }}.</p>{% endif %}
+    </div>
+    <div>
+      <h3>India context sensitivity: {{ r.classification.india_sensitivity }} ({{ r.classification.india_score }}/10)</h3>
+      <ul class="clean">{% for f in r.classification.india_factors %}<li>{{ f }}</li>{% else %}<li>No sensitivity factors declared.</li>{% endfor %}</ul>
+      <p class="note">Pramana heuristic aligned with the India AI Governance Guidelines' call for an India-specific risk framework; not an official tier.</p>
+    </div>
+  </div>
+  {% if r.classification.sector_notes %}<h3>Sector notes</h3><ul class="clean">{% for n in r.classification.sector_notes %}<li>{{ n }}</li>{% endfor %}</ul>{% endif %}
+  <h3>Regulatory milestones</h3>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Date</th><th>Regime</th><th>Obligation</th><th>Status</th></tr></thead>
+    <tbody>{% for o in r.classification.obligations %}
+      <tr><td class="mono">{{ o.date }}</td><td>{{ o.regime }}</td><td>{{ o.obligation }}</td>
+      <td>{{ o.status }}{% if o.status == 'upcoming' %} ({{ o.days_remaining }} days){% endif %}</td></tr>
+    {% endfor %}</tbody></table></div>
+  <p class="note">Dates were last reviewed on {{ calendar_reviewed }}. Confirm against the cited sources before relying on them.</p>
+</section>
+
+<section class="card" id="remediation">
+  <p class="eyebrow">Remediation plan</p>
+  <h2>{{ r.remediation | length }} action{{ '' if r.remediation | length == 1 else 's' }}</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Risk</th><th>Priority</th><th>Action</th><th>Owner</th><th>Due</th></tr></thead>
+    <tbody>{% for a in r.remediation %}
+      <tr><td class="mono">{{ a.risk_id }}</td><td>{{ a.priority }}</td><td>{{ a.action }}</td><td>{{ a.owner }}</td><td class="mono">{{ a.due }}</td></tr>
+    {% else %}<tr><td colspan="5">No open actions.</td></tr>{% endfor %}</tbody></table></div>
+</section>
+
+<section class="card" id="method">
+  <p class="eyebrow">Method and evidence</p>
+  <h2>How this audit was performed</h2>
+  <p class="lead">The audit follows the five SMACTR stages of internal algorithmic auditing (Raji et al., 2020). Every stage output is written to an append-only, hash-chained evidence ledger.</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Stage</th><th>What was produced</th></tr></thead>
+    <tbody>
+      <tr><td>Scoping</td><td>System profile, use-case risk classification, regulatory milestones</td></tr>
+      <tr><td>Mapping</td><td>Failure-mode table ({{ r.fmea | length }} failure modes) and RACI</td></tr>
+      <tr><td>Artifact collection</td><td>SHA-256 fingerprints of {{ r.artifacts | length }} artifacts and {{ r.manual_evidence | length }} governance documents</td></tr>
+      <tr><td>Testing</td><td>{{ executed }} automated tests with per-test evidence files</td></tr>
+      <tr><td>Reflection</td><td>Risk register, control coverage, remediation plan and release-gate decision</td></tr>
+    </tbody></table></div>
+  <details>
+    <summary>Failure modes considered (FMEA)</summary>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Test</th><th>Failure mode</th><th>Effect if missed</th></tr></thead>
+      <tbody>{% for f in r.fmea %}<tr><td class="mono">{{ f.check_id }}</td><td>{{ f.failure_mode }}</td><td>{{ f.effect }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </details>
+  <details>
+    <summary>Artifact fingerprints</summary>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Artifact</th><th>File</th><th>SHA-256</th></tr></thead>
+      <tbody>{% for a in r.artifacts %}<tr><td>{{ a.artifact }}</td><td class="mono">{{ a.file }}</td><td class="mono hash">{{ a.sha256 or 'not supplied' }}</td></tr>{% endfor %}
+      {% for m in r.manual_evidence %}<tr><td>{{ m.control }}</td><td class="mono">{{ m.file_name }}</td><td class="mono hash">{{ m.sha256 or 'not supplied' }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </details>
+  <h3>Verifying this pack</h3>
+  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">{{ r.ledger_root }}</span>.</p>
+  <h3>Limitations</h3>
+  <p class="note">Automated tests evidence technical controls only. Controls marked "not tested" need organisational evidence. Statistical tests depend on the representativeness of the data supplied. LLM probes are a sample of behaviour, not proof of safety. The classification is an assessment to support legal review, not legal advice. See docs/limitations.md in the Pramana repository.</p>
+</section>
+
+<footer>
+  Generated by Pramana {{ version }} · Python {{ r.environment.python }} · audit {{ r.audit_id }} · started {{ r.started }}
+</footer>
+</div>
+</body>
+</html>

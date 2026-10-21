@@ -1,0 +1,88 @@
+{
+  "category": "Monitoring",
+  "check_id": "drift.population_stability",
+  "controls": [
+    "NIST:MEASURE-2.4",
+    "NIST:MEASURE-4.3",
+    "NIST:MANAGE-4.1",
+    "NIST:MANAGE-2.2",
+    "ISO42001:A.6.2.6",
+    "EUAIA:Art-72",
+    "INDIA:SUTRA-SAFETY"
+  ],
+  "details": {
+    "compared_with": "production_data",
+    "features": [
+      {
+        "feature": "employment_type",
+        "p_value": 3.001965272412541e-141,
+        "psi": 0.2822,
+        "test": "chi2"
+      },
+      {
+        "feature": "monthly_income",
+        "p_value": 7.710817078728009e-81,
+        "psi": 0.2535,
+        "test": "ks"
+      },
+      {
+        "feature": "loan_amount",
+        "p_value": 1.7487618049938679e-46,
+        "psi": 0.1587,
+        "test": "ks"
+      },
+      {
+        "feature": "debt_to_income",
+        "p_value": 0.5301993444619438,
+        "psi": 0.0057,
+        "test": "ks"
+      },
+      {
+        "feature": "credit_history_months",
+        "p_value": 0.7838551445184229,
+        "psi": 0.0049,
+        "test": "ks"
+      },
+      {
+        "feature": "bureau_score",
+        "p_value": 0.35111289691381564,
+        "psi": 0.0048,
+        "test": "ks"
+      },
+      {
+        "feature": "existing_emis",
+        "p_value": 0.565186207411853,
+        "psi": 0.0034,
+        "test": "chi2"
+      },
+      {
+        "feature": "pincode_risk_band",
+        "p_value": 0.12727771098046675,
+        "psi": 0.0032,
+        "test": "chi2"
+      },
+      {
+        "feature": "years_at_address",
+        "p_value": 0.4141468142659299,
+        "psi": 0.0022,
+        "test": "ks"
+      }
+    ],
+    "score_shift": 0.0425
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "favourable_rate_current": 0.905,
+    "favourable_rate_reference": 0.8358,
+    "features_major_drift": 2,
+    "features_moderate_drift": 1,
+    "max_feature_psi": 0.2822,
+    "score_psi": 0.05
+  },
+  "plain_summary": "Today's applicants differ from the people the model learned from (for example employment_type), although overall scores have not moved much yet.",
+  "recommendation": "Re-validate performance and fairness on recent labelled data, review the drivers of the largest shifts, and set PSI alerts in production monitoring.",
+  "severity": "medium",
+  "status": "warn",
+  "summary": "Compared reference data with production_data (3000 rows). 2 features with major drift (PSI >= 0.25), 1 moderate. Largest shifts: employment_type (PSI 0.28), monthly_income (PSI 0.25), loan_amount (PSI 0.16). Score PSI 0.050; favourable-decision rate moved from 83.6% to 90.5%.",
+  "title": "Data and prediction drift"
+}

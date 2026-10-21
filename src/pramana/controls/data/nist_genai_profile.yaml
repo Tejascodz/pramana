@@ -1,0 +1,22 @@
+# NIST AI 600-1: Generative AI Profile (July 2024). The profile lists twelve
+# risks that are unique to, or made worse by, generative AI.
+framework:
+  id: NIST-GAI
+  name: NIST Generative AI Profile
+  version: "AI 600-1"
+  source: https://doi.org/10.6028/NIST.AI.600-1
+  group_label: Risk
+
+controls:
+  - {id: CBRN, group: GenAI risk, title: "CBRN information or capabilities", evidence: technical}
+  - {id: CONFABULATION, group: GenAI risk, title: "Confabulation (confidently stated false content)", evidence: technical}
+  - {id: DANGEROUS-CONTENT, group: GenAI risk, title: "Dangerous, violent or hateful content", evidence: technical}
+  - {id: DATA-PRIVACY, group: GenAI risk, title: "Data privacy (leakage or inference of personal data)", evidence: technical}
+  - {id: ENVIRONMENTAL, group: GenAI risk, title: "Environmental impacts", evidence: both}
+  - {id: HARMFUL-BIAS, group: GenAI risk, title: "Harmful bias and homogenization", evidence: technical}
+  - {id: HUMAN-AI-CONFIG, group: GenAI risk, title: "Human-AI configuration (over-reliance, anthropomorphism)", evidence: both}
+  - {id: INFO-INTEGRITY, group: GenAI risk, title: "Information integrity", evidence: technical}
+  - {id: INFO-SECURITY, group: GenAI risk, title: "Information security (e.g. prompt injection)", evidence: technical}
+  - {id: IP, group: GenAI risk, title: "Intellectual property", evidence: both}
+  - {id: OBSCENE-CONTENT, group: GenAI risk, title: "Obscene, degrading or abusive content", evidence: technical}
+  - {id: VALUE-CHAIN, group: GenAI risk, title: "Value chain and component integration", evidence: both}

@@ -1,0 +1,24 @@
+# India AI Governance Guidelines (MeitY, IndiaAI Mission, November 2025).
+# The guidelines are voluntary and principle-based. They set out seven guiding
+# principles ("sutras"), adapted from the RBI FREE-AI report, and six pillars of
+# recommendations. Pramana maps evidence to the sutras and to the two pillars
+# that apply directly to an individual AI system (risk mitigation, accountability).
+# The DPDP Act 2023 entry covers personal-data obligations relevant to AI data.
+framework:
+  id: INDIA
+  name: India AI Governance Guidelines
+  version: "MeitY, Nov 2025"
+  source: https://indiaai.gov.in/
+  group_label: Element
+
+controls:
+  - {id: SUTRA-TRUST, group: "Sutras", title: "Trust is the foundation", evidence: both}
+  - {id: SUTRA-PEOPLE-FIRST, group: "Sutras", title: "People first (human-centric design and oversight)", evidence: both}
+  - {id: SUTRA-INNOVATION, group: "Sutras", title: "Innovation over restraint", evidence: organizational}
+  - {id: SUTRA-FAIRNESS, group: "Sutras", title: "Fairness and equity", evidence: technical}
+  - {id: SUTRA-ACCOUNTABILITY, group: "Sutras", title: "Accountability", evidence: both}
+  - {id: SUTRA-UNDERSTANDABLE, group: "Sutras", title: "Understandable by design", evidence: both}
+  - {id: SUTRA-SAFETY, group: "Sutras", title: "Safety, resilience and sustainability", evidence: technical}
+  - {id: PILLAR-RISK-MITIGATION, group: "Pillars", title: "Risk mitigation (evidence-based risk assessment, techno-legal measures)", evidence: both}
+  - {id: PILLAR-ACCOUNTABILITY, group: "Pillars", title: "Accountability (graded liability tied to function and risk)", evidence: organizational}
+  - {id: DPDP-2023, group: "Related law", title: "Digital Personal Data Protection Act 2023 and DPDP Rules 2025", evidence: both}

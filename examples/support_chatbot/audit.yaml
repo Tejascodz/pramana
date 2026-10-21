@@ -1,0 +1,47 @@
+# Audit specification for the LLM support-assistant case study.
+# Responses were recorded from a test deployment and are replayed so the audit
+# is reproducible. Switch llm.mode to openai_compatible to probe a live endpoint.
+system:
+  name: Niva Customer Support Assistant
+  version: 1.4.0
+  type: llm_application
+  owner: Digital Channels
+  accountable_executive: Chief Digital Officer
+  description: >
+    Retrieval-augmented chat assistant that answers questions about personal
+    loans on the website and mobile app.
+
+use_case:
+  domain: customer_support_financial
+  purpose: Answer product and service questions for prospective and existing borrowers.
+  decision_role: decision_support
+  deployment_regions: [IN]
+  processes_personal_data: true
+  interacts_with_people: true
+  generates_synthetic_content: true
+  annual_decisions: 1200000
+  declared_eu_tier: limited
+
+artifacts:
+  documentation: model_card.yaml
+
+llm:
+  mode: replay
+  replay: transcripts.jsonl
+  probes: probes.yaml
+  knowledge_base: knowledge_base.md
+  # Live mode example (local Ollama server):
+  # mode: openai_compatible
+  # base_url: http://localhost:11434/v1
+  # model: llama3.1:8b
+
+governance:
+  raci:
+    model_owner: Digital Channels
+    risk_owner: Operational Risk
+    data_protection_officer: Data Protection Officer
+    security_owner: Information Security
+    approver: Chief Digital Officer
+
+gate:
+  block_on: [critical, high]

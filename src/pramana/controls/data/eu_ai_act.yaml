@@ -1,0 +1,28 @@
+# Regulation (EU) 2024/1689 (AI Act), as amended by the Digital Omnibus on AI
+# (Regulation (EU) 2026/1744). Application dates live in regulatory_calendar.yaml.
+# "applies_to" says which risk tiers the article is relevant for.
+framework:
+  id: EUAIA
+  name: EU AI Act
+  version: "2024/1689 as amended by 2026/1744"
+  source: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
+  group_label: Chapter
+
+controls:
+  - {id: Art-4, group: "General provisions", title: "AI literacy of staff and operators", evidence: organizational, applies_to: [all]}
+  - {id: Art-5, group: "Prohibited practices", title: "Prohibited AI practices", evidence: organizational, applies_to: [all]}
+  - {id: Art-6, group: "High-risk systems", title: "Classification rules for high-risk AI systems", evidence: both, applies_to: [all]}
+  - {id: Art-9, group: "High-risk systems", title: "Risk management system", evidence: both, applies_to: [high]}
+  - {id: Art-10, group: "High-risk systems", title: "Data and data governance (quality, relevance, bias examination)", evidence: technical, applies_to: [high]}
+  - {id: Art-11, group: "High-risk systems", title: "Technical documentation (Annex IV)", evidence: both, applies_to: [high]}
+  - {id: Art-12, group: "High-risk systems", title: "Record-keeping and automatic event logging", evidence: technical, applies_to: [high]}
+  - {id: Art-13, group: "High-risk systems", title: "Transparency and information to deployers", evidence: both, applies_to: [high]}
+  - {id: Art-14, group: "High-risk systems", title: "Human oversight", evidence: both, applies_to: [high]}
+  - {id: Art-15, group: "High-risk systems", title: "Accuracy, robustness and cybersecurity", evidence: technical, applies_to: [high]}
+  - {id: Art-17, group: "Provider obligations", title: "Quality management system", evidence: organizational, applies_to: [high]}
+  - {id: Art-26, group: "Deployer obligations", title: "Obligations of deployers of high-risk systems", evidence: organizational, applies_to: [high]}
+  - {id: Art-27, group: "Deployer obligations", title: "Fundamental rights impact assessment", evidence: organizational, applies_to: [high]}
+  - {id: Art-50, group: "Transparency", title: "Transparency for systems that interact with people or generate content", evidence: both, applies_to: [limited, high, gpai]}
+  - {id: Art-53, group: "General-purpose AI", title: "Obligations for providers of general-purpose AI models", evidence: organizational, applies_to: [gpai]}
+  - {id: Art-72, group: "Post-market", title: "Post-market monitoring", evidence: technical, applies_to: [high]}
+  - {id: Art-73, group: "Post-market", title: "Reporting of serious incidents", evidence: organizational, applies_to: [high]}

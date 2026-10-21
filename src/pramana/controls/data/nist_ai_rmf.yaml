@@ -1,0 +1,93 @@
+# NIST AI Risk Management Framework 1.0 (NIST AI 100-1, January 2023).
+# Titles are shortened paraphrases of each subcategory. Refer to the official
+# publication for the authoritative wording.
+# evidence: "technical" = can be evidenced by automated tests,
+#           "organizational" = needs a policy, record or human attestation,
+#           "both" = partially testable.
+framework:
+  id: NIST
+  name: NIST AI Risk Management Framework
+  version: "AI 100-1 (1.0)"
+  source: https://www.nist.gov/itl/ai-risk-management-framework
+  group_label: Function
+
+controls:
+  # GOVERN ---------------------------------------------------------------
+  - {id: GOVERN-1.1, group: GOVERN, title: "Legal and regulatory requirements for AI are understood, managed and documented", evidence: organizational}
+  - {id: GOVERN-1.2, group: GOVERN, title: "Trustworthy-AI characteristics are built into policies, processes and practices", evidence: organizational}
+  - {id: GOVERN-1.3, group: GOVERN, title: "Level of risk-management activity is set according to organizational risk tolerance", evidence: organizational}
+  - {id: GOVERN-1.4, group: GOVERN, title: "Risk-management process and outcomes are established through transparent policies and controls", evidence: both}
+  - {id: GOVERN-1.5, group: GOVERN, title: "Ongoing monitoring and periodic review of the risk process are planned, with clear roles", evidence: organizational}
+  - {id: GOVERN-1.6, group: GOVERN, title: "Mechanisms exist to inventory AI systems", evidence: organizational}
+  - {id: GOVERN-1.7, group: GOVERN, title: "Processes exist to decommission and phase out AI systems safely", evidence: organizational}
+  - {id: GOVERN-2.1, group: GOVERN, title: "Roles, responsibilities and lines of communication for AI risk are documented", evidence: organizational}
+  - {id: GOVERN-2.2, group: GOVERN, title: "Personnel and partners receive AI risk-management training", evidence: organizational}
+  - {id: GOVERN-2.3, group: GOVERN, title: "Executive leadership takes responsibility for decisions about AI risk", evidence: organizational}
+  - {id: GOVERN-3.1, group: GOVERN, title: "AI risk decisions are informed by a diverse team", evidence: organizational}
+  - {id: GOVERN-3.2, group: GOVERN, title: "Roles for human-AI configurations and oversight are defined", evidence: organizational}
+  - {id: GOVERN-4.1, group: GOVERN, title: "Practices foster critical thinking and a safety-first mindset", evidence: organizational}
+  - {id: GOVERN-4.2, group: GOVERN, title: "Teams document risks and impacts of the AI they build and use, and communicate them", evidence: both}
+  - {id: GOVERN-4.3, group: GOVERN, title: "Practices enable AI testing, incident identification and information sharing", evidence: both}
+  - {id: GOVERN-5.1, group: GOVERN, title: "Feedback from external stakeholders is collected and integrated", evidence: organizational}
+  - {id: GOVERN-5.2, group: GOVERN, title: "Adjudicated feedback from AI actors is regularly incorporated into design", evidence: organizational}
+  - {id: GOVERN-6.1, group: GOVERN, title: "Policies address risks from third-party entities, including IP", evidence: organizational}
+  - {id: GOVERN-6.2, group: GOVERN, title: "Contingency processes handle failures in high-risk third-party data or AI", evidence: organizational}
+
+  # MAP ------------------------------------------------------------------
+  - {id: MAP-1.1, group: MAP, title: "Intended purpose, context, applicable laws and deployment setting are documented", evidence: both}
+  - {id: MAP-1.2, group: MAP, title: "Interdisciplinary and diverse actors establish context", evidence: organizational}
+  - {id: MAP-1.3, group: MAP, title: "Organizational mission and goals for the AI are documented", evidence: organizational}
+  - {id: MAP-1.4, group: MAP, title: "Business value or context of use is clearly defined", evidence: organizational}
+  - {id: MAP-1.5, group: MAP, title: "Organizational risk tolerances are determined and documented", evidence: both}
+  - {id: MAP-1.6, group: MAP, title: "System requirements are elicited and understood by relevant actors", evidence: organizational}
+  - {id: MAP-2.1, group: MAP, title: "Tasks and methods the AI system supports are defined", evidence: both}
+  - {id: MAP-2.2, group: MAP, title: "Knowledge limits and how outputs are used and overseen by humans are documented", evidence: both}
+  - {id: MAP-2.3, group: MAP, title: "Scientific integrity and TEVV considerations are identified and documented", evidence: both}
+  - {id: MAP-3.1, group: MAP, title: "Potential benefits of the system are examined and documented", evidence: organizational}
+  - {id: MAP-3.2, group: MAP, title: "Potential costs of AI errors, including non-monetary costs, are documented", evidence: both}
+  - {id: MAP-3.3, group: MAP, title: "Targeted application scope is specified based on capability and categorization", evidence: both}
+  - {id: MAP-3.4, group: MAP, title: "Operator and practitioner proficiency processes are defined and assessed", evidence: organizational}
+  - {id: MAP-3.5, group: MAP, title: "Human oversight processes are defined, assessed and documented", evidence: both}
+  - {id: MAP-4.1, group: MAP, title: "Technology and legal risks of components, incl. third-party data/software, are mapped", evidence: both}
+  - {id: MAP-4.2, group: MAP, title: "Internal risk controls for system components are identified and documented", evidence: both}
+  - {id: MAP-5.1, group: MAP, title: "Likelihood and magnitude of each identified impact are documented", evidence: both}
+  - {id: MAP-5.2, group: MAP, title: "Engagement with AI actors about positive and negative impacts is in place", evidence: organizational}
+
+  # MEASURE --------------------------------------------------------------
+  - {id: MEASURE-1.1, group: MEASURE, title: "Metrics for the most significant mapped risks are selected and implemented", evidence: technical}
+  - {id: MEASURE-1.2, group: MEASURE, title: "Appropriateness of metrics and effectiveness of controls are regularly reassessed", evidence: both}
+  - {id: MEASURE-1.3, group: MEASURE, title: "Independent assessors or non-developer experts are involved in assessments", evidence: organizational}
+  - {id: MEASURE-2.1, group: MEASURE, title: "Test sets, metrics and TEVV tool details are documented", evidence: technical}
+  - {id: MEASURE-2.2, group: MEASURE, title: "Human-subject evaluations meet requirements and represent the population", evidence: organizational}
+  - {id: MEASURE-2.3, group: MEASURE, title: "Performance is measured and demonstrated for deployment-like conditions", evidence: technical}
+  - {id: MEASURE-2.4, group: MEASURE, title: "System functionality and behaviour are monitored in production", evidence: technical}
+  - {id: MEASURE-2.5, group: MEASURE, title: "System is shown to be valid and reliable; generalization limits documented", evidence: technical}
+  - {id: MEASURE-2.6, group: MEASURE, title: "System is regularly evaluated for safety risks", evidence: technical}
+  - {id: MEASURE-2.7, group: MEASURE, title: "Security and resilience are evaluated and documented", evidence: technical}
+  - {id: MEASURE-2.8, group: MEASURE, title: "Transparency and accountability risks are examined and documented", evidence: both}
+  - {id: MEASURE-2.9, group: MEASURE, title: "Model is explained, validated and documented; outputs interpreted in context", evidence: technical}
+  - {id: MEASURE-2.10, group: MEASURE, title: "Privacy risk is examined and documented", evidence: technical}
+  - {id: MEASURE-2.11, group: MEASURE, title: "Fairness and bias are evaluated and results documented", evidence: technical}
+  - {id: MEASURE-2.12, group: MEASURE, title: "Environmental impact and sustainability are assessed", evidence: both}
+  - {id: MEASURE-2.13, group: MEASURE, title: "Effectiveness of TEVV metrics and processes is evaluated", evidence: technical}
+  - {id: MEASURE-3.1, group: MEASURE, title: "Existing, unanticipated and emergent risks are regularly tracked", evidence: both}
+  - {id: MEASURE-3.2, group: MEASURE, title: "Risk tracking is considered where risks are hard to measure", evidence: organizational}
+  - {id: MEASURE-3.3, group: MEASURE, title: "Feedback and appeal processes for users and affected communities exist", evidence: organizational}
+  - {id: MEASURE-4.1, group: MEASURE, title: "Measurement approaches are connected to deployment context with domain input", evidence: both}
+  - {id: MEASURE-4.2, group: MEASURE, title: "Trustworthiness results in deployment are validated with domain experts", evidence: both}
+  - {id: MEASURE-4.3, group: MEASURE, title: "Measurable performance improvements or declines are identified and documented", evidence: technical}
+
+  # MANAGE ---------------------------------------------------------------
+  - {id: MANAGE-1.1, group: MANAGE, title: "A go/no-go determination is made on whether deployment should proceed", evidence: both}
+  - {id: MANAGE-1.2, group: MANAGE, title: "Risk treatment is prioritized by impact, likelihood and resources", evidence: both}
+  - {id: MANAGE-1.3, group: MANAGE, title: "Responses to high-priority risks are planned and documented", evidence: both}
+  - {id: MANAGE-1.4, group: MANAGE, title: "Negative residual risks are documented", evidence: both}
+  - {id: MANAGE-2.1, group: MANAGE, title: "Resources to manage risk and non-AI alternatives are considered", evidence: organizational}
+  - {id: MANAGE-2.2, group: MANAGE, title: "Mechanisms sustain the value of deployed AI systems", evidence: both}
+  - {id: MANAGE-2.3, group: MANAGE, title: "Procedures exist to respond to previously unknown risks", evidence: organizational}
+  - {id: MANAGE-2.4, group: MANAGE, title: "Mechanisms exist to supersede, disengage or deactivate misbehaving systems", evidence: both}
+  - {id: MANAGE-3.1, group: MANAGE, title: "Third-party AI risks are monitored and controls documented", evidence: both}
+  - {id: MANAGE-3.2, group: MANAGE, title: "Pre-trained models used in development are monitored", evidence: both}
+  - {id: MANAGE-4.1, group: MANAGE, title: "Post-deployment monitoring plans are implemented", evidence: both}
+  - {id: MANAGE-4.2, group: MANAGE, title: "Continual-improvement activities are integrated into updates", evidence: organizational}
+  - {id: MANAGE-4.3, group: MANAGE, title: "Incidents and errors are tracked, communicated and recovered from", evidence: both}

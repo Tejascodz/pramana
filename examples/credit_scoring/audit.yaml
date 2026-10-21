@@ -1,0 +1,96 @@
+# Audit specification for the credit-scoring case study.
+# Nilgiri Finance is a fictional lender; all data is synthetic.
+system:
+  name: Nilgiri Finance Personal Loan Pre-Approval Model
+  version: 2.3.0
+  type: tabular_classifier
+  owner: Credit Risk Analytics
+  accountable_executive: Chief Risk Officer
+  description: >
+    Gradient-boosted model that estimates the probability an applicant repays a
+    personal loan. Applications scoring at or above the threshold are
+    pre-approved; the rest go to manual underwriting.
+
+use_case:
+  domain: credit_scoring
+  purpose: Pre-approve unsecured personal loans for retail applicants.
+  decision_role: automated_decision
+  affected_persons: Retail loan applicants in India and NRI applicants in the EU
+  deployment_regions: [IN, EU]
+  processes_personal_data: true
+  interacts_with_people: false
+  generates_synthetic_content: false
+  annual_decisions: 240000
+  vulnerable_groups: false
+  contestability: medium
+  declared_eu_tier: limited
+  prohibited_practice_flags: []
+
+artifacts:
+  model: model.joblib
+  reference_data: data/train.csv
+  evaluation_data: data/test.csv
+  production_data: data/production_sample.csv
+  documentation: model_card.yaml
+
+target: repaid
+positive_label: 1
+decision_threshold: 0.5
+features:
+  - monthly_income
+  - employment_type
+  - pincode_risk_band
+  - credit_history_months
+  - existing_emis
+  - debt_to_income
+  - loan_amount
+  - bureau_score
+  - years_at_address
+sensitive_features: [gender, age_band, residence]
+exclude_columns: [applicant_id]
+
+thresholds:
+  min_auc: 0.70
+  disparate_impact_min: 0.80
+
+checks:
+  options:
+    robustness.perturbation:
+      monotone_increasing: [monthly_income, bureau_score]
+      monotone_decreasing: [debt_to_income]
+
+governance:
+  raci:
+    model_owner: Credit Risk Analytics
+    risk_owner: Model Risk Management
+    data_protection_officer: Data Protection Officer
+    security_owner: Information Security
+    approver: Chief Risk Officer
+  manual_evidence:
+    - control: ISO42001:A.2.2
+      file: governance/ai_policy.md
+      description: Board-approved Responsible AI Policy v1.2
+      owner: Chief Risk Officer
+    - control: NIST:GOVERN-1.2
+      file: governance/ai_policy.md
+      description: Trustworthy-AI principles embedded in the AI policy
+    - control: NIST:GOVERN-1.6
+      file: governance/ai_inventory_entry.md
+      description: AI inventory record for this model
+      owner: Model Risk Management
+    - control: NIST:GOVERN-2.1
+      file: governance/ai_inventory_entry.md
+      description: Roles and escalation lines recorded in the inventory entry
+    - control: EUAIA:Art-27
+      file: governance/fundamental_rights_impact_assessment.md
+      description: Fundamental rights impact assessment (cited by the business, not supplied)
+  risk_acceptances:
+    - check: data_quality.integrity
+      approved_by: Head of Credit Risk
+      justification: >
+        Missing bureau scores are expected for new-to-credit applicants and are
+        handled natively by the model. Monitored monthly.
+      expires: "2027-03-31"
+
+gate:
+  block_on: [critical, high]

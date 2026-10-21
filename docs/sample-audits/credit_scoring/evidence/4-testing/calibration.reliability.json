@@ -1,0 +1,103 @@
+{
+  "category": "Performance",
+  "check_id": "calibration.reliability",
+  "controls": [
+    "NIST:MEASURE-2.5",
+    "NIST:MEASURE-2.9",
+    "ISO42001:A.6.2.4",
+    "EUAIA:Art-15",
+    "INDIA:SUTRA-UNDERSTANDABLE"
+  ],
+  "details": {
+    "group_ece": {
+      "age_band": {
+        "18-25": 0.0459,
+        "26-40": 0.0284,
+        "41-60": 0.0415,
+        "60+": 0.0776
+      },
+      "gender": {
+        "female": 0.0526,
+        "male": 0.0482
+      },
+      "residence": {
+        "rural": 0.0678,
+        "semi_urban": 0.0305,
+        "urban": 0.0363
+      }
+    },
+    "reliability": [
+      {
+        "bin": "0.0-0.1",
+        "count": 7,
+        "mean_predicted": 0.08779584026095434,
+        "observed_rate": 0.2857142857142857
+      },
+      {
+        "bin": "0.1-0.2",
+        "count": 59,
+        "mean_predicted": 0.1571361289292051,
+        "observed_rate": 0.3389830508474576
+      },
+      {
+        "bin": "0.2-0.3",
+        "count": 98,
+        "mean_predicted": 0.25249048664237156,
+        "observed_rate": 0.40816326530612246
+      },
+      {
+        "bin": "0.3-0.4",
+        "count": 153,
+        "mean_predicted": 0.3552709230987225,
+        "observed_rate": 0.38562091503267976
+      },
+      {
+        "bin": "0.4-0.5",
+        "count": 190,
+        "mean_predicted": 0.4519091890463235,
+        "observed_rate": 0.48947368421052634
+      },
+      {
+        "bin": "0.5-0.6",
+        "count": 267,
+        "mean_predicted": 0.5515470916442659,
+        "observed_rate": 0.599250936329588
+      },
+      {
+        "bin": "0.6-0.7",
+        "count": 397,
+        "mean_predicted": 0.6511324165281127,
+        "observed_rate": 0.6574307304785895
+      },
+      {
+        "bin": "0.7-0.8",
+        "count": 574,
+        "mean_predicted": 0.7499606558491934,
+        "observed_rate": 0.740418118466899
+      },
+      {
+        "bin": "0.8-0.9",
+        "count": 806,
+        "mean_predicted": 0.8518510941417242,
+        "observed_rate": 0.825062034739454
+      },
+      {
+        "bin": "0.9-1.0",
+        "count": 1109,
+        "mean_predicted": 0.952954565354798,
+        "observed_rate": 0.9242560865644724
+      }
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "brier": 0.1612,
+    "ece": 0.031
+  },
+  "plain_summary": "Risk scores can be read as real probabilities.",
+  "recommendation": "Apply isotonic or Platt calibration on a held-out set and re-check per group.",
+  "severity": "info",
+  "status": "pass",
+  "summary": "Expected calibration error 0.031 (limit 0.05), Brier score 0.161. Worst group: age_band=60+ with ECE 0.078.",
+  "title": "Calibration"
+}

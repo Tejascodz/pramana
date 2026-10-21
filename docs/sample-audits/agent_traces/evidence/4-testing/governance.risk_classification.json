@@ -1,0 +1,63 @@
+{
+  "category": "Governance",
+  "check_id": "governance.risk_classification",
+  "controls": [
+    "NIST:MAP-1.1",
+    "NIST:MAP-3.3",
+    "NIST:MAP-1.5",
+    "NIST:GOVERN-1.1",
+    "ISO42001:A.9.4",
+    "ISO42001:A.5.2",
+    "EUAIA:Art-5",
+    "EUAIA:Art-6",
+    "INDIA:PILLAR-RISK-MITIGATION"
+  ],
+  "details": {
+    "eu_applicable": false,
+    "eu_basis": [
+      "Art. 50 transparency: interacts with people or generates synthetic content"
+    ],
+    "eu_tier": "limited",
+    "india_factors": [
+      "affects access to essential services, livelihood or rights (+3)",
+      "decisions are automated without human review (+2)",
+      "processes personal data under the DPDP Act (+1)"
+    ],
+    "india_score": 6,
+    "india_sensitivity": "elevated",
+    "obligations": [
+      {
+        "date": "2025-11-05",
+        "days_remaining": 0,
+        "obligation": "Voluntary, principle-based guidelines published (seven sutras, six pillars)",
+        "regime": "India AI Governance Guidelines",
+        "source": "https://ianslive.in/govt-unveils-india-ai-governance-guidelines-to-ensure-safe-inclusive-adoption--20251105175148",
+        "status": "in force"
+      },
+      {
+        "date": "2025-11-14",
+        "days_remaining": 0,
+        "obligation": "DPDP Rules notified; obligations phase in over 12 to 18 months",
+        "regime": "India DPDP Rules 2025",
+        "source": "https://www.deccanherald.com/india/centre-notifies-dpdp-rules-implementation-planned-in-phases-spread-over-12-18-months-3798465",
+        "status": "in force"
+      }
+    ],
+    "sector_notes": [
+      "Personal data of Indian data principals: DPDP Act 2023 and DPDP Rules 2025 apply."
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "declared_eu_tier": "limited",
+    "eu_tier": "limited",
+    "india_sensitivity": "elevated",
+    "upcoming_obligations": 0
+  },
+  "plain_summary": "This AI system carries transparency duties: people must know they are dealing with AI.",
+  "recommendation": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation.",
+  "severity": "info",
+  "status": "pass",
+  "summary": "EU AI Act tier: limited (Art. 50 transparency: interacts with people or generates synthetic content); the Act is used as a benchmark (no EU deployment declared). India context sensitivity: elevated (score 6/10). Declared and assessed tiers agree. 0 upcoming regulatory milestone(s) apply.",
+  "title": "Risk classification"
+}

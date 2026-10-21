@@ -1,0 +1,62 @@
+{
+  "category": "Robustness",
+  "check_id": "robustness.perturbation",
+  "controls": [
+    "NIST:MEASURE-2.5",
+    "NIST:MEASURE-2.7",
+    "NIST:MEASURE-2.6",
+    "ISO42001:A.6.2.4",
+    "EUAIA:Art-15",
+    "INDIA:SUTRA-SAFETY"
+  ],
+  "details": {
+    "monotonicity": [
+      {
+        "expected": "increasing",
+        "feature": "monthly_income",
+        "violation_rate": 0.1445
+      },
+      {
+        "expected": "increasing",
+        "feature": "bureau_score",
+        "violation_rate": 0.0776
+      },
+      {
+        "expected": "decreasing",
+        "feature": "debt_to_income",
+        "violation_rate": 0.1798
+      }
+    ],
+    "noise": [
+      {
+        "auc": 0.7476,
+        "flip_rate": 0.0126,
+        "noise_sigma": 0.01
+      },
+      {
+        "auc": 0.7462,
+        "flip_rate": 0.0402,
+        "noise_sigma": 0.05
+      },
+      {
+        "auc": 0.744,
+        "flip_rate": 0.0568,
+        "noise_sigma": 0.1
+      }
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "flip_rate_10pct": 0.0568,
+    "flip_rate_1pct": 0.0126,
+    "flip_rate_5pct": 0.0402,
+    "handles_missing": true,
+    "missing_value_flip_rate": 0.0292
+  },
+  "plain_summary": "Decisions stay stable under small input changes; some business-logic expectations are violated.",
+  "recommendation": "Add input validation and imputation, apply monotonic constraints where the business logic requires them, and add a manual-review band around the decision threshold.",
+  "severity": "medium",
+  "status": "warn",
+  "summary": "Decision flip rate 1.3% at 1% noise, 4.0% at 5%, 5.7% at 10% of each feature's std (limit 5%). 10% missing numeric values flip 2.9% of decisions. monthly_income should be increasing: violated for 14.4% of rows. bureau_score should be increasing: violated for 7.8% of rows. debt_to_income should be decreasing: violated for 18.0% of rows.",
+  "title": "Robustness to perturbation"
+}

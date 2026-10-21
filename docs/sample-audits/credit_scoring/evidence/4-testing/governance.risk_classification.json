@@ -1,0 +1,105 @@
+{
+  "category": "Governance",
+  "check_id": "governance.risk_classification",
+  "controls": [
+    "NIST:MAP-1.1",
+    "NIST:MAP-3.3",
+    "NIST:MAP-1.5",
+    "NIST:GOVERN-1.1",
+    "ISO42001:A.9.4",
+    "ISO42001:A.5.2",
+    "EUAIA:Art-5",
+    "EUAIA:Art-6",
+    "INDIA:PILLAR-RISK-MITIGATION"
+  ],
+  "details": {
+    "eu_applicable": true,
+    "eu_basis": [
+      "Art. 6(2) and Annex III point 5(b): Creditworthiness or credit scoring of natural persons"
+    ],
+    "eu_tier": "high",
+    "india_factors": [
+      "affects access to essential services, livelihood or rights (+3)",
+      "decisions are automated without human review (+2)",
+      "processes personal data under the DPDP Act (+1)",
+      "operates at large scale (+1)"
+    ],
+    "india_score": 7,
+    "india_sensitivity": "high",
+    "obligations": [
+      {
+        "date": "2025-02-02",
+        "days_remaining": 0,
+        "obligation": "Prohibited practices (Art. 5) and AI literacy (Art. 4) apply",
+        "regime": "EU AI Act",
+        "source": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+        "status": "in force"
+      },
+      {
+        "date": "2025-11-05",
+        "days_remaining": 0,
+        "obligation": "Voluntary, principle-based guidelines published (seven sutras, six pillars)",
+        "regime": "India AI Governance Guidelines",
+        "source": "https://ianslive.in/govt-unveils-india-ai-governance-guidelines-to-ensure-safe-inclusive-adoption--20251105175148",
+        "status": "in force"
+      },
+      {
+        "date": "2025-11-14",
+        "days_remaining": 0,
+        "obligation": "DPDP Rules notified; obligations phase in over 12 to 18 months",
+        "regime": "India DPDP Rules 2025",
+        "source": "https://www.deccanherald.com/india/centre-notifies-dpdp-rules-implementation-planned-in-phases-spread-over-12-18-months-3798465",
+        "status": "in force"
+      },
+      {
+        "date": "2026-08-02",
+        "days_remaining": 0,
+        "obligation": "Art. 50 transparency obligations and GPAI enforcement powers apply",
+        "regime": "EU AI Act",
+        "source": "https://www.processexcellencenetwork.com/ai/articles/eu-ai-act-2026-what-actually-changed-and-what-deployers-still-must-do",
+        "status": "in force"
+      },
+      {
+        "date": "2026-12-02",
+        "days_remaining": 42,
+        "obligation": "Digital Omnibus: new prohibited practices apply; end of Art. 50(2) marking grace period for systems already on the market",
+        "regime": "EU AI Act",
+        "source": "https://pasqualepillitteri.it/en/news/5190/digital-omnibus-ai-act-eu-parliament",
+        "status": "upcoming"
+      },
+      {
+        "date": "2027-12-02",
+        "days_remaining": 407,
+        "obligation": "High-risk obligations for stand-alone Annex III systems apply (deferred by Digital Omnibus)",
+        "regime": "EU AI Act",
+        "source": "https://www.jdsupra.com/legalnews/eu-legislators-agree-to-delay-for-high-5617765/",
+        "status": "upcoming"
+      },
+      {
+        "date": "2028-08-02",
+        "days_remaining": 651,
+        "obligation": "High-risk obligations for AI embedded in Annex I regulated products apply",
+        "regime": "EU AI Act",
+        "source": "https://www.jdsupra.com/legalnews/eu-legislators-agree-to-delay-for-high-5617765/",
+        "status": "upcoming"
+      }
+    ],
+    "sector_notes": [
+      "Regulated lending in India: the RBI FREE-AI framework (Aug 2025) is the sector reference; the India AI Governance Guidelines' seven sutras are adapted from it.",
+      "Personal data of Indian data principals: DPDP Act 2023 and DPDP Rules 2025 apply."
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "declared_eu_tier": "limited",
+    "eu_tier": "high",
+    "india_sensitivity": "high",
+    "upcoming_obligations": 3
+  },
+  "plain_summary": "This is a high-risk AI use under the EU AI Act, with strict duties on testing, documentation and human oversight. Its owner had classified it lower, so required controls may be missing.",
+  "recommendation": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation.",
+  "severity": "high",
+  "status": "fail",
+  "summary": "EU AI Act tier: high (Art. 6(2) and Annex III point 5(b): Creditworthiness or credit scoring of natural persons); the Act applies. India context sensitivity: high (score 7/10). The owner declared 'limited', lower than the assessed 'high' tier. 3 upcoming regulatory milestone(s) apply.",
+  "title": "Risk classification"
+}

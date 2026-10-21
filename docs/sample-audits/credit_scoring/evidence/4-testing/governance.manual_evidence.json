@@ -1,0 +1,17 @@
+{
+  "category": "Governance",
+  "check_id": "governance.manual_evidence",
+  "controls": [],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {
+    "documents": 5,
+    "missing": 1
+  },
+  "plain_summary": "Some governance documents that were cited as evidence could not be produced.",
+  "recommendation": "Provide each cited document, or remove the claim from the control register.",
+  "severity": "medium",
+  "status": "warn",
+  "summary": "4/5 referenced governance documents were supplied and fingerprinted. Missing: fundamental_rights_impact_assessment.md (EUAIA:Art-27).",
+  "title": "Governance evidence on file"
+}

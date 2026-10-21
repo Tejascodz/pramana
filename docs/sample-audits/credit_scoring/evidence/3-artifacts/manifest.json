@@ -1,0 +1,71 @@
+{
+  "artifacts": [
+    {
+      "artifact": "model",
+      "file": "model.joblib",
+      "sha256": "bea25a1865913e3f126be0fb8ac9949ef3c02427054a716158bbcf1c1c9577b5"
+    },
+    {
+      "artifact": "reference_data",
+      "file": "train.csv",
+      "sha256": "1710b65aa75bd5481f7f6db38d0cc720bcf18bd7fedc5b410cdc06031ce85311"
+    },
+    {
+      "artifact": "evaluation_data",
+      "file": "test.csv",
+      "sha256": "21a8ac5ed818edd90213392dc454823e806c3f348ea6b5acc1aac45aa1034e84"
+    },
+    {
+      "artifact": "production_data",
+      "file": "production_sample.csv",
+      "sha256": "308fb8e23eebc05095279096cc37f3c7fb7035781da9bcf4781f963c22bd2b79"
+    },
+    {
+      "artifact": "documentation",
+      "file": "model_card.yaml",
+      "sha256": "e64ca1e1ce6b48ee84bdb1b1d38daa896140e95b632a261d8ca8a94807974982"
+    }
+  ],
+  "manual_evidence": [
+    {
+      "control": "ISO42001:A.2.2",
+      "description": "Board-approved Responsible AI Policy v1.2",
+      "file_name": "ai_policy.md",
+      "owner": "Chief Risk Officer",
+      "present": true,
+      "sha256": "8df3091f1ea6706703e1cd9cd8fff1d8332fe9a4a0ed5dfc4b7e8856451fbdaf"
+    },
+    {
+      "control": "NIST:GOVERN-1.2",
+      "description": "Trustworthy-AI principles embedded in the AI policy",
+      "file_name": "ai_policy.md",
+      "owner": "",
+      "present": true,
+      "sha256": "8df3091f1ea6706703e1cd9cd8fff1d8332fe9a4a0ed5dfc4b7e8856451fbdaf"
+    },
+    {
+      "control": "NIST:GOVERN-1.6",
+      "description": "AI inventory record for this model",
+      "file_name": "ai_inventory_entry.md",
+      "owner": "Model Risk Management",
+      "present": true,
+      "sha256": "b30fbcc00c971611bc06311e010ffb18ca4a3da7a2b7f4824a30723ab362d3b5"
+    },
+    {
+      "control": "NIST:GOVERN-2.1",
+      "description": "Roles and escalation lines recorded in the inventory entry",
+      "file_name": "ai_inventory_entry.md",
+      "owner": "",
+      "present": true,
+      "sha256": "b30fbcc00c971611bc06311e010ffb18ca4a3da7a2b7f4824a30723ab362d3b5"
+    },
+    {
+      "control": "EUAIA:Art-27",
+      "description": "Fundamental rights impact assessment (cited by the business, not supplied)",
+      "file_name": "fundamental_rights_impact_assessment.md",
+      "owner": "",
+      "present": false,
+      "sha256": null
+    }
+  ]
+}

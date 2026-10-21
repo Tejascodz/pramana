@@ -1,0 +1,91 @@
+{
+  "category": "Transparency",
+  "check_id": "explainability.feature_importance",
+  "controls": [
+    "NIST:MEASURE-2.9",
+    "NIST:MAP-2.2",
+    "ISO42001:A.6.2.7",
+    "ISO42001:A.8.2",
+    "EUAIA:Art-13",
+    "INDIA:SUTRA-UNDERSTANDABLE"
+  ],
+  "details": {
+    "declared_drivers": [
+      "bureau_score",
+      "credit_history_months",
+      "debt_to_income",
+      "monthly_income"
+    ],
+    "ranking": [
+      {
+        "feature": "bureau_score",
+        "importance": 0.10305,
+        "share": 0.4653,
+        "std": 0.00681
+      },
+      {
+        "feature": "pincode_risk_band",
+        "importance": 0.037,
+        "share": 0.1671,
+        "std": 0.00417
+      },
+      {
+        "feature": "monthly_income",
+        "importance": 0.03518,
+        "share": 0.1589,
+        "std": 0.00345
+      },
+      {
+        "feature": "debt_to_income",
+        "importance": 0.02449,
+        "share": 0.1106,
+        "std": 0.00586
+      },
+      {
+        "feature": "loan_amount",
+        "importance": 0.00639,
+        "share": 0.0289,
+        "std": 0.00326
+      },
+      {
+        "feature": "years_at_address",
+        "importance": 0.00618,
+        "share": 0.0279,
+        "std": 0.00354
+      },
+      {
+        "feature": "credit_history_months",
+        "importance": 0.0042,
+        "share": 0.019,
+        "std": 0.00321
+      },
+      {
+        "feature": "employment_type",
+        "importance": 0.00362,
+        "share": 0.0163,
+        "std": 0.00244
+      },
+      {
+        "feature": "existing_emis",
+        "importance": 0.00134,
+        "share": 0.0061,
+        "std": 0.0009
+      }
+    ],
+    "undocumented": [
+      "pincode_risk_band",
+      "loan_amount"
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "top_feature": "bureau_score",
+    "top_feature_share": 0.4653
+  },
+  "plain_summary": "The decision is driven mostly by bureau_score, pincode_risk_band, monthly_income; some of these drivers are not described in the documentation.",
+  "recommendation": "Declare expected key drivers in the model documentation, explain any surprising driver, and provide reason codes for individual adverse decisions.",
+  "severity": "medium",
+  "status": "warn",
+  "summary": "Top drivers by permutation importance (AUC drop): bureau_score (47%), pincode_risk_band (17%), monthly_income (16%), debt_to_income (11%), loan_amount (3%). Not declared in documentation: pincode_risk_band, loan_amount.",
+  "title": "Decision drivers"
+}

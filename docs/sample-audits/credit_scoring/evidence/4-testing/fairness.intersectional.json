@@ -1,0 +1,359 @@
+{
+  "category": "Fairness",
+  "check_id": "fairness.intersectional",
+  "controls": [
+    "NIST:MEASURE-2.11",
+    "ISO42001:A.5.4",
+    "EUAIA:Art-10",
+    "INDIA:SUTRA-FAIRNESS"
+  ],
+  "details": {
+    "pairs": {
+      "age_band × residence": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.6502915451895044,
+            "favourable": 106,
+            "fpr": 0.5142857142857142,
+            "group": "18-25 × rural",
+            "mean_score": 0.5725703471358736,
+            "n": 168,
+            "selection_rate": 0.6309523809523809,
+            "tpr": 0.7142857142857143
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7439516129032256,
+            "favourable": 191,
+            "fpr": 0.734375,
+            "group": "18-25 × semi_urban",
+            "mean_score": 0.7245046523344797,
+            "n": 219,
+            "selection_rate": 0.8721461187214612,
+            "tpr": 0.9290322580645162
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.6932652409830833,
+            "favourable": 285,
+            "fpr": 0.8,
+            "group": "18-25 × urban",
+            "mean_score": 0.8030989537743167,
+            "n": 306,
+            "selection_rate": 0.9313725490196079,
+            "tpr": 0.966804979253112
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.6722884559464961,
+            "favourable": 279,
+            "fpr": 0.5414364640883977,
+            "group": "26-40 × rural",
+            "mean_score": 0.6004010012699342,
+            "n": 409,
+            "selection_rate": 0.6821515892420538,
+            "tpr": 0.793859649122807
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.717425466954023,
+            "favourable": 447,
+            "fpr": 0.7413793103448276,
+            "group": "26-40 × semi_urban",
+            "mean_score": 0.7643331602008278,
+            "n": 500,
+            "selection_rate": 0.894,
+            "tpr": 0.9401041666666666
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7209642283879845,
+            "favourable": 694,
+            "fpr": 0.7857142857142857,
+            "group": "26-40 × urban",
+            "mean_score": 0.8401091514277091,
+            "n": 735,
+            "selection_rate": 0.9442176870748299,
+            "tpr": 0.9727126805778491
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.6608490566037738,
+            "favourable": 183,
+            "fpr": 0.5849056603773585,
+            "group": "41-60 × rural",
+            "mean_score": 0.599704075721838,
+            "n": 266,
+            "selection_rate": 0.6879699248120301,
+            "tpr": 0.75625
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7170868347338936,
+            "favourable": 287,
+            "fpr": 0.7777777777777778,
+            "group": "41-60 × semi_urban",
+            "mean_score": 0.781363367053855,
+            "n": 318,
+            "selection_rate": 0.9025157232704403,
+            "tpr": 0.9333333333333333
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7634837688044338,
+            "favourable": 468,
+            "fpr": 0.7866666666666666,
+            "group": "41-60 × urban",
+            "mean_score": 0.8362972615091903,
+            "n": 496,
+            "selection_rate": 0.9435483870967742,
+            "tpr": 0.9714964370546318
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.47959183673469385,
+            "favourable": 46,
+            "fpr": 0.6666666666666666,
+            "group": "60+ × rural",
+            "mean_score": 0.6152909503652139,
+            "n": 63,
+            "selection_rate": 0.7301587301587301,
+            "tpr": 0.7619047619047619
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7651098901098901,
+            "favourable": 61,
+            "fpr": 0.5384615384615384,
+            "group": "60+ × semi_urban",
+            "mean_score": 0.7844580495450818,
+            "n": 69,
+            "selection_rate": 0.8840579710144928,
+            "tpr": 0.9642857142857143
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.8055555555555556,
+            "favourable": 106,
+            "fpr": 0.7916666666666666,
+            "group": "60+ × urban",
+            "mean_score": 0.8378457356559593,
+            "n": 111,
+            "selection_rate": 0.954954954954955,
+            "tpr": 1.0
+          }
+        ],
+        "small_subgroups": [],
+        "summary": {
+          "comparable_groups": 12,
+          "demographic_parity_difference": 0.324,
+          "disparate_impact_ratio": 0.6607,
+          "equal_opportunity_difference": 0.2857,
+          "equalized_odds_difference": 0.2857,
+          "least_favoured": "18-25 × rural",
+          "marginal_min_di": 0.7192,
+          "most_favoured": "60+ × urban",
+          "p_value": 5.610740178662765e-10
+        }
+      },
+      "gender × age_band": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.7614533965244865,
+            "favourable": 261,
+            "fpr": 0.6666666666666666,
+            "group": "female × 18-25",
+            "mean_score": 0.7175119411532602,
+            "n": 310,
+            "selection_rate": 0.8419354838709677,
+            "tpr": 0.9241706161137441
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7566324755165956,
+            "favourable": 634,
+            "fpr": 0.6394849785407726,
+            "group": "female × 26-40",
+            "mean_score": 0.7398297800856447,
+            "n": 751,
+            "selection_rate": 0.844207723035952,
+            "tpr": 0.9362934362934363
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7559347181008903,
+            "favourable": 401,
+            "fpr": 0.7045454545454546,
+            "group": "female × 41-60",
+            "mean_score": 0.7554868143044214,
+            "n": 469,
+            "selection_rate": 0.8550106609808102,
+            "tpr": 0.913946587537092
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.8169014084507041,
+            "favourable": 86,
+            "fpr": 0.59375,
+            "group": "female × 60+",
+            "mean_score": 0.740707757098728,
+            "n": 103,
+            "selection_rate": 0.8349514563106796,
+            "tpr": 0.9436619718309859
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.697243816254417,
+            "favourable": 321,
+            "fpr": 0.69,
+            "group": "male × 18-25",
+            "mean_score": 0.7263130947193419,
+            "n": 383,
+            "selection_rate": 0.8381201044386423,
+            "tpr": 0.8904593639575972
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7424004691264106,
+            "favourable": 786,
+            "fpr": 0.6988636363636364,
+            "group": "male × 26-40",
+            "mean_score": 0.7722269328945848,
+            "n": 893,
+            "selection_rate": 0.8801791713325868,
+            "tpr": 0.9246861924686193
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7589822502147152,
+            "favourable": 537,
+            "fpr": 0.6875,
+            "group": "male × 41-60",
+            "mean_score": 0.7667347965055965,
+            "n": 611,
+            "selection_rate": 0.8788870703764321,
+            "tpr": 0.9218436873747495
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.6174089068825911,
+            "favourable": 127,
+            "fpr": 0.8076923076923077,
+            "group": "male × 60+",
+            "mean_score": 0.7828493783447257,
+            "n": 140,
+            "selection_rate": 0.9071428571428571,
+            "tpr": 0.9298245614035088
+          }
+        ],
+        "small_subgroups": [],
+        "summary": {
+          "comparable_groups": 8,
+          "demographic_parity_difference": 0.0722,
+          "disparate_impact_ratio": 0.9204,
+          "equal_opportunity_difference": 0.0532,
+          "equalized_odds_difference": 0.2139,
+          "least_favoured": "female × 60+",
+          "marginal_min_di": 0.9581,
+          "most_favoured": "male × 60+",
+          "p_value": 0.09092814778957198
+        }
+      },
+      "gender × residence": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.5873243933588761,
+            "favourable": 267,
+            "fpr": 0.5714285714285714,
+            "group": "female × rural",
+            "mean_score": 0.5728863145461569,
+            "n": 426,
+            "selection_rate": 0.6267605633802817,
+            "tpr": 0.7068965517241379
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7256319999999998,
+            "favourable": 447,
+            "fpr": 0.728,
+            "group": "female × semi_urban",
+            "mean_score": 0.7611065825901134,
+            "n": 500,
+            "selection_rate": 0.894,
+            "tpr": 0.9493333333333334
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7378808666323673,
+            "favourable": 668,
+            "fpr": 0.773109243697479,
+            "group": "female × urban",
+            "mean_score": 0.8261021502122392,
+            "n": 707,
+            "selection_rate": 0.9448373408769448,
+            "tpr": 0.9795918367346939
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.707178728365169,
+            "favourable": 347,
+            "fpr": 0.5238095238095238,
+            "group": "male × rural",
+            "mean_score": 0.6166476497012174,
+            "n": 480,
+            "selection_rate": 0.7229166666666667,
+            "tpr": 0.7937853107344632
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7341261550823623,
+            "favourable": 539,
+            "fpr": 0.7480916030534351,
+            "group": "male × semi_urban",
+            "mean_score": 0.763829973281097,
+            "n": 606,
+            "selection_rate": 0.8894389438943895,
+            "tpr": 0.9284210526315789
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7390078642922137,
+            "favourable": 885,
+            "fpr": 0.802547770700637,
+            "group": "male × urban",
+            "mean_score": 0.836321577386423,
+            "n": 941,
+            "selection_rate": 0.9404888416578109,
+            "tpr": 0.9681122448979592
+          }
+        ],
+        "small_subgroups": [],
+        "summary": {
+          "comparable_groups": 6,
+          "demographic_parity_difference": 0.3181,
+          "disparate_impact_ratio": 0.6634,
+          "equal_opportunity_difference": 0.2727,
+          "equalized_odds_difference": 0.2787,
+          "least_favoured": "female × rural",
+          "marginal_min_di": 0.7192,
+          "most_favoured": "female × urban",
+          "p_value": 1.8595833165257757e-42
+        }
+      }
+    }
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "worst_intersectional_di": 0.6607,
+    "worst_pair": "age_band × residence"
+  },
+  "plain_summary": "The combined group '18-25 × rural' is treated less favourably than any single attribute reveals.",
+  "recommendation": "Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance. Collect more data for subgroups below the minimum sample size.",
+  "severity": "high",
+  "status": "fail",
+  "summary": "Worst pair age_band × residence: DI 0.66 between '18-25 × rural' and '60+ × urban' (p=5.61e-10); lowest single-attribute DI for the same attributes is 0.72. The intersectional gap is larger than either attribute shows on its own.",
+  "title": "Intersectional fairness"
+}

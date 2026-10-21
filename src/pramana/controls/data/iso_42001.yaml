@@ -1,0 +1,49 @@
+# ISO/IEC 42001:2023 Annex A reference controls (38 controls in 9 objectives).
+# Only control identifiers and short descriptive titles are listed here.
+# The standard itself is copyrighted; obtain it from ISO for the full text.
+framework:
+  id: ISO42001
+  name: ISO/IEC 42001 Annex A
+  version: "2023"
+  source: https://www.iso.org/standard/81230.html
+  group_label: Objective
+
+controls:
+  - {id: A.2.2, group: "A.2 AI policy", title: "AI policy", evidence: organizational}
+  - {id: A.2.3, group: "A.2 AI policy", title: "Alignment with other organizational policies", evidence: organizational}
+  - {id: A.2.4, group: "A.2 AI policy", title: "Review of the AI policy", evidence: organizational}
+  - {id: A.3.2, group: "A.3 Internal organization", title: "AI roles and responsibilities", evidence: organizational}
+  - {id: A.3.3, group: "A.3 Internal organization", title: "Reporting of concerns", evidence: organizational}
+  - {id: A.4.2, group: "A.4 Resources", title: "Resource documentation", evidence: both}
+  - {id: A.4.3, group: "A.4 Resources", title: "Data resources", evidence: both}
+  - {id: A.4.4, group: "A.4 Resources", title: "Tooling resources", evidence: both}
+  - {id: A.4.5, group: "A.4 Resources", title: "System and computing resources", evidence: both}
+  - {id: A.4.6, group: "A.4 Resources", title: "Human resources", evidence: organizational}
+  - {id: A.5.2, group: "A.5 Impact assessment", title: "AI system impact assessment process", evidence: organizational}
+  - {id: A.5.3, group: "A.5 Impact assessment", title: "Documentation of impact assessments", evidence: both}
+  - {id: A.5.4, group: "A.5 Impact assessment", title: "Impact on individuals or groups of individuals", evidence: both}
+  - {id: A.5.5, group: "A.5 Impact assessment", title: "Societal impacts of AI systems", evidence: organizational}
+  - {id: A.6.1.2, group: "A.6 Life cycle", title: "Objectives for responsible development", evidence: organizational}
+  - {id: A.6.1.3, group: "A.6 Life cycle", title: "Processes for responsible design and development", evidence: organizational}
+  - {id: A.6.2.2, group: "A.6 Life cycle", title: "System requirements and specification", evidence: both}
+  - {id: A.6.2.3, group: "A.6 Life cycle", title: "Documentation of design and development", evidence: both}
+  - {id: A.6.2.4, group: "A.6 Life cycle", title: "Verification and validation", evidence: technical}
+  - {id: A.6.2.5, group: "A.6 Life cycle", title: "Deployment", evidence: both}
+  - {id: A.6.2.6, group: "A.6 Life cycle", title: "Operation and monitoring", evidence: technical}
+  - {id: A.6.2.7, group: "A.6 Life cycle", title: "Technical documentation", evidence: both}
+  - {id: A.6.2.8, group: "A.6 Life cycle", title: "Recording of event logs", evidence: technical}
+  - {id: A.7.2, group: "A.7 Data", title: "Data for development and enhancement", evidence: both}
+  - {id: A.7.3, group: "A.7 Data", title: "Acquisition of data", evidence: organizational}
+  - {id: A.7.4, group: "A.7 Data", title: "Quality of data", evidence: technical}
+  - {id: A.7.5, group: "A.7 Data", title: "Data provenance", evidence: both}
+  - {id: A.7.6, group: "A.7 Data", title: "Data preparation", evidence: both}
+  - {id: A.8.2, group: "A.8 Information for interested parties", title: "System documentation and information for users", evidence: both}
+  - {id: A.8.3, group: "A.8 Information for interested parties", title: "External reporting", evidence: organizational}
+  - {id: A.8.4, group: "A.8 Information for interested parties", title: "Communication of incidents", evidence: organizational}
+  - {id: A.8.5, group: "A.8 Information for interested parties", title: "Information for interested parties", evidence: organizational}
+  - {id: A.9.2, group: "A.9 Use of AI systems", title: "Processes for responsible use", evidence: organizational}
+  - {id: A.9.3, group: "A.9 Use of AI systems", title: "Objectives for responsible use", evidence: organizational}
+  - {id: A.9.4, group: "A.9 Use of AI systems", title: "Intended use of the AI system", evidence: both}
+  - {id: A.10.2, group: "A.10 Third parties", title: "Allocating responsibilities", evidence: organizational}
+  - {id: A.10.3, group: "A.10 Third parties", title: "Suppliers", evidence: organizational}
+  - {id: A.10.4, group: "A.10 Third parties", title: "Customers", evidence: organizational}

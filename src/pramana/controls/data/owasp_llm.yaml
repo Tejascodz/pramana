@@ -1,0 +1,19 @@
+# OWASP Top 10 for Large Language Model Applications (2025 edition).
+framework:
+  id: OWASP-LLM
+  name: OWASP Top 10 for LLM Applications
+  version: "2025"
+  source: https://genai.owasp.org/llm-top-10/
+  group_label: Category
+
+controls:
+  - {id: LLM01, group: "Top 10", title: "Prompt injection", evidence: technical}
+  - {id: LLM02, group: "Top 10", title: "Sensitive information disclosure", evidence: technical}
+  - {id: LLM03, group: "Top 10", title: "Supply chain", evidence: both}
+  - {id: LLM04, group: "Top 10", title: "Data and model poisoning", evidence: both}
+  - {id: LLM05, group: "Top 10", title: "Improper output handling", evidence: technical}
+  - {id: LLM06, group: "Top 10", title: "Excessive agency", evidence: technical}
+  - {id: LLM07, group: "Top 10", title: "System prompt leakage", evidence: technical}
+  - {id: LLM08, group: "Top 10", title: "Vector and embedding weaknesses", evidence: technical}
+  - {id: LLM09, group: "Top 10", title: "Misinformation", evidence: technical}
+  - {id: LLM10, group: "Top 10", title: "Unbounded consumption", evidence: technical}

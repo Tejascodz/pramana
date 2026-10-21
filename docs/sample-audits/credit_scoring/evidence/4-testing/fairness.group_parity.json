@@ -1,0 +1,176 @@
+{
+  "category": "Fairness",
+  "check_id": "fairness.group_parity",
+  "controls": [
+    "NIST:MEASURE-2.11",
+    "NIST:MAP-5.1",
+    "ISO42001:A.5.4",
+    "ISO42001:A.7.4",
+    "EUAIA:Art-10",
+    "INDIA:SUTRA-FAIRNESS",
+    "NIST-GAI:HARMFUL-BIAS"
+  ],
+  "details": {
+    "attributes": {
+      "age_band": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.7272496083657153,
+            "favourable": 582,
+            "fpr": 0.678391959798995,
+            "group": "18-25",
+            "mean_score": 0.7223760707576028,
+            "n": 693,
+            "selection_rate": 0.8398268398268398,
+            "tpr": 0.9048582995951417
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7513180166892688,
+            "favourable": 1420,
+            "fpr": 0.6650366748166259,
+            "group": "26-40",
+            "mean_score": 0.7574275036004765,
+            "n": 1644,
+            "selection_rate": 0.8637469586374696,
+            "tpr": 0.9295546558704454
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7564220723193975,
+            "favourable": 938,
+            "fpr": 0.6967213114754098,
+            "group": "41-60",
+            "mean_score": 0.7618502560867529,
+            "n": 1080,
+            "selection_rate": 0.8685185185185185,
+            "tpr": 0.9186602870813397
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7229263746505126,
+            "favourable": 213,
+            "fpr": 0.6896551724137931,
+            "group": "60+",
+            "mean_score": 0.7649868804503316,
+            "n": 243,
+            "selection_rate": 0.8765432098765432,
+            "tpr": 0.9351351351351351
+          }
+        ],
+        "status": "pass",
+        "summary": {
+          "comparable_groups": 4,
+          "demographic_parity_difference": 0.0367,
+          "disparate_impact_ratio": 0.9581,
+          "equal_opportunity_difference": 0.0303,
+          "equalized_odds_difference": 0.0317,
+          "least_favoured": "18-25",
+          "most_favoured": "60+",
+          "p_value": 0.16857071945394242
+        }
+      },
+      "gender": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.7616410616506369,
+            "favourable": 1382,
+            "fpr": 0.6592741935483871,
+            "group": "female",
+            "mean_score": 0.7401451815626288,
+            "n": 1633,
+            "selection_rate": 0.8462951622780159,
+            "tpr": 0.9278803869832893
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7316339763575539,
+            "favourable": 1771,
+            "fpr": 0.7004830917874396,
+            "group": "male",
+            "mean_score": 0.7626297187891234,
+            "n": 2027,
+            "selection_rate": 0.8737049827331032,
+            "tpr": 0.9181649101053937
+          }
+        ],
+        "status": "pass",
+        "summary": {
+          "comparable_groups": 2,
+          "demographic_parity_difference": 0.0274,
+          "disparate_impact_ratio": 0.9686,
+          "equal_opportunity_difference": 0.0097,
+          "equalized_odds_difference": 0.0412,
+          "least_favoured": "female",
+          "most_favoured": "male",
+          "p_value": 0.017025043464364786
+        }
+      },
+      "residence": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.6523067981401314,
+            "favourable": 614,
+            "fpr": 0.5555555555555556,
+            "group": "rural",
+            "mean_score": 0.5960711278733413,
+            "n": 906,
+            "selection_rate": 0.6777041942604857,
+            "tpr": 0.7651515151515151
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7307950367647059,
+            "favourable": 986,
+            "fpr": 0.73828125,
+            "group": "semi_urban",
+            "mean_score": 0.7625987839994588,
+            "n": 1106,
+            "selection_rate": 0.891500904159132,
+            "tpr": 0.9376470588235294
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7376911944902185,
+            "favourable": 1553,
+            "fpr": 0.7898550724637681,
+            "group": "urban",
+            "mean_score": 0.8319373935198282,
+            "n": 1648,
+            "selection_rate": 0.9423543689320388,
+            "tpr": 0.9730320699708455
+          }
+        ],
+        "status": "fail",
+        "summary": {
+          "comparable_groups": 3,
+          "demographic_parity_difference": 0.2647,
+          "disparate_impact_ratio": 0.7192,
+          "equal_opportunity_difference": 0.2079,
+          "equalized_odds_difference": 0.2343,
+          "least_favoured": "rural",
+          "most_favoured": "urban",
+          "p_value": 3.1060747046243966e-71
+        }
+      }
+    }
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "di_age_band": 0.9581,
+    "di_gender": 0.9686,
+    "di_residence": 0.7192,
+    "eodds_age_band": 0.0317,
+    "eodds_gender": 0.0412,
+    "eodds_residence": 0.2343
+  },
+  "plain_summary": "Applicants in the 'rural' group (residence) receive a favourable outcome 68% of the time versus 94% for 'urban', below the four-fifths benchmark.",
+  "recommendation": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence.",
+  "severity": "high",
+  "status": "fail",
+  "summary": "gender: DI 0.97 (female vs male, p=0.017), EOdds diff 0.04; age_band: DI 0.96 (18-25 vs 60+, p=0.169), EOdds diff 0.03; residence: DI 0.72 (rural vs urban, p=3.11e-71), EOdds diff 0.23. Thresholds: DI >= 0.8, equalized-odds difference <= 0.1.",
+  "title": "Group fairness"
+}

@@ -1,0 +1,23 @@
+# Example: block a model release when the audit finds high or critical risks.
+# Copy this workflow into the repository that holds your model and audit spec.
+name: AI release gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "examples/support_chatbot/**"
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pramana audit
+        id: pramana
+        uses: ./
+        with:
+          spec: examples/support_chatbot/audit.yaml
+          out: pramana-audit
+          enforce: "false"   # set to "true" to fail the job on BLOCK
+      - run: echo "Gate decision was ${{ steps.pramana.outputs.decision }}"

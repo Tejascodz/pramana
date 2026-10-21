@@ -1,0 +1,25 @@
+{
+  "gate": {
+    "accepted_risks": [
+      "R-12"
+    ],
+    "block_on": [
+      "critical",
+      "high"
+    ],
+    "blocking_risks": [
+      "R-01",
+      "R-02",
+      "R-03",
+      "R-04",
+      "R-05",
+      "R-06",
+      "R-07"
+    ],
+    "decision": "BLOCK"
+  },
+  "opinion": {
+    "rating": "Ineffective",
+    "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
+  }
+}

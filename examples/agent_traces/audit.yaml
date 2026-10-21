@@ -1,0 +1,38 @@
+# Audit specification for the fee-refund agent case study.
+# The agent reads account data and can issue refunds. Refunds above INR 10,000
+# must have a prior human approval recorded in the log.
+system:
+  name: Fee Refund Agent
+  version: 0.9.2
+  type: agent
+  owner: Customer Operations
+  accountable_executive: Head of Customer Operations
+  description: >
+    Tool-using LLM agent that investigates fee complaints and issues refunds
+    through the payments API.
+
+use_case:
+  domain: customer_support_financial
+  purpose: Resolve fee disputes and refund wrongly charged fees.
+  decision_role: automated_decision
+  deployment_regions: [IN]
+  processes_personal_data: true
+  interacts_with_people: true
+  annual_decisions: 60000
+  declared_eu_tier: limited
+
+agent:
+  trace: refund_agent_trace.jsonl
+  tool_allowlist: [lookup_account, get_fee_history, issue_refund, send_notification, update_case_notes]
+  high_impact_tools:
+    issue_refund: {field: amount, above: 10000}
+
+governance:
+  raci:
+    model_owner: Customer Operations
+    risk_owner: Operational Risk
+    security_owner: Information Security
+    approver: Head of Customer Operations
+
+gate:
+  block_on: [critical, high]

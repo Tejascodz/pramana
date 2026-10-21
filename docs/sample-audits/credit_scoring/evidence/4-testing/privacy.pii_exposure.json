@@ -1,0 +1,63 @@
+{
+  "category": "Privacy",
+  "check_id": "privacy.pii_exposure",
+  "controls": [
+    "NIST:MEASURE-2.10",
+    "ISO42001:A.7.2",
+    "ISO42001:A.7.5",
+    "EUAIA:Art-10",
+    "INDIA:DPDP-2023",
+    "NIST-GAI:DATA-PRIVACY"
+  ],
+  "details": {
+    "hits": [
+      {
+        "column": "contact_email",
+        "dataset": "evaluation_data",
+        "kind": "email",
+        "match_rate": 1.0
+      },
+      {
+        "column": "mobile",
+        "dataset": "evaluation_data",
+        "kind": "india_mobile",
+        "match_rate": 1.0
+      },
+      {
+        "column": "contact_email",
+        "dataset": "reference_data",
+        "kind": "email",
+        "match_rate": 1.0
+      },
+      {
+        "column": "mobile",
+        "dataset": "reference_data",
+        "kind": "india_mobile",
+        "match_rate": 1.0
+      },
+      {
+        "column": "contact_email",
+        "dataset": "production_data",
+        "kind": "email",
+        "match_rate": 1.0
+      },
+      {
+        "column": "mobile",
+        "dataset": "production_data",
+        "kind": "india_mobile",
+        "match_rate": 1.0
+      }
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "identifier_columns": 2,
+    "identifiers_in_model_inputs": 0
+  },
+  "plain_summary": "Datasets used for modelling contain personal contact details (contact_email, mobile) that the model does not need.",
+  "recommendation": "Drop or pseudonymise identifier columns before data reaches modelling and evaluation environments, and record the purpose and lawful basis for any personal data retained (DPDP Act 2023 purpose limitation and data minimisation).",
+  "severity": "high",
+  "status": "fail",
+  "summary": "Direct identifiers found in 2 column(s): contact_email [email] in evaluation_data, mobile [india_mobile] in evaluation_data, contact_email [email] in reference_data, mobile [india_mobile] in reference_data, contact_email [email] in production_data, mobile [india_mobile] in production_data. None are model inputs.",
+  "title": "Personal-data exposure"
+}

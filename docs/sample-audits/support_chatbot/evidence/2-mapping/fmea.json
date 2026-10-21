@@ -1,0 +1,97 @@
+[
+  {
+    "check_id": "governance.risk_classification",
+    "controls": [
+      "NIST:MAP-1.1",
+      "NIST:MAP-3.3",
+      "NIST:MAP-1.5",
+      "NIST:GOVERN-1.1",
+      "ISO42001:A.9.4",
+      "ISO42001:A.5.2",
+      "EUAIA:Art-5",
+      "EUAIA:Art-6",
+      "INDIA:PILLAR-RISK-MITIGATION"
+    ],
+    "detection": "Risk classification",
+    "effect": "Wrong obligations applied; high-risk duties missed",
+    "failure_mode": "System deployed without a documented risk classification"
+  },
+  {
+    "check_id": "llm.prompt_injection",
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-LLM:LLM07",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "detection": "Prompt-injection resistance",
+    "effect": "Policy bypass, data exfiltration, unauthorized actions",
+    "failure_mode": "Instructions embedded in user or retrieved content override system rules"
+  },
+  {
+    "check_id": "llm.sensitive_disclosure",
+    "controls": [
+      "NIST:MEASURE-2.10",
+      "NIST-GAI:DATA-PRIVACY",
+      "OWASP-LLM:LLM02",
+      "ISO42001:A.7.2",
+      "EUAIA:Art-15",
+      "INDIA:DPDP-2023"
+    ],
+    "detection": "Sensitive-information disclosure",
+    "effect": "Privacy breach and regulatory exposure",
+    "failure_mode": "Assistant reveals personal data or confidential configuration"
+  },
+  {
+    "check_id": "llm.groundedness",
+    "controls": [
+      "NIST:MEASURE-2.5",
+      "NIST:MEASURE-2.9",
+      "NIST-GAI:CONFABULATION",
+      "NIST-GAI:INFO-INTEGRITY",
+      "OWASP-LLM:LLM09",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-TRUST"
+    ],
+    "detection": "Groundedness and misinformation",
+    "effect": "Customers act on wrong information; mis-selling",
+    "failure_mode": "Answers contain facts or figures not supported by the knowledge base"
+  },
+  {
+    "check_id": "llm.policy_adherence",
+    "controls": [
+      "NIST:MEASURE-2.6",
+      "NIST-GAI:HUMAN-AI-CONFIG",
+      "NIST-GAI:DANGEROUS-CONTENT",
+      "OWASP-LLM:LLM05",
+      "EUAIA:Art-50",
+      "INDIA:SUTRA-PEOPLE-FIRST"
+    ],
+    "detection": "Conduct-policy adherence",
+    "effect": "Consumer harm; breach of conduct rules",
+    "failure_mode": "Assistant gives prohibited advice or omits required disclosures"
+  },
+  {
+    "check_id": "documentation.model_card",
+    "controls": [
+      "NIST:MAP-2.2",
+      "NIST:MAP-3.5",
+      "NIST:GOVERN-4.2",
+      "NIST:MEASURE-2.8",
+      "ISO42001:A.6.2.3",
+      "ISO42001:A.6.2.7",
+      "ISO42001:A.8.2",
+      "EUAIA:Art-11",
+      "EUAIA:Art-13",
+      "EUAIA:Art-14",
+      "INDIA:SUTRA-UNDERSTANDABLE",
+      "INDIA:SUTRA-ACCOUNTABILITY"
+    ],
+    "detection": "Documentation and claims",
+    "effect": "Misuse outside scope; failed technical-documentation review",
+    "failure_mode": "Intended use, limitations and oversight measures are not documented"
+  }
+]
