@@ -22,3 +22,6 @@ pramana-audit/
 .DS_Store
 .idea/
 .vscode/
+
+# Trace written by the live-agent harness
+examples/agent_harness/trace.jsonl

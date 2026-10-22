@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from functools import cached_property
@@ -301,8 +300,10 @@ class AuditContext:
         path = self.spec.agent.get("trace")
         if not path:
             raise MissingArtifact("agent.trace is required for agent checks")
-        events = []
-        for line in Path(path).read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                events.append(json.loads(line))
-        return events
+        fmt = self.spec.agent.get("trace_format", "native")
+        from pramana.adapters.traces import load_trace
+
+        # A missing trace is "not applicable" (skip); a present-but-unreadable or
+        # misconfigured trace is an error that blocks the gate — an audit cannot
+        # vouch for evidence it could not parse.
+        return load_trace(path, fmt)

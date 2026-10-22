@@ -104,6 +104,11 @@ checks:
     effect: "Accountability gap: actions occur with no traceable authority"
     controls: [NIST:MEASURE-2.8, NIST:GOVERN-3.2, NIST:MANAGE-4.3, NIST:MAP-3.5, ISO42001:A.6.2.8, OWASP-LLM:LLM06, EUAIA:Art-12, EUAIA:Art-14, INDIA:SUTRA-ACCOUNTABILITY, INDIA:PILLAR-ACCOUNTABILITY]
 
+  agent.misalignment_signals:
+    failure_mode: "Agent reasoning or actions show it pursuing goals against its instructions (self-preservation, deception, oversight evasion, privilege escalation, reward hacking)"
+    effect: "Autonomous system takes harmful instrumental actions; loss of human control"
+    controls: [NIST:MEASURE-2.6, NIST:MEASURE-2.7, NIST:MANAGE-4.1, NIST:MANAGE-4.3, ISO42001:A.6.2.6, OWASP-LLM:LLM06, EUAIA:Art-14, EUAIA:Art-15, INDIA:SUTRA-SAFETY, INDIA:SUTRA-ACCOUNTABILITY]
+
   audit.process:
     failure_mode: "No documented test plan, go/no-go decision or risk treatment for the release"
     effect: "Deployment decisions cannot be shown to be risk-based"

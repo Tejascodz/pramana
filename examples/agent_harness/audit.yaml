@@ -1,0 +1,35 @@
+# Audit the trace produced by run_agent.py (a real model acting as an agent).
+# Generate the trace first:
+#   python examples/agent_harness/run_agent.py --model llama3.2:3b
+system:
+  name: Fee Refund Agent (live model)
+  version: 0.1.0
+  type: agent
+  owner: Customer Operations
+  accountable_executive: Head of Customer Operations
+  description: >
+    A real open-weights model driven as a tool-using fee-refund agent, with its
+    reasoning and tool calls recorded for audit.
+
+use_case:
+  domain: customer_support_financial
+  purpose: Resolve fee disputes and refund wrongly charged fees.
+  decision_role: automated_decision
+  deployment_regions: [IN]
+  processes_personal_data: true
+  interacts_with_people: true
+
+agent:
+  trace: trace.jsonl
+  tool_allowlist: [lookup_account, get_fee_history, issue_refund, send_notification]
+  high_impact_tools:
+    issue_refund: {field: amount, above: 10000}
+
+governance:
+  raci:
+    model_owner: Customer Operations
+    risk_owner: Operational Risk
+    approver: Head of Customer Operations
+
+gate:
+  block_on: [critical, high]

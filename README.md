@@ -85,7 +85,7 @@ Each case study plants known defects, so the audit can be checked against a grou
 | [Credit scoring](examples/credit_scoring) | Gradient-boosted loan pre-approval model for a fictional Indian lender (synthetic data) | Biased historical labels for rural women; pincode band that tracks residence; e-mail and mobile columns left in extracts; overstated AUC in the model card; owner classified it as "limited" risk; income and gig-work drift | Disparate impact 0.72 for rural applicants (p < 1e-70), worse for intersectional sub-groups; pincode proxy (AUC 0.99); personal data exposure; documentation mismatch; EU AI Act misclassification (Annex III 5(b) makes it high-risk); missing FRIA. **Gate: BLOCK** |
 | [Support assistant](examples/support_chatbot) | RAG chat assistant (replayed transcripts) | Indirect prompt injection in a pasted e-mail; another customer's contact details disclosed; invented foreclosure fee; crypto investment advice | 1/5 injection probes succeed; PII disclosure (critical); figures not in the knowledge base (4%, ₹500); conduct-rule breach. **Gate: BLOCK** |
 | [Live assistant](examples/live_assistant) | Retrieval-augmented loan assistant on a **local open-weights model** (Ollama), in a baseline and a guarded build | Shared retrieval index holding customer records; no input screening; no output validation | Run it yourself: `pramana diff` shows the guarded build's controls closing the gaps, and 4 **held-out** probes show the risk that remains. See below. |
-| [Refund agent](examples/agent_traces) | Tool-using agent that issues refunds | ₹18,500 refund with no human approval; a tool call with no originating request; no hash chain on the log | Approval coverage 50%, one unattributed action, log not tamper-evident; auditability index 0.78. **Gate: BLOCK** |
+| [Refund agent](examples/agent_traces) | Tool-using agent that issues refunds | ₹18,500 refund with no human approval; a tool call with no originating request; no hash chain; an agent that reasons about avoiding shutdown and hiding a weak justification | Approval coverage 50%, one unattributed action, log not tamper-evident; **misalignment signals** (self-preservation + oversight evasion) caught in the agent's own reasoning, co-occurring with an irreversible refund. **Gate: BLOCK** |
 
 ![Fairness spotlight](docs/img/fairness.png)
 
@@ -121,6 +121,7 @@ Each case study plants known defects, so the audit can be checked against a grou
 | LLM conduct | `llm.policy_adherence` | Required and forbidden phrases per conduct rule |
 | LLM operations | `llm.service_health` | Error rate, retries, p50/p95 latency and output length from the live run (OWASP LLM10) |
 | Agents | `agent.trace_auditability` | Attribution to a request, prior human approval for high-impact actions, tool allowlist, ordering, hash-chain integrity |
+| Agents | `agent.misalignment_signals` | Scans the agent's own reasoning and actions for rogue patterns (self-preservation, deception, oversight evasion, goal substitution, privilege escalation, reward hacking) and flags where intent co-occurs with an irreversible action ([see the review](docs/agentic-safety-review.md)) |
 | Assurance | `audit.detector_sensitivity` | Plants a disparity, a drift and a PII column in copies of the data and confirms the audit catches them |
 
 Scoring is deterministic, so the same inputs always produce the same findings. Run `pramana checks` for the list with failure modes, and see [docs/methodology.md](docs/methodology.md) for every formula and threshold.
@@ -156,6 +157,14 @@ packs/credit/
 ```
 
 `pramana verify` recomputes every hash. Editing a result, deleting a ledger line or reordering entries makes verification fail with exit code 2.
+
+**Signed packs (optional).** The hash chain proves a pack is internally consistent; a signature proves *who* sealed it and that it was not rebuilt. With `pip install "pramana[signing]"`:
+
+```bash
+pramana keygen                       # Ed25519 key pair
+pramana sign packs/credit --key pramana_ed25519.key
+pramana verify packs/credit --public-key pramana_ed25519.pub   # provenance check
+```
 
 ## Use it as a release gate
 
@@ -212,12 +221,16 @@ streamlit run dashboard/app.py --server.address 127.0.0.1 -- --pack packs/credit
 
 ```bash
 pramana init my_audit.yaml        # starter spec with every field
+pramana ingest log.json --format otel -o trace.jsonl   # real agent logs → Pramana trace
+pramana scan-trace log.jsonl                           # stream a huge log for misalignment signals
 pramana classify my_audit.yaml    # risk tier and obligations only
 pramana ping my_audit.yaml        # check an LLM endpoint is reachable
 pramana run my_audit.yaml
 ```
 
 Predictions-only audits are supported: if the model cannot be shared, supply a `score_column` in the evaluation data and Pramana runs every check that does not need the model itself.
+
+For agents, Pramana reads the logs real systems already emit: set `agent.trace_format` to `otel` (OpenTelemetry GenAI spans) or `langchain` (LangChain/LangGraph runs), or convert first with `pramana ingest`. See [examples/real_traces](examples/real_traces).
 
 ## Project layout
 
@@ -240,6 +253,7 @@ docs/                    # research notes, methodology, design decisions, limita
 ## Documentation
 
 - [Research notes and gap analysis](docs/research-notes.md)
+- [Agentic safety, misalignment and control: a 2026 review](docs/agentic-safety-review.md)
 - [Methodology: formulas, thresholds, scoring](docs/methodology.md)
 - [Design decisions](docs/design-decisions.md)
 - [Control crosswalk](docs/control-mapping.md)

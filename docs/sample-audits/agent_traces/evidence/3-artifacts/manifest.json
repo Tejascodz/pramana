@@ -3,7 +3,7 @@
     {
       "artifact": "agent_trace",
       "file": "refund_agent_trace.jsonl",
-      "sha256": "3f64fa0c8675b415a08a4a394883622655a216d5156248a87dfc82941a66c5a6"
+      "sha256": "2dd7a51735761f20b47976279d446f1f0dfc14e4045d0b170b8b76138e4ed21d"
     }
   ],
   "manual_evidence": []

@@ -90,16 +90,72 @@ def _cmd_run(args: argparse.Namespace) -> int:
 
 
 def _cmd_verify(args: argparse.Namespace) -> int:
-    from pramana.audit.ledger import verify_pack
+    from pramana.audit.ledger import SIGNATURE_NAME_IF_ANY, verify_pack
 
     ok, problems = verify_pack(Path(args.pack))
-    if ok:
-        print(f"OK: every evidence file and ledger entry in {args.pack} verifies.")
+    if not ok:
+        print(f"TAMPERED: {len(problems)} problem(s) found in {args.pack}")
+        for p in problems:
+            print(f"  - {p}")
+        return EXIT_TAMPERED
+
+    signed = (Path(args.pack) / SIGNATURE_NAME_IF_ANY).exists()
+    if getattr(args, "require_signature", False) or getattr(args, "public_key", None) or signed:
+        from pramana.audit.signing import SigningError, verify_pack_signature
+
+        if not signed and getattr(args, "require_signature", False):
+            print(f"UNSIGNED: {args.pack} has no signature but --require-signature was given")
+            return EXIT_TAMPERED
+        key = Path(args.public_key).read_bytes() if getattr(args, "public_key", None) else None
+        try:
+            sok, sproblems = verify_pack_signature(Path(args.pack), key)
+        except SigningError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return EXIT_INPUT
+        if not sok:
+            print(f"SIGNATURE INVALID: {len(sproblems)} problem(s) in {args.pack}")
+            for p in sproblems:
+                print(f"  - {p}")
+            return EXIT_TAMPERED
+        print(f"OK: {args.pack} verifies and its signature is valid.")
         return EXIT_OK
-    print(f"TAMPERED: {len(problems)} problem(s) found in {args.pack}")
-    for p in problems:
-        print(f"  - {p}")
-    return EXIT_TAMPERED
+
+    print(f"OK: every evidence file and ledger entry in {args.pack} verifies.")
+    return EXIT_OK
+
+
+def _cmd_keygen(args: argparse.Namespace) -> int:
+    import os
+
+    from pramana.audit.signing import SigningError, generate_keypair
+
+    try:
+        private_pem, public_pem = generate_keypair()
+    except SigningError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    out = Path(args.out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    priv, pub = out / "pramana_ed25519.key", out / "pramana_ed25519.pub"
+    priv.write_bytes(private_pem)
+    os.chmod(priv, 0o600)
+    pub.write_bytes(public_pem)
+    print(f"Wrote private key {priv} (keep secret) and public key {pub} (share for verification).")
+    return EXIT_OK
+
+
+def _cmd_sign(args: argparse.Namespace) -> int:
+    from pramana.audit.signing import SigningError, sign_pack
+
+    try:
+        sign_pack(Path(args.pack), Path(args.key).read_bytes())
+    except (SigningError, FileNotFoundError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    print(
+        f"Signed {args.pack}. Share the pack and your public key; verify with: pramana verify {args.pack}"
+    )
+    return EXIT_OK
 
 
 def _cmd_summary(args: argparse.Namespace) -> int:
@@ -287,6 +343,65 @@ def _cmd_init(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_scan_trace(args: argparse.Namespace) -> int:
+    from pramana.adapters.traces import stream_events
+    from pramana.checks.agent_trace import scan_misalignment
+
+    source = Path(args.source)
+    if not source.exists():
+        print(f"error: {source} not found", file=sys.stderr)
+        return EXIT_INPUT
+
+    counts: dict[str, int] = {}
+    total = events = 0
+    out = open(args.out, "w", encoding="utf-8") if args.out else None  # noqa: SIM115
+    try:
+        # One event at a time: constant memory regardless of trace size.
+        for event in stream_events(source, args.format):
+            events += 1
+            for signal in scan_misalignment([event]):
+                total += 1
+                counts[signal["pattern"]] = counts.get(signal["pattern"], 0) + 1
+                line = json.dumps(signal, ensure_ascii=False)
+                if out:
+                    out.write(line + "\n")
+                else:
+                    print(line)
+    except (ValueError, json.JSONDecodeError) as exc:
+        print(f"error: could not stream {source} as {args.format}: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    finally:
+        if out:
+            out.close()
+
+    summary = ", ".join(f"{k} {v}" for k, v in sorted(counts.items())) or "none"
+    print(f"Scanned {events} events; {total} misalignment signal(s): {summary}.", file=sys.stderr)
+    if total and args.fail_on_signal:
+        return EXIT_BLOCKED
+    return EXIT_OK
+
+
+def _cmd_ingest(args: argparse.Namespace) -> int:
+    from pramana.adapters.traces import load_trace
+
+    source = Path(args.source)
+    if not source.exists():
+        print(f"error: {source} not found", file=sys.stderr)
+        return EXIT_INPUT
+    try:
+        events = load_trace(source, args.format)
+    except (ValueError, json.JSONDecodeError) as exc:
+        print(f"error: could not read {source} as {args.format}: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    lines = "\n".join(json.dumps(e, ensure_ascii=False) for e in events)
+    if args.out:
+        Path(args.out).write_text(lines + "\n", encoding="utf-8")
+        print(f"Wrote {len(events)} events to {args.out}. Point your spec's agent.trace at it.")
+    else:
+        print(lines)
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="pramana",
@@ -310,7 +425,20 @@ def build_parser() -> argparse.ArgumentParser:
 
     verify = sub.add_parser("verify", help="verify an audit pack has not been altered")
     verify.add_argument("pack", help="audit pack folder")
+    verify.add_argument("--public-key", help="verify the pack is signed by this Ed25519 public key")
+    verify.add_argument(
+        "--require-signature", action="store_true", help="fail if the pack is not signed"
+    )
     verify.set_defaults(fn=_cmd_verify)
+
+    keygen = sub.add_parser("keygen", help="generate an Ed25519 key pair for signing packs")
+    keygen.add_argument("--out-dir", default=".", help="where to write the key pair")
+    keygen.set_defaults(fn=_cmd_keygen)
+
+    sign = sub.add_parser("sign", help="cryptographically sign an audit pack")
+    sign.add_argument("pack", help="audit pack folder")
+    sign.add_argument("--key", required=True, help="Ed25519 private key (PEM)")
+    sign.set_defaults(fn=_cmd_sign)
 
     summary = sub.add_parser("summary", help="print a Markdown summary of an audit pack")
     summary.add_argument("pack", help="audit pack folder")
@@ -343,6 +471,28 @@ def build_parser() -> argparse.ArgumentParser:
     init = sub.add_parser("init", help="write a starter audit spec")
     init.add_argument("path", nargs="?", default="audit.yaml")
     init.set_defaults(fn=_cmd_init)
+
+    scan = sub.add_parser(
+        "scan-trace",
+        help="stream a large agent log and report misalignment signals (constant memory)",
+    )
+    scan.add_argument("source", help="agent log (JSON Lines streams; JSON array is read whole)")
+    scan.add_argument("--format", default="native", choices=["native", "otel", "langchain"])
+    scan.add_argument("-o", "--out", help="write signals as JSONL (default: stdout)")
+    scan.add_argument(
+        "--fail-on-signal",
+        action="store_true",
+        help="exit non-zero if any signal is found (for CI)",
+    )
+    scan.set_defaults(fn=_cmd_scan_trace)
+
+    ingest = sub.add_parser(
+        "ingest", help="convert a real agent log (OpenTelemetry/LangChain) to a Pramana trace"
+    )
+    ingest.add_argument("source", help="path to the agent log (JSON array or JSON Lines)")
+    ingest.add_argument("--format", required=True, choices=["otel", "langchain", "native"])
+    ingest.add_argument("-o", "--out", help="output .jsonl path (default: stdout)")
+    ingest.set_defaults(fn=_cmd_ingest)
     return parser
 
 

@@ -17,6 +17,10 @@ from typing import Any
 
 LEDGER_NAME = "ledger.jsonl"
 EVIDENCE_DIR = "evidence"
+# Detached signature written beside the ledger by `pramana sign` (optional).
+# Named here so `verify` can detect it without importing the signing module
+# (which needs the optional 'cryptography' dependency).
+SIGNATURE_NAME_IF_ANY = "signature.json"
 
 
 def sha256_bytes(data: bytes) -> str:

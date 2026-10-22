@@ -6,7 +6,8 @@
       "high"
     ],
     "blocking_risks": [
-      "R-01"
+      "R-01",
+      "R-02"
     ],
     "decision": "BLOCK",
     "incomplete_checks": []

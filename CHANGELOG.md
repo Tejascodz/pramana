@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.4.1 — 2026-10-23
+
+Validated the misalignment detector on real agent trajectories, and fixed its precision.
+
+- Ran `agent.misalignment_signals` over the Who&When benchmark (ag2ai, ICML 2025, MIT): 184 real multi-agent trajectories, ~4,000 messages. The first version produced 19 signals, almost all false positives (web-scraped "hide", company names, trivia, normal OAuth).
+- Tightened the detector: polysemous patterns now require first-person agent intent, and hide/conceal/privilege patterns require a concrete object. Result: **0 false positives** on the same ~4,000 real messages, with every planted and real rogue example still firing.
+- Bundled the converter and three attributed sample trajectories under `examples/benchmark_whowhen`, with a precision test in CI.
+
+## 0.4.0 — 2026-10-23
+
+Three production levers: signed evidence, a live-model agent harness, and streaming.
+
+- **Signed evidence packs** (optional, `pip install "pramana[signing]"`): `pramana keygen`, `pramana sign` and signature-aware `pramana verify` (with `--public-key` to pin provenance and `--require-signature` for CI). Ed25519 over the ledger root and a ledger digest; signing refuses an already-tampered pack, and any later change breaks the signature.
+- **Live-model agent harness** (`examples/agent_harness`): drives a real OpenAI-compatible model (Ollama/llama3.2:3b by default) through a benign tool-using task with a text ReAct protocol, records its reasoning and tool calls as a Pramana trace, and audits it — so the agent checks run against a real model's behaviour, not a hand-written log. Offline-tested with a scripted model.
+- **Streaming scan** (`pramana scan-trace`): streams an agent log of any size in constant memory and reports misalignment signals, with `--fail-on-signal` for CI. Verified constant-memory on an 80k-event trace.
+
+## 0.3.1 — 2026-10-23
+
+Audit the logs real agent systems emit, and scale testing.
+
+- New trace adapters: ingest **OpenTelemetry GenAI spans** and **LangChain/LangGraph run logs** and map them to Pramana's event schema (`src/pramana/adapters/traces.py`). Set `agent.trace_format: otel|langchain|native` in the spec, or convert with the new `pramana ingest` command.
+- A misconfigured or unreadable trace now blocks the gate as an error instead of being silently skipped — an audit cannot vouch for evidence it could not parse.
+- Example real-format traces under `examples/real_traces`, each demonstrating misalignment detection on converted input.
+- Scale test: a ~12k-event trace is scanned in well under a second; limitations now document the in-memory bound and the session-batching path for production-volume logs.
+
+## 0.3.0 — 2026-10-23
+
+Agentic safety: a new check for agent misalignment, grounded in the 2026 literature.
+
+- New check `agent.misalignment_signals`: scans an agent's reasoning traces and actions for the documented rogue patterns (self-preservation, deception, oversight evasion, goal substitution, privilege escalation, reward hacking), quotes the offending log line as proof, and flags sessions where a misalignment signal co-occurs with an irreversible action (the intent-plus-capability core of the loss-of-control model). Judge-free and deterministic; a clean scan is reported honestly, never as proof of safety. User-extensible via `agent.misalignment_patterns` in the spec.
+- Mapped to NIST AI RMF (MEASURE/MANAGE), ISO/IEC 42001, OWASP LLM06 (excessive agency), EU AI Act Art. 14/15 and India's safety and accountability sutras.
+- The refund-agent case study now includes a session that demonstrates detection.
+- New `docs/agentic-safety-review.md`: a sourced 2026 review of AI safety regulation, governance, how agents go rogue, and how to control them, with the upgrade design this check implements.
+
 ## 0.2.5 — 2026-10-21
 
 - CI actions updated to their current releases, still pinned by commit SHA: checkout 7.0.1, setup-python 7.0.0, upload-artifact 7.0.2

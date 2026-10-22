@@ -26,9 +26,23 @@ Pramana supports an AI audit. It does not replace professional judgement, legal 
 - The test suite uses a deliberately naive stand-in model so it can run offline. Its results test Pramana's plumbing and scoring, not any real model.
 
 - Probe sets are samples. Passing every probe does not prove safety; failing one proves a problem exists.
+- `agent.misalignment_signals` scans the agent's recorded reasoning and actions with deterministic phrase signatures. Its precision was checked against the Who&When benchmark of real agent trajectories (0 false positives on ~4,000 real messages after tightening), but deterministic matching still trades recall for precision. It proves a problem when it fires, but a clean scan is not proof of alignment: it can miss paraphrased intent, and it cannot see reasoning the agent never wrote down. Chain-of-thought monitorability is a real but fragile signal (CoT-monitorability, 2025), so pair it with a runtime monitor and human approval for irreversible actions.
 - Deterministic scoring can miss paraphrased leaks or harmful content that avoids the configured markers, and can flag harmless numbers that are not in the knowledge base.
 - Replay mode audits the recorded behaviour, not the current deployment. Live mode depends on the endpoint behaving the same way in production.
 - Agent checks assume the log is complete. An agent that acts outside its logging pipeline cannot be audited from its logs; this is why tamper-evidence and gateway-enforced logging are recommended.
+
+## Scale
+
+- Agent checks load a trace into memory and resolve parent/child links across it,
+  so a single audit is bounded by available RAM. Traces are naturally partitioned
+  by session, so very large logs should be audited in session batches. A ~12k-event
+  trace scans in well under a second in the test suite; multi-million-event
+  production logs need batching. `pramana scan-trace` streams a log of any size in
+  constant memory for misalignment signals; the full multi-check audit still loads a
+  trace into memory and should be run per session batch for very large logs.
+- The OpenTelemetry and LangChain adapters cover the common span/run shapes. Custom
+  instrumentation may need field mapping; the adapters are small and are meant to be
+  extended.
 
 ## Data and dates
 

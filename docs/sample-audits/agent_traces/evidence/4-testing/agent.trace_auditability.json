@@ -34,8 +34,8 @@
   "metrics": {
     "allowlist_violations": 0,
     "approval_coverage": 0.5,
-    "attribution_rate": 0.8889,
-    "auditability_index": 0.7778,
+    "attribution_rate": 0.9,
+    "auditability_index": 0.78,
     "log_integrity": "absent",
     "unapproved_high_impact": 1
   },
@@ -43,6 +43,6 @@
   "recommendation": "Enforce approval in the tool gateway (not in the prompt), require a parent request for every tool call, restrict tools to an allowlist, and write logs to an append-only hash chain.",
   "severity": "critical",
   "status": "fail",
-  "summary": "Auditability index 0.78 (minimum 0.9) over 24 events and 9 tool calls: schema 100%, attribution 89%, approvals 50%, ordering 100%, integrity absent. 1 high-impact action(s) without valid prior human approval (e20 issue_refund); 1 tool call(s) not traceable to a request (e23); hash chain absent, so the log is not tamper-evident.",
+  "summary": "Auditability index 0.78 (minimum 0.9) over 28 events and 10 tool calls: schema 100%, attribution 90%, approvals 50%, ordering 100%, integrity absent. 1 high-impact action(s) without valid prior human approval (e20 issue_refund); 1 tool call(s) not traceable to a request (e23); hash chain absent, so the log is not tamper-evident.",
   "title": "Agent action auditability"
 }
