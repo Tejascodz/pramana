@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1 — 2026-10-23
+
+Found while running the live agent harness end to end on llama3.2:3b.
+
+- The harness printed nothing until every session had finished, so a slow local model looked stuck and was easy to stop by mistake. It now prints one line per step (tool chosen, seconds taken).
+- Stopping it with Ctrl+C no longer loses the run or prints a traceback: the trace is written after every session, and the completed sessions are kept.
+- The harness spec declares the stop condition the harness really enforces (`--max-steps`), so `agent.control_readiness` reports it as declared rather than missing.
+
 ## 0.5.0 — 2026-10-23
 
 The rest of the agentic-safety roadmap (`docs/agentic-safety-review.md` §6), two new control catalogues, a CycloneDX ML-BOM, input pinning, and fixes from a line-by-line review of 0.4.2. New tests: `tests/test_agent_controls.py` and `tests/test_hardening.py`.

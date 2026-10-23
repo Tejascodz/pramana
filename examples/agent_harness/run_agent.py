@@ -33,6 +33,7 @@ import json
 import re
 import sys
 import uuid
+from collections.abc import Callable
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -109,11 +110,20 @@ def _now() -> str:
 
 
 def run_episode(
-    client: LLMClient, task: str, session_id: str, max_steps: int = 6
+    client: LLMClient,
+    task: str,
+    session_id: str,
+    max_steps: int = 6,
+    on_step: Callable[[str], None] | None = None,
 ) -> list[dict[str, object]]:
-    """Drive the model through one task; return Pramana trace events."""
+    """Drive the model through one task; return Pramana trace events.
+
+    ``on_step`` receives a one-line progress message after each model reply, so a slow
+    local model is visibly working rather than looking stuck.
+    """
     events: list[dict[str, object]] = []
     n = 0
+    say = on_step or (lambda _msg: None)
 
     def ev(**fields: object) -> dict[str, object]:
         nonlocal n
@@ -126,7 +136,7 @@ def run_episode(
     req = ev(type="user_request", actor="customer:auto", parent_id=None, content=task)
     transcript = f"Task: {task}\n"
 
-    for _ in range(max_steps):
+    for step in range(1, max_steps + 1):
         reply = client.complete(SYSTEM, transcript)
         if not reply.ok:
             ev(
@@ -136,6 +146,7 @@ def run_episode(
                 content="",
                 error=reply.error,
             )
+            say(f"  {session_id} step {step}: model error: {reply.error}")
             break
         text = reply.text
         thought = THOUGHT_RE.search(text)
@@ -153,13 +164,19 @@ def run_episode(
             latency_ms=reply.latency_ms,
         )
 
+        seconds = (reply.latency_ms or 0) / 1000
         if final and not action:
+            say(f"  {session_id} step {step}: final answer ({seconds:.1f}s)")
             break
         if not action:
+            say(
+                f"  {session_id} step {step}: reply not in the ACTION/FINAL format ({seconds:.1f}s)"
+            )
             transcript += "\n(Reply did not contain an ACTION or FINAL. Follow the format.)\n"
             continue
 
         tool = action.group(1).lower()
+        say(f"  {session_id} step {step}: {tool} ({seconds:.1f}s)")
         try:
             args = json.loads(action.group(2)) if action.group(2) else {}
         except json.JSONDecodeError:
@@ -202,16 +219,35 @@ def main(argv: list[str] | None = None) -> None:
             "max_tokens": 400,
         }
     )
-    all_events: list[dict[str, object]] = []
-    for i in range(args.sessions):
-        all_events.extend(run_episode(client, args.task, f"S-{i + 1:03d}", args.max_steps))
-    Path(args.out).write_text(
-        "\n".join(json.dumps(e, ensure_ascii=False) for e in all_events) + "\n", encoding="utf-8"
+
+    def log(message: str) -> None:
+        print(message, file=sys.stderr, flush=True)
+
+    def save(events: list[dict[str, object]]) -> None:
+        Path(args.out).write_text(
+            "".join(json.dumps(e, ensure_ascii=False) + "\n" for e in events), encoding="utf-8"
+        )
+
+    log(
+        f"Running {args.model} as an agent for {args.sessions} session(s), up to "
+        f"{args.max_steps} steps each. A small local model takes a few seconds per step."
     )
-    print(
-        f"Wrote {len(all_events)} events from {args.sessions} session(s) to {args.out}.\n"
-        f"Audit it:  pramana run {HERE / 'audit.yaml'}",
-        file=sys.stderr,
+    all_events: list[dict[str, object]] = []
+    done = 0
+    try:
+        for i in range(args.sessions):
+            session = f"S-{i + 1:03d}"
+            log(f"Session {session} ({i + 1}/{args.sessions})")
+            all_events.extend(run_episode(client, args.task, session, args.max_steps, log))
+            done += 1
+            save(all_events)  # completed sessions are kept even if a later one is stopped
+    except KeyboardInterrupt:
+        log(f"\nStopped. Kept the {done} completed session(s); the unfinished one is discarded.")
+        if not done:
+            raise SystemExit(130) from None
+    log(
+        f"Wrote {len(all_events)} events from {done} session(s) to {args.out}.\n"
+        f"Audit it:  pramana run {HERE / 'audit.yaml'} --out packs/live_agent"
     )
 
 

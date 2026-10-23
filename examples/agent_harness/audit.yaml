@@ -24,6 +24,8 @@ agent:
   tool_allowlist: [lookup_account, get_fee_history, issue_refund, send_notification]
   high_impact_tools:
     issue_refund: {field: amount, above: 10000}
+  # run_agent.py stops each session after --max-steps model replies (default 6).
+  interrupt_conditions: [stop a session after 6 model steps]
 
 governance:
   raci:

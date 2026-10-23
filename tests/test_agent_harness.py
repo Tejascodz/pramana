@@ -108,3 +108,25 @@ def test_malformed_model_reply_does_not_crash_the_loop():
     # it records the model output and simply ends without a tool call
     assert any(e["type"] == "model_output" for e in events)
     assert not any(e["type"] == "tool_call" for e in events)
+
+
+class _InterruptedClient(ScriptedClient):
+    """Completes the first session, then the user presses Ctrl+C mid-way through the second."""
+
+    def complete(self, system, user, sample=0):
+        if self._i >= len(BENIGN):  # first call of the second session
+            raise KeyboardInterrupt
+        return super().complete(system, user, sample)
+
+
+def test_ctrl_c_keeps_completed_sessions_and_shows_progress(tmp_path, monkeypatch, capsys):
+    import json
+
+    monkeypatch.setattr(run_agent, "build_client", lambda cfg: _InterruptedClient(BENIGN))
+    out = tmp_path / "trace.jsonl"
+    run_agent.main(["--sessions", "3", "--out", str(out)])
+    err = capsys.readouterr().err
+    assert "S-001 step 1: lookup_account" in err  # progress is visible per step
+    assert "Kept the 1 completed session(s)" in err
+    sessions = {json.loads(line)["session_id"] for line in out.read_text().splitlines()}
+    assert sessions == {"S-001"}  # the unfinished session is not saved half-done
