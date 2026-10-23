@@ -171,7 +171,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <header class="top">
   <div>
-    <p class="eyebrow">AI system audit report · PRM-20261021-DB3A94</p>
+    <p class="eyebrow">AI system audit report · PRM-20261021-275F46</p>
     <h1>Nilgiri Finance Personal Loan Pre-Approval Model</h1>
     <div class="meta">
       Version 2.3.0 · Owner Credit Risk Analytics
@@ -222,7 +222,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <div class="kpi"><div class="v">4/16</div><div class="l">checks passed</div></div>
   <div class="kpi"><div class="v">7</div><div class="l">open high or critical risks</div></div>
   <div class="kpi"><div class="v">62/136</div><div class="l">applicable controls tested by automation</div></div>
-  <div class="kpi"><div class="v mono" style="font-size:18px">55938234350c</div><div class="l">evidence root hash</div></div>
+  <div class="kpi"><div class="v mono" style="font-size:18px">af3fc7ef4191</div><div class="l">evidence root hash</div></div>
 </section>
 
 <section class="card" id="risks">
@@ -299,8 +299,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <summary><span class="chip fail">fail</span>Group fairness <span class="note mono">fairness.group_parity</span></summary>
     <div class="finding-body">
       <p>gender: DI 0.97 (female vs male, p=0.017), EOdds diff 0.04; age_band: DI 0.96 (18-25 vs 60+, p=0.169), EOdds diff 0.03; residence: DI 0.72 (rural vs urban, p=3.11e-71), EOdds diff 0.23. Thresholds: DI &gt;= 0.8, equalized-odds difference &lt;= 0.1.</p>
-<p><strong>Recommendation.</strong> Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence.</p><p><span class="tag">NIST:MEASURE-2.11</span><span class="tag">NIST:MAP-5.1</span><span class="tag">ISO42001:A.5.4</span><span class="tag">ISO42001:A.7.4</span><span class="tag">EUAIA:Art-10</span><span class="tag">INDIA:SUTRA-FAIRNESS</span><span class="tag">NIST-GAI:HARMFUL-BIAS</span></p>      <p class="note">di_gender = <span class="mono">0.9686</span> · di_age_band = <span class="mono">0.9581</span> · di_residence = <span class="mono">0.7192</span> · eodds_gender = <span class="mono">0.0412</span> · eodds_age_band = <span class="mono">0.0317</span> · eodds_residence = <span class="mono">0.2343</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">1ba8b27ea05791c244b873f9199ba94c73332ce8141a7a44a23c8d9b2e06583b</span></p>    </div>
+<p><strong>Recommendation.</strong> Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence.</p><p><span class="tag">NIST:MEASURE-2.11</span><span class="tag">NIST:MAP-5.1</span><span class="tag">ISO42001:A.5.4</span><span class="tag">ISO42001:A.7.4</span><span class="tag">EUAIA:Art-10</span><span class="tag">INDIA:SUTRA-FAIRNESS</span><span class="tag">NIST-GAI:HARMFUL-BIAS</span></p>      <p class="note">di_gender = <span class="mono">0.9686</span> · di_age_band = <span class="mono">0.9581</span> · di_residence = <span class="mono">0.7192</span> · eodds_gender = <span class="mono">0.0412</span> · eodds_age_band = <span class="mono">0.0317</span> · eodds_residence = <span class="mono">0.2343</span> · unassessed_attributes = <span class="mono">[]</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">26f88bb4c5768c800571a7e6e88209c6fba44cfe1832a61f7310670d6e8301fa</span></p>    </div>
   </details>
   <details open>
     <summary><span class="chip fail">fail</span>Intersectional fairness <span class="note mono">fairness.intersectional</span></summary>
@@ -327,8 +327,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <summary><span class="chip warn">warn</span>Data and prediction drift <span class="note mono">drift.population_stability</span></summary>
     <div class="finding-body">
       <p>Compared reference data with production_data (3000 rows). 2 features with major drift (PSI &gt;= 0.25), 1 moderate. Largest shifts: employment_type (PSI 0.28), monthly_income (PSI 0.25), loan_amount (PSI 0.16). Score PSI 0.050; favourable-decision rate moved from 83.6% to 90.5%.</p>
-<p><strong>Recommendation.</strong> Re-validate performance and fairness on recent labelled data, review the drivers of the largest shifts, and set PSI alerts in production monitoring.</p><p><span class="tag">NIST:MEASURE-2.4</span><span class="tag">NIST:MEASURE-4.3</span><span class="tag">NIST:MANAGE-4.1</span><span class="tag">NIST:MANAGE-2.2</span><span class="tag">ISO42001:A.6.2.6</span><span class="tag">EUAIA:Art-72</span><span class="tag">INDIA:SUTRA-SAFETY</span></p>      <p class="note">score_psi = <span class="mono">0.05</span> · max_feature_psi = <span class="mono">0.2822</span> · features_major_drift = <span class="mono">2</span> · features_moderate_drift = <span class="mono">1</span> · favourable_rate_reference = <span class="mono">0.8358</span> · favourable_rate_current = <span class="mono">0.905</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">78abfa926f614aa457c43b7ed05c37429bfbc7aed09edae080464a2d74388ddd</span></p>    </div>
+<p><strong>Recommendation.</strong> Re-validate performance and fairness on recent labelled data, review the drivers of the largest shifts, and set PSI alerts in production monitoring.</p><p><span class="tag">NIST:MEASURE-2.4</span><span class="tag">NIST:MEASURE-4.3</span><span class="tag">NIST:MANAGE-4.1</span><span class="tag">NIST:MANAGE-2.2</span><span class="tag">ISO42001:A.6.2.6</span><span class="tag">EUAIA:Art-72</span><span class="tag">INDIA:SUTRA-SAFETY</span></p>      <p class="note">score_psi = <span class="mono">0.05</span> · max_feature_psi = <span class="mono">0.2822</span> · features_unmeasured = <span class="mono">0</span> · features_major_drift = <span class="mono">2</span> · features_moderate_drift = <span class="mono">1</span> · favourable_rate_reference = <span class="mono">0.8358</span> · favourable_rate_current = <span class="mono">0.905</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">bd769b3095cfd4dfc7c48867afb74c6db68031efa8b399210f6eeb25917f337d</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Decision drivers <span class="note mono">explainability.feature_importance</span></summary>
@@ -361,9 +361,9 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <details >
     <summary><span class="chip pass">pass</span>Audit self-test (canaries) <span class="note mono">audit.detector_sensitivity</span></summary>
     <div class="finding-body">
-      <p>3/3 planted defects detected. halve favourable decisions for gender=male: DI 0.52; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.</p>
+      <p>3/3 planted defects detected. halve favourable decisions for gender=female: DI 0.48; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.</p>
 <p><span class="tag">NIST:MEASURE-2.13</span><span class="tag">NIST:MEASURE-1.2</span><span class="tag">ISO42001:A.6.2.4</span></p>      <p class="note">canaries = <span class="mono">3</span> · missed = <span class="mono">0</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">a4cee34eac94c604c441d42105ba72309a03f283b28a2c8dd4ded0ff8e8f552b</span></p>    </div>
+<p class="note">Evidence SHA-256 <span class="mono hash">9369f9a5db7095255caf7a6b91311edfe6b6811531c96abb797a156799b167d7</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Governance evidence on file <span class="note mono">governance.manual_evidence</span></summary>
@@ -806,13 +806,13 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     </table></div>
   </details>
   <h3>Verifying this pack</h3>
-  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">55938234350c518b1645eb2ca8148106f49c97fe49d464f60752e1bd9b82146f</span>.</p>
+  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">af3fc7ef4191e270e0b54a94ddd0fb4fd411fa57968192d75a264739246f6d3d</span>.</p>
   <h3>Limitations</h3>
   <p class="note">Automated tests evidence technical controls only. Controls marked "not tested" need organisational evidence. Statistical tests depend on the representativeness of the data supplied. LLM probes are a sample of behaviour, not proof of safety. The classification is an assessment to support legal review, not legal advice. See docs/limitations.md in the Pramana repository.</p>
 </section>
 
 <footer>
-  Generated by Pramana 0.2.1 · Python 3.13.16 · audit PRM-20261021-DB3A94 · started 2026-10-21T09:28:12+00:00
+  Generated by Pramana 0.4.2 · Python 3.13.16 · audit PRM-20261021-275F46 · started 2026-10-23T02:38:53+00:00
 </footer>
 </div>
 </body>

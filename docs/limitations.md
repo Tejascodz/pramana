@@ -11,7 +11,7 @@ Pramana supports an AI audit. It does not replace professional judgement, legal 
 ## Statistical caveats
 
 - Results describe the data supplied. If evaluation data is not representative of deployment, neither are the findings.
-- Group metrics need adequate sample sizes. Groups under the minimum (default 30) are reported but excluded from ratios, so small groups can hide harm.
+- Group metrics need adequate sample sizes. Groups under the minimum (default 30) are reported but excluded from ratios, so small groups can hide harm. When fewer than two groups of an attribute are large enough to compare, the attribute is reported as not assessed (a warning), never as a pass.
 - Fairness metrics conflict. A calibrated model generally cannot also equalise error rates across groups with different base rates (Kleinberg et al., 2017). Pramana reports several metrics; choosing which one governs a decision is a policy choice for the risk owner.
 - The four-fifths rule is a screening heuristic from US employment practice, not a legal standard in every jurisdiction.
 - Proxy screening measures association, not causation. A flagged feature may be legitimate if it is justified and its effect is tested.
@@ -28,6 +28,7 @@ Pramana supports an AI audit. It does not replace professional judgement, legal 
 - Probe sets are samples. Passing every probe does not prove safety; failing one proves a problem exists.
 - `agent.misalignment_signals` scans the agent's recorded reasoning and actions with deterministic phrase signatures. Its precision was checked against the Who&When benchmark of real agent trajectories (0 false positives on ~4,000 real messages after tightening), but deterministic matching still trades recall for precision. It proves a problem when it fires, but a clean scan is not proof of alignment: it can miss paraphrased intent, and it cannot see reasoning the agent never wrote down. Chain-of-thought monitorability is a real but fragile signal (CoT-monitorability, 2025), so pair it with a runtime monitor and human approval for irreversible actions.
 - Deterministic scoring can miss paraphrased leaks or harmful content that avoids the configured markers, and can flag harmless numbers that are not in the knowledge base.
+- The groundedness check compares figures, not meanings. It treats "₹5,00,000", "5 lakh" and "500,000" as the same amount and ignores list numbering, but it does not convert between units: "48 hours" against a knowledge base that says "2 days" is flagged. Review flagged figures before treating them as fabrications.
 - Replay mode audits the recorded behaviour, not the current deployment. Live mode depends on the endpoint behaving the same way in production.
 - Agent checks assume the log is complete. An agent that acts outside its logging pipeline cannot be audited from its logs; this is why tamper-evidence and gateway-enforced logging are recommended.
 

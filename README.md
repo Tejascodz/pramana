@@ -161,10 +161,12 @@ packs/credit/
 **Signed packs (optional).** The hash chain proves a pack is internally consistent; a signature proves *who* sealed it and that it was not rebuilt. With `pip install "pramana[signing]"`:
 
 ```bash
-pramana keygen                       # Ed25519 key pair
-pramana sign packs/credit --key pramana_ed25519.key
-pramana verify packs/credit --public-key pramana_ed25519.pub   # provenance check
+pramana keygen                       # Ed25519 key pair in ~/.pramana/keys
+pramana sign packs/credit
+pramana verify packs/credit --public-key ~/.pramana/keys/pramana_ed25519.pub
 ```
+
+The private key never belongs in a repository: `keygen` refuses to write inside a git working tree. In CI, store the key as a secret and expose it as `PRAMANA_SIGNING_KEY_PEM`; `pramana sign` reads it from there when no `--key` is given.
 
 ## Use it as a release gate
 

@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.4.2 — 2026-10-23
+
+Fixes from an external code review. Each finding was reproduced before it was fixed, and each fix has a regression test (`tests/test_review_fixes.py`).
+
+- **Signing keys stay out of repositories.** `pramana keygen` now writes to `~/.pramana/keys` by default, refuses to write inside a git working tree unless given `--allow-in-repo`, and will not overwrite an existing key without `--force`. `pramana sign` reads the key from `--key`, then from the `PRAMANA_SIGNING_KEY_PEM` environment variable (for CI secrets), then from the default key file. `.gitignore` now excludes `*.key`, `*.pem` and `pramana_ed25519.*`.
+- **Fairness no longer passes what it could not test.** When an attribute has fewer than two groups large enough to compare, or no group receives a favourable outcome, `fairness.group_parity` and `fairness.intersectional` now report a warning saying the attribute could not be assessed, instead of a pass. Unassessed attributes are listed in the metrics.
+- **The detector self-test always plants a detectable disparity.** `audit.detector_sensitivity` used to halve favourable decisions for the most frequent group, which could hide the canary when that group was already favoured. It now targets the group with the lowest selection rate.
+- **Drift handles features it cannot measure.** Features with no usable values (PSI is NaN) are sorted last and reported as unmeasured, instead of being ranked arbitrarily, and the check no longer fails when no feature can be measured.
+- **Groundedness understands Indian figures and list markers.** "₹5,00,000", "5 lakh" and "1.5 crore" are matched as the same amounts as their expanded forms, and list numbering such as "1." is no longer treated as a claimed figure.
+- **Sentence splitting in the misalignment detector** no longer breaks on abbreviations ("e.g.", "etc.") or file names ("auth.py"), so first-person intent written around them is still detected. More first-person forms are recognised ("I'd", "myself", "my real goal").
+- **Audit packs reject planted files.** `pramana verify` now fails if a file under `evidence/` is not recorded in the ledger. Re-running an audit into an existing pack folder clears the previous run's evidence and signature first.
+- **`pramana scan-trace` reports intent alongside capability.** Each signal now carries `with_capability`: whether the same session also made an irreversible tool call. The summary names those sessions, and `--high-impact-tool` adds tool names of your own.
+
 ## 0.4.1 — 2026-10-23
 
 Validated the misalignment detector on real agent trajectories, and fixed its precision.

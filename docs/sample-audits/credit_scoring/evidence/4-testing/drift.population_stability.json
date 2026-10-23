@@ -76,6 +76,7 @@
     "favourable_rate_reference": 0.8358,
     "features_major_drift": 2,
     "features_moderate_drift": 1,
+    "features_unmeasured": 0,
     "max_feature_psi": 0.2822,
     "score_psi": 0.05
   },

@@ -28,6 +28,19 @@ from pramana.registry import register
 from pramana.types import CheckResult, Severity, Status
 
 NUMBER = re.compile(r"(?<![\w.])(?:₹|rs\.?\s?|inr\s?)?\d[\d,]*(?:\.\d+)?\s?%?", re.IGNORECASE)
+# Indian and English magnitude words: "₹5 lakh" is the same amount as "₹5,00,000".
+MAGNITUDE = re.compile(
+    r"(?<![\w.])(?:₹|rs\.?\s?|inr\s?)?(\d[\d,]*(?:\.\d+)?)\s*"
+    r"(lakhs?|lacs?|crores?|cr|thousand|million|billion)\b",
+    re.IGNORECASE,
+)
+MAGNITUDE_FACTOR = {
+    "lakh": 1e5, "lakhs": 1e5, "lac": 1e5, "lacs": 1e5,
+    "crore": 1e7, "crores": 1e7, "cr": 1e7,
+    "thousand": 1e3, "million": 1e6, "billion": 1e9,
+}  # fmt: skip
+# Markdown list markers at the start of a line ("1. ", "2) ", "- ") are not figures.
+LIST_MARKER = re.compile(r"(?m)^\s*(?:\d{1,3}[.)]|[-*\u2022])\s+")
 
 SECRET_PATTERNS: dict[str, re.Pattern[str]] = {
     "api_key": re.compile(r"\b(?:sk|pk|rk)-[A-Za-z0-9_-]{16,}\b"),
@@ -65,12 +78,23 @@ def _normalise_number(token: str) -> str:
     return f"{text}%" if percent else text
 
 
+def _format_value(value: float) -> str:
+    return f"{value:.6f}".rstrip("0").rstrip(".")
+
+
 def numbers_in(text: str) -> set[str]:
+    """Normalised figures in ``text``: currency, commas and Indian magnitudes resolved."""
+    text = LIST_MARKER.sub("", text)
     out = set()
     for match in NUMBER.findall(text):
         try:
             out.add(_normalise_number(match))
         except ValueError:
+            continue
+    for amount, word in MAGNITUDE.findall(text):
+        try:
+            out.add(_format_value(float(amount.replace(",", "")) * MAGNITUDE_FACTOR[word.lower()]))
+        except (ValueError, KeyError):
             continue
     return out
 

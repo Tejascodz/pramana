@@ -165,7 +165,8 @@
     "di_residence": 0.7192,
     "eodds_age_band": 0.0317,
     "eodds_gender": 0.0412,
-    "eodds_residence": 0.2343
+    "eodds_residence": 0.2343,
+    "unassessed_attributes": []
   },
   "plain_summary": "Applicants in the 'rural' group (residence) receive a favourable outcome 68% of the time versus 94% for 'urban', below the four-fifths benchmark.",
   "recommendation": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence.",

@@ -134,21 +134,79 @@ def _cmd_keygen(args: argparse.Namespace) -> int:
     except SigningError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return EXIT_INPUT
-    out = Path(args.out_dir)
-    out.mkdir(parents=True, exist_ok=True)
+    out = Path(args.out_dir).expanduser() if args.out_dir else DEFAULT_KEY_DIR
+    if _inside_git_worktree(out) and not args.allow_in_repo:
+        print(
+            f"error: refusing to write a private key inside a git repository ({out}). Keys written "
+            "there are easy to commit by accident. Use the default (~/.pramana/keys), another folder, "
+            "or --allow-in-repo if the folder is git-ignored.",
+            file=sys.stderr,
+        )
+        return EXIT_INPUT
+    out.mkdir(mode=0o700, parents=True, exist_ok=True)
     priv, pub = out / "pramana_ed25519.key", out / "pramana_ed25519.pub"
-    priv.write_bytes(private_pem)
-    os.chmod(priv, 0o600)
+    if priv.exists() and not args.force:
+        print(f"error: {priv} already exists (use --force to replace it)", file=sys.stderr)
+        return EXIT_INPUT
+    # Create the private key owner-only from the first byte, not chmod after writing.
+    fd = os.open(priv, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "wb") as handle:
+        handle.write(private_pem)
+    os.chmod(priv, 0o600)  # also tightens a key replaced with --force
     pub.write_bytes(public_pem)
-    print(f"Wrote private key {priv} (keep secret) and public key {pub} (share for verification).")
+    print(f"Wrote private key {priv} (keep secret, never commit it) and public key {pub}.")
     return EXIT_OK
+
+
+DEFAULT_KEY_DIR = Path.home() / ".pramana" / "keys"
+KEY_ENV = "PRAMANA_SIGNING_KEY_PEM"
+
+
+def _signing_key(path: str | None) -> bytes:
+    """The private key: --key path, else $PRAMANA_SIGNING_KEY_PEM, else the default key file."""
+    import os
+
+    if path:
+        return Path(path).read_bytes()
+    pem = os.environ.get(KEY_ENV)
+    if pem:
+        return pem.encode("utf-8")
+    default = DEFAULT_KEY_DIR / "pramana_ed25519.key"
+    if default.exists():
+        return default.read_bytes()
+    raise FileNotFoundError(
+        f"no signing key: pass --key, set {KEY_ENV}, or run `pramana keygen` (writes {default})"
+    )
+
+
+def _is_git_marker(marker: Path) -> bool:
+    """A real repository: a .git folder with a HEAD, or a .git file pointing elsewhere.
+
+    An empty or stray .git folder is not a repository (git itself ignores it), so it
+    must not stop keys being written to an ordinary folder such as ~/.pramana/keys.
+    """
+    if marker.is_dir():
+        return (marker / "HEAD").is_file()
+    if marker.is_file():
+        try:
+            return marker.read_text(encoding="utf-8", errors="replace").startswith("gitdir:")
+        except OSError:
+            return False
+    return False
+
+
+def _inside_git_worktree(path: Path) -> bool:
+    for parent in [path.resolve(), *path.resolve().parents]:
+        if _is_git_marker(parent / ".git"):
+            return True
+    return False
 
 
 def _cmd_sign(args: argparse.Namespace) -> int:
     from pramana.audit.signing import SigningError, sign_pack
 
     try:
-        sign_pack(Path(args.pack), Path(args.key).read_bytes())
+        sign_pack(Path(args.pack), _signing_key(args.key))
     except (SigningError, FileNotFoundError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return EXIT_INPUT
@@ -345,38 +403,64 @@ def _cmd_init(args: argparse.Namespace) -> int:
 
 def _cmd_scan_trace(args: argparse.Namespace) -> int:
     from pramana.adapters.traces import stream_events
-    from pramana.checks.agent_trace import scan_misalignment
+    from pramana.checks.agent_trace import IRREVERSIBLE_TOOL, scan_misalignment
 
     source = Path(args.source)
     if not source.exists():
         print(f"error: {source} not found", file=sys.stderr)
         return EXIT_INPUT
+    extra_tools = set(args.high_impact_tool or [])
+
+    def irreversible(event: dict) -> bool:
+        tool = str(event.get("tool", ""))
+        return event.get("type") == "tool_call" and (
+            tool in extra_tools or bool(IRREVERSIBLE_TOOL.search(tool))
+        )
 
     counts: dict[str, int] = {}
-    total = events = 0
-    out = open(args.out, "w", encoding="utf-8") if args.out else None  # noqa: SIM115
+    signals: list[dict] = []
+    events = 0
     try:
-        # One event at a time: constant memory regardless of trace size.
+        # Pass 1: stream events one at a time and keep only the (rare) signals.
         for event in stream_events(source, args.format):
             events += 1
             for signal in scan_misalignment([event]):
-                total += 1
                 counts[signal["pattern"]] = counts.get(signal["pattern"], 0) + 1
-                line = json.dumps(signal, ensure_ascii=False)
-                if out:
-                    out.write(line + "\n")
-                else:
-                    print(line)
+                signals.append(signal)
+        # Pass 2: for the flagged sessions only, look for an irreversible action. Memory
+        # grows with the number of signals, never with the size of the log.
+        flagged = {s["session_id"] for s in signals}
+        capable: set = set()
+        if flagged:
+            for event in stream_events(source, args.format):
+                if event.get("session_id") in flagged and irreversible(event):
+                    capable.add(event.get("session_id"))
     except (ValueError, json.JSONDecodeError) as exc:
         print(f"error: could not stream {source} as {args.format}: {exc}", file=sys.stderr)
         return EXIT_INPUT
-    finally:
-        if out:
-            out.close()
+
+    for signal in signals:
+        signal["with_capability"] = signal["session_id"] in capable
+    lines = [json.dumps(signal, ensure_ascii=False) for signal in signals]
+    if args.out:
+        Path(args.out).write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+    else:
+        for line in lines:
+            print(line)
 
     summary = ", ".join(f"{k} {v}" for k, v in sorted(counts.items())) or "none"
-    print(f"Scanned {events} events; {total} misalignment signal(s): {summary}.", file=sys.stderr)
-    if total and args.fail_on_signal:
+    cooccur = sorted(str(c) for c in capable)
+    print(
+        f"Scanned {events} events; {len(signals)} misalignment signal(s): {summary}."
+        + (
+            f" {len(cooccur)} session(s) pair a signal with an irreversible action: "
+            f"{', '.join(cooccur)}."
+            if cooccur
+            else ""
+        ),
+        file=sys.stderr,
+    )
+    if signals and args.fail_on_signal:
         return EXIT_BLOCKED
     return EXIT_OK
 
@@ -432,12 +516,19 @@ def build_parser() -> argparse.ArgumentParser:
     verify.set_defaults(fn=_cmd_verify)
 
     keygen = sub.add_parser("keygen", help="generate an Ed25519 key pair for signing packs")
-    keygen.add_argument("--out-dir", default=".", help="where to write the key pair")
+    keygen.add_argument("--out-dir", help="where to write the key pair (default: ~/.pramana/keys)")
+    keygen.add_argument(
+        "--allow-in-repo", action="store_true", help="allow writing the key inside a git repository"
+    )
+    keygen.add_argument("--force", action="store_true", help="replace an existing key")
     keygen.set_defaults(fn=_cmd_keygen)
 
     sign = sub.add_parser("sign", help="cryptographically sign an audit pack")
     sign.add_argument("pack", help="audit pack folder")
-    sign.add_argument("--key", required=True, help="Ed25519 private key (PEM)")
+    sign.add_argument(
+        "--key",
+        help="Ed25519 private key file (default: $PRAMANA_SIGNING_KEY_PEM or ~/.pramana/keys)",
+    )
     sign.set_defaults(fn=_cmd_sign)
 
     summary = sub.add_parser("summary", help="print a Markdown summary of an audit pack")
@@ -483,6 +574,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--fail-on-signal",
         action="store_true",
         help="exit non-zero if any signal is found (for CI)",
+    )
+    scan.add_argument(
+        "--high-impact-tool",
+        action="append",
+        help="treat this tool as irreversible for co-occurrence (repeatable)",
     )
     scan.set_defaults(fn=_cmd_scan_trace)
 

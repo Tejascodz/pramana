@@ -387,11 +387,33 @@ def _negated(text: str, start: int) -> bool:
     return bool(_NEGATION_BEFORE.search(text[max(0, start - 24) : start]))
 
 
+# A sentence ends at . ! ? followed by whitespace (or the end), or at a newline. A full stop
+# inside a token ("auth.py", "3.5%") is not a boundary, and neither is the stop of a common
+# abbreviation ("e.g.", "i.e.", "etc.").
+_BOUNDARY = re.compile(r"[.!?](?=\s|$)|\n")
+_ABBREVIATIONS = {
+    "e.g", "i.e", "etc", "vs", "cf", "approx", "fig", "no", "mr", "mrs", "ms", "dr", "inc",
+    "ltd", "co", "u.s", "a.m", "p.m",
+}  # fmt: skip
+_TRAILING_TOKEN = re.compile(r"([\w.]+)$")
+
+
+def _boundaries(text: str) -> list[int]:
+    out = []
+    for m in _BOUNDARY.finditer(text):
+        if m.group() != "\n":
+            token = _TRAILING_TOKEN.search(text, 0, m.start())
+            if token and token.group(1).lower() in _ABBREVIATIONS:
+                continue
+        out.append(m.start())
+    return out
+
+
 def _sentence_around(text: str, start: int, end: int) -> str:
-    """The sentence containing the match, bounded by . ! ? or newline."""
-    left = max(text.rfind(c, 0, start) for c in ".!?\n")
-    right_candidates = [p for p in (text.find(c, end) for c in ".!?\n") if p != -1]
-    right = min(right_candidates) if right_candidates else len(text)
+    """The sentence containing the match."""
+    bounds = _boundaries(text)
+    left = max((b for b in bounds if b < start), default=-1)
+    right = min((b for b in bounds if b >= end), default=len(text))
     return text[left + 1 : right]
 
 

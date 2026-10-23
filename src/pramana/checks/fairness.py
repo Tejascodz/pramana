@@ -77,10 +77,18 @@ def parity_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def _grade(summary: dict[str, Any], di_min: float, eo_max: float) -> tuple[Status, Severity]:
+def assessable(summary: dict[str, Any]) -> bool:
+    """True if at least two adequate groups were compared and the ratio is defined."""
     di = summary.get("disparate_impact_ratio")
-    if di is None or np.isnan(di):
-        return Status.PASS, Severity.INFO
+    return di is not None and not np.isnan(di)
+
+
+def _grade(summary: dict[str, Any], di_min: float, eo_max: float) -> tuple[Status, Severity]:
+    # Fewer than two comparable groups (or no favourable outcomes at all) means fairness
+    # was not tested. That is never a pass: the audit cannot vouch for what it did not measure.
+    if not assessable(summary):
+        return Status.WARN, Severity.LOW
+    di = summary["disparate_impact_ratio"]
     significant = summary["p_value"] < 0.05
     if di < di_min and significant:
         return Status.FAIL, Severity.CRITICAL if di < 0.6 else Severity.HIGH
@@ -125,7 +133,12 @@ def group_parity(ctx: AuditContext) -> CheckResult:
         status, severity = _grade(summary, di_min, eo_max)
         grades.append((status, severity))
         per_attr[attr] = {"groups": rows, "summary": summary, "status": status.value}
-        if "disparate_impact_ratio" in summary:
+        if not assessable(summary):
+            lines.append(
+                f"{attr}: not assessed, only {summary['comparable_groups']} group(s) with at least "
+                f"{min_n} records and a defined favourable rate"
+            )
+        else:
             lines.append(
                 f"{attr}: DI {summary['disparate_impact_ratio']:.2f} "
                 f"({summary['least_favoured']} vs {summary['most_favoured']}, p={summary['p_value']:.3g}), "
@@ -134,8 +147,9 @@ def group_parity(ctx: AuditContext) -> CheckResult:
     status, severity = _worst(grades)
     failing = [a for a in attrs if per_attr[a]["status"] != Status.PASS.value]
 
+    unassessed = [a for a in attrs if not assessable(per_attr[a]["summary"])]
     worst_attr = min(
-        (a for a in attrs if "disparate_impact_ratio" in per_attr[a]["summary"]),
+        (a for a in attrs if assessable(per_attr[a]["summary"])),
         key=lambda a: per_attr[a]["summary"]["disparate_impact_ratio"],
         default=None,
     )
@@ -143,14 +157,30 @@ def group_parity(ctx: AuditContext) -> CheckResult:
         f"eodds_{a}": per_attr[a]["summary"].get("equalized_odds_difference") for a in attrs
     }
 
-    if worst_attr and status != Status.PASS:
-        s = per_attr[worst_attr]["summary"]
+    worst_summary = per_attr[worst_attr]["summary"] if worst_attr else None
+    if worst_summary and worst_summary["disparate_impact_ratio"] < di_min:
+        s = worst_summary
         rows = {r["group"]: r for r in per_attr[worst_attr]["groups"]}
         plain = (
             f"Applicants in the '{s['least_favoured']}' group ({worst_attr}) receive a favourable outcome "
             f"{rows[s['least_favoured']]['selection_rate']:.0%} of the time versus "
             f"{rows[s['most_favoured']]['selection_rate']:.0%} for '{s['most_favoured']}', "
             f"below the four-fifths benchmark."
+        )
+    elif worst_attr and status != Status.PASS and worst_attr in failing:
+        plain = (
+            f"Outcome rates for {worst_attr} meet the four-fifths benchmark, but error rates differ "
+            "across groups more than the equalized-odds limit allows."
+        )
+    elif unassessed and len(unassessed) == len(attrs):
+        plain = (
+            "Fairness could not be assessed: no protected attribute had two or more groups large "
+            "enough to compare."
+        )
+    elif unassessed:
+        plain = (
+            "Outcome rates are within the four-fifths benchmark for the attributes that could be "
+            f"tested; {', '.join(unassessed)} could not be assessed (too few records per group)."
         )
     else:
         plain = "Outcome rates are within the four-fifths benchmark across every protected attribute tested."
@@ -167,11 +197,12 @@ def group_parity(ctx: AuditContext) -> CheckResult:
         recommendation=(
             "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or "
             "threshold adjustment, and document a fairness rationale approved by the risk owner. "
-            f"Attributes needing action: {', '.join(failing)}."
+            f"Attributes needing action: {', '.join(a for a in failing if a not in unassessed)}."
+            + (f" Collect enough records to test {', '.join(unassessed)}." if unassessed else "")
             if failing
             else "Re-run on each release and on production samples."
         ),
-        metrics=metrics,
+        metrics=metrics | {"unassessed_attributes": unassessed},
         details={"attributes": per_attr},
     )
 
@@ -192,39 +223,49 @@ def intersectional(ctx: AuditContext) -> CheckResult:
 
     df = ctx.eval_df
     pairs = {}
-    worst_pair, worst_di = None, 1.0
+    worst_pair, worst_di = None, float("inf")
     for a, b in combinations(attrs, 2):
         combo = df[a].astype(str) + " × " + df[b].astype(str)
         rows = group_table(combo, ctx.eval_y, ctx.eval_pred, ctx.eval_scores, min_n)
         summary = parity_summary(rows)
-        marginal = [
-            parity_summary(
-                group_table(df[x], ctx.eval_y, ctx.eval_pred, ctx.eval_scores, min_n)
-            ).get("disparate_impact_ratio", 1.0)
+        marginals = [
+            parity_summary(group_table(df[x], ctx.eval_y, ctx.eval_pred, ctx.eval_scores, min_n))
             for x in (a, b)
         ]
-        summary["marginal_min_di"] = round(min(marginal), 4)
+        marginal_dis = [m["disparate_impact_ratio"] for m in marginals if assessable(m)]
+        summary["marginal_min_di"] = round(min(marginal_dis), 4) if marginal_dis else None
         pairs[f"{a} × {b}"] = {
             "groups": rows,
             "summary": summary,
             "small_subgroups": [r["group"] for r in rows if not r["adequate_sample"]],
         }
-        di = summary.get("disparate_impact_ratio", 1.0)
-        if di < worst_di:
-            worst_pair, worst_di = f"{a} × {b}", di
+        # Only pairs with two or more adequate subgroups count; others were not tested.
+        if assessable(summary) and summary["disparate_impact_ratio"] < worst_di:
+            worst_pair, worst_di = f"{a} × {b}", summary["disparate_impact_ratio"]
 
     if worst_pair is None:
-        status, severity = Status.PASS, Severity.INFO
-        plain = "No intersectional subgroup falls below the four-fifths benchmark."
-        summary_text = "All intersectional subgroups with adequate samples are within threshold."
+        status, severity = Status.WARN, Severity.LOW
+        plain = (
+            "Intersectional fairness could not be assessed: no combination of attributes had two or "
+            "more subgroups large enough to compare."
+        )
+        summary_text = (
+            f"No attribute pair had two or more subgroups with at least {min_n} records, so no "
+            "intersectional comparison was possible."
+        )
     else:
         s = pairs[worst_pair]["summary"]
         status, severity = _grade(s, di_min, 1.0)
-        hidden = s["disparate_impact_ratio"] < s["marginal_min_di"] - 0.05
+        marginal_min = s["marginal_min_di"]
+        hidden = marginal_min is not None and s["disparate_impact_ratio"] < marginal_min - 0.05
         summary_text = (
             f"Worst pair {worst_pair}: DI {s['disparate_impact_ratio']:.2f} between "
             f"'{s['least_favoured']}' and '{s['most_favoured']}' (p={s['p_value']:.3g}); "
-            f"lowest single-attribute DI for the same attributes is {s['marginal_min_di']:.2f}."
+            + (
+                f"lowest single-attribute DI for the same attributes is {marginal_min:.2f}."
+                if marginal_min is not None
+                else "the single attributes could not be compared on their own."
+            )
             + (
                 " The intersectional gap is larger than either attribute shows on its own."
                 if hidden
@@ -250,7 +291,10 @@ def intersectional(ctx: AuditContext) -> CheckResult:
             "Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup "
             "tolerance. Collect more data for subgroups below the minimum sample size."
         ),
-        metrics={"worst_pair": worst_pair, "worst_intersectional_di": round(worst_di, 4)},
+        metrics={
+            "worst_pair": worst_pair,
+            "worst_intersectional_di": round(worst_di, 4) if worst_pair else None,
+        },
         details={"pairs": pairs},
     )
 

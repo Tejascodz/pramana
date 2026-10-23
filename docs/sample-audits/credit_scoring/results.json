@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-DB3A94",
+  "audit_id": "PRM-20261021-275F46",
   "tool": {
     "name": "pramana",
-    "version": "0.2.1"
+    "version": "0.4.2"
   },
   "system": {
     "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
@@ -31,8 +31,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-10-21T09:28:12+00:00",
-  "finished": "2026-10-21T09:28:16+00:00",
+  "started": "2026-10-23T02:38:53+00:00",
+  "finished": "2026-10-23T02:38:56+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -443,7 +443,8 @@
         "di_residence": 0.7192,
         "eodds_gender": 0.0412,
         "eodds_age_band": 0.0317,
-        "eodds_residence": 0.2343
+        "eodds_residence": 0.2343,
+        "unassessed_attributes": []
       },
       "details": {
         "attributes": {
@@ -602,7 +603,7 @@
         "INDIA:SUTRA-FAIRNESS",
         "NIST-GAI:HARMFUL-BIAS"
       ],
-      "evidence_hash": "1ba8b27ea05791c244b873f9199ba94c73332ce8141a7a44a23c8d9b2e06583b"
+      "evidence_hash": "26f88bb4c5768c800571a7e6e88209c6fba44cfe1832a61f7310670d6e8301fa"
     },
     {
       "check_id": "fairness.intersectional",
@@ -1136,6 +1137,7 @@
       "metrics": {
         "score_psi": 0.05,
         "max_feature_psi": 0.2822,
+        "features_unmeasured": 0,
         "features_major_drift": 2,
         "features_moderate_drift": 1,
         "favourable_rate_reference": 0.8358,
@@ -1210,7 +1212,7 @@
         "EUAIA:Art-72",
         "INDIA:SUTRA-SAFETY"
       ],
-      "evidence_hash": "78abfa926f614aa457c43b7ed05c37429bfbc7aed09edae080464a2d74388ddd"
+      "evidence_hash": "bd769b3095cfd4dfc7c48867afb74c6db68031efa8b399210f6eeb25917f337d"
     },
     {
       "check_id": "explainability.feature_importance",
@@ -1434,7 +1436,7 @@
       "category": "Assurance",
       "status": "pass",
       "severity": "info",
-      "summary": "3/3 planted defects detected. halve favourable decisions for gender=male: DI 0.52; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.",
+      "summary": "3/3 planted defects detected. halve favourable decisions for gender=female: DI 0.48; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.",
       "plain_summary": "The audit tests caught every defect deliberately planted to check them.",
       "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
       "metrics": {
@@ -1444,9 +1446,9 @@
       "details": {
         "canaries": [
           {
-            "canary": "halve favourable decisions for gender=male",
+            "canary": "halve favourable decisions for gender=female",
             "detected": true,
-            "observed": "DI 0.52"
+            "observed": "DI 0.48"
           },
           {
             "canary": "shift monthly_income by 1.5 standard deviations",
@@ -1465,7 +1467,7 @@
         "NIST:MEASURE-1.2",
         "ISO42001:A.6.2.4"
       ],
-      "evidence_hash": "a4cee34eac94c604c441d42105ba72309a03f283b28a2c8dd4ded0ff8e8f552b"
+      "evidence_hash": "9369f9a5db7095255caf7a6b91311edfe6b6811531c96abb797a156799b167d7"
     },
     {
       "check_id": "governance.manual_evidence",
@@ -4429,9 +4431,9 @@
     }
   ],
   "llm_run": {},
-  "ledger_root": "55938234350c518b1645eb2ca8148106f49c97fe49d464f60752e1bd9b82146f",
+  "ledger_root": "af3fc7ef4191e270e0b54a94ddd0fb4fd411fa57968192d75a264739246f6d3d",
   "environment": {
     "python": "3.13.16",
-    "pramana": "0.2.1"
+    "pramana": "0.4.2"
   }
 }

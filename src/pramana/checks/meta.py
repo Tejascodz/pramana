@@ -34,24 +34,32 @@ def detector_sensitivity(ctx: AuditContext) -> CheckResult:
     if attrs:
         attr = attrs[0]
         groups = df[attr].astype(str)
-        target_group = groups.value_counts().index[0]
-        pred = ctx.eval_pred.copy()
-        idx = np.where((groups == target_group).to_numpy() & (pred == 1))[0]
-        flip = rng.choice(idx, size=int(len(idx) * 0.5), replace=False) if len(idx) else idx
-        pred[flip] = 0
-        summary = parity_summary(
-            group_table(
-                groups, ctx.eval_y, pred, ctx.eval_scores, int(ctx.spec.threshold("min_group_size"))
+        min_n = int(ctx.spec.threshold("min_group_size"))
+        base = [
+            r
+            for r in group_table(groups, ctx.eval_y, ctx.eval_pred, ctx.eval_scores, min_n)
+            if r["adequate_sample"]
+        ]
+        if len(base) >= 2:
+            # Lower the least-favoured group's rate. DI is min/max, so this can only widen the
+            # gap. Halving the most frequent group instead could shrink it if that group is the
+            # favoured one, and the self-test would then miss its own planted defect.
+            target_group = min(base, key=lambda r: r["selection_rate"])["group"]
+            pred = ctx.eval_pred.copy()
+            idx = np.where((groups == target_group).to_numpy() & (pred == 1))[0]
+            flip = rng.choice(idx, size=int(len(idx) * 0.5), replace=False) if len(idx) else idx
+            pred[flip] = 0
+            summary = parity_summary(group_table(groups, ctx.eval_y, pred, ctx.eval_scores, min_n))
+            di = summary.get("disparate_impact_ratio")
+            canaries.append(
+                {
+                    "canary": f"halve favourable decisions for {attr}={target_group}",
+                    "detected": bool(
+                        di is not None and di < ctx.spec.threshold("disparate_impact_min")
+                    ),
+                    "observed": f"DI {di:.2f}" if di is not None else "DI not computable",
+                }
             )
-        )
-        di = summary.get("disparate_impact_ratio", 1.0)
-        canaries.append(
-            {
-                "canary": f"halve favourable decisions for {attr}={target_group}",
-                "detected": bool(di < ctx.spec.threshold("disparate_impact_min")),
-                "observed": f"DI {di:.2f}",
-            }
-        )
 
     numeric = ctx.numeric_features
     if numeric:

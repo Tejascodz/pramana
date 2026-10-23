@@ -67,6 +67,17 @@ Ollama applies its own origin and host checks; keep them by leaving
 - **Pramana never reads model files, chat history or any other data held by
   Ollama or another model server.** It sees only the answers to its own
   requests.
+- **Signing keys live outside the repository.** `pramana keygen` writes the
+  Ed25519 key pair to `~/.pramana/keys` (private key readable by the owner
+  only), refuses to write inside a git working tree unless told to, and never
+  overwrites an existing key without `--force`. In CI, keep the private key in
+  a secret store and pass it as `PRAMANA_SIGNING_KEY_PEM`. `.gitignore`
+  excludes `*.key`, `*.pem` and `pramana_ed25519.*`. Only the public key
+  should ever be shared.
+- **If a private key is exposed, treat it as compromised.** Generate a new key,
+  re-sign the packs you still rely on, publish the new public key, and remove
+  the old key from version-control history (for example with
+  `git filter-repo`). Removing it from the latest commit alone is not enough.
 
 ## What it trusts
 

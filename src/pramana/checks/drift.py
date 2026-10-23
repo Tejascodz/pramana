@@ -25,7 +25,9 @@ def feature_drift(reference: pd.DataFrame, current: pd.DataFrame, columns: list[
                 "p_value": p_value,
             }
         )
-    rows.sort(key=lambda r: -r["psi"])
+    # PSI is NaN when a feature cannot be binned (for example a constant column). Keep those
+    # rows as evidence but sort them last, so they never displace a measured shift.
+    rows.sort(key=lambda r: (bool(np.isnan(r["psi"])), -r["psi"] if not np.isnan(r["psi"]) else 0))
     return rows
 
 
@@ -50,8 +52,10 @@ def population_stability(ctx: AuditContext) -> CheckResult:
     ref_rate = float(ctx.decide(ref_scores).mean())
     cur_rate = float(ctx.decide(cur_scores).mean())
 
-    major = [r for r in rows if r["psi"] >= fail]
-    moderate = [r for r in rows if warn <= r["psi"] < fail]
+    measured = [r for r in rows if not np.isnan(r["psi"])]
+    unmeasured = [r["feature"] for r in rows if np.isnan(r["psi"])]
+    major = [r for r in measured if r["psi"] >= fail]
+    moderate = [r for r in measured if warn <= r["psi"] < fail]
     if score_psi >= fail or (major and score_psi >= warn):
         status, severity = Status.FAIL, Severity.HIGH
     elif major or moderate or score_psi >= warn:
@@ -60,7 +64,8 @@ def population_stability(ctx: AuditContext) -> CheckResult:
     else:
         status, severity = Status.PASS, Severity.INFO
 
-    top = ", ".join(f"{r['feature']} (PSI {r['psi']:.2f})" for r in rows[:3])
+    top = ", ".join(f"{r['feature']} (PSI {r['psi']:.2f})" for r in measured[:3]) or "none"
+    shifted = (major + moderate)[0]["feature"] if (major or moderate) else None
     return CheckResult(
         check_id="drift.population_stability",
         title="Data and prediction drift",
@@ -72,6 +77,7 @@ def population_stability(ctx: AuditContext) -> CheckResult:
             f"{len(major)} features with major drift (PSI >= {fail}), {len(moderate)} moderate. "
             f"Largest shifts: {top}. Score PSI {score_psi:.3f}; favourable-decision rate moved from "
             f"{ref_rate:.1%} to {cur_rate:.1%}."
+            + (f" PSI could not be computed for {', '.join(unmeasured)}." if unmeasured else "")
         ),
         plain_summary=(
             "Today's applicants look materially different from the people the model learned from, and "
@@ -80,7 +86,10 @@ def population_stability(ctx: AuditContext) -> CheckResult:
             else "Incoming data still resembles the data the model was validated on."
             if status == Status.PASS
             else "Today's applicants differ from the people the model learned from (for example "
-            f"{rows[0]['feature']}), although overall scores have not moved much yet."
+            f"{shifted}), although overall scores have not moved much yet."
+            if shifted
+            else "The model's scores have started to move away from validation, although no single "
+            "input has drifted much yet."
         ),
         recommendation=(
             "Re-validate performance and fairness on recent labelled data, review the drivers of the "
@@ -88,7 +97,8 @@ def population_stability(ctx: AuditContext) -> CheckResult:
         ),
         metrics={
             "score_psi": round(float(score_psi), 4),
-            "max_feature_psi": rows[0]["psi"] if rows else 0.0,
+            "max_feature_psi": measured[0]["psi"] if measured else 0.0,
+            "features_unmeasured": len(unmeasured),
             "features_major_drift": len(major),
             "features_moderate_drift": len(moderate),
             "favourable_rate_reference": round(ref_rate, 4),

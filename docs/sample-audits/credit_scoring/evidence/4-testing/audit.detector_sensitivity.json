@@ -9,9 +9,9 @@
   "details": {
     "canaries": [
       {
-        "canary": "halve favourable decisions for gender=male",
+        "canary": "halve favourable decisions for gender=female",
         "detected": true,
-        "observed": "DI 0.52"
+        "observed": "DI 0.48"
       },
       {
         "canary": "shift monthly_income by 1.5 standard deviations",
@@ -34,6 +34,6 @@
   "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
   "severity": "info",
   "status": "pass",
-  "summary": "3/3 planted defects detected. halve favourable decisions for gender=male: DI 0.52; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.",
+  "summary": "3/3 planted defects detected. halve favourable decisions for gender=female: DI 0.48; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.",
   "title": "Audit self-test (canaries)"
 }

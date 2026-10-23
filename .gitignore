@@ -25,3 +25,8 @@ pramana-audit/
 
 # Trace written by the live-agent harness
 examples/agent_harness/trace.jsonl
+
+# Signing keys: never commit private keys (pramana keygen writes these)
+*.key
+*.pem
+pramana_ed25519.*

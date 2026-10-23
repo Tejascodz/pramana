@@ -11,12 +11,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 LEDGER_NAME = "ledger.jsonl"
 EVIDENCE_DIR = "evidence"
+# Evidence lives in evidence/<n>-<stage>/<name>.json (one folder per SMACTR stage).
+_STAGE_DIR = re.compile(r"^\d-[a-z]+$")
+
 # Detached signature written beside the ledger by `pramana sign` (optional).
 # Named here so `verify` can detect it without importing the signing module
 # (which needs the optional 'cryptography' dependency).
@@ -51,9 +55,25 @@ class EvidenceLedger:
         self.pack_dir = Path(pack_dir)
         self.pack_dir.mkdir(parents=True, exist_ok=True)
         (self.pack_dir / EVIDENCE_DIR).mkdir(exist_ok=True)
+        self._clear_stale_evidence()
         self.path = self.pack_dir / LEDGER_NAME
         self.path.write_text("", encoding="utf-8")
         self.entries: list[dict[str, Any]] = []
+
+    def _clear_stale_evidence(self) -> None:
+        """Remove evidence left by an earlier run into the same folder.
+
+        A new ledger starts empty, so any evidence file already on disk would be unrecorded
+        and fail verification. Only Pramana's own files are touched: ``*.json`` directly
+        inside ``evidence/<n>-<stage>/`` folders.
+        """
+        for stage in (self.pack_dir / EVIDENCE_DIR).iterdir():
+            if stage.is_dir() and _STAGE_DIR.match(stage.name):
+                for f in stage.glob("*.json"):
+                    f.unlink()
+        stale_signature = self.pack_dir / SIGNATURE_NAME_IF_ANY
+        if stale_signature.exists():
+            stale_signature.unlink()  # it signed the previous ledger, not this one
 
     @property
     def root_hash(self) -> str | None:
@@ -156,4 +176,17 @@ def verify_pack(pack_dir: Path) -> tuple[bool, list[str]]:
             elif sha256_file(target) != entry["sha256"]:
                 problems.append(f"{label}: evidence file content changed")
         prev = entry.get("entry_hash")
+
+    # Every file under evidence/ must be recorded in the ledger. A planted file would
+    # otherwise sit beside genuine evidence with nothing to show it was never part of the audit.
+    recorded = {
+        json.loads(line).get("path") for line in lines if json.loads(line).get("kind") == "evidence"
+    }
+    evidence_dir = pack_dir / EVIDENCE_DIR
+    if evidence_dir.is_dir():
+        for f in sorted(evidence_dir.rglob("*")):
+            if f.is_file():
+                rel = f.relative_to(pack_dir).as_posix()
+                if rel not in recorded:
+                    problems.append(f"unrecorded file in evidence: {rel}")
     return not problems, problems
