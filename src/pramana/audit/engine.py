@@ -133,10 +133,15 @@ def _extra_types(spec: AuditSpec) -> tuple[str, ...]:
 
 GENAI_FRAMEWORKS = {"NIST-GAI", "OWASP-LLM"}
 GENAI_TYPES = {"llm_application", "agent"}
+# The agentic Top 10 describes risks of systems that act through tools; a chatbot audit
+# would otherwise show it as ten uncovered controls.
+AGENT_FRAMEWORKS = {"OWASP-ASI"}
 
 
 def _control_applicable(control, eu_tier: str, system_types: set[str]) -> bool:
     if control.framework in GENAI_FRAMEWORKS and not system_types & GENAI_TYPES:
+        return False
+    if control.framework in AGENT_FRAMEWORKS and "agent" not in system_types:
         return False
     if control.framework != "EUAIA":
         return True
@@ -230,6 +235,8 @@ def _remediation(risks: list[Risk], audit_date: date) -> list[dict[str, Any]]:
 
 
 def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) -> AuditResult:
+    # Pinned artifacts are checked before anything is read or unpickled.
+    spec.verify_artifacts()
     library = load_library()
     ctx = AuditContext(spec, audit_date=audit_date)
     ledger = EvidenceLedger(Path(out_dir))

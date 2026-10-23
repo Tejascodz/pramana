@@ -11,7 +11,9 @@
     "EUAIA:Art-12",
     "EUAIA:Art-14",
     "INDIA:SUTRA-ACCOUNTABILITY",
-    "INDIA:PILLAR-ACCOUNTABILITY"
+    "INDIA:PILLAR-ACCOUNTABILITY",
+    "OWASP-ASI:ASI02",
+    "OWASP-ASI:ASI03"
   ],
   "details": {
     "off_allowlist": [],

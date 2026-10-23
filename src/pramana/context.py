@@ -68,7 +68,9 @@ class AuditContext:
         if not path.exists():
             raise MissingArtifact(f"Model file not found: {path.name}")
         # Model files are pickles and can execute code when loaded. Only audit
-        # models received through a trusted, access-controlled channel.
+        # models received through a trusted, access-controlled channel, and pin their hash
+        # in artifacts_sha256 so a swapped file is refused before it is unpickled.
+        self.spec.verify_artifact("model")
         return joblib.load(path)
 
     @cached_property

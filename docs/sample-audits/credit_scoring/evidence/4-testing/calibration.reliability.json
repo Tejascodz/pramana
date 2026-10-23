@@ -91,6 +91,7 @@
   },
   "evidence_hash": null,
   "metrics": {
+    "adaptive_ece": 0.0353,
     "brier": 0.1612,
     "ece": 0.031
   },
@@ -98,6 +99,6 @@
   "recommendation": "Apply isotonic or Platt calibration on a held-out set and re-check per group.",
   "severity": "info",
   "status": "pass",
-  "summary": "Expected calibration error 0.031 (limit 0.05), Brier score 0.161. Worst group: age_band=60+ with ECE 0.078.",
+  "summary": "Expected calibration error 0.031 (limit 0.05; equal-mass bins 0.035), Brier score 0.161. Worst group: age_band=60+ with ECE 0.078.",
   "title": "Calibration"
 }

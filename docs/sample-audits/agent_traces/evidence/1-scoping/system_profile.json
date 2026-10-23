@@ -1,5 +1,5 @@
 {
-  "audit_id": "PRM-20261021-264797",
+  "audit_id": "PRM-20261021-CE7974",
   "classification": {
     "eu_applicable": false,
     "eu_basis": [
@@ -39,6 +39,8 @@
     "governance.risk_classification",
     "agent.trace_auditability",
     "agent.misalignment_signals",
+    "agent.control_readiness",
+    "agent.oversight_integrity",
     "documentation.model_card"
   ],
   "system": {
@@ -51,6 +53,7 @@
   },
   "thresholds": {
     "agent_auditability_min": 0.9,
+    "agent_reasoning_coverage_min": 0.8,
     "disparate_impact_min": 0.8,
     "duplicate_rate_max": 0.01,
     "ece_max": 0.05,

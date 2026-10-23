@@ -8,7 +8,8 @@
     "NIST:MANAGE-2.2",
     "ISO42001:A.6.2.6",
     "EUAIA:Art-72",
-    "INDIA:SUTRA-SAFETY"
+    "INDIA:SUTRA-SAFETY",
+    "ISO42005:5.12"
   ],
   "details": {
     "compared_with": "production_data",

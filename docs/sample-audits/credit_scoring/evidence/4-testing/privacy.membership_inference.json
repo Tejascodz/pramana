@@ -12,12 +12,14 @@
   "evidence_hash": null,
   "metrics": {
     "attack_auc": 0.5672,
-    "membership_advantage": 0.1345
+    "membership_advantage": 0.1345,
+    "tpr_at_1pct_fpr": 0.0156,
+    "tpr_at_5pct_fpr": 0.0648
   },
   "plain_summary": "The model does not reveal who was in its training data beyond chance level.",
   "recommendation": "Reduce overfitting (regularisation, fewer trees, early stopping) or train with differential privacy, then re-run this test.",
   "severity": "info",
   "status": "pass",
-  "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows.",
+  "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.6% of training rows (5% FPR: 6.5%).",
   "title": "Membership-inference risk"
 }

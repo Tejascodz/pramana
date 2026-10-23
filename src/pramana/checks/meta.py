@@ -40,7 +40,9 @@ def detector_sensitivity(ctx: AuditContext) -> CheckResult:
             for r in group_table(groups, ctx.eval_y, ctx.eval_pred, ctx.eval_scores, min_n)
             if r["adequate_sample"]
         ]
-        if len(base) >= 2:
+        # The canary needs two comparable groups and at least one favourable outcome; without
+        # them no disparity can be planted, so it is skipped rather than reported as missed.
+        if len(base) >= 2 and max(r["selection_rate"] for r in base) > 0:
             # Lower the least-favoured group's rate. DI is min/max, so this can only widen the
             # gap. Halving the most frequent group instead could shrink it if that group is the
             # favoured one, and the self-test would then miss its own planted defect.
@@ -51,17 +53,18 @@ def detector_sensitivity(ctx: AuditContext) -> CheckResult:
             pred[flip] = 0
             summary = parity_summary(group_table(groups, ctx.eval_y, pred, ctx.eval_scores, min_n))
             di = summary.get("disparate_impact_ratio")
+            measured = di is not None and not np.isnan(di)
             canaries.append(
                 {
                     "canary": f"halve favourable decisions for {attr}={target_group}",
-                    "detected": bool(
-                        di is not None and di < ctx.spec.threshold("disparate_impact_min")
-                    ),
-                    "observed": f"DI {di:.2f}" if di is not None else "DI not computable",
+                    "detected": bool(measured and di < ctx.spec.threshold("disparate_impact_min")),
+                    "observed": f"DI {di:.2f}" if measured else "DI not computable",
                 }
             )
 
-    numeric = ctx.numeric_features
+    # A constant or empty column cannot show a shift, so plant the drift canary in the first
+    # numeric feature that actually varies.
+    numeric = [c for c in ctx.numeric_features if df[c].dropna().nunique() > 1]
     if numeric:
         col = numeric[0]
         shifted = df.copy()

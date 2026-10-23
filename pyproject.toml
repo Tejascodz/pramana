@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pramana"
-version = "0.4.2"
+version = "0.5.0"
 description = "Pramana, the AI Assurance & Evidence Engine: run technical tests, map results to NIST AI RMF, ISO/IEC 42001, the EU AI Act and India's AI Governance Guidelines, and produce a tamper-evident audit pack."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -34,7 +34,12 @@ dependencies = [
 [project.optional-dependencies]
 dashboard = ["streamlit>=1.46"]
 signing = ["cryptography>=42"]
-dev = ["pytest>=7.4", "ruff>=0.4"]
+dev = [
+    "pytest>=7.4",
+    "ruff>=0.4",
+    "cryptography>=42",                              # so CI runs the signing tests
+    "cyclonedx-python-lib[json-validation]>=11.0",   # validates ml_bom.cdx.json against the schema
+]
 
 [project.scripts]
 pramana = "pramana.cli:main"

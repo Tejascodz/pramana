@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-603E87",
+  "audit_id": "PRM-20261021-7BDADA",
   "tool": {
     "name": "pramana",
-    "version": "0.2.2"
+    "version": "0.5.0"
   },
   "system": {
     "name": "Niva Customer Assistant (baseline build)",
@@ -26,8 +26,8 @@
     "declared_eu_tier": "limited"
   },
   "audit_date": "2026-10-21",
-  "started": "2026-10-21T09:48:37+00:00",
-  "finished": "2026-10-21T09:48:37+00:00",
+  "started": "2026-10-23T03:27:54+00:00",
+  "finished": "2026-10-23T03:27:54+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -146,9 +146,12 @@
         "ISO42001:A.5.2",
         "EUAIA:Art-5",
         "EUAIA:Art-6",
-        "INDIA:PILLAR-RISK-MITIGATION"
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
       ],
-      "evidence_hash": "2fd799761ad56994cefb31bb2c074ffcbcd3ddcf54c2b0f6a2ee5e70457d28a0"
+      "evidence_hash": "c9d9da555ea5acfd3c66c98b331a26195f98efa47ac573df420bba3df2a65a3b"
     },
     {
       "check_id": "llm.prompt_injection",
@@ -606,9 +609,10 @@
         "OWASP-LLM:LLM07",
         "ISO42001:A.6.2.4",
         "EUAIA:Art-15",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
       ],
-      "evidence_hash": "ec82a90d437200193a7642a53a03a4ee7172ba6e3b844cbc3b875118483e1662"
+      "evidence_hash": "7145567bebe0648dc389cad7e2b63c41d1b171bf030e4e0cdee6c34d831a71ee"
     },
     {
       "check_id": "llm.groundedness",
@@ -1030,9 +1034,12 @@
         "EUAIA:Art-13",
         "EUAIA:Art-14",
         "INDIA:SUTRA-UNDERSTANDABLE",
-        "INDIA:SUTRA-ACCOUNTABILITY"
+        "INDIA:SUTRA-ACCOUNTABILITY",
+        "ISO42005:6.3.4",
+        "ISO42005:6.3.5",
+        "ISO42005:6.5"
       ],
-      "evidence_hash": "f0c1355041ae047f15a962ad5853ff8ab4fc83ec5b144aa82e9ddd58605e46ba"
+      "evidence_hash": "d98d20f66ce916abddb0463fd585bcfb7657151df64ebb67a88e7520caf2e2ab"
     },
     {
       "check_id": "audit.process",
@@ -1055,9 +1062,13 @@
         "NIST:MANAGE-1.4",
         "ISO42001:A.5.3",
         "EUAIA:Art-9",
-        "INDIA:PILLAR-RISK-MITIGATION"
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.8",
+        "ISO42005:5.9",
+        "ISO42005:5.10",
+        "ISO42005:5.11"
       ],
-      "evidence_hash": "2c737ed8593f88f5095f9826a39e13019f0153d8af731b109ebdd069feca4614"
+      "evidence_hash": "b77f16f76643efe2d84fd0c853ba3539e3af4058b5cc2383fd23249b2d112398"
     }
   ],
   "risks": [
@@ -1078,7 +1089,8 @@
         "OWASP-LLM:LLM07",
         "ISO42001:A.6.2.4",
         "EUAIA:Art-15",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
       ],
       "accepted": false,
       "acceptance": null,
@@ -1171,7 +1183,10 @@
         "ISO42001:A.5.2",
         "EUAIA:Art-5",
         "EUAIA:Art-6",
-        "INDIA:PILLAR-RISK-MITIGATION"
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
       ]
     },
     {
@@ -1186,7 +1201,8 @@
         "OWASP-LLM:LLM07",
         "ISO42001:A.6.2.4",
         "EUAIA:Art-15",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
       ]
     },
     {
@@ -1263,7 +1279,10 @@
         "EUAIA:Art-13",
         "EUAIA:Art-14",
         "INDIA:SUTRA-UNDERSTANDABLE",
-        "INDIA:SUTRA-ACCOUNTABILITY"
+        "INDIA:SUTRA-ACCOUNTABILITY",
+        "ISO42005:6.3.4",
+        "ISO42005:6.3.5",
+        "ISO42005:6.5"
       ]
     }
   ],
@@ -3125,6 +3144,302 @@
           "llm.service_health"
         ],
         "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI01",
+        "framework": "OWASP-ASI",
+        "id": "ASI01",
+        "group": "Top 10",
+        "title": "Agent goal hijack",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI02",
+        "framework": "OWASP-ASI",
+        "id": "ASI02",
+        "group": "Top 10",
+        "title": "Tool misuse and exploitation",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI03",
+        "framework": "OWASP-ASI",
+        "id": "ASI03",
+        "group": "Top 10",
+        "title": "Identity and privilege abuse",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI04",
+        "framework": "OWASP-ASI",
+        "id": "ASI04",
+        "group": "Top 10",
+        "title": "Agentic supply chain vulnerabilities",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI05",
+        "framework": "OWASP-ASI",
+        "id": "ASI05",
+        "group": "Top 10",
+        "title": "Unexpected code execution (RCE)",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI06",
+        "framework": "OWASP-ASI",
+        "id": "ASI06",
+        "group": "Top 10",
+        "title": "Memory and context poisoning",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI07",
+        "framework": "OWASP-ASI",
+        "id": "ASI07",
+        "group": "Top 10",
+        "title": "Insecure inter-agent communication",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI08",
+        "framework": "OWASP-ASI",
+        "id": "ASI08",
+        "group": "Top 10",
+        "title": "Cascading failures",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI09",
+        "framework": "OWASP-ASI",
+        "id": "ASI09",
+        "group": "Top 10",
+        "title": "Human-agent trust exploitation",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI10",
+        "framework": "OWASP-ASI",
+        "id": "ASI10",
+        "group": "Top 10",
+        "title": "Rogue agents",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.4",
+        "framework": "ISO42005",
+        "id": "5.4",
+        "group": "5 Assessment process",
+        "title": "Timing of AI system impact assessment",
+        "evidence_type": "organizational",
+        "state": "evidenced",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.5",
+        "framework": "ISO42005",
+        "id": "5.5",
+        "group": "5 Assessment process",
+        "title": "Scope of the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.6",
+        "framework": "ISO42005",
+        "id": "5.6",
+        "group": "5 Assessment process",
+        "title": "Allocating responsibilities",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.8",
+        "framework": "ISO42005",
+        "id": "5.8",
+        "group": "5 Assessment process",
+        "title": "Performing the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.9",
+        "framework": "ISO42005",
+        "id": "5.9",
+        "group": "5 Assessment process",
+        "title": "Analysing the results of the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.10",
+        "framework": "ISO42005",
+        "id": "5.10",
+        "group": "5 Assessment process",
+        "title": "Recording and reporting",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.11",
+        "framework": "ISO42005",
+        "id": "5.11",
+        "group": "5 Assessment process",
+        "title": "Approval process",
+        "evidence_type": "organizational",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.12",
+        "framework": "ISO42005",
+        "id": "5.12",
+        "group": "5 Assessment process",
+        "title": "Monitoring and review",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.3.4",
+        "framework": "ISO42005",
+        "id": "6.3.4",
+        "group": "6 Assessment content",
+        "title": "Intended use",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "governance.risk_classification",
+          "documentation.model_card"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.3.5",
+        "framework": "ISO42005",
+        "id": "6.3.5",
+        "group": "6 Assessment content",
+        "title": "Unintended uses",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "documentation.model_card"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.4",
+        "framework": "ISO42005",
+        "id": "6.4",
+        "group": "6 Assessment content",
+        "title": "Data information and quality",
+        "evidence_type": "technical",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.5",
+        "framework": "ISO42005",
+        "id": "6.5",
+        "group": "6 Assessment content",
+        "title": "Algorithm and model information",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "documentation.model_card"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.7",
+        "framework": "ISO42005",
+        "id": "6.7",
+        "group": "6 Assessment content",
+        "title": "Relevant interested parties",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.8.2",
+        "framework": "ISO42005",
+        "id": "6.8.2",
+        "group": "6 Assessment content",
+        "title": "Benefits and harms",
+        "evidence_type": "technical",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.8.3",
+        "framework": "ISO42005",
+        "id": "6.8.3",
+        "group": "6 Assessment content",
+        "title": "AI system failures and reasonably foreseeable misuse",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "llm.prompt_injection"
+        ],
+        "manual_evidence": []
       }
     ],
     "frameworks": {
@@ -3399,6 +3714,57 @@
             "not applicable": 0
           }
         }
+      },
+      "OWASP-ASI": {
+        "name": "OWASP Top 10 for Agentic Applications",
+        "version": "2026",
+        "source": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+        "group_label": "Category",
+        "totals": {
+          "evidenced": 0,
+          "partial": 0,
+          "deficient": 0,
+          "not tested": 0,
+          "not applicable": 10
+        },
+        "groups": {
+          "Top 10": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 0,
+            "not applicable": 10
+          }
+        }
+      },
+      "ISO42005": {
+        "name": "ISO/IEC 42005 AI system impact assessment",
+        "version": "2025",
+        "source": "https://www.iso.org/standard/42005",
+        "group_label": "Clause",
+        "totals": {
+          "evidenced": 9,
+          "partial": 0,
+          "deficient": 1,
+          "not tested": 5,
+          "not applicable": 0
+        },
+        "groups": {
+          "5 Assessment process": {
+            "evidenced": 6,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 2,
+            "not applicable": 0
+          },
+          "6 Assessment content": {
+            "evidenced": 3,
+            "partial": 0,
+            "deficient": 1,
+            "not tested": 3,
+            "not applicable": 0
+          }
+        }
       }
     }
   },
@@ -3416,7 +3782,8 @@
         "OWASP-LLM:LLM07",
         "ISO42001:A.6.2.4",
         "EUAIA:Art-15",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
       ]
     },
     {
@@ -3508,9 +3875,9 @@
       "builtin:disclosure_core"
     ]
   },
-  "ledger_root": "351ba3dec63e88454ab978e9ec509b44fe4a65fb67c4116b3cad3f47244f05a8",
+  "ledger_root": "b1a00d27e3d5ab25db6e6682aaef84fcf928c26fd6039580919b172456131138",
   "environment": {
     "python": "3.13.16",
-    "pramana": "0.2.2"
+    "pramana": "0.5.0"
   }
 }

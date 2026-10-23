@@ -1,0 +1,103 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:2ddf13df-4ae0-52fd-83de-2407aa69e247",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-23T03:27:49+00:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "pramana",
+          "version": "0.5.0"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "bom-ref": "audited-system",
+      "name": "Fee Refund Agent",
+      "version": "0.9.2",
+      "description": "Tool-using LLM agent that investigates fee complaints and issues refunds through the payments API.",
+      "modelCard": {
+        "considerations": {
+          "useCases": [
+            "Resolve fee disputes and refund wrongly charged fees."
+          ],
+          "ethicalConsiderations": [
+            {
+              "name": "R-01: Agent misalignment signals",
+              "mitigationStrategy": "Treat any confirmed signal as an incident: review the session, add a trusted monitor on reasoning and actions, require human approval before irreversible actions, keep reasoning traces logged and monitorable, and avoid instilling strong standalone goals. See docs/agentic-safety-review.md."
+            },
+            {
+              "name": "R-02: Agent action auditability",
+              "mitigationStrategy": "Enforce approval in the tool gateway (not in the prompt), require a parent request for every tool call, restrict tools to an allowlist, and write logs to an append-only hash chain."
+            },
+            {
+              "name": "R-03: Agent control readiness",
+              "mitigationStrategy": "Give the agent its own identity rather than a user's token, scope its tools with an allowlist enforced in the gateway, require human approval before irreversible actions, define conditions that stop it, write its log to a hash chain, and attach a monitor that reviews actions. Record each in the trace so the audit can see it, not only declare it."
+            },
+            {
+              "name": "R-04: Agent oversight integrity",
+              "mitigationStrategy": "Log the agent's reasoning for every action, keep it legible (do not train against the monitor), and screen tool and retrieval results for instructions before they reach the model."
+            }
+          ]
+        }
+      },
+      "properties": [
+        {
+          "name": "pramana:audit_id",
+          "value": "PRM-20261021-CE7974"
+        },
+        {
+          "name": "pramana:audit_date",
+          "value": "2026-10-21"
+        },
+        {
+          "name": "pramana:owner",
+          "value": "Customer Operations"
+        },
+        {
+          "name": "pramana:gate_decision",
+          "value": "BLOCK"
+        },
+        {
+          "name": "pramana:opinion",
+          "value": "Ineffective"
+        },
+        {
+          "name": "pramana:eu_ai_act_tier",
+          "value": "limited"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "artifact-agent_trace",
+      "name": "refund_agent_trace.jsonl",
+      "type": "data",
+      "data": [
+        {
+          "type": "dataset",
+          "name": "agent_trace"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2dd7a51735761f20b47976279d446f1f0dfc14e4045d0b170b8b76138e4ed21d"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "audited-system",
+      "dependsOn": [
+        "artifact-agent_trace"
+      ]
+    }
+  ]
+}

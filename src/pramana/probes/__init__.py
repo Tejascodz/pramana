@@ -101,6 +101,8 @@ def load_probe_file(path: str | Path) -> dict[str, Any]:
             _merge(probes, _read_builtin(name), f"builtin:{name}")
         else:
             included = path.parent / ref
+            if not included.is_file():
+                raise ProbeFileError(f"included probe file not found: {ref}")
             _merge(
                 probes, yaml.safe_load(included.read_text(encoding="utf-8")) or {}, included.name
             )

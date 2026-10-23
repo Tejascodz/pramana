@@ -16,6 +16,8 @@ FRAMEWORK_FILES = (
     "eu_ai_act.yaml",
     "india_aigg.yaml",
     "owasp_llm.yaml",
+    "owasp_agentic.yaml",
+    "iso_42005.yaml",
 )
 
 

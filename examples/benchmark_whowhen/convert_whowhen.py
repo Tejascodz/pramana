@@ -79,4 +79,7 @@ def main(src_dir: str, out: str):
 
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3 or sys.argv[1] in ("-h", "--help"):
+        print("usage: convert_whowhen.py <Who&When folder of .json trajectories> <output.jsonl>")
+        sys.exit(0 if len(sys.argv) > 1 and sys.argv[1] in ("-h", "--help") else 2)
     main(sys.argv[1], sys.argv[2])

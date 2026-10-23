@@ -11,7 +11,10 @@
       "EUAIA:Art-14",
       "EUAIA:Art-15",
       "INDIA:SUTRA-SAFETY",
-      "INDIA:SUTRA-ACCOUNTABILITY"
+      "INDIA:SUTRA-ACCOUNTABILITY",
+      "ISO42005:6.8.3",
+      "OWASP-ASI:ASI01",
+      "OWASP-ASI:ASI10"
     ],
     "due": "2026-11-04",
     "owner": "Operational Risk",
@@ -30,11 +33,59 @@
       "EUAIA:Art-12",
       "EUAIA:Art-14",
       "INDIA:SUTRA-ACCOUNTABILITY",
-      "INDIA:PILLAR-ACCOUNTABILITY"
+      "INDIA:PILLAR-ACCOUNTABILITY",
+      "OWASP-ASI:ASI02",
+      "OWASP-ASI:ASI03"
     ],
     "due": "2026-11-04",
     "owner": "Operational Risk",
     "priority": "P1",
     "risk_id": "R-02"
+  },
+  {
+    "action": "Give the agent its own identity rather than a user's token, scope its tools with an allowlist enforced in the gateway, require human approval before irreversible actions, define conditions that stop it, write its log to a hash chain, and attach a monitor that reviews actions. Record each in the trace so the audit can see it, not only declare it.",
+    "closes_controls": [
+      "NIST:GOVERN-3.2",
+      "NIST:MAP-3.5",
+      "NIST:MANAGE-2.4",
+      "NIST:MANAGE-4.1",
+      "ISO42001:A.6.2.6",
+      "OWASP-LLM:LLM06",
+      "OWASP-ASI:ASI02",
+      "OWASP-ASI:ASI03",
+      "OWASP-ASI:ASI08",
+      "OWASP-ASI:ASI10",
+      "EUAIA:Art-14",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY",
+      "INDIA:SUTRA-ACCOUNTABILITY"
+    ],
+    "due": "2027-01-19",
+    "owner": "Operational Risk",
+    "priority": "P2",
+    "risk_id": "R-03"
+  },
+  {
+    "action": "Log the agent's reasoning for every action, keep it legible (do not train against the monitor), and screen tool and retrieval results for instructions before they reach the model.",
+    "closes_controls": [
+      "NIST:MEASURE-2.7",
+      "NIST:MEASURE-2.8",
+      "NIST:MANAGE-4.1",
+      "NIST-GAI:INFO-SECURITY",
+      "ISO42001:A.6.2.6",
+      "ISO42001:A.6.2.8",
+      "OWASP-LLM:LLM01",
+      "OWASP-ASI:ASI01",
+      "OWASP-ASI:ASI06",
+      "EUAIA:Art-12",
+      "EUAIA:Art-14",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-UNDERSTANDABLE",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "due": "2027-01-19",
+    "owner": "Operational Risk",
+    "priority": "P2",
+    "risk_id": "R-04"
   }
 ]

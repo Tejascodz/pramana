@@ -1,0 +1,256 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:3c9a582d-3aa4-558b-bf53-f843607ea76a",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-10-23T03:27:45+00:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "pramana",
+          "version": "0.5.0"
+        }
+      ]
+    },
+    "component": {
+      "type": "machine-learning-model",
+      "bom-ref": "audited-system",
+      "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
+      "version": "2.3.0",
+      "description": "Gradient-boosted model that estimates the probability an applicant repays a personal loan. Applications scoring at or above the threshold are pre-approved; the rest go to manual underwriting.",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "bea25a1865913e3f126be0fb8ac9949ef3c02427054a716158bbcf1c1c9577b5"
+        }
+      ],
+      "modelCard": {
+        "modelParameters": {
+          "approach": {
+            "type": "supervised"
+          },
+          "task": "binary classification"
+        },
+        "quantitativeAnalysis": {
+          "performanceMetrics": [
+            {
+              "type": "AUC",
+              "value": "0.7475",
+              "confidenceInterval": {
+                "lowerBound": "0.7308",
+                "upperBound": "0.7651"
+              }
+            },
+            {
+              "type": "accuracy",
+              "value": "0.773"
+            },
+            {
+              "type": "precision",
+              "value": "0.8043"
+            },
+            {
+              "type": "recall",
+              "value": "0.9222"
+            },
+            {
+              "type": "F1",
+              "value": "0.8592"
+            },
+            {
+              "type": "expected calibration error",
+              "value": "0.031"
+            },
+            {
+              "type": "expected calibration error (equal-mass bins)",
+              "value": "0.0353"
+            },
+            {
+              "type": "Brier score",
+              "value": "0.1612"
+            },
+            {
+              "type": "disparate impact ratio",
+              "value": "0.9686",
+              "slice": "gender"
+            },
+            {
+              "type": "disparate impact ratio",
+              "value": "0.9581",
+              "slice": "age_band"
+            },
+            {
+              "type": "disparate impact ratio",
+              "value": "0.7192",
+              "slice": "residence"
+            }
+          ]
+        },
+        "considerations": {
+          "useCases": [
+            "Pre-approve unsecured personal loans for retail applicants."
+          ],
+          "users": [
+            "Retail loan applicants in India and NRI applicants in the EU"
+          ],
+          "ethicalConsiderations": [
+            {
+              "name": "R-01: Documentation and claims",
+              "mitigationStrategy": "Complete the missing sections, correct documented figures to match validated results, and make the model card part of the release checklist."
+            },
+            {
+              "name": "R-02: Group fairness",
+              "mitigationStrategy": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence."
+            },
+            {
+              "name": "R-03: Intersectional fairness",
+              "mitigationStrategy": "Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance. Collect more data for subgroups below the minimum sample size."
+            },
+            {
+              "name": "R-04: Proxy-feature screening",
+              "mitigationStrategy": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them."
+            },
+            {
+              "name": "R-05: Risk classification",
+              "mitigationStrategy": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation."
+            },
+            {
+              "name": "R-06: Personal-data exposure",
+              "mitigationStrategy": "Drop or pseudonymise identifier columns before data reaches modelling and evaluation environments, and record the purpose and lawful basis for any personal data retained (DPDP Act 2023 purpose limitation and data minimisation)."
+            },
+            {
+              "name": "R-07: Decision drivers",
+              "mitigationStrategy": "Declare expected key drivers in the model documentation, explain any surprising driver, and provide reason codes for individual adverse decisions."
+            },
+            {
+              "name": "R-08: Data and prediction drift",
+              "mitigationStrategy": "Re-validate performance and fairness on recent labelled data, review the drivers of the largest shifts, and set PSI alerts in production monitoring."
+            },
+            {
+              "name": "R-09: Governance evidence on file",
+              "mitigationStrategy": "Provide each cited document, or remove the claim from the control register."
+            },
+            {
+              "name": "R-10: Robustness to perturbation",
+              "mitigationStrategy": "Add input validation and imputation, apply monotonic constraints where the business logic requires them, and add a manual-review band around the decision threshold."
+            },
+            {
+              "name": "R-11: Predictive performance",
+              "mitigationStrategy": "Track AUC in production monitoring with an alert at the declared minimum."
+            }
+          ],
+          "fairnessAssessments": [
+            {
+              "groupAtRisk": "residence=rural",
+              "harms": "Favourable-outcome rate 0.72 times that of residence=urban",
+              "mitigationStrategy": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence."
+            }
+          ]
+        }
+      },
+      "properties": [
+        {
+          "name": "pramana:audit_id",
+          "value": "PRM-20261021-6E6BB8"
+        },
+        {
+          "name": "pramana:audit_date",
+          "value": "2026-10-21"
+        },
+        {
+          "name": "pramana:owner",
+          "value": "Credit Risk Analytics"
+        },
+        {
+          "name": "pramana:gate_decision",
+          "value": "BLOCK"
+        },
+        {
+          "name": "pramana:opinion",
+          "value": "Ineffective"
+        },
+        {
+          "name": "pramana:eu_ai_act_tier",
+          "value": "high"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "artifact-reference_data",
+      "name": "train.csv",
+      "type": "data",
+      "data": [
+        {
+          "type": "dataset",
+          "name": "reference_data"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1710b65aa75bd5481f7f6db38d0cc720bcf18bd7fedc5b410cdc06031ce85311"
+        }
+      ]
+    },
+    {
+      "bom-ref": "artifact-evaluation_data",
+      "name": "test.csv",
+      "type": "data",
+      "data": [
+        {
+          "type": "dataset",
+          "name": "evaluation_data"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "21a8ac5ed818edd90213392dc454823e806c3f348ea6b5acc1aac45aa1034e84"
+        }
+      ]
+    },
+    {
+      "bom-ref": "artifact-production_data",
+      "name": "production_sample.csv",
+      "type": "data",
+      "data": [
+        {
+          "type": "dataset",
+          "name": "production_data"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "308fb8e23eebc05095279096cc37f3c7fb7035781da9bcf4781f963c22bd2b79"
+        }
+      ]
+    },
+    {
+      "bom-ref": "artifact-documentation",
+      "name": "model_card.yaml",
+      "type": "file",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e64ca1e1ce6b48ee84bdb1b1d38daa896140e95b632a261d8ca8a94807974982"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "audited-system",
+      "dependsOn": [
+        "artifact-reference_data",
+        "artifact-evaluation_data",
+        "artifact-production_data",
+        "artifact-documentation"
+      ]
+    }
+  ]
+}

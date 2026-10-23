@@ -167,6 +167,16 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
     labels = np.r_[np.ones(n), np.zeros(n)]
     attack_auc = safe_auc(labels, -np.r_[loss_in, loss_out])
     advantage = 2 * (attack_auc - 0.5)
+    # An average AUC can hide an attack that is very confident about a few records.
+    # Carlini et al. (IEEE S&P 2022) recommend reporting the true-positive rate at a low
+    # false-positive rate; here for the same loss-threshold attack, at 1% and 5% FPR.
+    tail = {}
+    for fpr in (0.01, 0.05):
+        if n * fpr >= 1:
+            cut = float(np.quantile(loss_out, fpr))
+            tail[fpr] = round(float((loss_in <= cut).mean()), 4)
+        else:
+            tail[fpr] = None
 
     if attack_auc > limit + 0.10:
         status, severity = Status.FAIL, Severity.HIGH
@@ -185,6 +195,12 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
             f"Loss-threshold attack (Yeom et al., 2018) on {n} training and {n} held-out rows: attack AUC "
             f"{attack_auc:.3f} (limit {limit}), membership advantage {advantage:.3f}. Mean loss "
             f"{loss_in.mean():.3f} on training rows vs {loss_out.mean():.3f} on held-out rows."
+            + (
+                f" At a 1% false-positive rate the attack identifies {tail[0.01]:.1%} of training "
+                f"rows (5% FPR: {tail[0.05]:.1%})."
+                if tail[0.01] is not None and tail[0.05] is not None
+                else ""
+            )
         ),
         plain_summary=(
             "An attacker could tell whether a specific person was in the training data more often than chance."
@@ -195,5 +211,10 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
             "Reduce overfitting (regularisation, fewer trees, early stopping) or train with differential "
             "privacy, then re-run this test."
         ),
-        metrics={"attack_auc": round(attack_auc, 4), "membership_advantage": round(advantage, 4)},
+        metrics={
+            "attack_auc": round(attack_auc, 4),
+            "membership_advantage": round(advantage, 4),
+            "tpr_at_1pct_fpr": tail[0.01],
+            "tpr_at_5pct_fpr": tail[0.05],
+        },
     )

@@ -5,7 +5,8 @@
     "NIST:MEASURE-2.11",
     "ISO42001:A.5.4",
     "EUAIA:Art-10",
-    "INDIA:SUTRA-FAIRNESS"
+    "INDIA:SUTRA-FAIRNESS",
+    "ISO42005:6.8.2"
   ],
   "details": {
     "pairs": {
@@ -14,6 +15,7 @@
           {
             "adequate_sample": true,
             "auc": 0.6502915451895044,
+            "base_rate": 0.5833333333333334,
             "favourable": 106,
             "fpr": 0.5142857142857142,
             "group": "18-25 × rural",
@@ -25,6 +27,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7439516129032256,
+            "base_rate": 0.7077625570776256,
             "favourable": 191,
             "fpr": 0.734375,
             "group": "18-25 × semi_urban",
@@ -36,6 +39,7 @@
           {
             "adequate_sample": true,
             "auc": 0.6932652409830833,
+            "base_rate": 0.7875816993464052,
             "favourable": 285,
             "fpr": 0.8,
             "group": "18-25 × urban",
@@ -47,6 +51,7 @@
           {
             "adequate_sample": true,
             "auc": 0.6722884559464961,
+            "base_rate": 0.5574572127139364,
             "favourable": 279,
             "fpr": 0.5414364640883977,
             "group": "26-40 × rural",
@@ -58,6 +63,7 @@
           {
             "adequate_sample": true,
             "auc": 0.717425466954023,
+            "base_rate": 0.768,
             "favourable": 447,
             "fpr": 0.7413793103448276,
             "group": "26-40 × semi_urban",
@@ -69,6 +75,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7209642283879845,
+            "base_rate": 0.8476190476190476,
             "favourable": 694,
             "fpr": 0.7857142857142857,
             "group": "26-40 × urban",
@@ -80,6 +87,7 @@
           {
             "adequate_sample": true,
             "auc": 0.6608490566037738,
+            "base_rate": 0.6015037593984962,
             "favourable": 183,
             "fpr": 0.5849056603773585,
             "group": "41-60 × rural",
@@ -91,6 +99,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7170868347338936,
+            "base_rate": 0.8018867924528302,
             "favourable": 287,
             "fpr": 0.7777777777777778,
             "group": "41-60 × semi_urban",
@@ -102,6 +111,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7634837688044338,
+            "base_rate": 0.8487903225806451,
             "favourable": 468,
             "fpr": 0.7866666666666666,
             "group": "41-60 × urban",
@@ -113,6 +123,7 @@
           {
             "adequate_sample": true,
             "auc": 0.47959183673469385,
+            "base_rate": 0.6666666666666666,
             "favourable": 46,
             "fpr": 0.6666666666666666,
             "group": "60+ × rural",
@@ -124,6 +135,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7651098901098901,
+            "base_rate": 0.8115942028985508,
             "favourable": 61,
             "fpr": 0.5384615384615384,
             "group": "60+ × semi_urban",
@@ -135,6 +147,7 @@
           {
             "adequate_sample": true,
             "auc": 0.8055555555555556,
+            "base_rate": 0.7837837837837838,
             "favourable": 106,
             "fpr": 0.7916666666666666,
             "group": "60+ × urban",
@@ -146,6 +159,7 @@
         ],
         "small_subgroups": [],
         "summary": {
+          "base_rate_difference": 0.2913,
           "comparable_groups": 12,
           "demographic_parity_difference": 0.324,
           "disparate_impact_ratio": 0.6607,
@@ -162,6 +176,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7614533965244865,
+            "base_rate": 0.6806451612903226,
             "favourable": 261,
             "fpr": 0.6666666666666666,
             "group": "female × 18-25",
@@ -173,6 +188,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7566324755165956,
+            "base_rate": 0.6897470039946738,
             "favourable": 634,
             "fpr": 0.6394849785407726,
             "group": "female × 26-40",
@@ -184,6 +200,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7559347181008903,
+            "base_rate": 0.7185501066098081,
             "favourable": 401,
             "fpr": 0.7045454545454546,
             "group": "female × 41-60",
@@ -195,6 +212,7 @@
           {
             "adequate_sample": true,
             "auc": 0.8169014084507041,
+            "base_rate": 0.6893203883495146,
             "favourable": 86,
             "fpr": 0.59375,
             "group": "female × 60+",
@@ -206,6 +224,7 @@
           {
             "adequate_sample": true,
             "auc": 0.697243816254417,
+            "base_rate": 0.7389033942558747,
             "favourable": 321,
             "fpr": 0.69,
             "group": "male × 18-25",
@@ -217,6 +236,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7424004691264106,
+            "base_rate": 0.8029115341545353,
             "favourable": 786,
             "fpr": 0.6988636363636364,
             "group": "male × 26-40",
@@ -228,6 +248,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7589822502147152,
+            "base_rate": 0.8166939443535188,
             "favourable": 537,
             "fpr": 0.6875,
             "group": "male × 41-60",
@@ -239,6 +260,7 @@
           {
             "adequate_sample": true,
             "auc": 0.6174089068825911,
+            "base_rate": 0.8142857142857143,
             "favourable": 127,
             "fpr": 0.8076923076923077,
             "group": "male × 60+",
@@ -250,6 +272,7 @@
         ],
         "small_subgroups": [],
         "summary": {
+          "base_rate_difference": 0.136,
           "comparable_groups": 8,
           "demographic_parity_difference": 0.0722,
           "disparate_impact_ratio": 0.9204,
@@ -266,6 +289,7 @@
           {
             "adequate_sample": true,
             "auc": 0.5873243933588761,
+            "base_rate": 0.4084507042253521,
             "favourable": 267,
             "fpr": 0.5714285714285714,
             "group": "female × rural",
@@ -277,6 +301,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7256319999999998,
+            "base_rate": 0.75,
             "favourable": 447,
             "fpr": 0.728,
             "group": "female × semi_urban",
@@ -288,6 +313,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7378808666323673,
+            "base_rate": 0.8316831683168316,
             "favourable": 668,
             "fpr": 0.773109243697479,
             "group": "female × urban",
@@ -299,6 +325,7 @@
           {
             "adequate_sample": true,
             "auc": 0.707178728365169,
+            "base_rate": 0.7375,
             "favourable": 347,
             "fpr": 0.5238095238095238,
             "group": "male × rural",
@@ -310,6 +337,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7341261550823623,
+            "base_rate": 0.7838283828382838,
             "favourable": 539,
             "fpr": 0.7480916030534351,
             "group": "male × semi_urban",
@@ -321,6 +349,7 @@
           {
             "adequate_sample": true,
             "auc": 0.7390078642922137,
+            "base_rate": 0.8331562167906482,
             "favourable": 885,
             "fpr": 0.802547770700637,
             "group": "male × urban",
@@ -332,6 +361,7 @@
         ],
         "small_subgroups": [],
         "summary": {
+          "base_rate_difference": 0.4247,
           "comparable_groups": 6,
           "demographic_parity_difference": 0.3181,
           "disparate_impact_ratio": 0.6634,

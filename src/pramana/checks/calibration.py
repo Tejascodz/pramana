@@ -6,7 +6,11 @@ import numpy as np
 from sklearn.metrics import brier_score_loss
 
 from pramana.context import AuditContext
-from pramana.metrics import expected_calibration_error, reliability_table
+from pramana.metrics import (
+    adaptive_calibration_error,
+    expected_calibration_error,
+    reliability_table,
+)
 from pramana.registry import register
 from pramana.types import CheckResult, Severity, Status
 
@@ -23,6 +27,9 @@ def reliability(ctx: AuditContext) -> CheckResult:
     limit = ctx.spec.threshold("ece_max")
     min_n = int(ctx.spec.threshold("min_group_size"))
     ece = expected_calibration_error(y, p)
+    # Reported alongside ECE, not graded: it shows when equal-width binning flatters a model
+    # whose scores cluster near 0 or 1.
+    ace = adaptive_calibration_error(y, p)
     brier = float(brier_score_loss(y, np.clip(p, 0, 1)))
 
     group_ece: dict[str, dict[str, float]] = {}
@@ -48,7 +55,10 @@ def reliability(ctx: AuditContext) -> CheckResult:
     else:
         status, severity = Status.PASS, Severity.INFO
 
-    summary = f"Expected calibration error {ece:.3f} (limit {limit}), Brier score {brier:.3f}."
+    summary = (
+        f"Expected calibration error {ece:.3f} (limit {limit}; equal-mass bins {ace:.3f}), "
+        f"Brier score {brier:.3f}."
+    )
     if worst_group:
         summary += f" Worst group: {worst_group[0]}={worst_group[1]} with ECE {worst_group[2]:.3f}."
     return CheckResult(
@@ -64,6 +74,6 @@ def reliability(ctx: AuditContext) -> CheckResult:
             else "Risk scores do not match observed outcome rates closely enough to be read as probabilities."
         ),
         recommendation="Apply isotonic or Platt calibration on a held-out set and re-check per group.",
-        metrics={"ece": round(ece, 4), "brier": round(brier, 4)},
+        metrics={"ece": round(ece, 4), "adaptive_ece": round(ace, 4), "brier": round(brier, 4)},
         details={"reliability": reliability_table(y, p), "group_ece": group_ece},
     )

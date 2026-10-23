@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-275F46",
+  "audit_id": "PRM-20261021-6E6BB8",
   "tool": {
     "name": "pramana",
-    "version": "0.4.2"
+    "version": "0.5.0"
   },
   "system": {
     "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
@@ -31,8 +31,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-10-23T02:38:53+00:00",
-  "finished": "2026-10-23T02:38:56+00:00",
+  "started": "2026-10-23T03:27:42+00:00",
+  "finished": "2026-10-23T03:27:45+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -241,9 +241,12 @@
         "ISO42001:A.5.2",
         "EUAIA:Art-5",
         "EUAIA:Art-6",
-        "INDIA:PILLAR-RISK-MITIGATION"
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
       ],
-      "evidence_hash": "6a5184cde234741db87b9c1115aed79f226dc0d5dfe5025d5927365418155bbd"
+      "evidence_hash": "e18db9b8327cbd185b6b20dc2bf2e2ecc3e7f1585902ca5bf175e251f1f5f8e9"
     },
     {
       "check_id": "data_quality.integrity",
@@ -285,9 +288,10 @@
         "ISO42001:A.7.4",
         "ISO42001:A.7.6",
         "ISO42001:A.4.3",
-        "EUAIA:Art-10"
+        "EUAIA:Art-10",
+        "ISO42005:6.4"
       ],
-      "evidence_hash": "079b4736b70310e2a231f4d42fe330e8356389900f700166ca4f7fbc405adc00"
+      "evidence_hash": "a8c7490eb70e9152e31d411b83adea084aa448deb8a3af1b0becb64894e2b852"
     },
     {
       "check_id": "performance.discrimination",
@@ -331,11 +335,12 @@
       "category": "Performance",
       "status": "pass",
       "severity": "info",
-      "summary": "Expected calibration error 0.031 (limit 0.05), Brier score 0.161. Worst group: age_band=60+ with ECE 0.078.",
+      "summary": "Expected calibration error 0.031 (limit 0.05; equal-mass bins 0.035), Brier score 0.161. Worst group: age_band=60+ with ECE 0.078.",
       "plain_summary": "Risk scores can be read as real probabilities.",
       "recommendation": "Apply isotonic or Platt calibration on a held-out set and re-check per group.",
       "metrics": {
         "ece": 0.031,
+        "adaptive_ece": 0.0353,
         "brier": 0.1612
       },
       "details": {
@@ -426,7 +431,7 @@
         "EUAIA:Art-15",
         "INDIA:SUTRA-UNDERSTANDABLE"
       ],
-      "evidence_hash": "1efd70aa4696e7cbde71f1727b912f305858c48d3a48b609b48f65bb6a9765e9"
+      "evidence_hash": "acc9f40f7deb9b8d4c85a0daa24407bf483ee7247a7f4c73b527d68ea04fb41a"
     },
     {
       "check_id": "fairness.group_parity",
@@ -434,7 +439,7 @@
       "category": "Fairness",
       "status": "fail",
       "severity": "high",
-      "summary": "gender: DI 0.97 (female vs male, p=0.017), EOdds diff 0.04; age_band: DI 0.96 (18-25 vs 60+, p=0.169), EOdds diff 0.03; residence: DI 0.72 (rural vs urban, p=3.11e-71), EOdds diff 0.23. Thresholds: DI >= 0.8, equalized-odds difference <= 0.1.",
+      "summary": "gender: DI 0.97 (female vs male, p=0.017), EOdds diff 0.04; age_band: DI 0.96 (18-25 vs 60+, p=0.169), EOdds diff 0.03; residence: DI 0.72 (rural vs urban, p=3.11e-71), EOdds diff 0.23 (observed outcome rates differ by 0.25 between groups, so equal error rates and calibration cannot both be met; choosing which governs is a policy decision). Thresholds: DI >= 0.8, equalized-odds difference <= 0.1.",
       "plain_summary": "Applicants in the 'rural' group (residence) receive a favourable outcome 68% of the time versus 94% for 'urban', below the four-fifths benchmark.",
       "recommendation": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence.",
       "metrics": {
@@ -459,7 +464,8 @@
                 "tpr": 0.9278803869832893,
                 "fpr": 0.6592741935483871,
                 "auc": 0.7616410616506369,
-                "mean_score": 0.7401451815626288
+                "mean_score": 0.7401451815626288,
+                "base_rate": 0.6962645437844458
               },
               {
                 "group": "male",
@@ -470,7 +476,8 @@
                 "tpr": 0.9181649101053937,
                 "fpr": 0.7004830917874396,
                 "auc": 0.7316339763575539,
-                "mean_score": 0.7626297187891234
+                "mean_score": 0.7626297187891234,
+                "base_rate": 0.7957572767636902
               }
             ],
             "summary": {
@@ -481,7 +488,8 @@
               "demographic_parity_difference": 0.0274,
               "equal_opportunity_difference": 0.0097,
               "equalized_odds_difference": 0.0412,
-              "p_value": 0.017025043464364786
+              "p_value": 0.017025043464364786,
+              "base_rate_difference": 0.0995
             },
             "status": "pass"
           },
@@ -496,7 +504,8 @@
                 "tpr": 0.9048582995951417,
                 "fpr": 0.678391959798995,
                 "auc": 0.7272496083657153,
-                "mean_score": 0.7223760707576028
+                "mean_score": 0.7223760707576028,
+                "base_rate": 0.7128427128427128
               },
               {
                 "group": "26-40",
@@ -507,7 +516,8 @@
                 "tpr": 0.9295546558704454,
                 "fpr": 0.6650366748166259,
                 "auc": 0.7513180166892688,
-                "mean_score": 0.7574275036004765
+                "mean_score": 0.7574275036004765,
+                "base_rate": 0.7512165450121655
               },
               {
                 "group": "41-60",
@@ -518,7 +528,8 @@
                 "tpr": 0.9186602870813397,
                 "fpr": 0.6967213114754098,
                 "auc": 0.7564220723193975,
-                "mean_score": 0.7618502560867529
+                "mean_score": 0.7618502560867529,
+                "base_rate": 0.774074074074074
               },
               {
                 "group": "60+",
@@ -529,7 +540,8 @@
                 "tpr": 0.9351351351351351,
                 "fpr": 0.6896551724137931,
                 "auc": 0.7229263746505126,
-                "mean_score": 0.7649868804503316
+                "mean_score": 0.7649868804503316,
+                "base_rate": 0.7613168724279835
               }
             ],
             "summary": {
@@ -540,7 +552,8 @@
               "demographic_parity_difference": 0.0367,
               "equal_opportunity_difference": 0.0303,
               "equalized_odds_difference": 0.0317,
-              "p_value": 0.16857071945394242
+              "p_value": 0.16857071945394242,
+              "base_rate_difference": 0.0612
             },
             "status": "pass"
           },
@@ -555,7 +568,8 @@
                 "tpr": 0.7651515151515151,
                 "fpr": 0.5555555555555556,
                 "auc": 0.6523067981401314,
-                "mean_score": 0.5960711278733413
+                "mean_score": 0.5960711278733413,
+                "base_rate": 0.5827814569536424
               },
               {
                 "group": "semi_urban",
@@ -566,7 +580,8 @@
                 "tpr": 0.9376470588235294,
                 "fpr": 0.73828125,
                 "auc": 0.7307950367647059,
-                "mean_score": 0.7625987839994588
+                "mean_score": 0.7625987839994588,
+                "base_rate": 0.7685352622061483
               },
               {
                 "group": "urban",
@@ -577,7 +592,8 @@
                 "tpr": 0.9730320699708455,
                 "fpr": 0.7898550724637681,
                 "auc": 0.7376911944902185,
-                "mean_score": 0.8319373935198282
+                "mean_score": 0.8319373935198282,
+                "base_rate": 0.8325242718446602
               }
             ],
             "summary": {
@@ -588,7 +604,8 @@
               "demographic_parity_difference": 0.2647,
               "equal_opportunity_difference": 0.2079,
               "equalized_odds_difference": 0.2343,
-              "p_value": 3.1060747046243966e-71
+              "p_value": 3.1060747046243966e-71,
+              "base_rate_difference": 0.2497
             },
             "status": "fail"
           }
@@ -601,9 +618,10 @@
         "ISO42001:A.7.4",
         "EUAIA:Art-10",
         "INDIA:SUTRA-FAIRNESS",
-        "NIST-GAI:HARMFUL-BIAS"
+        "NIST-GAI:HARMFUL-BIAS",
+        "ISO42005:6.8.2"
       ],
-      "evidence_hash": "26f88bb4c5768c800571a7e6e88209c6fba44cfe1832a61f7310670d6e8301fa"
+      "evidence_hash": "9a9536e6189b69ab85ce8056eff71ef1cc7f978554065530c55bbbf765c3753d"
     },
     {
       "check_id": "fairness.intersectional",
@@ -631,7 +649,8 @@
                 "tpr": 0.9241706161137441,
                 "fpr": 0.6666666666666666,
                 "auc": 0.7614533965244865,
-                "mean_score": 0.7175119411532602
+                "mean_score": 0.7175119411532602,
+                "base_rate": 0.6806451612903226
               },
               {
                 "group": "female \u00d7 26-40",
@@ -642,7 +661,8 @@
                 "tpr": 0.9362934362934363,
                 "fpr": 0.6394849785407726,
                 "auc": 0.7566324755165956,
-                "mean_score": 0.7398297800856447
+                "mean_score": 0.7398297800856447,
+                "base_rate": 0.6897470039946738
               },
               {
                 "group": "female \u00d7 41-60",
@@ -653,7 +673,8 @@
                 "tpr": 0.913946587537092,
                 "fpr": 0.7045454545454546,
                 "auc": 0.7559347181008903,
-                "mean_score": 0.7554868143044214
+                "mean_score": 0.7554868143044214,
+                "base_rate": 0.7185501066098081
               },
               {
                 "group": "female \u00d7 60+",
@@ -664,7 +685,8 @@
                 "tpr": 0.9436619718309859,
                 "fpr": 0.59375,
                 "auc": 0.8169014084507041,
-                "mean_score": 0.740707757098728
+                "mean_score": 0.740707757098728,
+                "base_rate": 0.6893203883495146
               },
               {
                 "group": "male \u00d7 18-25",
@@ -675,7 +697,8 @@
                 "tpr": 0.8904593639575972,
                 "fpr": 0.69,
                 "auc": 0.697243816254417,
-                "mean_score": 0.7263130947193419
+                "mean_score": 0.7263130947193419,
+                "base_rate": 0.7389033942558747
               },
               {
                 "group": "male \u00d7 26-40",
@@ -686,7 +709,8 @@
                 "tpr": 0.9246861924686193,
                 "fpr": 0.6988636363636364,
                 "auc": 0.7424004691264106,
-                "mean_score": 0.7722269328945848
+                "mean_score": 0.7722269328945848,
+                "base_rate": 0.8029115341545353
               },
               {
                 "group": "male \u00d7 41-60",
@@ -697,7 +721,8 @@
                 "tpr": 0.9218436873747495,
                 "fpr": 0.6875,
                 "auc": 0.7589822502147152,
-                "mean_score": 0.7667347965055965
+                "mean_score": 0.7667347965055965,
+                "base_rate": 0.8166939443535188
               },
               {
                 "group": "male \u00d7 60+",
@@ -708,7 +733,8 @@
                 "tpr": 0.9298245614035088,
                 "fpr": 0.8076923076923077,
                 "auc": 0.6174089068825911,
-                "mean_score": 0.7828493783447257
+                "mean_score": 0.7828493783447257,
+                "base_rate": 0.8142857142857143
               }
             ],
             "summary": {
@@ -720,6 +746,7 @@
               "equal_opportunity_difference": 0.0532,
               "equalized_odds_difference": 0.2139,
               "p_value": 0.09092814778957198,
+              "base_rate_difference": 0.136,
               "marginal_min_di": 0.9581
             },
             "small_subgroups": []
@@ -735,7 +762,8 @@
                 "tpr": 0.7068965517241379,
                 "fpr": 0.5714285714285714,
                 "auc": 0.5873243933588761,
-                "mean_score": 0.5728863145461569
+                "mean_score": 0.5728863145461569,
+                "base_rate": 0.4084507042253521
               },
               {
                 "group": "female \u00d7 semi_urban",
@@ -746,7 +774,8 @@
                 "tpr": 0.9493333333333334,
                 "fpr": 0.728,
                 "auc": 0.7256319999999998,
-                "mean_score": 0.7611065825901134
+                "mean_score": 0.7611065825901134,
+                "base_rate": 0.75
               },
               {
                 "group": "female \u00d7 urban",
@@ -757,7 +786,8 @@
                 "tpr": 0.9795918367346939,
                 "fpr": 0.773109243697479,
                 "auc": 0.7378808666323673,
-                "mean_score": 0.8261021502122392
+                "mean_score": 0.8261021502122392,
+                "base_rate": 0.8316831683168316
               },
               {
                 "group": "male \u00d7 rural",
@@ -768,7 +798,8 @@
                 "tpr": 0.7937853107344632,
                 "fpr": 0.5238095238095238,
                 "auc": 0.707178728365169,
-                "mean_score": 0.6166476497012174
+                "mean_score": 0.6166476497012174,
+                "base_rate": 0.7375
               },
               {
                 "group": "male \u00d7 semi_urban",
@@ -779,7 +810,8 @@
                 "tpr": 0.9284210526315789,
                 "fpr": 0.7480916030534351,
                 "auc": 0.7341261550823623,
-                "mean_score": 0.763829973281097
+                "mean_score": 0.763829973281097,
+                "base_rate": 0.7838283828382838
               },
               {
                 "group": "male \u00d7 urban",
@@ -790,7 +822,8 @@
                 "tpr": 0.9681122448979592,
                 "fpr": 0.802547770700637,
                 "auc": 0.7390078642922137,
-                "mean_score": 0.836321577386423
+                "mean_score": 0.836321577386423,
+                "base_rate": 0.8331562167906482
               }
             ],
             "summary": {
@@ -802,6 +835,7 @@
               "equal_opportunity_difference": 0.2727,
               "equalized_odds_difference": 0.2787,
               "p_value": 1.8595833165257757e-42,
+              "base_rate_difference": 0.4247,
               "marginal_min_di": 0.7192
             },
             "small_subgroups": []
@@ -817,7 +851,8 @@
                 "tpr": 0.7142857142857143,
                 "fpr": 0.5142857142857142,
                 "auc": 0.6502915451895044,
-                "mean_score": 0.5725703471358736
+                "mean_score": 0.5725703471358736,
+                "base_rate": 0.5833333333333334
               },
               {
                 "group": "18-25 \u00d7 semi_urban",
@@ -828,7 +863,8 @@
                 "tpr": 0.9290322580645162,
                 "fpr": 0.734375,
                 "auc": 0.7439516129032256,
-                "mean_score": 0.7245046523344797
+                "mean_score": 0.7245046523344797,
+                "base_rate": 0.7077625570776256
               },
               {
                 "group": "18-25 \u00d7 urban",
@@ -839,7 +875,8 @@
                 "tpr": 0.966804979253112,
                 "fpr": 0.8,
                 "auc": 0.6932652409830833,
-                "mean_score": 0.8030989537743167
+                "mean_score": 0.8030989537743167,
+                "base_rate": 0.7875816993464052
               },
               {
                 "group": "26-40 \u00d7 rural",
@@ -850,7 +887,8 @@
                 "tpr": 0.793859649122807,
                 "fpr": 0.5414364640883977,
                 "auc": 0.6722884559464961,
-                "mean_score": 0.6004010012699342
+                "mean_score": 0.6004010012699342,
+                "base_rate": 0.5574572127139364
               },
               {
                 "group": "26-40 \u00d7 semi_urban",
@@ -861,7 +899,8 @@
                 "tpr": 0.9401041666666666,
                 "fpr": 0.7413793103448276,
                 "auc": 0.717425466954023,
-                "mean_score": 0.7643331602008278
+                "mean_score": 0.7643331602008278,
+                "base_rate": 0.768
               },
               {
                 "group": "26-40 \u00d7 urban",
@@ -872,7 +911,8 @@
                 "tpr": 0.9727126805778491,
                 "fpr": 0.7857142857142857,
                 "auc": 0.7209642283879845,
-                "mean_score": 0.8401091514277091
+                "mean_score": 0.8401091514277091,
+                "base_rate": 0.8476190476190476
               },
               {
                 "group": "41-60 \u00d7 rural",
@@ -883,7 +923,8 @@
                 "tpr": 0.75625,
                 "fpr": 0.5849056603773585,
                 "auc": 0.6608490566037738,
-                "mean_score": 0.599704075721838
+                "mean_score": 0.599704075721838,
+                "base_rate": 0.6015037593984962
               },
               {
                 "group": "41-60 \u00d7 semi_urban",
@@ -894,7 +935,8 @@
                 "tpr": 0.9333333333333333,
                 "fpr": 0.7777777777777778,
                 "auc": 0.7170868347338936,
-                "mean_score": 0.781363367053855
+                "mean_score": 0.781363367053855,
+                "base_rate": 0.8018867924528302
               },
               {
                 "group": "41-60 \u00d7 urban",
@@ -905,7 +947,8 @@
                 "tpr": 0.9714964370546318,
                 "fpr": 0.7866666666666666,
                 "auc": 0.7634837688044338,
-                "mean_score": 0.8362972615091903
+                "mean_score": 0.8362972615091903,
+                "base_rate": 0.8487903225806451
               },
               {
                 "group": "60+ \u00d7 rural",
@@ -916,7 +959,8 @@
                 "tpr": 0.7619047619047619,
                 "fpr": 0.6666666666666666,
                 "auc": 0.47959183673469385,
-                "mean_score": 0.6152909503652139
+                "mean_score": 0.6152909503652139,
+                "base_rate": 0.6666666666666666
               },
               {
                 "group": "60+ \u00d7 semi_urban",
@@ -927,7 +971,8 @@
                 "tpr": 0.9642857142857143,
                 "fpr": 0.5384615384615384,
                 "auc": 0.7651098901098901,
-                "mean_score": 0.7844580495450818
+                "mean_score": 0.7844580495450818,
+                "base_rate": 0.8115942028985508
               },
               {
                 "group": "60+ \u00d7 urban",
@@ -938,7 +983,8 @@
                 "tpr": 1.0,
                 "fpr": 0.7916666666666666,
                 "auc": 0.8055555555555556,
-                "mean_score": 0.8378457356559593
+                "mean_score": 0.8378457356559593,
+                "base_rate": 0.7837837837837838
               }
             ],
             "summary": {
@@ -950,6 +996,7 @@
               "equal_opportunity_difference": 0.2857,
               "equalized_odds_difference": 0.2857,
               "p_value": 5.610740178662765e-10,
+              "base_rate_difference": 0.2913,
               "marginal_min_di": 0.7192
             },
             "small_subgroups": []
@@ -960,9 +1007,10 @@
         "NIST:MEASURE-2.11",
         "ISO42001:A.5.4",
         "EUAIA:Art-10",
-        "INDIA:SUTRA-FAIRNESS"
+        "INDIA:SUTRA-FAIRNESS",
+        "ISO42005:6.8.2"
       ],
-      "evidence_hash": "05576416040cd6a614cdf5ca7bc7f8bafd9eb6458680d2dbd203a04a43b549b2"
+      "evidence_hash": "db883c5a791651b2663d125f5383c2b302ce9ecf1509defcd3973a9f40f90f54"
     },
     {
       "check_id": "fairness.proxy_features",
@@ -970,7 +1018,7 @@
       "category": "Fairness",
       "status": "fail",
       "severity": "high",
-      "summary": "5 feature/attribute pairs exceed proxy AUC 0.7: pincode_risk_band\u2192residence (AUC 0.99), monthly_income\u2192residence (AUC 0.85), credit_history_months\u2192age_band (AUC 0.83), loan_amount\u2192residence (AUC 0.76), employment_type\u2192residence (AUC 0.73).",
+      "summary": "5 feature/attribute pairs exceed proxy AUC 0.7: pincode_risk_band\u2192residence (AUC 0.99), monthly_income\u2192residence (AUC 0.85), credit_history_months\u2192age_band (AUC 0.83), loan_amount\u2192residence (AUC 0.76), employment_type\u2192residence (AUC 0.72).",
       "plain_summary": "Some inputs (e.g. 'pincode_risk_band') closely track 'residence', so the model can discriminate indirectly even though that attribute is excluded.",
       "recommendation": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them.",
       "metrics": {
@@ -982,7 +1030,7 @@
           {
             "feature": "pincode_risk_band",
             "attribute": "residence",
-            "auc": 0.9882
+            "auc": 0.9875
           },
           {
             "feature": "monthly_income",
@@ -1002,7 +1050,7 @@
           {
             "feature": "employment_type",
             "attribute": "residence",
-            "auc": 0.7252
+            "auc": 0.7188
           }
         ],
         "matrix": {
@@ -1012,14 +1060,14 @@
             "residence": 0.846
           },
           "employment_type": {
-            "gender": 0.6151,
-            "age_band": 0.5387,
-            "residence": 0.7252
+            "gender": 0.6013,
+            "age_band": 0.5441,
+            "residence": 0.7188
           },
           "pincode_risk_band": {
-            "gender": 0.5196,
-            "age_band": 0.5323,
-            "residence": 0.9882
+            "gender": 0.511,
+            "age_band": 0.5413,
+            "residence": 0.9875
           },
           "credit_history_months": {
             "gender": 0.5065,
@@ -1061,7 +1109,7 @@
         "EUAIA:Art-10",
         "INDIA:SUTRA-FAIRNESS"
       ],
-      "evidence_hash": "cbdbf1ce1d852cb908aec559a8bcc350980778891830f11d6001191abc9cde41"
+      "evidence_hash": "1d4b4e76a5add583bd6370d0a6746dc2aaeeff8d4108f1666fa83bcec0d728f1"
     },
     {
       "check_id": "robustness.perturbation",
@@ -1121,9 +1169,10 @@
         "NIST:MEASURE-2.6",
         "ISO42001:A.6.2.4",
         "EUAIA:Art-15",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
       ],
-      "evidence_hash": "102c1a952d2e00fc0e8005cfe3865386700e43c4fd036c1b7888e79fbbea4e99"
+      "evidence_hash": "a134c131062297d64480d1f6ad8f1a4009627caf5f6d637b39822e68e9935e33"
     },
     {
       "check_id": "drift.population_stability",
@@ -1210,9 +1259,10 @@
         "NIST:MANAGE-2.2",
         "ISO42001:A.6.2.6",
         "EUAIA:Art-72",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:5.12"
       ],
-      "evidence_hash": "bd769b3095cfd4dfc7c48867afb74c6db68031efa8b399210f6eeb25917f337d"
+      "evidence_hash": "98dcb771f453a98bb5b652275aaa746fae7f6f23cb456faa548e7a47c4aa4c02"
     },
     {
       "check_id": "explainability.feature_importance",
@@ -1374,12 +1424,14 @@
       "category": "Privacy",
       "status": "pass",
       "severity": "info",
-      "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows.",
+      "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.6% of training rows (5% FPR: 6.5%).",
       "plain_summary": "The model does not reveal who was in its training data beyond chance level.",
       "recommendation": "Reduce overfitting (regularisation, fewer trees, early stopping) or train with differential privacy, then re-run this test.",
       "metrics": {
         "attack_auc": 0.5672,
-        "membership_advantage": 0.1345
+        "membership_advantage": 0.1345,
+        "tpr_at_1pct_fpr": 0.0156,
+        "tpr_at_5pct_fpr": 0.0648
       },
       "details": {},
       "controls": [
@@ -1389,7 +1441,7 @@
         "EUAIA:Art-15",
         "INDIA:DPDP-2023"
       ],
-      "evidence_hash": "4a13f32e0f0288d47946d55bf16608924e80b9bba7ac3ecaf2f07ef6e4c5b2a3"
+      "evidence_hash": "b85bc0a0e46a774097ddec29967c45dc26bcbc734dfc6f1acd615aa886c08f8e"
     },
     {
       "check_id": "documentation.model_card",
@@ -1426,9 +1478,12 @@
         "EUAIA:Art-13",
         "EUAIA:Art-14",
         "INDIA:SUTRA-UNDERSTANDABLE",
-        "INDIA:SUTRA-ACCOUNTABILITY"
+        "INDIA:SUTRA-ACCOUNTABILITY",
+        "ISO42005:6.3.4",
+        "ISO42005:6.3.5",
+        "ISO42005:6.5"
       ],
-      "evidence_hash": "c578733c05090db7bd6f424e8bec16bc384dcbf5e756c1c4da26de0663af778d"
+      "evidence_hash": "48a2e236a6aa4d42038353faef8fd55ab70c901ef3aa5a1366259f3bebea9774"
     },
     {
       "check_id": "audit.detector_sensitivity",
@@ -1507,9 +1562,13 @@
         "NIST:MANAGE-1.4",
         "ISO42001:A.5.3",
         "EUAIA:Art-9",
-        "INDIA:PILLAR-RISK-MITIGATION"
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.8",
+        "ISO42005:5.9",
+        "ISO42005:5.10",
+        "ISO42005:5.11"
       ],
-      "evidence_hash": "9c9e7b56ef29d8bd62946cde45a4d27313e39e526ad8f1c18c9b329fb6219624"
+      "evidence_hash": "a28eafc155811610daddeb9dce08a1604209674831b9d5afd92bb5a5e4d45f52"
     }
   ],
   "risks": [
@@ -1535,7 +1594,10 @@
         "EUAIA:Art-13",
         "EUAIA:Art-14",
         "INDIA:SUTRA-UNDERSTANDABLE",
-        "INDIA:SUTRA-ACCOUNTABILITY"
+        "INDIA:SUTRA-ACCOUNTABILITY",
+        "ISO42005:6.3.4",
+        "ISO42005:6.3.5",
+        "ISO42005:6.5"
       ],
       "accepted": false,
       "acceptance": null,
@@ -1559,7 +1621,8 @@
         "ISO42001:A.7.4",
         "EUAIA:Art-10",
         "INDIA:SUTRA-FAIRNESS",
-        "NIST-GAI:HARMFUL-BIAS"
+        "NIST-GAI:HARMFUL-BIAS",
+        "ISO42005:6.8.2"
       ],
       "accepted": false,
       "acceptance": null,
@@ -1580,7 +1643,8 @@
         "NIST:MEASURE-2.11",
         "ISO42001:A.5.4",
         "EUAIA:Art-10",
-        "INDIA:SUTRA-FAIRNESS"
+        "INDIA:SUTRA-FAIRNESS",
+        "ISO42005:6.8.2"
       ],
       "accepted": false,
       "acceptance": null,
@@ -1629,7 +1693,10 @@
         "ISO42001:A.5.2",
         "EUAIA:Art-5",
         "EUAIA:Art-6",
-        "INDIA:PILLAR-RISK-MITIGATION"
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
       ],
       "accepted": false,
       "acceptance": null,
@@ -1699,7 +1766,8 @@
         "NIST:MANAGE-2.2",
         "ISO42001:A.6.2.6",
         "EUAIA:Art-72",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:5.12"
       ],
       "accepted": false,
       "acceptance": null,
@@ -1738,7 +1806,8 @@
         "NIST:MEASURE-2.6",
         "ISO42001:A.6.2.4",
         "EUAIA:Art-15",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
       ],
       "accepted": false,
       "acceptance": null,
@@ -1785,7 +1854,8 @@
         "ISO42001:A.7.4",
         "ISO42001:A.7.6",
         "ISO42001:A.4.3",
-        "EUAIA:Art-10"
+        "EUAIA:Art-10",
+        "ISO42005:6.4"
       ],
       "accepted": true,
       "acceptance": {
@@ -1813,7 +1883,10 @@
         "ISO42001:A.5.2",
         "EUAIA:Art-5",
         "EUAIA:Art-6",
-        "INDIA:PILLAR-RISK-MITIGATION"
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
       ]
     },
     {
@@ -1827,7 +1900,8 @@
         "ISO42001:A.7.4",
         "ISO42001:A.7.6",
         "ISO42001:A.4.3",
-        "EUAIA:Art-10"
+        "EUAIA:Art-10",
+        "ISO42005:6.4"
       ]
     },
     {
@@ -1870,7 +1944,8 @@
         "ISO42001:A.7.4",
         "EUAIA:Art-10",
         "INDIA:SUTRA-FAIRNESS",
-        "NIST-GAI:HARMFUL-BIAS"
+        "NIST-GAI:HARMFUL-BIAS",
+        "ISO42005:6.8.2"
       ]
     },
     {
@@ -1882,7 +1957,8 @@
         "NIST:MEASURE-2.11",
         "ISO42001:A.5.4",
         "EUAIA:Art-10",
-        "INDIA:SUTRA-FAIRNESS"
+        "INDIA:SUTRA-FAIRNESS",
+        "ISO42005:6.8.2"
       ]
     },
     {
@@ -1910,7 +1986,8 @@
         "NIST:MEASURE-2.6",
         "ISO42001:A.6.2.4",
         "EUAIA:Art-15",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
       ]
     },
     {
@@ -1925,7 +2002,8 @@
         "NIST:MANAGE-2.2",
         "ISO42001:A.6.2.6",
         "EUAIA:Art-72",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:5.12"
       ]
     },
     {
@@ -1986,7 +2064,10 @@
         "EUAIA:Art-13",
         "EUAIA:Art-14",
         "INDIA:SUTRA-UNDERSTANDABLE",
-        "INDIA:SUTRA-ACCOUNTABILITY"
+        "INDIA:SUTRA-ACCOUNTABILITY",
+        "ISO42005:6.3.4",
+        "ISO42005:6.3.5",
+        "ISO42005:6.5"
       ]
     },
     {
@@ -3914,6 +3995,309 @@
         "state": "not applicable",
         "checks": [],
         "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI01",
+        "framework": "OWASP-ASI",
+        "id": "ASI01",
+        "group": "Top 10",
+        "title": "Agent goal hijack",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI02",
+        "framework": "OWASP-ASI",
+        "id": "ASI02",
+        "group": "Top 10",
+        "title": "Tool misuse and exploitation",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI03",
+        "framework": "OWASP-ASI",
+        "id": "ASI03",
+        "group": "Top 10",
+        "title": "Identity and privilege abuse",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI04",
+        "framework": "OWASP-ASI",
+        "id": "ASI04",
+        "group": "Top 10",
+        "title": "Agentic supply chain vulnerabilities",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI05",
+        "framework": "OWASP-ASI",
+        "id": "ASI05",
+        "group": "Top 10",
+        "title": "Unexpected code execution (RCE)",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI06",
+        "framework": "OWASP-ASI",
+        "id": "ASI06",
+        "group": "Top 10",
+        "title": "Memory and context poisoning",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI07",
+        "framework": "OWASP-ASI",
+        "id": "ASI07",
+        "group": "Top 10",
+        "title": "Insecure inter-agent communication",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI08",
+        "framework": "OWASP-ASI",
+        "id": "ASI08",
+        "group": "Top 10",
+        "title": "Cascading failures",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI09",
+        "framework": "OWASP-ASI",
+        "id": "ASI09",
+        "group": "Top 10",
+        "title": "Human-agent trust exploitation",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI10",
+        "framework": "OWASP-ASI",
+        "id": "ASI10",
+        "group": "Top 10",
+        "title": "Rogue agents",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.4",
+        "framework": "ISO42005",
+        "id": "5.4",
+        "group": "5 Assessment process",
+        "title": "Timing of AI system impact assessment",
+        "evidence_type": "organizational",
+        "state": "deficient",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.5",
+        "framework": "ISO42005",
+        "id": "5.5",
+        "group": "5 Assessment process",
+        "title": "Scope of the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "deficient",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.6",
+        "framework": "ISO42005",
+        "id": "5.6",
+        "group": "5 Assessment process",
+        "title": "Allocating responsibilities",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.8",
+        "framework": "ISO42005",
+        "id": "5.8",
+        "group": "5 Assessment process",
+        "title": "Performing the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.9",
+        "framework": "ISO42005",
+        "id": "5.9",
+        "group": "5 Assessment process",
+        "title": "Analysing the results of the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.10",
+        "framework": "ISO42005",
+        "id": "5.10",
+        "group": "5 Assessment process",
+        "title": "Recording and reporting",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.11",
+        "framework": "ISO42005",
+        "id": "5.11",
+        "group": "5 Assessment process",
+        "title": "Approval process",
+        "evidence_type": "organizational",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.12",
+        "framework": "ISO42005",
+        "id": "5.12",
+        "group": "5 Assessment process",
+        "title": "Monitoring and review",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.3.4",
+        "framework": "ISO42005",
+        "id": "6.3.4",
+        "group": "6 Assessment content",
+        "title": "Intended use",
+        "evidence_type": "both",
+        "state": "deficient",
+        "checks": [
+          "governance.risk_classification",
+          "documentation.model_card"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.3.5",
+        "framework": "ISO42005",
+        "id": "6.3.5",
+        "group": "6 Assessment content",
+        "title": "Unintended uses",
+        "evidence_type": "both",
+        "state": "deficient",
+        "checks": [
+          "documentation.model_card"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.4",
+        "framework": "ISO42005",
+        "id": "6.4",
+        "group": "6 Assessment content",
+        "title": "Data information and quality",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "data_quality.integrity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.5",
+        "framework": "ISO42005",
+        "id": "6.5",
+        "group": "6 Assessment content",
+        "title": "Algorithm and model information",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "documentation.model_card"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.7",
+        "framework": "ISO42005",
+        "id": "6.7",
+        "group": "6 Assessment content",
+        "title": "Relevant interested parties",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.8.2",
+        "framework": "ISO42005",
+        "id": "6.8.2",
+        "group": "6 Assessment content",
+        "title": "Benefits and harms",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "fairness.group_parity",
+          "fairness.intersectional"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.8.3",
+        "framework": "ISO42005",
+        "id": "6.8.3",
+        "group": "6 Assessment content",
+        "title": "AI system failures and reasonably foreseeable misuse",
+        "evidence_type": "technical",
+        "state": "partial",
+        "checks": [
+          "robustness.perturbation"
+        ],
+        "manual_evidence": []
       }
     ],
     "frameworks": {
@@ -4188,6 +4572,57 @@
             "not applicable": 10
           }
         }
+      },
+      "OWASP-ASI": {
+        "name": "OWASP Top 10 for Agentic Applications",
+        "version": "2026",
+        "source": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+        "group_label": "Category",
+        "totals": {
+          "evidenced": 0,
+          "partial": 0,
+          "deficient": 0,
+          "not tested": 0,
+          "not applicable": 10
+        },
+        "groups": {
+          "Top 10": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 0,
+            "not applicable": 10
+          }
+        }
+      },
+      "ISO42005": {
+        "name": "ISO/IEC 42005 AI system impact assessment",
+        "version": "2025",
+        "source": "https://www.iso.org/standard/42005",
+        "group_label": "Clause",
+        "totals": {
+          "evidenced": 5,
+          "partial": 2,
+          "deficient": 6,
+          "not tested": 2,
+          "not applicable": 0
+        },
+        "groups": {
+          "5 Assessment process": {
+            "evidenced": 4,
+            "partial": 1,
+            "deficient": 2,
+            "not tested": 1,
+            "not applicable": 0
+          },
+          "6 Assessment content": {
+            "evidenced": 1,
+            "partial": 1,
+            "deficient": 4,
+            "not tested": 1,
+            "not applicable": 0
+          }
+        }
       }
     }
   },
@@ -4210,7 +4645,10 @@
         "EUAIA:Art-13",
         "EUAIA:Art-14",
         "INDIA:SUTRA-UNDERSTANDABLE",
-        "INDIA:SUTRA-ACCOUNTABILITY"
+        "INDIA:SUTRA-ACCOUNTABILITY",
+        "ISO42005:6.3.4",
+        "ISO42005:6.3.5",
+        "ISO42005:6.5"
       ]
     },
     {
@@ -4226,7 +4664,8 @@
         "ISO42001:A.7.4",
         "EUAIA:Art-10",
         "INDIA:SUTRA-FAIRNESS",
-        "NIST-GAI:HARMFUL-BIAS"
+        "NIST-GAI:HARMFUL-BIAS",
+        "ISO42005:6.8.2"
       ]
     },
     {
@@ -4239,7 +4678,8 @@
         "NIST:MEASURE-2.11",
         "ISO42001:A.5.4",
         "EUAIA:Art-10",
-        "INDIA:SUTRA-FAIRNESS"
+        "INDIA:SUTRA-FAIRNESS",
+        "ISO42005:6.8.2"
       ]
     },
     {
@@ -4272,7 +4712,10 @@
         "ISO42001:A.5.2",
         "EUAIA:Art-5",
         "EUAIA:Art-6",
-        "INDIA:PILLAR-RISK-MITIGATION"
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
       ]
     },
     {
@@ -4318,7 +4761,8 @@
         "NIST:MANAGE-2.2",
         "ISO42001:A.6.2.6",
         "EUAIA:Art-72",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:5.12"
       ]
     },
     {
@@ -4341,7 +4785,8 @@
         "NIST:MEASURE-2.6",
         "ISO42001:A.6.2.4",
         "EUAIA:Art-15",
-        "INDIA:SUTRA-SAFETY"
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
       ]
     },
     {
@@ -4431,9 +4876,9 @@
     }
   ],
   "llm_run": {},
-  "ledger_root": "af3fc7ef4191e270e0b54a94ddd0fb4fd411fa57968192d75a264739246f6d3d",
+  "ledger_root": "008d4715f87388ea1591cd0cbde2871eb880a5b7ed19dd78d82612d2999703ec",
   "environment": {
     "python": "3.13.16",
-    "pramana": "0.4.2"
+    "pramana": "0.5.0"
   }
 }

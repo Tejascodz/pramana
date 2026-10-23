@@ -54,7 +54,11 @@ def _cmd_run(args: argparse.Namespace) -> int:
     audit_date = date.fromisoformat(args.date) if args.date else None
 
     print(f"Pramana {__version__}: auditing {spec.name} v{spec.system['version']}")
-    result = run_audit(spec, out, audit_date=audit_date)
+    try:
+        result = run_audit(spec, out, audit_date=audit_date)
+    except SpecError as exc:  # includes ArtifactIntegrityError for a pinned hash mismatch
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
     paths = write_outputs(result, out, ledger=result.ledger)
 
     width = max(len(r.check_id) for r in result.results)
@@ -170,6 +174,9 @@ def _signing_key(path: str | None) -> bytes:
         return Path(path).read_bytes()
     pem = os.environ.get(KEY_ENV)
     if pem:
+        # Some secret stores keep a multi-line PEM as one line with literal "\n".
+        if "\\n" in pem and "\n" not in pem:
+            pem = pem.replace("\\n", "\n")
         return pem.encode("utf-8")
     default = DEFAULT_KEY_DIR / "pramana_ed25519.key"
     if default.exists():
@@ -403,19 +410,13 @@ def _cmd_init(args: argparse.Namespace) -> int:
 
 def _cmd_scan_trace(args: argparse.Namespace) -> int:
     from pramana.adapters.traces import stream_events
-    from pramana.checks.agent_trace import IRREVERSIBLE_TOOL, scan_misalignment
+    from pramana.checks.agent_trace import scan_misalignment, session_conditions
 
     source = Path(args.source)
     if not source.exists():
         print(f"error: {source} not found", file=sys.stderr)
         return EXIT_INPUT
     extra_tools = set(args.high_impact_tool or [])
-
-    def irreversible(event: dict) -> bool:
-        tool = str(event.get("tool", ""))
-        return event.get("type") == "tool_call" and (
-            tool in extra_tools or bool(IRREVERSIBLE_TOOL.search(tool))
-        )
 
     counts: dict[str, int] = {}
     signals: list[dict] = []
@@ -427,20 +428,28 @@ def _cmd_scan_trace(args: argparse.Namespace) -> int:
             for signal in scan_misalignment([event]):
                 counts[signal["pattern"]] = counts.get(signal["pattern"], 0) + 1
                 signals.append(signal)
-        # Pass 2: for the flagged sessions only, look for an irreversible action. Memory
-        # grows with the number of signals, never with the size of the log.
-        flagged = {s["session_id"] for s in signals}
-        capable: set = set()
+        # Pass 2: re-read only the flagged sessions (plus approvals) and judge capability and
+        # a permissive environment there. Memory grows with the flagged sessions, never with
+        # the size of the log. Without a spec there is no allowlist, so only missing approvals
+        # count as permissive.
+        flagged = {str(s["session_id"]) for s in signals if s.get("session_id") not in (None, "")}
+        capable: set[str] = set()
+        permissive: dict[str, list[str]] = {}
         if flagged:
-            for event in stream_events(source, args.format):
-                if event.get("session_id") in flagged and irreversible(event):
-                    capable.add(event.get("session_id"))
+            kept = [
+                e
+                for e in stream_events(source, args.format)
+                if str(e.get("session_id")) in flagged or e.get("type") == "approval"
+            ]
+            capable, permissive = session_conditions(kept, {}, None, extra_tools)
     except (ValueError, json.JSONDecodeError) as exc:
         print(f"error: could not stream {source} as {args.format}: {exc}", file=sys.stderr)
         return EXIT_INPUT
 
     for signal in signals:
-        signal["with_capability"] = signal["session_id"] in capable
+        sid = signal.get("session_id")
+        signal["with_capability"] = sid is not None and str(sid) in capable
+        signal["permissive_environment"] = sid is not None and str(sid) in permissive
     lines = [json.dumps(signal, ensure_ascii=False) for signal in signals]
     if args.out:
         Path(args.out).write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
@@ -449,13 +458,20 @@ def _cmd_scan_trace(args: argparse.Namespace) -> int:
             print(line)
 
     summary = ", ".join(f"{k} {v}" for k, v in sorted(counts.items())) or "none"
-    cooccur = sorted(str(c) for c in capable)
+    cooccur = sorted(capable)
+    triad = [s for s in cooccur if s in permissive]
     print(
         f"Scanned {events} events; {len(signals)} misalignment signal(s): {summary}."
         + (
             f" {len(cooccur)} session(s) pair a signal with an irreversible action: "
             f"{', '.join(cooccur)}."
             if cooccur
+            else ""
+        )
+        + (
+            f" {len(triad)} of them also ran an irreversible action without human approval "
+            f"(all three loss-of-control conditions): {', '.join(triad)}."
+            if triad
             else ""
         ),
         file=sys.stderr,
@@ -555,7 +571,10 @@ def build_parser() -> argparse.ArgumentParser:
     checks.set_defaults(fn=_cmd_checks)
 
     controls = sub.add_parser("controls", help="browse the control library and crosswalk")
-    controls.add_argument("--framework", help="NIST, NIST-GAI, ISO42001, EUAIA, INDIA or OWASP-LLM")
+    controls.add_argument(
+        "--framework",
+        help="NIST, NIST-GAI, ISO42001, ISO42005, EUAIA, INDIA, OWASP-LLM or OWASP-ASI",
+    )
     controls.add_argument("--markdown", action="store_true", help="print the crosswalk as Markdown")
     controls.set_defaults(fn=_cmd_controls)
 
@@ -594,7 +613,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    return args.fn(args)
+    try:
+        return args.fn(args)
+    except BrokenPipeError:
+        # Output piped into `head` or similar was closed early; that is not an error.
+        import os
+
+        os.dup2(os.open(os.devnull, os.O_WRONLY), sys.stdout.fileno())
+        return EXIT_OK
 
 
 if __name__ == "__main__":

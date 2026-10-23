@@ -12,7 +12,7 @@
 
 ![Audit report overview](docs/img/report-overview.png)
 
-Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 20 automated checks, can red-team a **live LLM application on your laptop**, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
+Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 23 automated checks, can red-team a **live LLM application on your laptop**, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
 
 ---
 
@@ -39,7 +39,7 @@ flowchart LR
     subgraph Pramana
     A[1 Scoping<br/>risk tier, obligations] --> B[2 Mapping<br/>FMEA, RACI]
     B --> C[3 Artifacts<br/>SHA-256 fingerprints]
-    C --> D[4 Testing<br/>20 checks]
+    C --> D[4 Testing<br/>23 checks]
     D --> E[5 Reflection<br/>risk register, coverage, gate]
     end
     E --> R[report.html]
@@ -105,23 +105,25 @@ Each case study plants known defects, so the audit can be checked against a grou
 | Governance | `governance.risk_classification` | EU AI Act tier from Art. 5, Art. 6 and Annex III and Art. 50; India context-sensitivity score; compares the owner's declared tier with the assessed one |
 | Data | `data_quality.integrity` | Missingness, duplicates, class balance, single-feature target-leakage screen |
 | Performance | `performance.discrimination` | ROC AUC with a bootstrap 95% CI against a declared minimum; train/test gap |
-| Performance | `calibration.reliability` | Expected calibration error and Brier score, overall and per group |
-| Fairness | `fairness.group_parity` | Disparate impact (four-fifths rule) with a two-proportion z-test, equal opportunity and equalized odds |
+| Performance | `calibration.reliability` | Expected calibration error (equal-width and equal-mass bins) and Brier score, overall and per group |
+| Fairness | `fairness.group_parity` | Disparate impact (four-fifths rule) with a two-proportion z-test, equal opportunity and equalized odds; group base rates, so a calibration-versus-error-rate trade-off is visible; an attribute with too few records is reported as not assessed, never as passed |
 | Fairness | `fairness.intersectional` | All attribute pairs; flags gaps hidden by single-attribute analysis |
-| Fairness | `fairness.proxy_features` | How well each input predicts each protected attribute (smoothed target-encoded AUC) |
+| Fairness | `fairness.proxy_features` | How well each input predicts each protected attribute (out-of-fold, smoothed target-encoded AUC) |
 | Robustness | `robustness.perturbation` | Decision flip rate under noise and missing values; monotonicity rules from the spec |
 | Monitoring | `drift.population_stability` | PSI and KS/chi-square per feature, score drift, favourable-rate shift |
 | Transparency | `explainability.feature_importance` | Permutation importance reconciled with drivers declared in the documentation |
 | Transparency | `documentation.model_card` | Completeness against Model Cards, EU AI Act Art. 11, 13 and 14 and ISO 42001 A.6.2.7; **claims vs. measured results** |
 | Privacy | `privacy.pii_exposure` | E-mail, Indian mobile, PAN, Aadhaar-format, card (Luhn) and IP patterns in every dataset |
-| Privacy | `privacy.membership_inference` | Loss-threshold attack (Yeom et al., 2018) on training vs. held-out rows |
+| Privacy | `privacy.membership_inference` | Loss-threshold attack (Yeom et al., 2018) on training vs. held-out rows, with the true-positive rate at 1% and 5% false-positive rate (Carlini et al., 2022) |
 | LLM security | `llm.prompt_injection` | 26 probes: direct, role-play, indirect (e-mail, web page, tool output, JSON), payload splitting, base64, few-shot, markdown-image exfiltration, and Indic-language attacks; system-prompt canary; per-language results |
 | LLM privacy | `llm.sensitive_disclosure` | Personal data and forbidden strings in responses |
 | LLM reliability | `llm.groundedness` | Required facts plus a numeric-claim check against the knowledge base |
 | LLM conduct | `llm.policy_adherence` | Required and forbidden phrases per conduct rule |
 | LLM operations | `llm.service_health` | Error rate, retries, p50/p95 latency and output length from the live run (OWASP LLM10) |
 | Agents | `agent.trace_auditability` | Attribution to a request, prior human approval for high-impact actions, tool allowlist, ordering, hash-chain integrity |
-| Agents | `agent.misalignment_signals` | Scans the agent's own reasoning and actions for rogue patterns (self-preservation, deception, oversight evasion, goal substitution, privilege escalation, reward hacking) and flags where intent co-occurs with an irreversible action ([see the review](docs/agentic-safety-review.md)) |
+| Agents | `agent.misalignment_signals` | Scans the agent's own reasoning and actions for rogue patterns (self-preservation, deception, oversight evasion, goal substitution, privilege escalation, reward hacking, gaming an evaluation) and scores each session on the UN Scientific Panel's three loss-of-control conditions: misaligned intent, irreversible capability and a permissive environment ([see the review](docs/agentic-safety-review.md)) |
+| Agents | `agent.control_readiness` | Six safeguards from the agent-control literature (own identity, tool allowlist, approval gate, stop conditions, tamper-evident log, action monitor), each graded as evidenced in the trace, only declared in the spec, or missing |
+| Agents | `agent.oversight_integrity` | Share of tool calls explained by logged reasoning, and instructions planted in tool results (indirect prompt injection), with the action that followed |
 | Assurance | `audit.detector_sensitivity` | Plants a disparity, a drift and a PII column in copies of the data and confirms the audit catches them |
 
 Scoring is deterministic, so the same inputs always produce the same findings. Run `pramana checks` for the list with failure modes, and see [docs/methodology.md](docs/methodology.md) for every formula and threshold.
@@ -136,6 +138,8 @@ Scoring is deterministic, so the same inputs always produce the same findings. R
 | EU AI Act | 2024/1689 as amended by the Digital Omnibus (2026/1744) | 17 articles, tier-aware |
 | India AI Governance Guidelines + DPDP Act | MeitY, Nov 2025 | 7 sutras, 2 pillars, DPDP |
 | OWASP Top 10 for LLM Applications | 2025 | 10 categories |
+| OWASP Top 10 for Agentic Applications | 2026 | 10 categories (agents only) |
+| ISO/IEC 42005 AI system impact assessment | 2025 | 15 clauses |
 
 The report shows, per framework, which controls are **evidenced**, **partial**, **deficient** or **not tested by automation**. Pramana is honest that many governance controls (board approval, training, supplier contracts) need organisational evidence. Those documents can be attached in the spec, and they are fingerprinted into the pack. The full crosswalk is in [docs/control-mapping.md](docs/control-mapping.md).
 
@@ -151,12 +155,15 @@ packs/credit/
 ├── risk_register.csv      # opens in Excel or Numbers
 ├── control_coverage.csv
 ├── remediation_plan.csv
+├── ml_bom.cdx.json        # CycloneDX 1.7 ML bill of materials: what was audited, with hashes and measured metrics
 ├── ledger.jsonl           # append-only, hash-chained record of every evidence item
 └── evidence/
     ├── 1-scoping/  2-mapping/  3-artifacts/  4-testing/  5-reflection/
 ```
 
-`pramana verify` recomputes every hash. Editing a result, deleting a ledger line or reordering entries makes verification fail with exit code 2.
+`pramana verify` recomputes every hash. Editing a result, deleting a ledger line, reordering entries or adding a file under `evidence/` makes verification fail with exit code 2.
+
+**Pinned inputs (optional).** List an artifact's SHA-256 under `artifacts_sha256` in the spec and Pramana refuses to audit it, or unpickle a model, if the file has changed since it was pinned.
 
 **Signed packs (optional).** The hash chain proves a pack is internally consistent; a signature proves *who* sealed it and that it was not rebuilt. With `pip install "pramana[signing]"`:
 

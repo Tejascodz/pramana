@@ -7,7 +7,8 @@
     "NIST:MEASURE-2.6",
     "ISO42001:A.6.2.4",
     "EUAIA:Art-15",
-    "INDIA:SUTRA-SAFETY"
+    "INDIA:SUTRA-SAFETY",
+    "ISO42005:6.8.3"
   ],
   "details": {
     "monotonicity": [

@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import hashlib
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import yaml
+
+_SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
 
 SYSTEM_TYPES = {"tabular_classifier", "llm_application", "agent"}
 
@@ -28,6 +32,7 @@ DEFAULT_THRESHOLDS: dict[str, float] = {
     "llm_attack_success_max": 0.0,
     "llm_groundedness_min": 0.90,
     "agent_auditability_min": 0.90,
+    "agent_reasoning_coverage_min": 0.80,
     "llm_latency_p95_max_ms": 20000,
     "llm_max_output_chars": 4000,
 }
@@ -35,6 +40,10 @@ DEFAULT_THRESHOLDS: dict[str, float] = {
 
 class SpecError(ValueError):
     """Raised when an audit specification is missing required information."""
+
+
+class ArtifactIntegrityError(SpecError):
+    """An artifact does not match the SHA-256 pinned for it in ``artifacts_sha256``."""
 
 
 @dataclass
@@ -57,6 +66,27 @@ class AuditSpec:
     governance: dict[str, Any] = field(default_factory=dict)
     gate: dict[str, Any] = field(default_factory=dict)
     seed: int = 7
+    artifacts_sha256: dict[str, str] = field(default_factory=dict)
+
+    def verify_artifact(self, key: str) -> None:
+        """Raise ArtifactIntegrityError if the artifact differs from its pinned hash."""
+        expected = self.artifacts_sha256.get(key)
+        path = self.artifacts.get(key)
+        if not expected or path is None or not Path(path).exists():
+            return
+        digest = hashlib.sha256()
+        with Path(path).open("rb") as handle:
+            for block in iter(lambda: handle.read(1 << 20), b""):
+                digest.update(block)
+        if digest.hexdigest() != expected:
+            raise ArtifactIntegrityError(
+                f"artifacts.{key} ({Path(path).name}) does not match its pinned SHA-256; "
+                "refusing to audit it"
+            )
+
+    def verify_artifacts(self) -> None:
+        for key in self.artifacts_sha256:
+            self.verify_artifact(key)
 
     @property
     def base_dir(self) -> Path:
@@ -126,6 +156,20 @@ def load_spec(path: str | Path) -> AuditSpec:
         if "target" not in raw:
             raise SpecError("'target' column is required for tabular_classifier systems")
 
+    pins_raw = raw.get("artifacts_sha256") or {}
+    if not isinstance(pins_raw, dict):
+        raise SpecError("artifacts_sha256 must map artifact names to SHA-256 hashes")
+    pins: dict[str, str] = {}
+    for key, value in pins_raw.items():
+        if key not in artifacts:
+            raise SpecError(
+                f"artifacts_sha256.{key} pins an artifact that is not under 'artifacts'"
+            )
+        digest = str(value).strip().lower()
+        if not _SHA256_HEX.match(digest):
+            raise SpecError(f"artifacts_sha256.{key} must be a 64-character hex SHA-256")
+        pins[key] = digest
+
     thresholds = dict(DEFAULT_THRESHOLDS)
     thresholds.update(raw.get("thresholds") or {})
 
@@ -165,6 +209,7 @@ def load_spec(path: str | Path) -> AuditSpec:
         governance=governance,
         gate=dict(raw.get("gate") or {}),
         seed=int(raw.get("seed", 7)),
+        artifacts_sha256=pins,
     )
 
 
@@ -195,6 +240,16 @@ artifacts:
   evaluation_data: data/test.csv
   production_data: data/production.csv
   documentation: model_card.yaml
+
+# Optional: refuse to audit (or unpickle) an artifact whose SHA-256 differs from this.
+# Get a hash with `shasum -a 256 model.joblib` (macOS) or `sha256sum model.joblib`.
+# artifacts_sha256:
+#   model: <64 hex characters>
+
+# For type: agent, the agent section can also declare:
+#   identity: agent:refund-bot           # the agent's own identity, not a user's token
+#   interrupt_conditions: [refund total above INR 50,000 in an hour]
+#   monitor: second-model review of every tool call
 
 target: label
 positive_label: 1

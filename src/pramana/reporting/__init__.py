@@ -15,6 +15,7 @@ from pramana.audit.ledger import EvidenceLedger
 from pramana.checks.llm import fmt_ms
 from pramana.controls import load_library
 from pramana.reporting.charts import coverage_bars, group_bars, risk_heatmap
+from pramana.reporting.ml_bom import render_ml_bom
 from pramana.reporting.model_card import render_model_card
 from pramana.reporting.narrative import executive_summary
 from pramana.types import Status
@@ -26,6 +27,7 @@ REPORT_FILES = {
     "control_coverage": "control_coverage.csv",
     "remediation_plan": "remediation_plan.csv",
     "model_card": "model_card.md",
+    "ml_bom": "ml_bom.cdx.json",
 }
 
 
@@ -160,6 +162,9 @@ def write_outputs(result, out_dir: Path, ledger: EvidenceLedger | None = None) -
         ["risk_id", "priority", "action", "owner", "due", "closes_controls"],
     )
     paths["model_card"].write_text(render_model_card(result), encoding="utf-8")
+    paths["ml_bom"].write_text(
+        json.dumps(render_ml_bom(result), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
 
     if ledger is not None:
         for key, path in paths.items():

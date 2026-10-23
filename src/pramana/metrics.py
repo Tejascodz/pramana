@@ -81,6 +81,24 @@ def expected_calibration_error(y_true: np.ndarray, probs: np.ndarray, bins: int 
     return float(ece)
 
 
+def adaptive_calibration_error(y_true: np.ndarray, probs: np.ndarray, bins: int = 10) -> float:
+    """ECE with equal-mass bins (Nixon et al., CVPR Workshops 2019).
+
+    Equal-width bins leave most bins nearly empty when scores cluster near 0 or 1, which
+    biases ECE; equal-mass bins hold the same number of predictions each.
+    """
+    y_true = np.asarray(y_true, dtype=float)
+    probs = np.asarray(probs, dtype=float)
+    if len(probs) == 0:
+        return float("nan")
+    order = np.argsort(probs, kind="stable")
+    total = 0.0
+    for idx in np.array_split(order, min(bins, len(probs))):
+        if len(idx):
+            total += len(idx) / len(probs) * abs(probs[idx].mean() - y_true[idx].mean())
+    return float(total)
+
+
 def reliability_table(y_true: np.ndarray, probs: np.ndarray, bins: int = 10) -> list[dict]:
     edges = np.linspace(0.0, 1.0, bins + 1)
     ids = np.clip(np.digitize(probs, edges[1:-1], right=True), 0, bins - 1)
@@ -143,7 +161,10 @@ def single_feature_auc(feature: pd.Series, target: pd.Series) -> float:
     """How well one feature alone separates a binary target (symmetrised to >= 0.5).
 
     Categorical features are target-encoded first, which makes this a fast,
-    model-free association measure for proxy and leakage screening.
+    model-free association measure for proxy and leakage screening. The encoding is
+    out-of-fold: each row's category is encoded from the other folds only. Encoding a row
+    with its own label lets a column of unique IDs (pure noise) score AUC 1.0 and be
+    reported as leakage.
     """
     df = pd.DataFrame({"x": feature, "y": target}).dropna()
     if df["y"].nunique() < 2 or df["x"].nunique() < 2:
@@ -151,11 +172,16 @@ def single_feature_auc(feature: pd.Series, target: pd.Series) -> float:
     if pd.api.types.is_numeric_dtype(df["x"]):
         x = df["x"].astype(float)
     else:
-        # Smoothed target encoding so rare categories cannot fake a strong signal.
-        prior, m = df["y"].mean(), 20.0
-        grouped = df.groupby("x")["y"].agg(["sum", "count"])
-        encoding = (grouped["sum"] + m * prior) / (grouped["count"] + m)
-        x = df["x"].map(encoding)
+        # Smoothed (m = 20) so rare categories shrink to the prior; 5 shuffled, seeded folds
+        # so the result is reproducible and does not depend on row order.
+        prior, m = float(df["y"].mean()), 20.0
+        fold = np.random.default_rng(0).permutation(len(df)) % 5
+        x = pd.Series(prior, index=df.index, dtype=float)
+        for k in range(5):
+            held = fold == k
+            grouped = df[~held].groupby("x")["y"].agg(["sum", "count"])
+            encoding = (grouped["sum"] + m * prior) / (grouped["count"] + m)
+            x[held] = df.loc[held, "x"].map(encoding).fillna(prior).to_numpy()
     auc = roc_auc_score(df["y"], x)
     return float(max(auc, 1 - auc))
 

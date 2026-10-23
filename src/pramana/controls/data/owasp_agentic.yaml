@@ -1,0 +1,20 @@
+# OWASP Top 10 for Agentic Applications (2026 edition, published December 2025 by the
+# OWASP GenAI Security Project). Identifiers and titles as published.
+framework:
+  id: OWASP-ASI
+  name: OWASP Top 10 for Agentic Applications
+  version: "2026"
+  source: https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
+  group_label: Category
+
+controls:
+  - {id: ASI01, group: "Top 10", title: "Agent goal hijack", evidence: technical}
+  - {id: ASI02, group: "Top 10", title: "Tool misuse and exploitation", evidence: technical}
+  - {id: ASI03, group: "Top 10", title: "Identity and privilege abuse", evidence: both}
+  - {id: ASI04, group: "Top 10", title: "Agentic supply chain vulnerabilities", evidence: both}
+  - {id: ASI05, group: "Top 10", title: "Unexpected code execution (RCE)", evidence: technical}
+  - {id: ASI06, group: "Top 10", title: "Memory and context poisoning", evidence: technical}
+  - {id: ASI07, group: "Top 10", title: "Insecure inter-agent communication", evidence: technical}
+  - {id: ASI08, group: "Top 10", title: "Cascading failures", evidence: both}
+  - {id: ASI09, group: "Top 10", title: "Human-agent trust exploitation", evidence: both}
+  - {id: ASI10, group: "Top 10", title: "Rogue agents", evidence: technical}

@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.5.0 — 2026-10-23
+
+The rest of the agentic-safety roadmap (`docs/agentic-safety-review.md` §6), two new control catalogues, a CycloneDX ML-BOM, input pinning, and fixes from a line-by-line review of 0.4.2. New tests: `tests/test_agent_controls.py` and `tests/test_hardening.py`.
+
+**Agents**
+- **Loss-of-control triad.** `agent.misalignment_signals` now scores each session on the UN Scientific Panel's three conditions: misaligned intent, irreversible capability and a permissive environment (an irreversible action ran with no human review, a tool outside the allowlist was used, or no allowlist exists). Critical only when all three hold in the same session; a signal in one session is never paired with an action in another.
+- **Evaluation gaming.** A seventh pattern catches first-person intent to fake compliance or deliberately underperform because the agent may be tested. Noticing a test ("this is a benchmark question") does not count.
+- **New check `agent.control_readiness`.** Six safeguards (own identity, allowlist, approval gate, stop conditions, tamper-evident log, monitor), each graded as evidenced in the trace, declared in the spec only, or missing. Fails when tool calls run under a person's identity. Gaps that `agent.trace_auditability` already reports are noted, not counted twice.
+- **New check `agent.oversight_integrity`.** Share of tool calls explained by logged reasoning (output text does not count) and instructions planted in tool results, with the action that followed.
+- Precision re-checked on the full Who&When benchmark: 0 signals and 0 planted-instruction hits across 4,092 real agent messages.
+- `pramana scan-trace` reports the triad too, and `permissive_environment` on each signal.
+
+**Frameworks and outputs**
+- **OWASP Top 10 for Agentic Applications (2026)**, with the published IDs and titles, applied to agent audits only.
+- **ISO/IEC 42005:2025 AI system impact assessment**: 15 clauses, numbered as in NIST's ISO/IEC 42005 to AI RMF crosswalk. The library now holds 8 frameworks and 184 controls.
+- **`ml_bom.cdx.json`** in every pack: a CycloneDX 1.7 ML bill of materials (system, data and trace files with SHA-256, measured metrics, fairness findings), sealed in the ledger and validated in the tests against the official schema.
+- **`artifacts_sha256`** in the spec pins inputs: an artifact that has changed is refused before anything is read, and a model before it is unpickled.
+- The dashboard re-verifies the pack it shows and warns if it was altered.
+
+**Statistics**
+- Proxy and leakage screening uses out-of-fold target encoding. Before, a column of unique IDs (pure noise) scored AUC 1.0 and was reported as leakage.
+- Calibration also reports ECE with equal-mass bins (Nixon et al., 2019); membership inference also reports the true-positive rate at 1% and 5% false-positive rate (Carlini et al., 2022); fairness reports group base rates and says when equal error rates and calibration cannot both be met (Kleinberg et al., 2017).
+
+**Fixes**
+- Groundedness now matches "5 lakh" against "₹5,00,000" in both directions (only one direction worked), reads thousand/million/billion, and no longer takes "5 credit cards" as 5 crore.
+- Fairness no longer prints an empty "Attributes needing action" list when the only issue is an untested attribute, and its summary no longer says "within the four-fifths benchmark" while a different attribute fails on error rates.
+- The detector self-test skips, rather than fails, its fairness canary when no one receives a favourable outcome, and plants the drift canary in a feature that varies.
+- An approval or tool call without a timestamp no longer crashes the auditability check; it counts as unapproved.
+- "no" and "ms" were removed from the abbreviation list: they end real sentences, and merging sentences weakened the first-person check.
+- Signals from events with no session ID are never paired, and no longer crash the co-occurrence step.
+- `PRAMANA_SIGNING_KEY_PEM` also accepts a key stored on one line with literal `\n`.
+- HTTP endpoints must use POST, PUT or PATCH (the prompt travels in the body); a missing probe include is a clear error; the ledger refuses to write outside the pack; piping CLI output into `head` no longer prints a traceback; the benchmark converter prints usage instead of crashing.
+- `pip install -e ".[dev]"` now includes `cryptography` and the CycloneDX validator, so CI runs the signing and ML-BOM schema tests.
+
 ## 0.4.2 — 2026-10-23
 
 Fixes from an external code review. Each finding was reproduced before it was fixed, and each fix has a regression test (`tests/test_review_fixes.py`).

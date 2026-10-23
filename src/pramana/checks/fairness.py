@@ -43,6 +43,9 @@ def group_table(
                 "fpr": false_positive_rate(y[mask], pred[mask]),
                 "auc": safe_auc(y[mask], scores[mask]),
                 "mean_score": float(scores[mask].mean()),
+                # Observed positive rate. Where it differs between groups, calibration and
+                # equal error rates cannot both hold (Kleinberg et al., 2017).
+                "base_rate": float(y[mask].mean()) if n else float("nan"),
             }
         )
     return rows
@@ -74,7 +77,13 @@ def parity_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "p_value": two_proportion_pvalue(
             best["favourable"], best["n"], worst["favourable"], worst["n"]
         ),
+        "base_rate_difference": _spread([r.get("base_rate") for r in usable]),
     }
+
+
+def _spread(values: list[Any]) -> float | None:
+    known = [float(v) for v in values if v is not None and not np.isnan(v)]
+    return round(max(known) - min(known), 4) if len(known) >= 2 else None
 
 
 def assessable(summary: dict[str, Any]) -> bool:
@@ -139,15 +148,30 @@ def group_parity(ctx: AuditContext) -> CheckResult:
                 f"{min_n} records and a defined favourable rate"
             )
         else:
+            spread = summary.get("base_rate_difference")
+            tension = (
+                spread is not None
+                and spread >= 0.05
+                and (summary.get("equalized_odds_difference") or 0) > eo_max
+            )
             lines.append(
                 f"{attr}: DI {summary['disparate_impact_ratio']:.2f} "
                 f"({summary['least_favoured']} vs {summary['most_favoured']}, p={summary['p_value']:.3g}), "
                 f"EOdds diff {summary['equalized_odds_difference']:.2f}"
+                + (
+                    f" (observed outcome rates differ by {spread:.2f} between groups, so equal "
+                    "error rates and calibration cannot both be met; choosing which governs is a "
+                    "policy decision)"
+                    if tension
+                    else ""
+                )
             )
     status, severity = _worst(grades)
     failing = [a for a in attrs if per_attr[a]["status"] != Status.PASS.value]
 
     unassessed = [a for a in attrs if not assessable(per_attr[a]["summary"])]
+    # Measured and short of a threshold (four-fifths or equalized odds), as opposed to untested.
+    needs_action = [a for a in failing if a not in unassessed]
     worst_attr = min(
         (a for a in attrs if assessable(per_attr[a]["summary"])),
         key=lambda a: per_attr[a]["summary"]["disparate_impact_ratio"],
@@ -158,6 +182,11 @@ def group_parity(ctx: AuditContext) -> CheckResult:
     }
 
     worst_summary = per_attr[worst_attr]["summary"] if worst_attr else None
+    untested_note = (
+        f" {', '.join(unassessed)} could not be assessed (too few records per group)."
+        if unassessed
+        else ""
+    )
     if worst_summary and worst_summary["disparate_impact_ratio"] < di_min:
         s = worst_summary
         rows = {r["group"]: r for r in per_attr[worst_attr]["groups"]}
@@ -165,12 +194,14 @@ def group_parity(ctx: AuditContext) -> CheckResult:
             f"Applicants in the '{s['least_favoured']}' group ({worst_attr}) receive a favourable outcome "
             f"{rows[s['least_favoured']]['selection_rate']:.0%} of the time versus "
             f"{rows[s['most_favoured']]['selection_rate']:.0%} for '{s['most_favoured']}', "
-            f"below the four-fifths benchmark."
+            f"below the four-fifths benchmark." + untested_note
         )
-    elif worst_attr and status != Status.PASS and worst_attr in failing:
+    elif needs_action:
+        # Every measured DI meets four-fifths, so these attributes fall short on error rates.
         plain = (
-            f"Outcome rates for {worst_attr} meet the four-fifths benchmark, but error rates differ "
-            "across groups more than the equalized-odds limit allows."
+            "Outcome rates meet the four-fifths benchmark, but error rates for "
+            f"{', '.join(needs_action)} differ across groups more than the equalized-odds limit "
+            "allows." + untested_note
         )
     elif unassessed and len(unassessed) == len(attrs):
         plain = (
@@ -197,9 +228,16 @@ def group_parity(ctx: AuditContext) -> CheckResult:
         recommendation=(
             "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or "
             "threshold adjustment, and document a fairness rationale approved by the risk owner. "
-            f"Attributes needing action: {', '.join(a for a in failing if a not in unassessed)}."
-            + (f" Collect enough records to test {', '.join(unassessed)}." if unassessed else "")
-            if failing
+            f"Attributes needing action: {', '.join(needs_action)}."
+            + (
+                f" Collect at least {min_n} records per group to test {', '.join(unassessed)}."
+                if unassessed
+                else ""
+            )
+            if needs_action
+            else f"Collect at least {min_n} records for each group of {', '.join(unassessed)} and "
+            "re-run; until then fairness for it is untested, not passed."
+            if unassessed
             else "Re-run on each release and on production samples."
         ),
         metrics=metrics | {"unassessed_attributes": unassessed},
@@ -277,6 +315,8 @@ def intersectional(ctx: AuditContext) -> CheckResult:
             "attribute reveals."
             if hidden and status != Status.PASS
             else f"The combined group '{s['least_favoured']}' has the lowest favourable-outcome rate."
+            if status != Status.PASS
+            else "No intersectional subgroup falls below the four-fifths benchmark."
         )
 
     return CheckResult(

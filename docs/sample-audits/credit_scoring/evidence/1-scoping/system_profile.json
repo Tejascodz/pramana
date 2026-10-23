@@ -1,5 +1,5 @@
 {
-  "audit_id": "PRM-20261021-275F46",
+  "audit_id": "PRM-20261021-6E6BB8",
   "classification": {
     "eu_applicable": true,
     "eu_basis": [
@@ -103,6 +103,7 @@
   },
   "thresholds": {
     "agent_auditability_min": 0.9,
+    "agent_reasoning_coverage_min": 0.8,
     "disparate_impact_min": 0.8,
     "duplicate_rate_max": 0.01,
     "ece_max": 0.05,

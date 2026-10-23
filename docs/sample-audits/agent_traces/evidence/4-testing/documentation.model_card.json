@@ -13,7 +13,10 @@
     "EUAIA:Art-13",
     "EUAIA:Art-14",
     "INDIA:SUTRA-UNDERSTANDABLE",
-    "INDIA:SUTRA-ACCOUNTABILITY"
+    "INDIA:SUTRA-ACCOUNTABILITY",
+    "ISO42005:6.3.4",
+    "ISO42005:6.3.5",
+    "ISO42005:6.5"
   ],
   "details": {},
   "evidence_hash": null,

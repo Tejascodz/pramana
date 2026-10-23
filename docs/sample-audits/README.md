@@ -12,7 +12,7 @@ Complete audit packs for the three case studies, generated with `--date 2026-10-
 | [llama32_3b_x3_baseline](llama32_3b_x3_baseline) | `llama32_3b_x3_baseline/report.html` | BLOCK |
 | [llama32_3b_x3_guarded](llama32_3b_x3_guarded) | `llama32_3b_x3_guarded/report.html` | BLOCK |
 
-Download a `report.html` and open it in any browser; it is a single file with no external dependencies.
+Download a `report.html` and open it in any browser; it is a single file with no external dependencies. Each pack also holds `ml_bom.cdx.json`, a CycloneDX 1.7 bill of materials for the audited system.
 
 Check that a pack is intact:
 

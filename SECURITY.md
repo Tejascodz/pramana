@@ -88,7 +88,9 @@ Ollama applies its own origin and host checks; keep them by leaving
 - **Model files are code.** `artifacts.model` is loaded with joblib, which uses
   pickle, and loading a pickle can run code. Only audit model files that came
   through a trusted, access-controlled channel, or audit from predictions
-  (`score_column`) instead.
+  (`score_column`) instead. Pin the file's SHA-256 under `artifacts_sha256` in the
+  spec: Pramana then refuses to unpickle a model that has changed since it was
+  pinned.
 - **Model output is untrusted text.** The HTML report escapes everything it
   shows, so an answer containing HTML or script is displayed, never run.
 - **Audit packs from someone else are untrusted data.** `pramana verify` only

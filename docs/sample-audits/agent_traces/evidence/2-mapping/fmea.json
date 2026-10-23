@@ -10,7 +10,10 @@
       "ISO42001:A.5.2",
       "EUAIA:Art-5",
       "EUAIA:Art-6",
-      "INDIA:PILLAR-RISK-MITIGATION"
+      "INDIA:PILLAR-RISK-MITIGATION",
+      "ISO42005:5.4",
+      "ISO42005:5.5",
+      "ISO42005:6.3.4"
     ],
     "detection": "Risk classification",
     "effect": "Wrong obligations applied; high-risk duties missed",
@@ -28,7 +31,9 @@
       "EUAIA:Art-12",
       "EUAIA:Art-14",
       "INDIA:SUTRA-ACCOUNTABILITY",
-      "INDIA:PILLAR-ACCOUNTABILITY"
+      "INDIA:PILLAR-ACCOUNTABILITY",
+      "OWASP-ASI:ASI02",
+      "OWASP-ASI:ASI03"
     ],
     "detection": "Agent action auditability",
     "effect": "Accountability gap: actions occur with no traceable authority",
@@ -46,11 +51,58 @@
       "EUAIA:Art-14",
       "EUAIA:Art-15",
       "INDIA:SUTRA-SAFETY",
-      "INDIA:SUTRA-ACCOUNTABILITY"
+      "INDIA:SUTRA-ACCOUNTABILITY",
+      "ISO42005:6.8.3",
+      "OWASP-ASI:ASI01",
+      "OWASP-ASI:ASI10"
     ],
     "detection": "Agent misalignment signals",
     "effect": "Autonomous system takes harmful instrumental actions; loss of human control",
-    "failure_mode": "Agent reasoning or actions show it pursuing goals against its instructions (self-preservation, deception, oversight evasion, privilege escalation, reward hacking)"
+    "failure_mode": "Agent reasoning or actions show it pursuing goals against its instructions (self-preservation, deception, oversight evasion, privilege escalation, reward hacking, gaming an evaluation)"
+  },
+  {
+    "check_id": "agent.control_readiness",
+    "controls": [
+      "NIST:GOVERN-3.2",
+      "NIST:MAP-3.5",
+      "NIST:MANAGE-2.4",
+      "NIST:MANAGE-4.1",
+      "ISO42001:A.6.2.6",
+      "OWASP-LLM:LLM06",
+      "OWASP-ASI:ASI02",
+      "OWASP-ASI:ASI03",
+      "OWASP-ASI:ASI08",
+      "OWASP-ASI:ASI10",
+      "EUAIA:Art-14",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY",
+      "INDIA:SUTRA-ACCOUNTABILITY"
+    ],
+    "detection": "Agent control readiness",
+    "effect": "A misaligned or hijacked agent can act irreversibly before anyone can intervene",
+    "failure_mode": "Agent deployed without its own identity, scoped tools, approval gates, stop conditions, tamper-evident logging or a monitor"
+  },
+  {
+    "check_id": "agent.oversight_integrity",
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST:MEASURE-2.8",
+      "NIST:MANAGE-4.1",
+      "NIST-GAI:INFO-SECURITY",
+      "ISO42001:A.6.2.6",
+      "ISO42001:A.6.2.8",
+      "OWASP-LLM:LLM01",
+      "OWASP-ASI:ASI01",
+      "OWASP-ASI:ASI06",
+      "EUAIA:Art-12",
+      "EUAIA:Art-14",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-UNDERSTANDABLE",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "detection": "Agent oversight integrity",
+    "effect": "Monitors cannot see why the agent acted; indirect prompt injection steers its actions",
+    "failure_mode": "Agent actions are not explained by logged reasoning, or data the agent reads carries planted instructions"
   },
   {
     "check_id": "documentation.model_card",
@@ -66,7 +118,10 @@
       "EUAIA:Art-13",
       "EUAIA:Art-14",
       "INDIA:SUTRA-UNDERSTANDABLE",
-      "INDIA:SUTRA-ACCOUNTABILITY"
+      "INDIA:SUTRA-ACCOUNTABILITY",
+      "ISO42005:6.3.4",
+      "ISO42005:6.3.5",
+      "ISO42005:6.5"
     ],
     "detection": "Documentation and claims",
     "effect": "Misuse outside scope; failed technical-documentation review",

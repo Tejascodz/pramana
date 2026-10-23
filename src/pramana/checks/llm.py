@@ -27,11 +27,12 @@ from pramana.metrics import wilson_interval
 from pramana.registry import register
 from pramana.types import CheckResult, Severity, Status
 
-NUMBER = re.compile(r"(?<![\w.])(?:₹|rs\.?\s?|inr\s?)?\d[\d,]*(?:\.\d+)?\s?%?", re.IGNORECASE)
-# Indian and English magnitude words: "₹5 lakh" is the same amount as "₹5,00,000".
-MAGNITUDE = re.compile(
-    r"(?<![\w.])(?:₹|rs\.?\s?|inr\s?)?(\d[\d,]*(?:\.\d+)?)\s*"
-    r"(lakhs?|lacs?|crores?|cr|thousand|million|billion)\b",
+# A figure with an optional Indian or English magnitude word, read as one amount:
+# "₹5 lakh" is the same amount as "₹5,00,000". The word must end at a word boundary, so
+# "5 credit cards" stays 5 and never becomes 5 crore.
+FIGURE = re.compile(
+    r"(?<![\w.])(?:₹|rs\.?\s?|inr\s?)?(\d[\d,]*(?:\.\d+)?)"
+    r"(?:\s*(lakhs?|lacs?|crores?|cr|thousand|million|billion)\b)?(\s?%)?",
     re.IGNORECASE,
 )
 MAGNITUDE_FACTOR = {
@@ -69,38 +70,35 @@ def _contains(text: str, needle: str) -> bool:
     return needle.lower() in text.lower()
 
 
-def _normalise_number(token: str) -> str:
-    token = token.lower().replace("₹", "").replace("inr", "").replace("rs.", "").replace("rs", "")
-    token = token.replace(",", "").replace(" ", "")
-    percent = token.endswith("%")
-    value = float(token[:-1] if percent else token)
-    text = f"{value:.6f}".rstrip("0").rstrip(".")
-    return f"{text}%" if percent else text
-
-
 def _format_value(value: float) -> str:
     return f"{value:.6f}".rstrip("0").rstrip(".")
 
 
-def numbers_in(text: str) -> set[str]:
-    """Normalised figures in ``text``: currency, commas and Indian magnitudes resolved."""
+def numbers_in(text: str, keep_bare: bool = False) -> set[str]:
+    """Normalised figures in ``text``: currency, commas and Indian magnitudes resolved.
+
+    "5 lakh" is read as the single amount 500000. With ``keep_bare`` the bare number (5) is
+    kept as well; that is used for the knowledge base and prompt, so a reply that repeats
+    "up to 5" from "up to 5 lakh" is not treated as a new figure.
+    """
     text = LIST_MARKER.sub("", text)
     out = set()
-    for match in NUMBER.findall(text):
+    for amount, word, percent in FIGURE.findall(text):
         try:
-            out.add(_normalise_number(match))
+            value = float(amount.replace(",", ""))
         except ValueError:
             continue
-    for amount, word in MAGNITUDE.findall(text):
-        try:
-            out.add(_format_value(float(amount.replace(",", "")) * MAGNITUDE_FACTOR[word.lower()]))
-        except (ValueError, KeyError):
-            continue
+        suffix = "%" if percent.strip() else ""
+        if word:
+            out.add(_format_value(value * MAGNITUDE_FACTOR[word.lower()]) + suffix)
+            if not keep_bare:
+                continue
+        out.add(_format_value(value) + suffix)
     return out
 
 
 def unsupported_numbers(response: str, knowledge: str, prompt: str) -> list[str]:
-    allowed = numbers_in(knowledge) | numbers_in(prompt)
+    allowed = numbers_in(knowledge, keep_bare=True) | numbers_in(prompt, keep_bare=True)
     allowed |= {n.rstrip("%") for n in allowed} | {f"{n}%" for n in allowed if not n.endswith("%")}
     return sorted(n for n in numbers_in(response) if n not in allowed)
 

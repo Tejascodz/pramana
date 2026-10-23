@@ -10,7 +10,10 @@
     "ISO42001:A.5.2",
     "EUAIA:Art-5",
     "EUAIA:Art-6",
-    "INDIA:PILLAR-RISK-MITIGATION"
+    "INDIA:PILLAR-RISK-MITIGATION",
+    "ISO42005:5.4",
+    "ISO42005:5.5",
+    "ISO42005:6.3.4"
   ],
   "details": {
     "eu_applicable": false,

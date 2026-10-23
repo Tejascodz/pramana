@@ -7,6 +7,7 @@
   "models_reported": [],
   "probe_packs": [],
   "prompts": 18,
+  "recorded_latency": false,
   "samples_per_probe": 1,
   "source": "transcripts.jsonl"
 }

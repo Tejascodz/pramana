@@ -19,6 +19,9 @@ failure mode it targets and the framework controls its evidence supports.
 | EU AI Act | Art-5 | Prohibited AI practices |
 | EU AI Act | Art-6 | Classification rules for high-risk AI systems |
 | India AI Governance Guidelines | PILLAR-RISK-MITIGATION | Risk mitigation (evidence-based risk assessment, techno-legal measures) |
+| ISO/IEC 42005 AI system impact assessment | 5.4 | Timing of AI system impact assessment |
+| ISO/IEC 42005 AI system impact assessment | 5.5 | Scope of the AI system impact assessment |
+| ISO/IEC 42005 AI system impact assessment | 6.3.4 | Intended use |
 
 ## `performance.discrimination`
 
@@ -49,6 +52,7 @@ failure mode it targets and the framework controls its evidence supports.
 | EU AI Act | Art-10 | Data and data governance (quality, relevance, bias examination) |
 | India AI Governance Guidelines | SUTRA-FAIRNESS | Fairness and equity |
 | NIST Generative AI Profile | HARMFUL-BIAS | Harmful bias and homogenization |
+| ISO/IEC 42005 AI system impact assessment | 6.8.2 | Benefits and harms |
 
 ## `fairness.intersectional`
 
@@ -61,6 +65,7 @@ failure mode it targets and the framework controls its evidence supports.
 | ISO/IEC 42001 Annex A | A.5.4 | Impact on individuals or groups of individuals |
 | EU AI Act | Art-10 | Data and data governance (quality, relevance, bias examination) |
 | India AI Governance Guidelines | SUTRA-FAIRNESS | Fairness and equity |
+| ISO/IEC 42005 AI system impact assessment | 6.8.2 | Benefits and harms |
 
 ## `fairness.proxy_features`
 
@@ -89,6 +94,7 @@ failure mode it targets and the framework controls its evidence supports.
 | ISO/IEC 42001 Annex A | A.6.2.4 | Verification and validation |
 | EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
 | India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
+| ISO/IEC 42005 AI system impact assessment | 6.8.3 | AI system failures and reasonably foreseeable misuse |
 
 ## `calibration.reliability`
 
@@ -117,6 +123,7 @@ failure mode it targets and the framework controls its evidence supports.
 | ISO/IEC 42001 Annex A | A.6.2.6 | Operation and monitoring |
 | EU AI Act | Art-72 | Post-market monitoring |
 | India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
+| ISO/IEC 42005 AI system impact assessment | 5.12 | Monitoring and review |
 
 ## `explainability.feature_importance`
 
@@ -172,6 +179,7 @@ failure mode it targets and the framework controls its evidence supports.
 | ISO/IEC 42001 Annex A | A.7.6 | Data preparation |
 | ISO/IEC 42001 Annex A | A.4.3 | Data resources |
 | EU AI Act | Art-10 | Data and data governance (quality, relevance, bias examination) |
+| ISO/IEC 42005 AI system impact assessment | 6.4 | Data information and quality |
 
 ## `documentation.model_card`
 
@@ -192,6 +200,9 @@ failure mode it targets and the framework controls its evidence supports.
 | EU AI Act | Art-14 | Human oversight |
 | India AI Governance Guidelines | SUTRA-UNDERSTANDABLE | Understandable by design |
 | India AI Governance Guidelines | SUTRA-ACCOUNTABILITY | Accountability |
+| ISO/IEC 42005 AI system impact assessment | 6.3.4 | Intended use |
+| ISO/IEC 42005 AI system impact assessment | 6.3.5 | Unintended uses |
+| ISO/IEC 42005 AI system impact assessment | 6.5 | Algorithm and model information |
 
 ## `audit.detector_sensitivity`
 
@@ -218,6 +229,7 @@ failure mode it targets and the framework controls its evidence supports.
 | ISO/IEC 42001 Annex A | A.6.2.4 | Verification and validation |
 | EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
 | India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
+| ISO/IEC 42005 AI system impact assessment | 6.8.3 | AI system failures and reasonably foreseeable misuse |
 
 ## `llm.sensitive_disclosure`
 
@@ -293,6 +305,73 @@ failure mode it targets and the framework controls its evidence supports.
 | EU AI Act | Art-14 | Human oversight |
 | India AI Governance Guidelines | SUTRA-ACCOUNTABILITY | Accountability |
 | India AI Governance Guidelines | PILLAR-ACCOUNTABILITY | Accountability (graded liability tied to function and risk) |
+| OWASP Top 10 for Agentic Applications | ASI02 | Tool misuse and exploitation |
+| OWASP Top 10 for Agentic Applications | ASI03 | Identity and privilege abuse |
+
+## `agent.misalignment_signals`
+
+- **Failure mode:** Agent reasoning or actions show it pursuing goals against its instructions (self-preservation, deception, oversight evasion, privilege escalation, reward hacking, gaming an evaluation)
+- **Effect if missed:** Autonomous system takes harmful instrumental actions; loss of human control
+
+| Framework | Control | Title |
+|---|---|---|
+| NIST AI Risk Management Framework | MEASURE-2.6 | System is regularly evaluated for safety risks |
+| NIST AI Risk Management Framework | MEASURE-2.7 | Security and resilience are evaluated and documented |
+| NIST AI Risk Management Framework | MANAGE-4.1 | Post-deployment monitoring plans are implemented |
+| NIST AI Risk Management Framework | MANAGE-4.3 | Incidents and errors are tracked, communicated and recovered from |
+| ISO/IEC 42001 Annex A | A.6.2.6 | Operation and monitoring |
+| OWASP Top 10 for LLM Applications | LLM06 | Excessive agency |
+| EU AI Act | Art-14 | Human oversight |
+| EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
+| India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
+| India AI Governance Guidelines | SUTRA-ACCOUNTABILITY | Accountability |
+| ISO/IEC 42005 AI system impact assessment | 6.8.3 | AI system failures and reasonably foreseeable misuse |
+| OWASP Top 10 for Agentic Applications | ASI01 | Agent goal hijack |
+| OWASP Top 10 for Agentic Applications | ASI10 | Rogue agents |
+
+## `agent.control_readiness`
+
+- **Failure mode:** Agent deployed without its own identity, scoped tools, approval gates, stop conditions, tamper-evident logging or a monitor
+- **Effect if missed:** A misaligned or hijacked agent can act irreversibly before anyone can intervene
+
+| Framework | Control | Title |
+|---|---|---|
+| NIST AI Risk Management Framework | GOVERN-3.2 | Roles for human-AI configurations and oversight are defined |
+| NIST AI Risk Management Framework | MAP-3.5 | Human oversight processes are defined, assessed and documented |
+| NIST AI Risk Management Framework | MANAGE-2.4 | Mechanisms exist to supersede, disengage or deactivate misbehaving systems |
+| NIST AI Risk Management Framework | MANAGE-4.1 | Post-deployment monitoring plans are implemented |
+| ISO/IEC 42001 Annex A | A.6.2.6 | Operation and monitoring |
+| OWASP Top 10 for LLM Applications | LLM06 | Excessive agency |
+| OWASP Top 10 for Agentic Applications | ASI02 | Tool misuse and exploitation |
+| OWASP Top 10 for Agentic Applications | ASI03 | Identity and privilege abuse |
+| OWASP Top 10 for Agentic Applications | ASI08 | Cascading failures |
+| OWASP Top 10 for Agentic Applications | ASI10 | Rogue agents |
+| EU AI Act | Art-14 | Human oversight |
+| EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
+| India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
+| India AI Governance Guidelines | SUTRA-ACCOUNTABILITY | Accountability |
+
+## `agent.oversight_integrity`
+
+- **Failure mode:** Agent actions are not explained by logged reasoning, or data the agent reads carries planted instructions
+- **Effect if missed:** Monitors cannot see why the agent acted; indirect prompt injection steers its actions
+
+| Framework | Control | Title |
+|---|---|---|
+| NIST AI Risk Management Framework | MEASURE-2.7 | Security and resilience are evaluated and documented |
+| NIST AI Risk Management Framework | MEASURE-2.8 | Transparency and accountability risks are examined and documented |
+| NIST AI Risk Management Framework | MANAGE-4.1 | Post-deployment monitoring plans are implemented |
+| NIST Generative AI Profile | INFO-SECURITY | Information security (e.g. prompt injection) |
+| ISO/IEC 42001 Annex A | A.6.2.6 | Operation and monitoring |
+| ISO/IEC 42001 Annex A | A.6.2.8 | Recording of event logs |
+| OWASP Top 10 for LLM Applications | LLM01 | Prompt injection |
+| OWASP Top 10 for Agentic Applications | ASI01 | Agent goal hijack |
+| OWASP Top 10 for Agentic Applications | ASI06 | Memory and context poisoning |
+| EU AI Act | Art-12 | Record-keeping and automatic event logging |
+| EU AI Act | Art-14 | Human oversight |
+| EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
+| India AI Governance Guidelines | SUTRA-UNDERSTANDABLE | Understandable by design |
+| India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
 
 ## `audit.process`
 
@@ -311,6 +390,10 @@ failure mode it targets and the framework controls its evidence supports.
 | ISO/IEC 42001 Annex A | A.5.3 | Documentation of impact assessments |
 | EU AI Act | Art-9 | Risk management system |
 | India AI Governance Guidelines | PILLAR-RISK-MITIGATION | Risk mitigation (evidence-based risk assessment, techno-legal measures) |
+| ISO/IEC 42005 AI system impact assessment | 5.8 | Performing the AI system impact assessment |
+| ISO/IEC 42005 AI system impact assessment | 5.9 | Analysing the results of the AI system impact assessment |
+| ISO/IEC 42005 AI system impact assessment | 5.10 | Recording and reporting |
+| ISO/IEC 42005 AI system impact assessment | 5.11 | Approval process |
 
 ## Framework catalogues
 
@@ -320,4 +403,6 @@ failure mode it targets and the framework controls its evidence supports.
 - **EU AI Act** (2024/1689 as amended by 2026/1744): 17 controls. Source: https://eur-lex.europa.eu/eli/reg/2024/1689/oj
 - **India AI Governance Guidelines** (MeitY, Nov 2025): 10 controls. Source: https://indiaai.gov.in/
 - **OWASP Top 10 for LLM Applications** (2025): 10 controls. Source: https://genai.owasp.org/llm-top-10/
+- **OWASP Top 10 for Agentic Applications** (2026): 10 controls. Source: https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/
+- **ISO/IEC 42005 AI system impact assessment** (2025): 15 controls. Source: https://www.iso.org/standard/42005
 

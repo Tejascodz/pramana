@@ -7,7 +7,7 @@ checks:
   governance.risk_classification:
     failure_mode: "System deployed without a documented risk classification"
     effect: "Wrong obligations applied; high-risk duties missed"
-    controls: [NIST:MAP-1.1, NIST:MAP-3.3, NIST:MAP-1.5, NIST:GOVERN-1.1, ISO42001:A.9.4, ISO42001:A.5.2, EUAIA:Art-5, EUAIA:Art-6, INDIA:PILLAR-RISK-MITIGATION]
+    controls: [NIST:MAP-1.1, NIST:MAP-3.3, NIST:MAP-1.5, NIST:GOVERN-1.1, ISO42001:A.9.4, ISO42001:A.5.2, EUAIA:Art-5, EUAIA:Art-6, INDIA:PILLAR-RISK-MITIGATION, ISO42005:5.4, ISO42005:5.5, ISO42005:6.3.4]
 
   performance.discrimination:
     failure_mode: "Model does not separate good and bad outcomes well enough for its intended use"
@@ -17,12 +17,12 @@ checks:
   fairness.group_parity:
     failure_mode: "Outcomes or error rates differ materially across protected groups"
     effect: "Discrimination against applicants; legal and reputational exposure"
-    controls: [NIST:MEASURE-2.11, NIST:MAP-5.1, ISO42001:A.5.4, ISO42001:A.7.4, EUAIA:Art-10, INDIA:SUTRA-FAIRNESS, NIST-GAI:HARMFUL-BIAS]
+    controls: [NIST:MEASURE-2.11, NIST:MAP-5.1, ISO42001:A.5.4, ISO42001:A.7.4, EUAIA:Art-10, INDIA:SUTRA-FAIRNESS, NIST-GAI:HARMFUL-BIAS, ISO42005:6.8.2]
 
   fairness.intersectional:
     failure_mode: "Disparity hidden inside combinations of attributes (e.g. rural women)"
     effect: "Sub-group harm that single-attribute tests miss"
-    controls: [NIST:MEASURE-2.11, ISO42001:A.5.4, EUAIA:Art-10, INDIA:SUTRA-FAIRNESS]
+    controls: [NIST:MEASURE-2.11, ISO42001:A.5.4, EUAIA:Art-10, INDIA:SUTRA-FAIRNESS, ISO42005:6.8.2]
 
   fairness.proxy_features:
     failure_mode: "Model inputs act as proxies for protected attributes"
@@ -32,7 +32,7 @@ checks:
   robustness.perturbation:
     failure_mode: "Small input noise or missing values flip decisions"
     effect: "Unstable, unrepeatable outcomes; exploitable behaviour"
-    controls: [NIST:MEASURE-2.5, NIST:MEASURE-2.7, NIST:MEASURE-2.6, ISO42001:A.6.2.4, EUAIA:Art-15, INDIA:SUTRA-SAFETY]
+    controls: [NIST:MEASURE-2.5, NIST:MEASURE-2.7, NIST:MEASURE-2.6, ISO42001:A.6.2.4, EUAIA:Art-15, INDIA:SUTRA-SAFETY, ISO42005:6.8.3]
 
   calibration.reliability:
     failure_mode: "Predicted probabilities do not match observed rates"
@@ -42,7 +42,7 @@ checks:
   drift.population_stability:
     failure_mode: "Production data no longer resembles the data the model was validated on"
     effect: "Silent performance and fairness decay after deployment"
-    controls: [NIST:MEASURE-2.4, NIST:MEASURE-4.3, NIST:MANAGE-4.1, NIST:MANAGE-2.2, ISO42001:A.6.2.6, EUAIA:Art-72, INDIA:SUTRA-SAFETY]
+    controls: [NIST:MEASURE-2.4, NIST:MEASURE-4.3, NIST:MANAGE-4.1, NIST:MANAGE-2.2, ISO42001:A.6.2.6, EUAIA:Art-72, INDIA:SUTRA-SAFETY, ISO42005:5.12]
 
   explainability.feature_importance:
     failure_mode: "Decision drivers are unknown, undocumented or include prohibited inputs"
@@ -62,12 +62,12 @@ checks:
   data_quality.integrity:
     failure_mode: "Missing values, duplicates, imbalance or target leakage in data"
     effect: "Biased or over-optimistic validation results"
-    controls: [NIST:MAP-2.3, NIST:MEASURE-2.1, ISO42001:A.7.4, ISO42001:A.7.6, ISO42001:A.4.3, EUAIA:Art-10]
+    controls: [NIST:MAP-2.3, NIST:MEASURE-2.1, ISO42001:A.7.4, ISO42001:A.7.6, ISO42001:A.4.3, EUAIA:Art-10, ISO42005:6.4]
 
   documentation.model_card:
     failure_mode: "Intended use, limitations and oversight measures are not documented"
     effect: "Misuse outside scope; failed technical-documentation review"
-    controls: [NIST:MAP-2.2, NIST:MAP-3.5, NIST:GOVERN-4.2, NIST:MEASURE-2.8, ISO42001:A.6.2.3, ISO42001:A.6.2.7, ISO42001:A.8.2, EUAIA:Art-11, EUAIA:Art-13, EUAIA:Art-14, INDIA:SUTRA-UNDERSTANDABLE, INDIA:SUTRA-ACCOUNTABILITY]
+    controls: [NIST:MAP-2.2, NIST:MAP-3.5, NIST:GOVERN-4.2, NIST:MEASURE-2.8, ISO42001:A.6.2.3, ISO42001:A.6.2.7, ISO42001:A.8.2, EUAIA:Art-11, EUAIA:Art-13, EUAIA:Art-14, INDIA:SUTRA-UNDERSTANDABLE, INDIA:SUTRA-ACCOUNTABILITY, ISO42005:6.3.4, ISO42005:6.3.5, ISO42005:6.5]
 
   audit.detector_sensitivity:
     failure_mode: "Audit tests fail to detect a defect that is known to exist"
@@ -77,7 +77,7 @@ checks:
   llm.prompt_injection:
     failure_mode: "Instructions embedded in user or retrieved content override system rules"
     effect: "Policy bypass, data exfiltration, unauthorized actions"
-    controls: [NIST:MEASURE-2.7, NIST-GAI:INFO-SECURITY, OWASP-LLM:LLM01, OWASP-LLM:LLM07, ISO42001:A.6.2.4, EUAIA:Art-15, INDIA:SUTRA-SAFETY]
+    controls: [NIST:MEASURE-2.7, NIST-GAI:INFO-SECURITY, OWASP-LLM:LLM01, OWASP-LLM:LLM07, ISO42001:A.6.2.4, EUAIA:Art-15, INDIA:SUTRA-SAFETY, ISO42005:6.8.3]
 
   llm.sensitive_disclosure:
     failure_mode: "Assistant reveals personal data or confidential configuration"
@@ -102,14 +102,24 @@ checks:
   agent.trace_auditability:
     failure_mode: "Agent actions cannot be attributed, reconstructed or shown to be approved"
     effect: "Accountability gap: actions occur with no traceable authority"
-    controls: [NIST:MEASURE-2.8, NIST:GOVERN-3.2, NIST:MANAGE-4.3, NIST:MAP-3.5, ISO42001:A.6.2.8, OWASP-LLM:LLM06, EUAIA:Art-12, EUAIA:Art-14, INDIA:SUTRA-ACCOUNTABILITY, INDIA:PILLAR-ACCOUNTABILITY]
+    controls: [NIST:MEASURE-2.8, NIST:GOVERN-3.2, NIST:MANAGE-4.3, NIST:MAP-3.5, ISO42001:A.6.2.8, OWASP-LLM:LLM06, EUAIA:Art-12, EUAIA:Art-14, INDIA:SUTRA-ACCOUNTABILITY, INDIA:PILLAR-ACCOUNTABILITY, OWASP-ASI:ASI02, OWASP-ASI:ASI03]
 
   agent.misalignment_signals:
-    failure_mode: "Agent reasoning or actions show it pursuing goals against its instructions (self-preservation, deception, oversight evasion, privilege escalation, reward hacking)"
+    failure_mode: "Agent reasoning or actions show it pursuing goals against its instructions (self-preservation, deception, oversight evasion, privilege escalation, reward hacking, gaming an evaluation)"
     effect: "Autonomous system takes harmful instrumental actions; loss of human control"
-    controls: [NIST:MEASURE-2.6, NIST:MEASURE-2.7, NIST:MANAGE-4.1, NIST:MANAGE-4.3, ISO42001:A.6.2.6, OWASP-LLM:LLM06, EUAIA:Art-14, EUAIA:Art-15, INDIA:SUTRA-SAFETY, INDIA:SUTRA-ACCOUNTABILITY]
+    controls: [NIST:MEASURE-2.6, NIST:MEASURE-2.7, NIST:MANAGE-4.1, NIST:MANAGE-4.3, ISO42001:A.6.2.6, OWASP-LLM:LLM06, EUAIA:Art-14, EUAIA:Art-15, INDIA:SUTRA-SAFETY, INDIA:SUTRA-ACCOUNTABILITY, ISO42005:6.8.3, OWASP-ASI:ASI01, OWASP-ASI:ASI10]
+
+  agent.control_readiness:
+    failure_mode: "Agent deployed without its own identity, scoped tools, approval gates, stop conditions, tamper-evident logging or a monitor"
+    effect: "A misaligned or hijacked agent can act irreversibly before anyone can intervene"
+    controls: [NIST:GOVERN-3.2, NIST:MAP-3.5, NIST:MANAGE-2.4, NIST:MANAGE-4.1, ISO42001:A.6.2.6, OWASP-LLM:LLM06, OWASP-ASI:ASI02, OWASP-ASI:ASI03, OWASP-ASI:ASI08, OWASP-ASI:ASI10, EUAIA:Art-14, EUAIA:Art-15, INDIA:SUTRA-SAFETY, INDIA:SUTRA-ACCOUNTABILITY]
+
+  agent.oversight_integrity:
+    failure_mode: "Agent actions are not explained by logged reasoning, or data the agent reads carries planted instructions"
+    effect: "Monitors cannot see why the agent acted; indirect prompt injection steers its actions"
+    controls: [NIST:MEASURE-2.7, NIST:MEASURE-2.8, NIST:MANAGE-4.1, NIST-GAI:INFO-SECURITY, ISO42001:A.6.2.6, ISO42001:A.6.2.8, OWASP-LLM:LLM01, OWASP-ASI:ASI01, OWASP-ASI:ASI06, EUAIA:Art-12, EUAIA:Art-14, EUAIA:Art-15, INDIA:SUTRA-UNDERSTANDABLE, INDIA:SUTRA-SAFETY]
 
   audit.process:
     failure_mode: "No documented test plan, go/no-go decision or risk treatment for the release"
     effect: "Deployment decisions cannot be shown to be risk-based"
-    controls: [NIST:MEASURE-1.1, NIST:MEASURE-2.1, NIST:MAP-5.1, NIST:MANAGE-1.1, NIST:MANAGE-1.2, NIST:MANAGE-1.3, NIST:MANAGE-1.4, ISO42001:A.5.3, EUAIA:Art-9, INDIA:PILLAR-RISK-MITIGATION]
+    controls: [NIST:MEASURE-1.1, NIST:MEASURE-2.1, NIST:MAP-5.1, NIST:MANAGE-1.1, NIST:MANAGE-1.2, NIST:MANAGE-1.3, NIST:MANAGE-1.4, ISO42001:A.5.3, EUAIA:Art-9, INDIA:PILLAR-RISK-MITIGATION, ISO42005:5.8, ISO42005:5.9, ISO42005:5.10, ISO42005:5.11]

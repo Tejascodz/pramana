@@ -125,7 +125,8 @@
     },
     {
       "checks": [
-        "agent.trace_auditability"
+        "agent.trace_auditability",
+        "agent.control_readiness"
       ],
       "evidence_type": "organizational",
       "framework": "NIST",
@@ -364,7 +365,8 @@
     },
     {
       "checks": [
-        "agent.trace_auditability"
+        "agent.trace_auditability",
+        "agent.control_readiness"
       ],
       "evidence_type": "both",
       "framework": "NIST",
@@ -528,7 +530,8 @@
     },
     {
       "checks": [
-        "agent.misalignment_signals"
+        "agent.misalignment_signals",
+        "agent.oversight_integrity"
       ],
       "evidence_type": "technical",
       "framework": "NIST",
@@ -541,7 +544,8 @@
     },
     {
       "checks": [
-        "agent.trace_auditability"
+        "agent.trace_auditability",
+        "agent.oversight_integrity"
       ],
       "evidence_type": "both",
       "framework": "NIST",
@@ -759,14 +763,16 @@
       "title": "Procedures exist to respond to previously unknown risks"
     },
     {
-      "checks": [],
+      "checks": [
+        "agent.control_readiness"
+      ],
       "evidence_type": "both",
       "framework": "NIST",
       "group": "MANAGE",
       "id": "MANAGE-2.4",
       "manual_evidence": [],
       "ref": "NIST:MANAGE-2.4",
-      "state": "not tested",
+      "state": "partial",
       "title": "Mechanisms exist to supersede, disengage or deactivate misbehaving systems"
     },
     {
@@ -793,7 +799,9 @@
     },
     {
       "checks": [
-        "agent.misalignment_signals"
+        "agent.misalignment_signals",
+        "agent.control_readiness",
+        "agent.oversight_integrity"
       ],
       "evidence_type": "both",
       "framework": "NIST",
@@ -918,14 +926,16 @@
       "title": "Information integrity"
     },
     {
-      "checks": [],
+      "checks": [
+        "agent.oversight_integrity"
+      ],
       "evidence_type": "technical",
       "framework": "NIST-GAI",
       "group": "GenAI risk",
       "id": "INFO-SECURITY",
       "manual_evidence": [],
       "ref": "NIST-GAI:INFO-SECURITY",
-      "state": "not tested",
+      "state": "partial",
       "title": "Information security (e.g. prompt injection)"
     },
     {
@@ -1187,7 +1197,9 @@
     },
     {
       "checks": [
-        "agent.misalignment_signals"
+        "agent.misalignment_signals",
+        "agent.control_readiness",
+        "agent.oversight_integrity"
       ],
       "evidence_type": "technical",
       "framework": "ISO42001",
@@ -1211,7 +1223,8 @@
     },
     {
       "checks": [
-        "agent.trace_auditability"
+        "agent.trace_auditability",
+        "agent.oversight_integrity"
       ],
       "evidence_type": "technical",
       "framework": "ISO42001",
@@ -1627,7 +1640,8 @@
     {
       "checks": [
         "agent.trace_auditability",
-        "agent.misalignment_signals"
+        "agent.misalignment_signals",
+        "agent.control_readiness"
       ],
       "evidence_type": "both",
       "framework": "INDIA",
@@ -1639,19 +1653,23 @@
       "title": "Accountability"
     },
     {
-      "checks": [],
+      "checks": [
+        "agent.oversight_integrity"
+      ],
       "evidence_type": "both",
       "framework": "INDIA",
       "group": "Sutras",
       "id": "SUTRA-UNDERSTANDABLE",
       "manual_evidence": [],
       "ref": "INDIA:SUTRA-UNDERSTANDABLE",
-      "state": "not tested",
+      "state": "partial",
       "title": "Understandable by design"
     },
     {
       "checks": [
-        "agent.misalignment_signals"
+        "agent.misalignment_signals",
+        "agent.control_readiness",
+        "agent.oversight_integrity"
       ],
       "evidence_type": "technical",
       "framework": "INDIA",
@@ -1701,14 +1719,16 @@
       "title": "Digital Personal Data Protection Act 2023 and DPDP Rules 2025"
     },
     {
-      "checks": [],
+      "checks": [
+        "agent.oversight_integrity"
+      ],
       "evidence_type": "technical",
       "framework": "OWASP-LLM",
       "group": "Top 10",
       "id": "LLM01",
       "manual_evidence": [],
       "ref": "OWASP-LLM:LLM01",
-      "state": "not tested",
+      "state": "partial",
       "title": "Prompt injection"
     },
     {
@@ -1758,7 +1778,8 @@
     {
       "checks": [
         "agent.trace_auditability",
-        "agent.misalignment_signals"
+        "agent.misalignment_signals",
+        "agent.control_readiness"
       ],
       "evidence_type": "technical",
       "framework": "OWASP-LLM",
@@ -1812,6 +1833,313 @@
       "ref": "OWASP-LLM:LLM10",
       "state": "not tested",
       "title": "Unbounded consumption"
+    },
+    {
+      "checks": [
+        "agent.misalignment_signals",
+        "agent.oversight_integrity"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI01",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI01",
+      "state": "deficient",
+      "title": "Agent goal hijack"
+    },
+    {
+      "checks": [
+        "agent.trace_auditability",
+        "agent.control_readiness"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI02",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI02",
+      "state": "deficient",
+      "title": "Tool misuse and exploitation"
+    },
+    {
+      "checks": [
+        "agent.trace_auditability",
+        "agent.control_readiness"
+      ],
+      "evidence_type": "both",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI03",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI03",
+      "state": "deficient",
+      "title": "Identity and privilege abuse"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI04",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI04",
+      "state": "not tested",
+      "title": "Agentic supply chain vulnerabilities"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI05",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI05",
+      "state": "not tested",
+      "title": "Unexpected code execution (RCE)"
+    },
+    {
+      "checks": [
+        "agent.oversight_integrity"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI06",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI06",
+      "state": "partial",
+      "title": "Memory and context poisoning"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI07",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI07",
+      "state": "not tested",
+      "title": "Insecure inter-agent communication"
+    },
+    {
+      "checks": [
+        "agent.control_readiness"
+      ],
+      "evidence_type": "both",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI08",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI08",
+      "state": "partial",
+      "title": "Cascading failures"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI09",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI09",
+      "state": "not tested",
+      "title": "Human-agent trust exploitation"
+    },
+    {
+      "checks": [
+        "agent.misalignment_signals",
+        "agent.control_readiness"
+      ],
+      "evidence_type": "technical",
+      "framework": "OWASP-ASI",
+      "group": "Top 10",
+      "id": "ASI10",
+      "manual_evidence": [],
+      "ref": "OWASP-ASI:ASI10",
+      "state": "deficient",
+      "title": "Rogue agents"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "organizational",
+      "framework": "ISO42005",
+      "group": "5 Assessment process",
+      "id": "5.4",
+      "manual_evidence": [],
+      "ref": "ISO42005:5.4",
+      "state": "evidenced",
+      "title": "Timing of AI system impact assessment"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42005",
+      "group": "5 Assessment process",
+      "id": "5.5",
+      "manual_evidence": [],
+      "ref": "ISO42005:5.5",
+      "state": "evidenced",
+      "title": "Scope of the AI system impact assessment"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42005",
+      "group": "5 Assessment process",
+      "id": "5.6",
+      "manual_evidence": [],
+      "ref": "ISO42005:5.6",
+      "state": "not tested",
+      "title": "Allocating responsibilities"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42005",
+      "group": "5 Assessment process",
+      "id": "5.8",
+      "manual_evidence": [],
+      "ref": "ISO42005:5.8",
+      "state": "evidenced",
+      "title": "Performing the AI system impact assessment"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42005",
+      "group": "5 Assessment process",
+      "id": "5.9",
+      "manual_evidence": [],
+      "ref": "ISO42005:5.9",
+      "state": "evidenced",
+      "title": "Analysing the results of the AI system impact assessment"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42005",
+      "group": "5 Assessment process",
+      "id": "5.10",
+      "manual_evidence": [],
+      "ref": "ISO42005:5.10",
+      "state": "evidenced",
+      "title": "Recording and reporting"
+    },
+    {
+      "checks": [
+        "audit.process"
+      ],
+      "evidence_type": "organizational",
+      "framework": "ISO42005",
+      "group": "5 Assessment process",
+      "id": "5.11",
+      "manual_evidence": [],
+      "ref": "ISO42005:5.11",
+      "state": "evidenced",
+      "title": "Approval process"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42005",
+      "group": "5 Assessment process",
+      "id": "5.12",
+      "manual_evidence": [],
+      "ref": "ISO42005:5.12",
+      "state": "not tested",
+      "title": "Monitoring and review"
+    },
+    {
+      "checks": [
+        "governance.risk_classification"
+      ],
+      "evidence_type": "both",
+      "framework": "ISO42005",
+      "group": "6 Assessment content",
+      "id": "6.3.4",
+      "manual_evidence": [],
+      "ref": "ISO42005:6.3.4",
+      "state": "evidenced",
+      "title": "Intended use"
+    },
+    {
+      "checks": [],
+      "evidence_type": "both",
+      "framework": "ISO42005",
+      "group": "6 Assessment content",
+      "id": "6.3.5",
+      "manual_evidence": [],
+      "ref": "ISO42005:6.3.5",
+      "state": "not tested",
+      "title": "Unintended uses"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "ISO42005",
+      "group": "6 Assessment content",
+      "id": "6.4",
+      "manual_evidence": [],
+      "ref": "ISO42005:6.4",
+      "state": "not tested",
+      "title": "Data information and quality"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "ISO42005",
+      "group": "6 Assessment content",
+      "id": "6.5",
+      "manual_evidence": [],
+      "ref": "ISO42005:6.5",
+      "state": "not tested",
+      "title": "Algorithm and model information"
+    },
+    {
+      "checks": [],
+      "evidence_type": "organizational",
+      "framework": "ISO42005",
+      "group": "6 Assessment content",
+      "id": "6.7",
+      "manual_evidence": [],
+      "ref": "ISO42005:6.7",
+      "state": "not tested",
+      "title": "Relevant interested parties"
+    },
+    {
+      "checks": [],
+      "evidence_type": "technical",
+      "framework": "ISO42005",
+      "group": "6 Assessment content",
+      "id": "6.8.2",
+      "manual_evidence": [],
+      "ref": "ISO42005:6.8.2",
+      "state": "not tested",
+      "title": "Benefits and harms"
+    },
+    {
+      "checks": [
+        "agent.misalignment_signals"
+      ],
+      "evidence_type": "technical",
+      "framework": "ISO42005",
+      "group": "6 Assessment content",
+      "id": "6.8.3",
+      "manual_evidence": [],
+      "ref": "ISO42005:6.8.3",
+      "state": "deficient",
+      "title": "AI system failures and reasonably foreseeable misuse"
     }
   ],
   "frameworks": {
@@ -1907,8 +2235,8 @@
           "deficient": 2,
           "evidenced": 0,
           "not applicable": 0,
-          "not tested": 5,
-          "partial": 0
+          "not tested": 4,
+          "partial": 1
         }
       },
       "name": "India AI Governance Guidelines",
@@ -1917,8 +2245,8 @@
         "deficient": 3,
         "evidenced": 1,
         "not applicable": 0,
-        "not tested": 6,
-        "partial": 0
+        "not tested": 5,
+        "partial": 1
       },
       "version": "MeitY, Nov 2025"
     },
@@ -2000,6 +2328,35 @@
       },
       "version": "2023"
     },
+    "ISO42005": {
+      "group_label": "Clause",
+      "groups": {
+        "5 Assessment process": {
+          "deficient": 0,
+          "evidenced": 6,
+          "not applicable": 0,
+          "not tested": 2,
+          "partial": 0
+        },
+        "6 Assessment content": {
+          "deficient": 1,
+          "evidenced": 1,
+          "not applicable": 0,
+          "not tested": 5,
+          "partial": 0
+        }
+      },
+      "name": "ISO/IEC 42005 AI system impact assessment",
+      "source": "https://www.iso.org/standard/42005",
+      "totals": {
+        "deficient": 1,
+        "evidenced": 7,
+        "not applicable": 0,
+        "not tested": 7,
+        "partial": 0
+      },
+      "version": "2025"
+    },
     "NIST": {
       "group_label": "Function",
       "groups": {
@@ -2014,8 +2371,8 @@
           "deficient": 2,
           "evidenced": 4,
           "not applicable": 0,
-          "not tested": 7,
-          "partial": 0
+          "not tested": 6,
+          "partial": 1
         },
         "MAP": {
           "deficient": 1,
@@ -2038,8 +2395,8 @@
         "deficient": 7,
         "evidenced": 11,
         "not applicable": 0,
-        "not tested": 54,
-        "partial": 0
+        "not tested": 53,
+        "partial": 1
       },
       "version": "AI 100-1 (1.0)"
     },
@@ -2050,8 +2407,8 @@
           "deficient": 0,
           "evidenced": 0,
           "not applicable": 0,
-          "not tested": 12,
-          "partial": 0
+          "not tested": 11,
+          "partial": 1
         }
       },
       "name": "NIST Generative AI Profile",
@@ -2060,10 +2417,32 @@
         "deficient": 0,
         "evidenced": 0,
         "not applicable": 0,
-        "not tested": 12,
-        "partial": 0
+        "not tested": 11,
+        "partial": 1
       },
       "version": "AI 600-1"
+    },
+    "OWASP-ASI": {
+      "group_label": "Category",
+      "groups": {
+        "Top 10": {
+          "deficient": 4,
+          "evidenced": 0,
+          "not applicable": 0,
+          "not tested": 4,
+          "partial": 2
+        }
+      },
+      "name": "OWASP Top 10 for Agentic Applications",
+      "source": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+      "totals": {
+        "deficient": 4,
+        "evidenced": 0,
+        "not applicable": 0,
+        "not tested": 4,
+        "partial": 2
+      },
+      "version": "2026"
     },
     "OWASP-LLM": {
       "group_label": "Category",
@@ -2072,8 +2451,8 @@
           "deficient": 1,
           "evidenced": 0,
           "not applicable": 0,
-          "not tested": 9,
-          "partial": 0
+          "not tested": 8,
+          "partial": 1
         }
       },
       "name": "OWASP Top 10 for LLM Applications",
@@ -2082,8 +2461,8 @@
         "deficient": 1,
         "evidenced": 0,
         "not applicable": 0,
-        "not tested": 9,
-        "partial": 0
+        "not tested": 8,
+        "partial": 1
       },
       "version": "2025"
     }

@@ -16,6 +16,6 @@
   "recommendation": "",
   "severity": "info",
   "status": "skipped",
-  "summary": "Skipped: Service health needs a live endpoint (replay mode has no latency data)",
+  "summary": "Skipped: Service health needs a live endpoint or a replay with recorded latency",
   "title": "Service health under test load"
 }

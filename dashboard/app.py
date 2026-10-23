@@ -28,22 +28,37 @@ def plain(value: object) -> str:
     return MARKDOWN_SPECIAL.sub(r"\\\1", str(value))
 
 
-def load_results() -> dict | None:
+def load_results() -> tuple[dict | None, Path | None]:
+    """The results and, when read from disk, the pack folder they came from."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--pack", default=None)
     args, _ = parser.parse_known_args(sys.argv[1:])
     if args.pack:
         path = Path(args.pack) / "results.json"
         if path.exists():
-            return json.loads(path.read_text(encoding="utf-8"))
+            return json.loads(path.read_text(encoding="utf-8")), Path(args.pack)
         st.error(f"No results.json in {args.pack}")
     uploaded = st.sidebar.file_uploader("Upload results.json", type="json")
-    return json.load(uploaded) if uploaded else None
+    return (json.load(uploaded) if uploaded else None), None
+
+
+def show_integrity(pack: Path | None) -> None:
+    """Re-verify the pack on every view, so an edited pack is never shown as genuine."""
+    if pack is None:
+        st.caption("Uploaded results.json: integrity not checked (open the full pack with --pack).")
+        return
+    from pramana.audit.ledger import verify_pack
+
+    ok, problems = verify_pack(pack)
+    if ok:
+        st.success("Evidence verified: every file matches the hash chain.")
+    else:
+        st.error("This pack has been altered since the audit: " + plain("; ".join(problems[:5])))
 
 
 def main() -> None:
     st.set_page_config(page_title="Pramana audit viewer", layout="wide")
-    data = load_results()
+    data, pack = load_results()
     if data is None:
         st.title("Pramana audit viewer")
         st.info(
@@ -54,6 +69,7 @@ def main() -> None:
     system = data["system"]
     st.title(plain(f"{system['name']} v{system['version']}"))
     st.caption(plain(f"Audit {data['audit_id']} · {data['audit_date']} · owner {system['owner']}"))
+    show_integrity(pack)
 
     risks = pd.DataFrame(data["risks"])
     open_risks = risks[~risks["accepted"]] if not risks.empty else risks

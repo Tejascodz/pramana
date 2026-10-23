@@ -171,7 +171,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <header class="top">
   <div>
-    <p class="eyebrow">AI system audit report · PRM-20261021-275F46</p>
+    <p class="eyebrow">AI system audit report · PRM-20261021-6E6BB8</p>
     <h1>Nilgiri Finance Personal Loan Pre-Approval Model</h1>
     <div class="meta">
       Version 2.3.0 · Owner Credit Risk Analytics
@@ -221,8 +221,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 <section class="kpis" style="margin-bottom:18px">
   <div class="kpi"><div class="v">4/16</div><div class="l">checks passed</div></div>
   <div class="kpi"><div class="v">7</div><div class="l">open high or critical risks</div></div>
-  <div class="kpi"><div class="v">62/136</div><div class="l">applicable controls tested by automation</div></div>
-  <div class="kpi"><div class="v mono" style="font-size:18px">af3fc7ef4191</div><div class="l">evidence root hash</div></div>
+  <div class="kpi"><div class="v">75/151</div><div class="l">applicable controls tested by automation</div></div>
+  <div class="kpi"><div class="v mono" style="font-size:18px">008d4715f873</div><div class="l">evidence root hash</div></div>
 </section>
 
 <section class="card" id="risks">
@@ -271,15 +271,15 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <summary><span class="chip fail">fail</span>Risk classification <span class="note mono">governance.risk_classification</span></summary>
     <div class="finding-body">
       <p>EU AI Act tier: high (Art. 6(2) and Annex III point 5(b): Creditworthiness or credit scoring of natural persons); the Act applies. India context sensitivity: high (score 7/10). The owner declared &#39;limited&#39;, lower than the assessed &#39;high&#39; tier. 3 upcoming regulatory milestone(s) apply.</p>
-<p><strong>Recommendation.</strong> Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation.</p><p><span class="tag">NIST:MAP-1.1</span><span class="tag">NIST:MAP-3.3</span><span class="tag">NIST:MAP-1.5</span><span class="tag">NIST:GOVERN-1.1</span><span class="tag">ISO42001:A.9.4</span><span class="tag">ISO42001:A.5.2</span><span class="tag">EUAIA:Art-5</span><span class="tag">EUAIA:Art-6</span><span class="tag">INDIA:PILLAR-RISK-MITIGATION</span></p>      <p class="note">eu_tier = <span class="mono">high</span> · declared_eu_tier = <span class="mono">limited</span> · india_sensitivity = <span class="mono">high</span> · upcoming_obligations = <span class="mono">3</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">6a5184cde234741db87b9c1115aed79f226dc0d5dfe5025d5927365418155bbd</span></p>    </div>
+<p><strong>Recommendation.</strong> Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation.</p><p><span class="tag">NIST:MAP-1.1</span><span class="tag">NIST:MAP-3.3</span><span class="tag">NIST:MAP-1.5</span><span class="tag">NIST:GOVERN-1.1</span><span class="tag">ISO42001:A.9.4</span><span class="tag">ISO42001:A.5.2</span><span class="tag">EUAIA:Art-5</span><span class="tag">EUAIA:Art-6</span><span class="tag">INDIA:PILLAR-RISK-MITIGATION</span><span class="tag">ISO42005:5.4</span><span class="tag">ISO42005:5.5</span><span class="tag">ISO42005:6.3.4</span></p>      <p class="note">eu_tier = <span class="mono">high</span> · declared_eu_tier = <span class="mono">limited</span> · india_sensitivity = <span class="mono">high</span> · upcoming_obligations = <span class="mono">3</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">e18db9b8327cbd185b6b20dc2bf2e2ecc3e7f1585902ca5bf175e251f1f5f8e9</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Data quality <span class="note mono">data_quality.integrity</span></summary>
     <div class="finding-body">
       <p>Issues: evaluation_data: missing values above 5% in bureau_score; evaluation_data: 1.6% duplicate rows; reference_data: missing values above 5% in bureau_score.</p>
-<p><strong>Recommendation.</strong> Document how missing values are handled, de-duplicate records, and confirm no input is recorded after the outcome it predicts.</p><p><span class="tag">NIST:MAP-2.3</span><span class="tag">NIST:MEASURE-2.1</span><span class="tag">ISO42001:A.7.4</span><span class="tag">ISO42001:A.7.6</span><span class="tag">ISO42001:A.4.3</span><span class="tag">EUAIA:Art-10</span></p>      <p class="note">issues = <span class="mono">3</span> · leakage_suspects = <span class="mono">0</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">079b4736b70310e2a231f4d42fe330e8356389900f700166ca4f7fbc405adc00</span></p>    </div>
+<p><strong>Recommendation.</strong> Document how missing values are handled, de-duplicate records, and confirm no input is recorded after the outcome it predicts.</p><p><span class="tag">NIST:MAP-2.3</span><span class="tag">NIST:MEASURE-2.1</span><span class="tag">ISO42001:A.7.4</span><span class="tag">ISO42001:A.7.6</span><span class="tag">ISO42001:A.4.3</span><span class="tag">EUAIA:Art-10</span><span class="tag">ISO42005:6.4</span></p>      <p class="note">issues = <span class="mono">3</span> · leakage_suspects = <span class="mono">0</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">a8c7490eb70e9152e31d411b83adea084aa448deb8a3af1b0becb64894e2b852</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Predictive performance <span class="note mono">performance.discrimination</span></summary>
@@ -291,44 +291,44 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <details >
     <summary><span class="chip pass">pass</span>Calibration <span class="note mono">calibration.reliability</span></summary>
     <div class="finding-body">
-      <p>Expected calibration error 0.031 (limit 0.05), Brier score 0.161. Worst group: age_band=60+ with ECE 0.078.</p>
-<p><span class="tag">NIST:MEASURE-2.5</span><span class="tag">NIST:MEASURE-2.9</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:SUTRA-UNDERSTANDABLE</span></p>      <p class="note">ece = <span class="mono">0.031</span> · brier = <span class="mono">0.1612</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">1efd70aa4696e7cbde71f1727b912f305858c48d3a48b609b48f65bb6a9765e9</span></p>    </div>
+      <p>Expected calibration error 0.031 (limit 0.05; equal-mass bins 0.035), Brier score 0.161. Worst group: age_band=60+ with ECE 0.078.</p>
+<p><span class="tag">NIST:MEASURE-2.5</span><span class="tag">NIST:MEASURE-2.9</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:SUTRA-UNDERSTANDABLE</span></p>      <p class="note">ece = <span class="mono">0.031</span> · adaptive_ece = <span class="mono">0.0353</span> · brier = <span class="mono">0.1612</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">acc9f40f7deb9b8d4c85a0daa24407bf483ee7247a7f4c73b527d68ea04fb41a</span></p>    </div>
   </details>
   <details open>
     <summary><span class="chip fail">fail</span>Group fairness <span class="note mono">fairness.group_parity</span></summary>
     <div class="finding-body">
-      <p>gender: DI 0.97 (female vs male, p=0.017), EOdds diff 0.04; age_band: DI 0.96 (18-25 vs 60+, p=0.169), EOdds diff 0.03; residence: DI 0.72 (rural vs urban, p=3.11e-71), EOdds diff 0.23. Thresholds: DI &gt;= 0.8, equalized-odds difference &lt;= 0.1.</p>
-<p><strong>Recommendation.</strong> Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence.</p><p><span class="tag">NIST:MEASURE-2.11</span><span class="tag">NIST:MAP-5.1</span><span class="tag">ISO42001:A.5.4</span><span class="tag">ISO42001:A.7.4</span><span class="tag">EUAIA:Art-10</span><span class="tag">INDIA:SUTRA-FAIRNESS</span><span class="tag">NIST-GAI:HARMFUL-BIAS</span></p>      <p class="note">di_gender = <span class="mono">0.9686</span> · di_age_band = <span class="mono">0.9581</span> · di_residence = <span class="mono">0.7192</span> · eodds_gender = <span class="mono">0.0412</span> · eodds_age_band = <span class="mono">0.0317</span> · eodds_residence = <span class="mono">0.2343</span> · unassessed_attributes = <span class="mono">[]</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">26f88bb4c5768c800571a7e6e88209c6fba44cfe1832a61f7310670d6e8301fa</span></p>    </div>
+      <p>gender: DI 0.97 (female vs male, p=0.017), EOdds diff 0.04; age_band: DI 0.96 (18-25 vs 60+, p=0.169), EOdds diff 0.03; residence: DI 0.72 (rural vs urban, p=3.11e-71), EOdds diff 0.23 (observed outcome rates differ by 0.25 between groups, so equal error rates and calibration cannot both be met; choosing which governs is a policy decision). Thresholds: DI &gt;= 0.8, equalized-odds difference &lt;= 0.1.</p>
+<p><strong>Recommendation.</strong> Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: residence.</p><p><span class="tag">NIST:MEASURE-2.11</span><span class="tag">NIST:MAP-5.1</span><span class="tag">ISO42001:A.5.4</span><span class="tag">ISO42001:A.7.4</span><span class="tag">EUAIA:Art-10</span><span class="tag">INDIA:SUTRA-FAIRNESS</span><span class="tag">NIST-GAI:HARMFUL-BIAS</span><span class="tag">ISO42005:6.8.2</span></p>      <p class="note">di_gender = <span class="mono">0.9686</span> · di_age_band = <span class="mono">0.9581</span> · di_residence = <span class="mono">0.7192</span> · eodds_gender = <span class="mono">0.0412</span> · eodds_age_band = <span class="mono">0.0317</span> · eodds_residence = <span class="mono">0.2343</span> · unassessed_attributes = <span class="mono">[]</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">9a9536e6189b69ab85ce8056eff71ef1cc7f978554065530c55bbbf765c3753d</span></p>    </div>
   </details>
   <details open>
     <summary><span class="chip fail">fail</span>Intersectional fairness <span class="note mono">fairness.intersectional</span></summary>
     <div class="finding-body">
       <p>Worst pair age_band × residence: DI 0.66 between &#39;18-25 × rural&#39; and &#39;60+ × urban&#39; (p=5.61e-10); lowest single-attribute DI for the same attributes is 0.72. The intersectional gap is larger than either attribute shows on its own.</p>
-<p><strong>Recommendation.</strong> Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance. Collect more data for subgroups below the minimum sample size.</p><p><span class="tag">NIST:MEASURE-2.11</span><span class="tag">ISO42001:A.5.4</span><span class="tag">EUAIA:Art-10</span><span class="tag">INDIA:SUTRA-FAIRNESS</span></p>      <p class="note">worst_pair = <span class="mono">age_band × residence</span> · worst_intersectional_di = <span class="mono">0.6607</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">05576416040cd6a614cdf5ca7bc7f8bafd9eb6458680d2dbd203a04a43b549b2</span></p>    </div>
+<p><strong>Recommendation.</strong> Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance. Collect more data for subgroups below the minimum sample size.</p><p><span class="tag">NIST:MEASURE-2.11</span><span class="tag">ISO42001:A.5.4</span><span class="tag">EUAIA:Art-10</span><span class="tag">INDIA:SUTRA-FAIRNESS</span><span class="tag">ISO42005:6.8.2</span></p>      <p class="note">worst_pair = <span class="mono">age_band × residence</span> · worst_intersectional_di = <span class="mono">0.6607</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">db883c5a791651b2663d125f5383c2b302ce9ecf1509defcd3973a9f40f90f54</span></p>    </div>
   </details>
   <details open>
     <summary><span class="chip fail">fail</span>Proxy-feature screening <span class="note mono">fairness.proxy_features</span></summary>
     <div class="finding-body">
-      <p>5 feature/attribute pairs exceed proxy AUC 0.7: pincode_risk_band→residence (AUC 0.99), monthly_income→residence (AUC 0.85), credit_history_months→age_band (AUC 0.83), loan_amount→residence (AUC 0.76), employment_type→residence (AUC 0.73).</p>
+      <p>5 feature/attribute pairs exceed proxy AUC 0.7: pincode_risk_band→residence (AUC 0.99), monthly_income→residence (AUC 0.85), credit_history_months→age_band (AUC 0.83), loan_amount→residence (AUC 0.76), employment_type→residence (AUC 0.72).</p>
 <p><strong>Recommendation.</strong> For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them.</p><p><span class="tag">NIST:MEASURE-2.11</span><span class="tag">NIST:MAP-2.3</span><span class="tag">ISO42001:A.7.4</span><span class="tag">ISO42001:A.7.6</span><span class="tag">EUAIA:Art-10</span><span class="tag">INDIA:SUTRA-FAIRNESS</span></p>      <p class="note">flagged_pairs = <span class="mono">5</span> · direct_sensitive_inputs = <span class="mono">0</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">cbdbf1ce1d852cb908aec559a8bcc350980778891830f11d6001191abc9cde41</span></p>    </div>
+<p class="note">Evidence SHA-256 <span class="mono hash">1d4b4e76a5add583bd6370d0a6746dc2aaeeff8d4108f1666fa83bcec0d728f1</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Robustness to perturbation <span class="note mono">robustness.perturbation</span></summary>
     <div class="finding-body">
       <p>Decision flip rate 1.3% at 1% noise, 4.0% at 5%, 5.7% at 10% of each feature&#39;s std (limit 5%). 10% missing numeric values flip 2.9% of decisions. monthly_income should be increasing: violated for 14.4% of rows. bureau_score should be increasing: violated for 7.8% of rows. debt_to_income should be decreasing: violated for 18.0% of rows.</p>
-<p><strong>Recommendation.</strong> Add input validation and imputation, apply monotonic constraints where the business logic requires them, and add a manual-review band around the decision threshold.</p><p><span class="tag">NIST:MEASURE-2.5</span><span class="tag">NIST:MEASURE-2.7</span><span class="tag">NIST:MEASURE-2.6</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:SUTRA-SAFETY</span></p>      <p class="note">flip_rate_1pct = <span class="mono">0.0126</span> · flip_rate_5pct = <span class="mono">0.0402</span> · flip_rate_10pct = <span class="mono">0.0568</span> · missing_value_flip_rate = <span class="mono">0.0292</span> · handles_missing = <span class="mono">True</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">102c1a952d2e00fc0e8005cfe3865386700e43c4fd036c1b7888e79fbbea4e99</span></p>    </div>
+<p><strong>Recommendation.</strong> Add input validation and imputation, apply monotonic constraints where the business logic requires them, and add a manual-review band around the decision threshold.</p><p><span class="tag">NIST:MEASURE-2.5</span><span class="tag">NIST:MEASURE-2.7</span><span class="tag">NIST:MEASURE-2.6</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:SUTRA-SAFETY</span><span class="tag">ISO42005:6.8.3</span></p>      <p class="note">flip_rate_1pct = <span class="mono">0.0126</span> · flip_rate_5pct = <span class="mono">0.0402</span> · flip_rate_10pct = <span class="mono">0.0568</span> · missing_value_flip_rate = <span class="mono">0.0292</span> · handles_missing = <span class="mono">True</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">a134c131062297d64480d1f6ad8f1a4009627caf5f6d637b39822e68e9935e33</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Data and prediction drift <span class="note mono">drift.population_stability</span></summary>
     <div class="finding-body">
       <p>Compared reference data with production_data (3000 rows). 2 features with major drift (PSI &gt;= 0.25), 1 moderate. Largest shifts: employment_type (PSI 0.28), monthly_income (PSI 0.25), loan_amount (PSI 0.16). Score PSI 0.050; favourable-decision rate moved from 83.6% to 90.5%.</p>
-<p><strong>Recommendation.</strong> Re-validate performance and fairness on recent labelled data, review the drivers of the largest shifts, and set PSI alerts in production monitoring.</p><p><span class="tag">NIST:MEASURE-2.4</span><span class="tag">NIST:MEASURE-4.3</span><span class="tag">NIST:MANAGE-4.1</span><span class="tag">NIST:MANAGE-2.2</span><span class="tag">ISO42001:A.6.2.6</span><span class="tag">EUAIA:Art-72</span><span class="tag">INDIA:SUTRA-SAFETY</span></p>      <p class="note">score_psi = <span class="mono">0.05</span> · max_feature_psi = <span class="mono">0.2822</span> · features_unmeasured = <span class="mono">0</span> · features_major_drift = <span class="mono">2</span> · features_moderate_drift = <span class="mono">1</span> · favourable_rate_reference = <span class="mono">0.8358</span> · favourable_rate_current = <span class="mono">0.905</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">bd769b3095cfd4dfc7c48867afb74c6db68031efa8b399210f6eeb25917f337d</span></p>    </div>
+<p><strong>Recommendation.</strong> Re-validate performance and fairness on recent labelled data, review the drivers of the largest shifts, and set PSI alerts in production monitoring.</p><p><span class="tag">NIST:MEASURE-2.4</span><span class="tag">NIST:MEASURE-4.3</span><span class="tag">NIST:MANAGE-4.1</span><span class="tag">NIST:MANAGE-2.2</span><span class="tag">ISO42001:A.6.2.6</span><span class="tag">EUAIA:Art-72</span><span class="tag">INDIA:SUTRA-SAFETY</span><span class="tag">ISO42005:5.12</span></p>      <p class="note">score_psi = <span class="mono">0.05</span> · max_feature_psi = <span class="mono">0.2822</span> · features_unmeasured = <span class="mono">0</span> · features_major_drift = <span class="mono">2</span> · features_moderate_drift = <span class="mono">1</span> · favourable_rate_reference = <span class="mono">0.8358</span> · favourable_rate_current = <span class="mono">0.905</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">98dcb771f453a98bb5b652275aaa746fae7f6f23cb456faa548e7a47c4aa4c02</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Decision drivers <span class="note mono">explainability.feature_importance</span></summary>
@@ -347,16 +347,16 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <details >
     <summary><span class="chip pass">pass</span>Membership-inference risk <span class="note mono">privacy.membership_inference</span></summary>
     <div class="finding-body">
-      <p>Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows.</p>
-<p><span class="tag">NIST:MEASURE-2.10</span><span class="tag">NIST:MEASURE-2.7</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:DPDP-2023</span></p>      <p class="note">attack_auc = <span class="mono">0.5672</span> · membership_advantage = <span class="mono">0.1345</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">4a13f32e0f0288d47946d55bf16608924e80b9bba7ac3ecaf2f07ef6e4c5b2a3</span></p>    </div>
+      <p>Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.6% of training rows (5% FPR: 6.5%).</p>
+<p><span class="tag">NIST:MEASURE-2.10</span><span class="tag">NIST:MEASURE-2.7</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:DPDP-2023</span></p>      <p class="note">attack_auc = <span class="mono">0.5672</span> · membership_advantage = <span class="mono">0.1345</span> · tpr_at_1pct_fpr = <span class="mono">0.0156</span> · tpr_at_5pct_fpr = <span class="mono">0.0648</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">b85bc0a0e46a774097ddec29967c45dc26bcbc734dfc6f1acd615aa886c08f8e</span></p>    </div>
   </details>
   <details open>
     <summary><span class="chip fail">fail</span>Documentation and claims <span class="note mono">documentation.model_card</span></summary>
     <div class="finding-body">
       <p>Documentation completeness 85% (17/20 fields). Missing: Out-of-scope uses, Override / appeal process, Impact assessment reference. Claims that do not match evidence: documented AUC 0.81 but measured 0.748.</p>
-<p><strong>Recommendation.</strong> Complete the missing sections, correct documented figures to match validated results, and make the model card part of the release checklist.</p><p><span class="tag">NIST:MAP-2.2</span><span class="tag">NIST:MAP-3.5</span><span class="tag">NIST:GOVERN-4.2</span><span class="tag">NIST:MEASURE-2.8</span><span class="tag">ISO42001:A.6.2.3</span><span class="tag">ISO42001:A.6.2.7</span><span class="tag">ISO42001:A.8.2</span><span class="tag">EUAIA:Art-11</span><span class="tag">EUAIA:Art-13</span><span class="tag">EUAIA:Art-14</span><span class="tag">INDIA:SUTRA-UNDERSTANDABLE</span><span class="tag">INDIA:SUTRA-ACCOUNTABILITY</span></p>      <p class="note">completeness = <span class="mono">0.85</span> · claim_mismatches = <span class="mono">1</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">c578733c05090db7bd6f424e8bec16bc384dcbf5e756c1c4da26de0663af778d</span></p>    </div>
+<p><strong>Recommendation.</strong> Complete the missing sections, correct documented figures to match validated results, and make the model card part of the release checklist.</p><p><span class="tag">NIST:MAP-2.2</span><span class="tag">NIST:MAP-3.5</span><span class="tag">NIST:GOVERN-4.2</span><span class="tag">NIST:MEASURE-2.8</span><span class="tag">ISO42001:A.6.2.3</span><span class="tag">ISO42001:A.6.2.7</span><span class="tag">ISO42001:A.8.2</span><span class="tag">EUAIA:Art-11</span><span class="tag">EUAIA:Art-13</span><span class="tag">EUAIA:Art-14</span><span class="tag">INDIA:SUTRA-UNDERSTANDABLE</span><span class="tag">INDIA:SUTRA-ACCOUNTABILITY</span><span class="tag">ISO42005:6.3.4</span><span class="tag">ISO42005:6.3.5</span><span class="tag">ISO42005:6.5</span></p>      <p class="note">completeness = <span class="mono">0.85</span> · claim_mismatches = <span class="mono">1</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">48a2e236a6aa4d42038353faef8fd55ab70c901ef3aa5a1366259f3bebea9774</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip pass">pass</span>Audit self-test (canaries) <span class="note mono">audit.detector_sensitivity</span></summary>
@@ -376,7 +376,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <summary><span class="chip pass">pass</span>Documented go/no-go decision <span class="note mono">audit.process</span></summary>
     <div class="finding-body">
       <p>Test plan (FMEA, 14 failure modes), scored risk register (12 risks), treatment plan and release-gate decision (BLOCK) recorded in this audit pack.</p>
-<p><span class="tag">NIST:MEASURE-1.1</span><span class="tag">NIST:MEASURE-2.1</span><span class="tag">NIST:MAP-5.1</span><span class="tag">NIST:MANAGE-1.1</span><span class="tag">NIST:MANAGE-1.2</span><span class="tag">NIST:MANAGE-1.3</span><span class="tag">NIST:MANAGE-1.4</span><span class="tag">ISO42001:A.5.3</span><span class="tag">EUAIA:Art-9</span><span class="tag">INDIA:PILLAR-RISK-MITIGATION</span></p><p class="note">Evidence SHA-256 <span class="mono hash">9c9e7b56ef29d8bd62946cde45a4d27313e39e526ad8f1c18c9b329fb6219624</span></p>    </div>
+<p><span class="tag">NIST:MEASURE-1.1</span><span class="tag">NIST:MEASURE-2.1</span><span class="tag">NIST:MAP-5.1</span><span class="tag">NIST:MANAGE-1.1</span><span class="tag">NIST:MANAGE-1.2</span><span class="tag">NIST:MANAGE-1.3</span><span class="tag">NIST:MANAGE-1.4</span><span class="tag">ISO42001:A.5.3</span><span class="tag">EUAIA:Art-9</span><span class="tag">INDIA:PILLAR-RISK-MITIGATION</span><span class="tag">ISO42005:5.8</span><span class="tag">ISO42005:5.9</span><span class="tag">ISO42005:5.10</span><span class="tag">ISO42005:5.11</span></p><p class="note">Evidence SHA-256 <span class="mono hash">a28eafc155811610daddeb9dce08a1604209674831b9d5afd92bb5a5e4d45f52</span></p>    </div>
   </details>
 </section>
 
@@ -415,9 +415,9 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <section class="card" id="coverage">
   <p class="eyebrow">Framework coverage</p>
-  <h2>Evidence mapped to 4 frameworks</h2>
-  <p class="lead">13 of 136 applicable controls across 4 frameworks are evidenced by this audit. Controls marked &#39;not tested&#39; need organisational evidence (policies, records, sign-offs) that tests cannot produce.</p>
-  <svg class="chart coverage" viewBox="0 0 840 152" role="img" aria-label="Control coverage by framework"><text class="t-label" x="238" y="20.0" text-anchor="end">NIST AI Risk Management Framework</text><rect class="st-good" x="250.0" y="4" width="56.8" height="24" rx="3"><title>NIST AI Risk Management Framework: 9 evidenced</title></rect><text class="t-on-bar" x="278.4" y="20.0" text-anchor="middle">9</text><rect class="st-warn" x="308.8" y="4" width="69.8" height="24" rx="3"><title>NIST AI Risk Management Framework: 11 partial</title></rect><text class="t-on-bar" x="343.7" y="20.0" text-anchor="middle">11</text><rect class="st-crit" x="380.6" y="4" width="76.3" height="24" rx="3"><title>NIST AI Risk Management Framework: 12 deficient</title></rect><text class="t-on-bar" x="418.7" y="20.0" text-anchor="middle">12</text><rect class="st-none" x="458.9" y="4" width="259.1" height="24" rx="3"><title>NIST AI Risk Management Framework: 40 not tested</title></rect><text class="t-on-bar" x="588.4" y="20.0" text-anchor="middle">40</text><text class="t-muted" x="730" y="20.0">9/72 evidenced</text><text class="t-label" x="238" y="56.0" text-anchor="end">ISO/IEC 42001 Annex A</text><rect class="st-good" x="250.0" y="40" width="35.1" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 3 evidenced</title></rect><text class="t-on-bar" x="267.6" y="56.0" text-anchor="middle">3</text><rect class="st-warn" x="287.1" y="40" width="22.7" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 2 partial</title></rect><rect class="st-crit" x="311.8" y="40" width="121.7" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 10 deficient</title></rect><text class="t-on-bar" x="372.7" y="56.0" text-anchor="middle">10</text><rect class="st-none" x="435.5" y="40" width="282.5" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 23 not tested</title></rect><text class="t-on-bar" x="576.8" y="56.0" text-anchor="middle">23</text><text class="t-muted" x="730" y="56.0">3/38 evidenced</text><text class="t-label" x="238" y="92.0" text-anchor="end">EU AI Act</text><rect class="st-good" x="250.0" y="76" width="27.4" height="24" rx="3"><title>EU AI Act: 1 evidenced</title></rect><text class="t-on-bar" x="263.7" y="92.0" text-anchor="middle">1</text><rect class="st-warn" x="279.4" y="76" width="56.8" height="24" rx="3"><title>EU AI Act: 2 partial</title></rect><text class="t-on-bar" x="307.8" y="92.0" text-anchor="middle">2</text><rect class="st-crit" x="338.1" y="76" width="174.2" height="24" rx="3"><title>EU AI Act: 6 deficient</title></rect><text class="t-on-bar" x="425.2" y="92.0" text-anchor="middle">6</text><rect class="st-none" x="514.4" y="76" width="203.6" height="24" rx="3"><title>EU AI Act: 7 not tested</title></rect><text class="t-on-bar" x="616.2" y="92.0" text-anchor="middle">7</text><text class="t-muted" x="730" y="92.0">1/16 evidenced</text><text class="t-label" x="238" y="128.0" text-anchor="end">India AI Governance Guidelines</text><rect class="st-warn" x="250.0" y="112" width="45.0" height="24" rx="3"><title>India AI Governance Guidelines: 1 partial</title></rect><text class="t-on-bar" x="272.5" y="128.0" text-anchor="middle">1</text><rect class="st-crit" x="297.0" y="112" width="233.0" height="24" rx="3"><title>India AI Governance Guidelines: 5 deficient</title></rect><text class="t-on-bar" x="413.5" y="128.0" text-anchor="middle">5</text><rect class="st-none" x="532.0" y="112" width="186.0" height="24" rx="3"><title>India AI Governance Guidelines: 4 not tested</title></rect><text class="t-on-bar" x="625.0" y="128.0" text-anchor="middle">4</text><text class="t-muted" x="730" y="128.0">0/10 evidenced</text></svg>
+  <h2>Evidence mapped to 5 frameworks</h2>
+  <p class="lead">18 of 151 applicable controls across 5 frameworks are evidenced by this audit. Controls marked &#39;not tested&#39; need organisational evidence (policies, records, sign-offs) that tests cannot produce.</p>
+  <svg class="chart coverage" viewBox="0 0 840 188" role="img" aria-label="Control coverage by framework"><text class="t-label" x="238" y="20.0" text-anchor="end">NIST AI Risk Management Framework</text><rect class="st-good" x="250.0" y="4" width="56.8" height="24" rx="3"><title>NIST AI Risk Management Framework: 9 evidenced</title></rect><text class="t-on-bar" x="278.4" y="20.0" text-anchor="middle">9</text><rect class="st-warn" x="308.8" y="4" width="69.8" height="24" rx="3"><title>NIST AI Risk Management Framework: 11 partial</title></rect><text class="t-on-bar" x="343.7" y="20.0" text-anchor="middle">11</text><rect class="st-crit" x="380.6" y="4" width="76.3" height="24" rx="3"><title>NIST AI Risk Management Framework: 12 deficient</title></rect><text class="t-on-bar" x="418.7" y="20.0" text-anchor="middle">12</text><rect class="st-none" x="458.9" y="4" width="259.1" height="24" rx="3"><title>NIST AI Risk Management Framework: 40 not tested</title></rect><text class="t-on-bar" x="588.4" y="20.0" text-anchor="middle">40</text><text class="t-muted" x="730" y="20.0">9/72 evidenced</text><text class="t-label" x="238" y="56.0" text-anchor="end">ISO/IEC 42001 Annex A</text><rect class="st-good" x="250.0" y="40" width="35.1" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 3 evidenced</title></rect><text class="t-on-bar" x="267.6" y="56.0" text-anchor="middle">3</text><rect class="st-warn" x="287.1" y="40" width="22.7" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 2 partial</title></rect><rect class="st-crit" x="311.8" y="40" width="121.7" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 10 deficient</title></rect><text class="t-on-bar" x="372.7" y="56.0" text-anchor="middle">10</text><rect class="st-none" x="435.5" y="40" width="282.5" height="24" rx="3"><title>ISO/IEC 42001 Annex A: 23 not tested</title></rect><text class="t-on-bar" x="576.8" y="56.0" text-anchor="middle">23</text><text class="t-muted" x="730" y="56.0">3/38 evidenced</text><text class="t-label" x="238" y="92.0" text-anchor="end">EU AI Act</text><rect class="st-good" x="250.0" y="76" width="27.4" height="24" rx="3"><title>EU AI Act: 1 evidenced</title></rect><text class="t-on-bar" x="263.7" y="92.0" text-anchor="middle">1</text><rect class="st-warn" x="279.4" y="76" width="56.8" height="24" rx="3"><title>EU AI Act: 2 partial</title></rect><text class="t-on-bar" x="307.8" y="92.0" text-anchor="middle">2</text><rect class="st-crit" x="338.1" y="76" width="174.2" height="24" rx="3"><title>EU AI Act: 6 deficient</title></rect><text class="t-on-bar" x="425.2" y="92.0" text-anchor="middle">6</text><rect class="st-none" x="514.4" y="76" width="203.6" height="24" rx="3"><title>EU AI Act: 7 not tested</title></rect><text class="t-on-bar" x="616.2" y="92.0" text-anchor="middle">7</text><text class="t-muted" x="730" y="92.0">1/16 evidenced</text><text class="t-label" x="238" y="128.0" text-anchor="end">India AI Governance Guidelines</text><rect class="st-warn" x="250.0" y="112" width="45.0" height="24" rx="3"><title>India AI Governance Guidelines: 1 partial</title></rect><text class="t-on-bar" x="272.5" y="128.0" text-anchor="middle">1</text><rect class="st-crit" x="297.0" y="112" width="233.0" height="24" rx="3"><title>India AI Governance Guidelines: 5 deficient</title></rect><text class="t-on-bar" x="413.5" y="128.0" text-anchor="middle">5</text><rect class="st-none" x="532.0" y="112" width="186.0" height="24" rx="3"><title>India AI Governance Guidelines: 4 not tested</title></rect><text class="t-on-bar" x="625.0" y="128.0" text-anchor="middle">4</text><text class="t-muted" x="730" y="128.0">0/10 evidenced</text><text class="t-label" x="238" y="164.0" text-anchor="end">ISO/IEC 42005 AI system impact assessment</text><rect class="st-good" x="250.0" y="148" width="154.7" height="24" rx="3"><title>ISO/IEC 42005 AI system impact assessment: 5 evidenced</title></rect><text class="t-on-bar" x="327.3" y="164.0" text-anchor="middle">5</text><rect class="st-warn" x="406.7" y="148" width="60.7" height="24" rx="3"><title>ISO/IEC 42005 AI system impact assessment: 2 partial</title></rect><text class="t-on-bar" x="437.0" y="164.0" text-anchor="middle">2</text><rect class="st-crit" x="469.3" y="148" width="186.0" height="24" rx="3"><title>ISO/IEC 42005 AI system impact assessment: 6 deficient</title></rect><text class="t-on-bar" x="562.3" y="164.0" text-anchor="middle">6</text><rect class="st-none" x="657.3" y="148" width="60.7" height="24" rx="3"><title>ISO/IEC 42005 AI system impact assessment: 2 not tested</title></rect><text class="t-on-bar" x="687.7" y="164.0" text-anchor="middle">2</text><text class="t-muted" x="730" y="164.0">5/15 evidenced</text></svg>
   <div class="legend">
     <span style="--c: var(--good)">Evidenced</span><span style="--c: var(--warning)">Partial (warning)</span>
     <span style="--c: var(--critical)">Deficient (failed test)</span><span style="--c: var(--none)">Not tested by automation</span>
@@ -722,6 +722,43 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 </tbody></table></div>
     <p class="note">Source: https://indiaai.gov.in/</p>
   </details>
+  <details>
+    <summary>ISO/IEC 42005 AI system impact assessment <span class="note">2025</span></summary>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Control</th><th>Title</th><th>State</th><th>Evidence</th></tr></thead>
+      <tbody>        <tr><td class="mono">5.4</td><td>Timing of AI system impact assessment</td><td><span class="chip deficient">deficient</span></td>
+        <td><span class="tag">governance.risk_classification</span></td></tr>
+        <tr><td class="mono">5.5</td><td>Scope of the AI system impact assessment</td><td><span class="chip deficient">deficient</span></td>
+        <td><span class="tag">governance.risk_classification</span></td></tr>
+        <tr><td class="mono">5.6</td><td>Allocating responsibilities</td><td><span class="chip not-tested">not tested</span></td>
+        <td></td></tr>
+        <tr><td class="mono">5.8</td><td>Performing the AI system impact assessment</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">audit.process</span></td></tr>
+        <tr><td class="mono">5.9</td><td>Analysing the results of the AI system impact assessment</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">audit.process</span></td></tr>
+        <tr><td class="mono">5.10</td><td>Recording and reporting</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">audit.process</span></td></tr>
+        <tr><td class="mono">5.11</td><td>Approval process</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">audit.process</span></td></tr>
+        <tr><td class="mono">5.12</td><td>Monitoring and review</td><td><span class="chip partial">partial</span></td>
+        <td><span class="tag">drift.population_stability</span></td></tr>
+        <tr><td class="mono">6.3.4</td><td>Intended use</td><td><span class="chip deficient">deficient</span></td>
+        <td><span class="tag">governance.risk_classification</span><span class="tag">documentation.model_card</span></td></tr>
+        <tr><td class="mono">6.3.5</td><td>Unintended uses</td><td><span class="chip deficient">deficient</span></td>
+        <td><span class="tag">documentation.model_card</span></td></tr>
+        <tr><td class="mono">6.4</td><td>Data information and quality</td><td><span class="chip evidenced">evidenced</span></td>
+        <td><span class="tag">data_quality.integrity</span></td></tr>
+        <tr><td class="mono">6.5</td><td>Algorithm and model information</td><td><span class="chip deficient">deficient</span></td>
+        <td><span class="tag">documentation.model_card</span></td></tr>
+        <tr><td class="mono">6.7</td><td>Relevant interested parties</td><td><span class="chip not-tested">not tested</span></td>
+        <td></td></tr>
+        <tr><td class="mono">6.8.2</td><td>Benefits and harms</td><td><span class="chip deficient">deficient</span></td>
+        <td><span class="tag">fairness.group_parity</span><span class="tag">fairness.intersectional</span></td></tr>
+        <tr><td class="mono">6.8.3</td><td>AI system failures and reasonably foreseeable misuse</td><td><span class="chip partial">partial</span></td>
+        <td><span class="tag">robustness.perturbation</span></td></tr>
+</tbody></table></div>
+    <p class="note">Source: https://www.iso.org/standard/42005</p>
+  </details>
 </section>
 
 <section class="card" id="regulatory">
@@ -806,13 +843,13 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     </table></div>
   </details>
   <h3>Verifying this pack</h3>
-  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">af3fc7ef4191e270e0b54a94ddd0fb4fd411fa57968192d75a264739246f6d3d</span>.</p>
+  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">008d4715f87388ea1591cd0cbde2871eb880a5b7ed19dd78d82612d2999703ec</span>.</p>
   <h3>Limitations</h3>
   <p class="note">Automated tests evidence technical controls only. Controls marked "not tested" need organisational evidence. Statistical tests depend on the representativeness of the data supplied. LLM probes are a sample of behaviour, not proof of safety. The classification is an assessment to support legal review, not legal advice. See docs/limitations.md in the Pramana repository.</p>
 </section>
 
 <footer>
-  Generated by Pramana 0.4.2 · Python 3.13.16 · audit PRM-20261021-275F46 · started 2026-10-23T02:38:53+00:00
+  Generated by Pramana 0.5.0 · Python 3.13.16 · audit PRM-20261021-6E6BB8 · started 2026-10-23T03:27:42+00:00
 </footer>
 </div>
 </body>

@@ -446,11 +446,15 @@ def build_client(config: dict[str, Any]) -> LLMClient:
         for key in ("url", "body", "response_path"):
             if not config.get(key):
                 raise ValueError(f"llm.{key} is required in http mode")
+        method = str(config.get("method", "POST")).upper()
+        if method not in ("POST", "PUT", "PATCH"):
+            # The prompt travels in the JSON body; a GET or HEAD would not carry it reliably.
+            raise ValueError(f"llm.method must be POST, PUT or PATCH in http mode, not {method}")
         return HTTPJSONClient(
             url=config["url"],
             body=config["body"],
             response_path=config["response_path"],
-            method=config.get("method", "POST"),
+            method=method,
             model_path=config.get("model_path"),
             **common,
         )

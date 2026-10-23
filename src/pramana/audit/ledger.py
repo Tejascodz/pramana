@@ -79,6 +79,14 @@ class EvidenceLedger:
     def root_hash(self) -> str | None:
         return self.entries[-1]["entry_hash"] if self.entries else None
 
+    def _inside(self, rel_path: str | Path) -> Path:
+        """The pack path for ``rel_path``; refuses anything that would land outside the pack."""
+        root = self.pack_dir.resolve()
+        target = (self.pack_dir / rel_path).resolve()
+        if not target.is_relative_to(root):
+            raise ValueError(f"refusing to write outside the audit pack: {rel_path}")
+        return target
+
     def _append(self, entry: dict[str, Any]) -> dict[str, Any]:
         entry["seq"] = len(self.entries) + 1
         entry["ts"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
@@ -92,7 +100,7 @@ class EvidenceLedger:
     def add_json(self, stage: str, name: str, data: Any) -> str:
         """Write JSON evidence inside the pack and record its hash."""
         rel = Path(EVIDENCE_DIR) / stage / f"{name}.json"
-        target = self.pack_dir / rel
+        target = self._inside(rel)
         target.parent.mkdir(parents=True, exist_ok=True)
         payload = canonical_json(data)
         target.write_bytes(payload)
@@ -110,7 +118,7 @@ class EvidenceLedger:
 
     def add_text(self, stage: str, name: str, rel_path: str, text: str) -> str:
         """Write a text file inside the pack (e.g. a JSONL replay file) and record its hash."""
-        target = self.pack_dir / rel_path
+        target = self._inside(rel_path)
         target.parent.mkdir(parents=True, exist_ok=True)
         payload = text.encode("utf-8")
         target.write_bytes(payload)
@@ -122,7 +130,7 @@ class EvidenceLedger:
 
     def add_pack_file(self, stage: str, name: str, rel_path: str) -> str:
         """Record a file already written inside the pack (e.g. the report)."""
-        digest = sha256_file(self.pack_dir / rel_path)
+        digest = sha256_file(self._inside(rel_path))
         self._append(
             {"stage": stage, "kind": "evidence", "name": name, "path": rel_path, "sha256": digest}
         )

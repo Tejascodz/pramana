@@ -13,7 +13,7 @@
     "flagged": [
       {
         "attribute": "residence",
-        "auc": 0.9882,
+        "auc": 0.9875,
         "feature": "pincode_risk_band"
       },
       {
@@ -33,7 +33,7 @@
       },
       {
         "attribute": "residence",
-        "auc": 0.7252,
+        "auc": 0.7188,
         "feature": "employment_type"
       }
     ],
@@ -54,9 +54,9 @@
         "residence": 0.5217
       },
       "employment_type": {
-        "age_band": 0.5387,
-        "gender": 0.6151,
-        "residence": 0.7252
+        "age_band": 0.5441,
+        "gender": 0.6013,
+        "residence": 0.7188
       },
       "existing_emis": {
         "age_band": 0.5175,
@@ -74,9 +74,9 @@
         "residence": 0.846
       },
       "pincode_risk_band": {
-        "age_band": 0.5323,
-        "gender": 0.5196,
-        "residence": 0.9882
+        "age_band": 0.5413,
+        "gender": 0.511,
+        "residence": 0.9875
       },
       "years_at_address": {
         "age_band": 0.5538,
@@ -94,6 +94,6 @@
   "recommendation": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them.",
   "severity": "high",
   "status": "fail",
-  "summary": "5 feature/attribute pairs exceed proxy AUC 0.7: pincode_risk_band→residence (AUC 0.99), monthly_income→residence (AUC 0.85), credit_history_months→age_band (AUC 0.83), loan_amount→residence (AUC 0.76), employment_type→residence (AUC 0.73).",
+  "summary": "5 feature/attribute pairs exceed proxy AUC 0.7: pincode_risk_band→residence (AUC 0.99), monthly_income→residence (AUC 0.85), credit_history_months→age_band (AUC 0.83), loan_amount→residence (AUC 0.76), employment_type→residence (AUC 0.72).",
   "title": "Proxy-feature screening"
 }

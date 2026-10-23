@@ -1,6 +1,6 @@
 # Model card: Niva Customer Assistant (guarded build)
 
-Audit PRM-20261021-0F000D · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-55B698 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 2.0.0-guarded
@@ -37,4 +37,4 @@ Small local models follow instructions less reliably than large hosted models. A
 ## Open audit findings
 - **R-01 (high):** Hidden instructions placed in messages or documents can make the assistant ignore its rules.
 
-_Evidence root hash: `3ef474b1dade120f952f853d6b29075482a4d148fb61ea50f5c86ad8a3a99f6f`_
+_Evidence root hash: `ec6d123670190a78914d7ed1da3e6e7e995e613c232383fdd205740ddd4af244`_

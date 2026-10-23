@@ -1,0 +1,26 @@
+# ISO/IEC 42005:2025 AI system impact assessment. Clause numbers and titles as cited in
+# NIST's ISO/IEC 42005 to AI RMF crosswalk (airc.nist.gov). Only clauses that a technical
+# audit can supply evidence for are listed. The standard is copyrighted; obtain it from ISO.
+framework:
+  id: ISO42005
+  name: ISO/IEC 42005 AI system impact assessment
+  version: "2025"
+  source: https://www.iso.org/standard/42005
+  group_label: Clause
+
+controls:
+  - {id: "5.4", group: "5 Assessment process", title: "Timing of AI system impact assessment", evidence: organizational}
+  - {id: "5.5", group: "5 Assessment process", title: "Scope of the AI system impact assessment", evidence: both}
+  - {id: "5.6", group: "5 Assessment process", title: "Allocating responsibilities", evidence: organizational}
+  - {id: "5.8", group: "5 Assessment process", title: "Performing the AI system impact assessment", evidence: both}
+  - {id: "5.9", group: "5 Assessment process", title: "Analysing the results of the AI system impact assessment", evidence: both}
+  - {id: "5.10", group: "5 Assessment process", title: "Recording and reporting", evidence: both}
+  - {id: "5.11", group: "5 Assessment process", title: "Approval process", evidence: organizational}
+  - {id: "5.12", group: "5 Assessment process", title: "Monitoring and review", evidence: both}
+  - {id: "6.3.4", group: "6 Assessment content", title: "Intended use", evidence: both}
+  - {id: "6.3.5", group: "6 Assessment content", title: "Unintended uses", evidence: both}
+  - {id: "6.4", group: "6 Assessment content", title: "Data information and quality", evidence: technical}
+  - {id: "6.5", group: "6 Assessment content", title: "Algorithm and model information", evidence: technical}
+  - {id: "6.7", group: "6 Assessment content", title: "Relevant interested parties", evidence: organizational}
+  - {id: "6.8.2", group: "6 Assessment content", title: "Benefits and harms", evidence: technical}
+  - {id: "6.8.3", group: "6 Assessment content", title: "AI system failures and reasonably foreseeable misuse", evidence: technical}

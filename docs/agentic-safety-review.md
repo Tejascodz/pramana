@@ -246,7 +246,7 @@ gravity, so this is where to go deep. Three new checks and one scoring lens, eac
 grounded in the citations above and each operating on an agent **spec + trace** —
 measurement, not attack generation.
 
-### 6.1 New check: `agent.control_readiness`
+### 6.1 New check: `agent.control_readiness` (built in 0.5.0)
 
 Audits whether the deployment has the control measures the literature requires,
 read from the audit spec and the trace. Evidence-mapped to CSA agentic controls,
@@ -285,23 +285,33 @@ planted and real rogue example still fires. Precision on independently collected
 real data is part of the method, not an afterthought — see
 [examples/benchmark_whowhen](../examples/benchmark_whowhen). [WhoWhen-2025]
 
-### 6.3 New check: `agent.oversight_integrity`
+### 6.3 New check: `agent.oversight_integrity` (built in 0.5.0)
 
 Assesses monitorability: is the agent's reasoning actually logged and reviewable; are
 high-impact actions reviewed before execution; is there a monitor; is there any
 anti-steganography measure (e.g. paraphrasing). Grounded in CoT-monitorability and
 Redwood monitoring. [CoT-Monitor, Redwood]
 
-### 6.4 Scoring lens: the three-condition loss-of-control model
+As built, the check measures reasoning coverage of tool calls and screens tool results for planted
+instructions. An anti-steganography *test* is deliberately not included: no reliable way exists to
+detect encoded reasoning from a log, and a pattern for long base64 strings fired in 57 of 58
+real Who&When sessions (on URLs and commit hashes) when tried.
+
+### 6.4 Scoring lens: the three-condition loss-of-control model (built in 0.5.0)
 
 Score each agent deployment on the UN Panel's model — **misaligned-goal signals ×
 capability (tool power / reversibility) × permissive environment (missing controls)**
 — so the report frames agent risk exactly as the international panel does. [UN-Panel]
 
+As built, all three conditions are judged per session in `agent.misalignment_signals`: a signal
+in one session is never paired with an unapproved action in another.
+
 ### 6.5 Catalogue and docs updates
 
 - Add **NIST AI 100-2 E2025** (adversarial ML / prompt injection), **ISO/IEC 42005**
   (impact assessment) and **ISO/IEC 23894** to the control library and crosswalk.
+  *Done in 0.5.0:* ISO/IEC 42005 (15 clauses, numbered as in NIST's crosswalk) and the OWASP
+  Top 10 for Agentic Applications (2026). NIST AI 100-2 and ISO/IEC 23894 remain to do.
 - Add the CSA agentic-governance controls as a mappable set.
 - Confirm the regulatory calendar against the Omnibus dates in Section 2 (the repo's
   2 Dec 2027 / 2 Aug 2028 high-risk dates are current).
