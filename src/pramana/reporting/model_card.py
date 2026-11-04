@@ -109,9 +109,9 @@ def render_model_card(result) -> str:
 
 
 def _load(spec) -> dict[str, Any]:
-    import yaml
+    from pramana.safeio import load_yaml
 
     path = spec.artifact("documentation")
     if path is None or not path.exists():
         return {}
-    return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    return load_yaml(path) or {}

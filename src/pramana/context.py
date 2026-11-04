@@ -11,15 +11,37 @@ from typing import Any
 import joblib
 import numpy as np
 import pandas as pd
-import yaml
 
 from pramana.adapters.llm import Completion, EndpointUnavailable, LLMClient, build_client
 from pramana.probes import load_probe_file
+from pramana.safeio import load_yaml
 from pramana.spec import AuditSpec
 
 
 class MissingArtifact(RuntimeError):
     """Raised by a check when an artifact it needs was not supplied."""
+
+
+#: Module prefixes whose types a .skops model may contain. skops rebuilds objects from
+#: these modules without unpickling, so arbitrary code in the file never runs.
+SKOPS_TRUSTED_PREFIXES = ("sklearn.", "numpy.", "scipy.", "builtins.", "collections.")
+
+
+def _load_skops(path: Path) -> Any:
+    try:
+        from skops.io import get_untrusted_types, load
+    except ImportError as exc:  # pragma: no cover - depends on the optional extra
+        raise MissingArtifact(
+            'Loading a .skops model needs skops: pip install "pramana-audit[skops]"'
+        ) from exc
+    untrusted = get_untrusted_types(file=path)
+    refused = [t for t in untrusted if not t.startswith(SKOPS_TRUSTED_PREFIXES)]
+    if refused:
+        raise MissingArtifact(
+            f"{path.name} contains types outside scikit-learn, NumPy and SciPy, which "
+            f"Pramana will not load: {', '.join(sorted(refused))}"
+        )
+    return load(path, trusted=untrusted)
 
 
 class AuditContext:
@@ -67,11 +89,13 @@ class AuditContext:
             raise MissingArtifact("No model artifact supplied (predictions-only audit)")
         if not path.exists():
             raise MissingArtifact(f"Model file not found: {path.name}")
-        # Model files are pickles and can execute code when loaded. Only audit
-        # models received through a trusted, access-controlled channel, and pin their hash
-        # in artifacts_sha256 so a swapped file is refused before it is unpickled.
         self.spec.verify_artifact("model")
-        return joblib.load(path)
+        if path.suffix.lower() == ".skops":
+            return _load_skops(path)
+        # Pickle (joblib) can execute code while loading. check_model_trust() refuses a
+        # pickle that is neither pinned by SHA-256 nor explicitly trusted.
+        self.spec.check_model_trust()
+        return joblib.load(path)  # nosec B301 - pinned or explicitly trusted above
 
     @cached_property
     def feature_columns(self) -> list[str]:
@@ -133,7 +157,7 @@ class AuditContext:
         path = self.spec.artifact("documentation")
         if path is None or not path.exists():
             return None
-        return yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        return load_yaml(path) or {}
 
     # LLM applications ----------------------------------------------------
 

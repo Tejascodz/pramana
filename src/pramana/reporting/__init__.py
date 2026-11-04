@@ -18,6 +18,7 @@ from pramana.reporting.charts import coverage_bars, group_bars, risk_heatmap
 from pramana.reporting.ml_bom import render_ml_bom
 from pramana.reporting.model_card import render_model_card
 from pramana.reporting.narrative import executive_summary
+from pramana.safeio import csv_safe
 from pramana.types import Status
 
 REPORT_FILES = {
@@ -111,7 +112,12 @@ def _write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> Non
         writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
         for row in rows:
-            writer.writerow({k: "; ".join(v) if isinstance(v, list) else v for k, v in row.items()})
+            writer.writerow(
+                {
+                    k: csv_safe("; ".join(map(str, v)) if isinstance(v, list) else v)
+                    for k, v in row.items()
+                }
+            )
 
 
 def write_outputs(result, out_dir: Path, ledger: EvidenceLedger | None = None) -> dict[str, Path]:

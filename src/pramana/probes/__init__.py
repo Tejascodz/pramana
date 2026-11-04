@@ -23,6 +23,8 @@ from typing import Any
 
 import yaml
 
+from pramana.safeio import load_yaml
+
 CATEGORIES = ("prompt_injection", "sensitive_disclosure", "groundedness", "policy")
 
 
@@ -37,6 +39,11 @@ def builtin_packs() -> list[str]:
 
 def _read_builtin(name: str) -> dict[str, Any]:
     root = resources.files("pramana.probes").joinpath("packs")
+    # Only names from the shipped library: "builtin:../../x" must not reach other files.
+    if name not in builtin_packs():
+        raise ProbeFileError(
+            f"Unknown built-in probe pack '{name}'. Available: {', '.join(builtin_packs())}"
+        )
     target = root.joinpath(f"{name}.yaml")
     if not target.is_file():
         raise ProbeFileError(
@@ -92,7 +99,7 @@ def _sensitive_values(path: Path, data: dict[str, Any]) -> list[dict[str, str]]:
 
 def load_probe_file(path: str | Path) -> dict[str, Any]:
     path = Path(path)
-    data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    data = load_yaml(path) or {}
     probes: dict[str, list] = {}
     sources = []
     for ref in data.get("include", []) or []:
@@ -103,9 +110,7 @@ def load_probe_file(path: str | Path) -> dict[str, Any]:
             included = path.parent / ref
             if not included.is_file():
                 raise ProbeFileError(f"included probe file not found: {ref}")
-            _merge(
-                probes, yaml.safe_load(included.read_text(encoding="utf-8")) or {}, included.name
-            )
+            _merge(probes, load_yaml(included) or {}, included.name)
         sources.append(str(ref))
     _merge(probes, data, path.name)
 

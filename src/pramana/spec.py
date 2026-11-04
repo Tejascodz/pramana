@@ -10,6 +10,8 @@ from typing import Any
 
 import yaml
 
+from pramana.safeio import InputTooLarge, load_yaml
+
 _SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
 
 SYSTEM_TYPES = {"tabular_classifier", "llm_application", "agent"}
@@ -46,6 +48,14 @@ class ArtifactIntegrityError(SpecError):
     """An artifact does not match the SHA-256 pinned for it in ``artifacts_sha256``."""
 
 
+class UntrustedModelError(SpecError):
+    """A pickled model would be loaded without a pinned hash or an explicit trust decision."""
+
+
+#: Model formats that load without running code from the file.
+SAFE_MODEL_SUFFIXES = (".skops",)
+
+
 @dataclass
 class AuditSpec:
     path: Path
@@ -67,6 +77,27 @@ class AuditSpec:
     gate: dict[str, Any] = field(default_factory=dict)
     seed: int = 7
     artifacts_sha256: dict[str, str] = field(default_factory=dict)
+    trust_pickled_model: bool = False
+
+    def check_model_trust(self) -> None:
+        """Refuse to unpickle a model nobody has vouched for.
+
+        Pickle (and joblib, which uses it) runs code from the file while loading, so a
+        swapped or malicious model file is a code-execution attack on the auditor. A
+        pickled model is loaded only when its SHA-256 is pinned in ``artifacts_sha256``
+        or the spec (or ``pramana run --trust-model``) says the file is trusted.
+        """
+        path = self.artifacts.get("model")
+        if path is None or Path(path).suffix.lower() in SAFE_MODEL_SUFFIXES:
+            return
+        if "model" in self.artifacts_sha256 or self.trust_pickled_model:
+            return
+        raise UntrustedModelError(
+            f"artifacts.model ({Path(path).name}) is a pickle, and loading a pickle can run "
+            "code. Pin its SHA-256 under artifacts_sha256.model (recommended), save the "
+            "model in the .skops format, set trust_pickled_model: true in the spec, or pass "
+            "--trust-model if you built the file yourself."
+        )
 
     def verify_artifact(self, key: str) -> None:
         """Raise ArtifactIntegrityError if the artifact differs from its pinned hash."""
@@ -128,7 +159,14 @@ def load_spec(path: str | Path) -> AuditSpec:
     spec_path = Path(path)
     if not spec_path.exists():
         raise SpecError(f"Spec file not found: {spec_path}")
-    raw = yaml.safe_load(spec_path.read_text(encoding="utf-8")) or {}
+    try:
+        raw = load_yaml(spec_path) or {}
+    except InputTooLarge as exc:
+        raise SpecError(str(exc)) from exc
+    except yaml.YAMLError as exc:
+        raise SpecError(f"Spec is not valid YAML: {exc}") from exc
+    if not isinstance(raw, dict):
+        raise SpecError("Spec must be a YAML mapping")
 
     for key in ("system", "use_case"):
         if key not in raw:
@@ -210,6 +248,7 @@ def load_spec(path: str | Path) -> AuditSpec:
         gate=dict(raw.get("gate") or {}),
         seed=int(raw.get("seed", 7)),
         artifacts_sha256=pins,
+        trust_pickled_model=raw.get("trust_pickled_model", False) is True,
     )
 
 
@@ -245,6 +284,11 @@ artifacts:
 # Get a hash with `shasum -a 256 model.joblib` (macOS) or `sha256sum model.joblib`.
 # artifacts_sha256:
 #   model: <64 hex characters>
+#
+# A pickled model (.joblib, .pkl) can run code when it is loaded, so Pramana refuses
+# one that is neither pinned above nor marked as trusted. Prefer the .skops format
+# (`pip install "pramana-audit[skops]"`), which loads without running code.
+# trust_pickled_model: false
 
 # For type: agent, the agent section can also declare:
 #   identity: agent:refund-bot           # the agent's own identity, not a user's token

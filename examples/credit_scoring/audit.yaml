@@ -33,6 +33,10 @@ artifacts:
   production_data: data/production_sample.csv
   documentation: model_card.yaml
 
+# build_model.py creates model.joblib on your own computer, so it is trusted here.
+# For a model someone else sent you, pin its SHA-256 under artifacts_sha256 instead.
+trust_pickled_model: true
+
 target: repaid
 positive_label: 1
 decision_threshold: 0.5

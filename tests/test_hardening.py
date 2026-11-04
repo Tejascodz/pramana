@@ -211,9 +211,10 @@ def test_adaptive_ece_sees_miscalibration_that_equal_width_bins_blur():
     assert adaptive_calibration_error(y, p) > 0.04
 
 
-def test_credit_audit_reports_tail_privacy_and_base_rates(tmp_path):
-    spec = load_spec(ROOT / "examples" / "credit_scoring" / "audit.yaml")
-    r = run_audit(spec, tmp_path / "pack")
+def test_credit_audit_reports_tail_privacy_and_base_rates(credit_audit):
+    # Uses the fixture that builds the data and model in a private copy, so the test
+    # passes on a fresh clone (the repository does not ship the generated files).
+    r, _, _ = credit_audit
     mia = r.result("privacy.membership_inference")
     assert mia.metrics["tpr_at_1pct_fpr"] is not None
     parity = r.result("fairness.group_parity")

@@ -50,6 +50,8 @@ def _cmd_run(args: argparse.Namespace) -> int:
         }
     if args.samples:
         spec.llm["samples"] = args.samples
+    if args.trust_model:
+        spec.trust_pickled_model = True
     out = Path(args.out or f"audit-{spec.system['version']}")
     audit_date = date.fromisoformat(args.date) if args.date else None
 
@@ -520,6 +522,11 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--samples", type=int, help="override llm.samples (times each probe is sent)")
     run.add_argument(
         "--replay", help="re-score a recorded llm_replay.jsonl instead of calling the endpoint"
+    )
+    run.add_argument(
+        "--trust-model",
+        action="store_true",
+        help="load a pickled model that has no pinned SHA-256 (only for files you built)",
     )
     run.set_defaults(fn=_cmd_run)
 

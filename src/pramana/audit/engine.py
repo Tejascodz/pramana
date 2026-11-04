@@ -237,6 +237,7 @@ def _remediation(risks: list[Risk], audit_date: date) -> list[dict[str, Any]]:
 def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) -> AuditResult:
     # Pinned artifacts are checked before anything is read or unpickled.
     spec.verify_artifacts()
+    spec.check_model_trust()
     library = load_library()
     ctx = AuditContext(spec, audit_date=audit_date)
     ledger = EvidenceLedger(Path(out_dir))
