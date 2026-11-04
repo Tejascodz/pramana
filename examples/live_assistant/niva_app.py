@@ -44,6 +44,7 @@ import os
 import re
 import sys
 import time
+import unicodedata
 import urllib.error
 import urllib.request
 import uuid
@@ -243,7 +244,23 @@ def numbers(text: str) -> set[str]:
     return found
 
 
+# Cyrillic and Greek letters that look like Latin ones, folded before screening.
+CONFUSABLES = str.maketrans(
+    "\u0430\u0441\u0435\u0456\u043e\u0440\u0455\u0445\u0443\u0458\u0410\u0412\u0421\u0415\u041d"
+    "\u0406\u039a\u041c\u041e\u0420\u0422\u0425\u03a5",
+    "aceiopsxyjABCEHIKMOPTXY",
+)
+
+
+def normalize(text: str) -> str:
+    """Undo invisible and look-alike characters so the screen sees what the model reads."""
+    text = unicodedata.normalize("NFKC", text)
+    text = "".join(ch for ch in text if unicodedata.category(ch) != "Cf")
+    return text.translate(CONFUSABLES)
+
+
 def looks_injected(message: str) -> bool:
+    message = normalize(message)
     if INJECTION.search(message):
         return True
     for blob in BASE64_BLOB.findall(message):

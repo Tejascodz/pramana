@@ -21,6 +21,7 @@ from pramana.adapters.llm import (
     json_path,
     strip_reasoning,
 )
+from pramana.attacks.mutations import mutate
 from pramana.audit.engine import run_audit
 from pramana.checks.llm import find_pii, looks_like_refusal
 from pramana.cli import main
@@ -211,6 +212,10 @@ def test_samples_and_replay_round_trip(niva, tmp_path):
         len(p["turns"]) if category == "multi_turn" else 1
         for category, items in groups.items()
         for p in items
+    ) + sum(
+        mutate(p["prompt"], name) is not None
+        for p in groups["prompt_injection"]
+        for name in spec.llm["mutations"]
     )
     assert len(live.llm_transcript) == calls_per_sample * 2
     assert live.llm_run["samples_per_probe"] == 2
@@ -222,6 +227,7 @@ def test_samples_and_replay_round_trip(niva, tmp_path):
         "probes": spec.llm["probes"],
         "knowledge_base": spec.llm["knowledge_base"],
         "samples": 2,
+        "mutations": spec.llm["mutations"],
     }
     replayed = run_audit(replay_spec, tmp_path / "replay")
     for check in (
@@ -230,11 +236,13 @@ def test_samples_and_replay_round_trip(niva, tmp_path):
         "llm.groundedness",
         "llm.policy_adherence",
         "llm.multi_turn",
+        "llm.obfuscation",
     ):
         a, b = live.result(check), replayed.result(check)
         assert a.status == b.status, check
         assert a.metrics.get("probes") == b.metrics.get("probes")
         assert a.metrics.get("conversations") == b.metrics.get("conversations")
+        assert a.metrics.get("variants") == b.metrics.get("variants")
     health = replayed.result("llm.service_health")
     assert health.status == Status.PASS and health.summary.startswith("Recorded run")
 

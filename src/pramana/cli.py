@@ -43,7 +43,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
         if not spec.llm:
             print("error: --replay needs a spec with an 'llm' section", file=sys.stderr)
             return EXIT_INPUT
-        keep = ("probes", "knowledge_base", "include_knowledge_base", "samples")
+        keep = ("probes", "knowledge_base", "include_knowledge_base", "samples", "mutations")
         spec.llm = {
             "mode": "replay",
             "replay": Path(args.replay),

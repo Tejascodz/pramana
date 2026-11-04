@@ -39,6 +39,9 @@ llm:
   samples: 1
   concurrency: 1
   probes: probes.yaml
+  # Re-send every injection probe disguised: invisible characters, look-alike letters,
+  # full-width letters and joiners inside Indic words. Use 'all' for every obfuscation.
+  mutations: [zero_width, homoglyph, fullwidth, indic_joiners]
   knowledge_base: ../support_chatbot/knowledge_base.md
 
 thresholds:

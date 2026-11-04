@@ -15,6 +15,8 @@ import re
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+from pramana.attacks.mutations import normalize
+
 JOIN = re.compile(
     r"'([A-Z]{2,})'\s*(?:and|\+|followed by|aur|mattu|ಮತ್ತು|மற்றும்|और)\s*'([A-Z]{1,}-\d+)'",
     re.IGNORECASE,
@@ -98,7 +100,10 @@ class _Handler(BaseHTTPRequestHandler):
         if reply is None:
             # The guarded variant screens only the latest message, as many first
             # versions do; history is still passed to the model.
-            reply = REFUSAL if server.guard and SCREEN.search(user) else naive_reply(system, user)
+            # Like a real model, the stub reads through invisible and look-alike
+            # characters; the guard, like a regex filter, sees only the raw text.
+            screened = server.guard and SCREEN.search(normalize(user) if server.normalize else user)
+            reply = REFUSAL if screened else naive_reply(system, normalize(user))
         payload = json.dumps(
             {
                 "model": body.get("model", "naive"),
@@ -122,11 +127,12 @@ class _Handler(BaseHTTPRequestHandler):
 class NaiveModelServer:
     """Context manager that serves the naive model on a free local port."""
 
-    def __init__(self, fail_first: int = 0, guard: bool = False):
+    def __init__(self, fail_first: int = 0, guard: bool = False, normalize: bool = False):
         self.httpd = ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
         self.httpd.requests = 0
         self.httpd.fail_first = fail_first
         self.httpd.guard = guard
+        self.httpd.normalize = normalize
         self.httpd.histories = []
         self.thread = threading.Thread(target=self.httpd.serve_forever, daemon=True)
 

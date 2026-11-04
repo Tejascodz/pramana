@@ -2,6 +2,11 @@
 
 ## 0.7.0 — unreleased
 
+**Obfuscated attacks**
+- New check `llm.obfuscation` (opt in with `llm.mutations: all` or a list): every injection probe is re-sent with zero-width spaces, look-alike letters, soft hyphens, letter spacing, digit substitution, full-width letters or joiners inside Indic-script words. Codes, quotes, the canary and URLs are never altered, so variants are judged by the original markers. Variants that succeed where the plain attack failed are reported as bypasses.
+- `pramana.attacks.mutations.normalize` is the matching defence (NFKC, strip format characters, fold look-alikes). The guarded Niva build now screens normalised text. On the test model, a raw-text filter let 22 disguised attacks through that it stopped in plain form; with normalisation, 2.
+- Fix: `pramana run --replay` dropped `llm.mutations`, so the obfuscation check was skipped on replay.
+
 **Multi-turn attacks**
 - New check `llm.multi_turn`: plays attack conversations turn by turn with the system's real replies in the history, judges every reply with the same deterministic rules as `llm.prompt_injection`, and reports the turn at which the defence broke. Built-in pack `builtin:multiturn_core` (8 conversations: Crescendo-style escalation, delayed triggers, persona drift, refusal erosion, fabricated history, Hindi and Hinglish).
 - Every client can send a whole conversation: `openai_compatible` natively, `http` through a `"{messages}"` body slot or flattened, and replay keyed by the user turns. Live conversations are recorded per turn in `llm_replay.jsonl` and replay offline with identical verdicts.

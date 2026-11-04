@@ -212,6 +212,16 @@ def load_spec(path: str | Path) -> AuditSpec:
     thresholds.update(raw.get("thresholds") or {})
 
     llm = dict(raw.get("llm") or {})
+    if "mutations" in llm:
+        from pramana.attacks.mutations import MUTATORS
+
+        wanted = llm["mutations"]
+        if wanted == "all":
+            llm["mutations"] = list(MUTATORS)
+        elif not isinstance(wanted, list) or not all(m in MUTATORS for m in wanted):
+            raise SpecError(
+                f"llm.mutations must be 'all' or a list drawn from {', '.join(MUTATORS)}"
+            )
     for key in ("probes", "replay", "knowledge_base"):
         if key in llm:
             llm[key] = _resolve(base, llm[key])

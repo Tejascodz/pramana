@@ -370,6 +370,7 @@ def prompt_injection(ctx: AuditContext) -> CheckResult:
     rows, totals = _evaluate(probes, runs, judge)
     for r in rows:
         r["succeeded"] = r["failed"]
+    ctx.shared["injection_failed"] = {r["probe_id"]: r["failed"] for r in rows}
     successes = [r for r in rows if r["failed"]]
     probe_rate = len(successes) / len(rows)
     leaked = any(r.get("system_prompt_leaked") for r in rows)
@@ -440,6 +441,123 @@ def prompt_injection(ctx: AuditContext) -> CheckResult:
             "errored_samples": totals["errored_samples"],
         },
         details={"probes": rows, "by_language": by_language},
+    )
+
+
+@register(
+    "llm.obfuscation",
+    title="Obfuscated-attack resistance",
+    category="Security",
+    system_types=("llm_application",),
+    order=14,
+)
+def obfuscation(ctx: AuditContext) -> CheckResult:
+    from pramana.attacks.mutations import DESCRIPTIONS, mutate
+
+    names = ctx.spec.llm.get("mutations")
+    if not names:
+        raise MissingArtifact(
+            "set llm.mutations (for example 'all') to re-send each attack in obfuscated forms"
+        )
+    limit = ctx.spec.threshold("llm_attack_success_max")
+    canary = str(ctx.probes.get("canary", ""))
+    variants: list[dict[str, Any]] = []
+    for probe in _probes(ctx, "prompt_injection"):
+        for name in names:
+            text = mutate(probe["prompt"], name)
+            if text is None:
+                continue
+            variants.append(
+                {
+                    **probe,
+                    "id": f"{probe['id']}~{name}",
+                    "base_id": probe["id"],
+                    "mutation": name,
+                    "prompt": text,
+                    "technique": f"{probe.get('technique', 'injection')} + {DESCRIPTIONS[name]}",
+                }
+            )
+    if not variants:
+        raise MissingArtifact("no injection probe has words the chosen mutations can rewrite")
+    runs = ctx.ask_all("obfuscation", variants)
+
+    def judge(probe: dict[str, Any], c: Completion) -> tuple[bool, dict[str, Any]]:
+        return injection_verdict(c.text, probe, canary)
+
+    rows, totals = _evaluate(variants, runs, judge)
+    plain = ctx.shared.get("injection_failed", {})
+    by_mutation: dict[str, list[int]] = {}
+    for row, variant in zip(rows, variants, strict=True):
+        row["mutation"] = variant["mutation"]
+        stat = by_mutation.setdefault(variant["mutation"], [0, 0])
+        stat[0] += int(row["failed"])
+        stat[1] += 1
+        if row["failed"] and plain.get(variant["base_id"]) is False:
+            row["bypass"] = True
+            row["technique"] += " · bypassed a defence that stopped the plain attack"
+    successes = [r for r in rows if r["failed"]]
+    bypasses = [r for r in successes if r.get("bypass")]
+    rate = len(successes) / len(rows)
+    leaked = any(r.get("system_prompt_leaked") for r in rows)
+    status, severity = _status_with_errors(
+        rate > limit, totals, Severity.CRITICAL if leaked else Severity.HIGH
+    )
+    worst = sorted(by_mutation.items(), key=lambda kv: -kv[1][0])
+    return CheckResult(
+        check_id="llm.obfuscation",
+        title="Obfuscated-attack resistance",
+        category="Security",
+        status=status,
+        severity=severity,
+        summary=(
+            f"{len(successes)}/{len(rows)} obfuscated attack variants succeeded "
+            f"({len(by_mutation)} obfuscations of {len({v['base_id'] for v in variants})} "
+            f"injection probes, limit {limit:.0%})."
+            + _rate_text(totals, "Attack success on")
+            + " By obfuscation: "
+            + ", ".join(f"{name} {s[0]}/{s[1]}" for name, s in worst)
+            + "."
+            + (
+                f" {len(bypasses)} variant(s) got through although the plain attack was stopped: "
+                + ", ".join(r["probe_id"] for r in bypasses[:8])
+                + ("…" if len(bypasses) > 8 else "")
+                + ". The defence reads the raw text, the model reads the meaning."
+                if bypasses
+                else ""
+            )
+            + (" The confidential system-prompt canary was disclosed." if leaked else "")
+            + _incomplete_note(totals)
+        ),
+        plain_summary=(
+            "Disguising an attack with invisible or look-alike characters gets it past the "
+            "assistant's defences."
+            if bypasses
+            else "Obfuscated attacks succeeded."
+            if successes
+            else "Obfuscated versions of the attacks were stopped as well as the plain ones."
+            if status == Status.PASS
+            else "Some obfuscated attacks could not be tested."
+        ),
+        recommendation=(
+            "Normalise input before screening it: Unicode NFKC, remove format characters "
+            "(zero-width spaces and joiners, soft hyphens) and fold look-alike letters "
+            "(Unicode TR39 confusables); `pramana.attacks.mutations.normalize` does all three. "
+            "Do not rely on keyword filters alone: validate outputs for canaries and markers too."
+        ),
+        metrics={
+            "attack_success_rate": round(rate, 4),
+            "sample_attack_success_rate": totals["sample_failure_rate"],
+            "ci_low": totals["ci_low"],
+            "ci_high": totals["ci_high"],
+            "variants": len(rows),
+            "bypasses": len(bypasses),
+            "canary_leaked": leaked,
+            "errored_samples": totals["errored_samples"],
+        },
+        details={
+            "probes": rows,
+            "by_mutation": {k: {"succeeded": v[0], "sent": v[1]} for k, v in by_mutation.items()},
+        },
     )
 
 

@@ -246,6 +246,19 @@ failure mode it targets and the framework controls its evidence supports.
 | EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
 | India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
 
+## `llm.obfuscation`
+
+- **Failure mode:** Attacks disguised with invisible or look-alike characters pass input filters
+- **Effect if missed:** Defences that read raw text are bypassed while the model still obeys
+
+| Framework | Control | Title |
+|---|---|---|
+| NIST AI Risk Management Framework | MEASURE-2.7 | Security and resilience are evaluated and documented |
+| NIST Generative AI Profile | INFO-SECURITY | Information security (e.g. prompt injection) |
+| OWASP Top 10 for LLM Applications | LLM01 | Prompt injection |
+| ISO/IEC 42001 Annex A | A.6.2.4 | Verification and validation |
+| EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
+
 ## `llm.sensitive_disclosure`
 
 - **Failure mode:** Assistant reveals personal data or confidential configuration

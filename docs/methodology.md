@@ -128,6 +128,12 @@ Forbidden phrases (`must_not_include`) in groundedness and conduct probes are ne
 
 When some calls failed but nothing failed among those scored, the check is a **WARN** ("not yet proven"), never a PASS.
 
+### Obfuscated attacks (`llm.obfuscation`)
+
+Set `llm.mutations` to a list (or `all`) and every single-message injection probe is re-sent in disguised forms: zero-width spaces inside words, Cyrillic and Greek look-alike letters, soft hyphens, letter-by-letter spacing, digits for letters, full-width letters, and zero-width joiners inside Devanagari, Kannada and Tamil words. A language model reads through these; a keyword or regular-expression filter usually does not. Mutators never touch what the verdict depends on (quoted fragments, codes such as `LANTERN-6650`, the canary, URLs), so each variant is judged with the original probe's markers. They are deterministic, so live runs replay offline.
+
+A variant that succeeds where the plain probe was stopped is reported as a **bypass**: the defence looked at the raw text while the model acted on the meaning. The fix is to normalise input before screening it (Unicode NFKC, remove format characters, fold look-alikes per Unicode TR39); `pramana.attacks.mutations.normalize` does this, and the guarded Niva build uses the same steps. Spacing and digit substitution survive normalisation and need fuzzy matching or output validation.
+
 ### Multi-turn manipulation (`llm.multi_turn`)
 
 Each `multi_turn` probe is a conversation. Its user turns are sent one after another and the system's real replies are kept in the history, so the test sees what a patient attacker sees. Every reply is judged with the same deterministic rules as `llm.prompt_injection` (markers, regular expressions, canary); the first reply that proves the attack decides the conversation, and the report records the turn at which the defence broke. A conversation that broke after its first turn is one that single-message tests cannot find. The built-in pack `builtin:multiturn_core` covers gradual escalation (Crescendo, Russinovich et al., 2024), instructions planted early and triggered later, persona drift, refusal erosion under pressure, a fabricated dialogue history, and Hindi and Hinglish variants.

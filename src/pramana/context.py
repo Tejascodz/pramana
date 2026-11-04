@@ -56,6 +56,9 @@ class AuditContext:
         self.audit_date = audit_date or date.today()
         self.rng = np.random.default_rng(spec.seed)
         self._preflight: dict[str, Any] | Exception | None = None
+        # Results one check publishes for a later one (e.g. plain injection verdicts
+        # that the obfuscation check compares against).
+        self.shared: dict[str, Any] = {}
 
     # Tabular artifacts ---------------------------------------------------
 

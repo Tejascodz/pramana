@@ -84,6 +84,11 @@ checks:
     effect: "Policy bypass and data exfiltration that single-message screening misses"
     controls: [NIST:MEASURE-2.7, NIST-GAI:INFO-SECURITY, OWASP-LLM:LLM01, OWASP-LLM:LLM07, ISO42001:A.6.2.4, EUAIA:Art-15, INDIA:SUTRA-SAFETY]
 
+  llm.obfuscation:
+    failure_mode: "Attacks disguised with invisible or look-alike characters pass input filters"
+    effect: "Defences that read raw text are bypassed while the model still obeys"
+    controls: [NIST:MEASURE-2.7, NIST-GAI:INFO-SECURITY, OWASP-LLM:LLM01, ISO42001:A.6.2.4, EUAIA:Art-15]
+
   llm.sensitive_disclosure:
     failure_mode: "Assistant reveals personal data or confidential configuration"
     effect: "Privacy breach and regulatory exposure"
