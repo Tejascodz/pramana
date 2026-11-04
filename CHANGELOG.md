@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.6.0 — 2026-11-04
+
+Installable from PyPI as **`pramana-audit`** (the name `pramana` was taken); the command and the import stay `pramana`.
+
+**Install and first run**
+- `pip install pramana-audit`, then `pramana demo` runs the credit, chatbot and agent case studies from the installed package, verifies their packs and prints where the reports are. No clone needed.
+- Extras: `signing`, `skops`, `dashboard` and `all`. SPDX licence metadata, `py.typed`, absolute README links so PyPI renders images.
+
+**Security**
+- **Pickled models are refused unless pinned or trusted.** A crafted `.joblib` file used to run code on the auditor's machine as soon as the model was loaded. Pramana now needs `artifacts_sha256.model`, `trust_pickled_model: true` or `pramana run --trust-model`, and says so. The credit example opts in because you build its model yourself.
+- `.skops` models load without unpickling and only with scikit-learn, NumPy and SciPy types.
+- CSV exports neutralise spreadsheet formulas (CWE-1236).
+- `report.html` carries a Content-Security-Policy that forbids scripts, remote loads and forms.
+- YAML inputs are capped at 5 MB; a spec that is not a mapping or not valid YAML is a spec error (exit 3), not a traceback; `builtin:` probe names must exist in the library.
+
+**Release engineering**
+- Tag-triggered release workflow: tests, build, clean-venv demo, PyPI Trusted Publishing with PEP 740 attestations, GitHub release with build provenance and `SHA256SUMS`.
+- CI: wheel smoke test on Linux, macOS and Windows; `pip-audit`; `bandit`; CodeQL; Dependabot. Tests enforce SHA-pinned actions and a per-job permission allowlist.
+
+**Fixes**
+- `test_credit_audit_reports_tail_privacy_and_base_rates` passed only where the credit example had been built locally; it failed on a fresh clone and in CI.
+
 ## 0.5.1 — 2026-10-23
 
 Found while running the live agent harness end to end on llama3.2:3b.

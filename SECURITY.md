@@ -85,14 +85,27 @@ Ollama applies its own origin and host checks; keep them by leaving
   and which environment variable is sent as a credential. Only run specs you
   wrote or reviewed, as you would a CI workflow. Specs are parsed with
   `yaml.safe_load`, which does not create Python objects.
-- **Model files are code.** `artifacts.model` is loaded with joblib, which uses
-  pickle, and loading a pickle can run code. Only audit model files that came
-  through a trusted, access-controlled channel, or audit from predictions
-  (`score_column`) instead. Pin the file's SHA-256 under `artifacts_sha256` in the
-  spec: Pramana then refuses to unpickle a model that has changed since it was
-  pinned.
+- **Pickled model files are code, so Pramana refuses them by default.** A
+  `.joblib` or `.pkl` model can run code the moment it is loaded. Pramana loads
+  one only when its SHA-256 is pinned under `artifacts_sha256.model` (then a
+  swapped file is refused before it is unpickled) or when you vouch for it with
+  `trust_pickled_model: true` in the spec or `pramana run --trust-model`. Safer
+  options: save the model as `.skops` (`pip install "pramana-audit[skops]"`),
+  which loads without unpickling and only accepts scikit-learn, NumPy and SciPy
+  types, or audit from predictions (`score_column`) and never load the model.
+- **Configuration files are size-capped.** Specs, probe packs and model cards
+  above 5 MB are refused (`PRAMANA_MAX_YAML_BYTES` changes the limit), and
+  `builtin:` probe names must name a pack that ships with Pramana.
 - **Model output is untrusted text.** The HTML report escapes everything it
-  shows, so an answer containing HTML or script is displayed, never run.
+  shows, so an answer containing HTML or script is displayed, never run. The
+  report also carries a Content-Security-Policy that forbids every script,
+  remote load, form and frame, so even an escaping bug could not run code or
+  send data anywhere.
+- **CSV exports cannot carry formulas.** A cell that would start with `=`, `+`,
+  `-`, `@` or a tab is written with a leading apostrophe, so text from a model's
+  answer or a trace cannot run as a formula when a reviewer opens the risk
+  register in Excel, Numbers or Google Sheets (CWE-1236). Plain numbers are
+  left as they are.
 - **Audit packs from someone else are untrusted data.** `pramana verify` only
   reads files inside the pack, and the dashboard shows a pack's text as plain
   text, so it cannot load images or links from it.
@@ -108,13 +121,32 @@ Ollama applies its own origin and host checks; keep them by leaving
 - The composite action passes its inputs to the shell as environment
   variables, never as script text.
 
+- CodeQL (Python and Actions, `security-extended`), `bandit` and `pip-audit` run
+  on every push; Dependabot proposes dependency and action updates weekly.
+- Only three jobs get more than a read-only token, each with exactly the
+  permission it needs (publishing, the GitHub release, CodeQL results). A test
+  fails if any other job gains a permission or any action is not pinned to a
+  full commit SHA.
+
+## Verifying a release
+
+Releases are built by `.github/workflows/release.yml` from a tagged commit and
+uploaded to PyPI with Trusted Publishing: no long-lived API token exists that
+could be stolen. Each file has a Sigstore attestation on PyPI (shown on the
+project's *Verified details*) and a GitHub build-provenance attestation:
+
+```bash
+pip download pramana-audit==0.6.0 --no-deps -d dl
+gh attestation verify dl/pramana_audit-0.6.0-py3-none-any.whl --repo Tejascodz/pramana
+```
+
+The GitHub release also lists `SHA256SUMS` for every file.
+
 ## Dependencies
 
-The core package has no known vulnerable dependencies (checked with
-`pip-audit`) and sets minimum versions above known advisories (Jinja2 3.1.6,
-scikit-learn 1.5). The optional dashboard depends on Streamlit, which currently
-limits Pillow to the 12.x series; the advisories fixed in Pillow 13 concern
-opening or saving untrusted image and PDF files, which the dashboard never does.
+The package and every optional extra had no known vulnerable dependencies
+when 0.6.0 was released (`pip-audit`, run in CI on every push). Minimum
+versions sit above known advisories (Jinja2 3.1.6, scikit-learn 1.5).
 
 ## Reporting a problem
 
@@ -128,5 +160,5 @@ pip install bandit pip-audit
 bandit -r src dashboard examples        # static analysis
 pip-audit                               # known-vulnerable dependencies
 gitleaks git .                          # secrets in the full git history
-pytest tests/test_security.py           # the properties on this page
+pytest tests/test_security.py tests/test_input_safety.py   # the properties on this page
 ```

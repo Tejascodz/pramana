@@ -30,3 +30,10 @@ Edit `src/pramana/controls/data/regulatory_calendar.yaml` or the framework catal
 ## Style
 
 Ruff handles linting and formatting (`ruff check` and `ruff format`). Keep reports and plain summaries in plain language.
+
+## Releasing
+
+1. Bump `version` in `pyproject.toml` and `__version__` in `src/pramana/__init__.py`, and add a CHANGELOG entry.
+2. If you changed a case study in `examples/`, run `make demos` so the bundled copy matches (a test checks this).
+3. `make release-check` builds the wheel, installs it in a clean environment and runs `pramana demo`.
+4. Merge to `main`, then tag: `git tag v0.6.0 && git push origin v0.6.0`. The release workflow does the rest; approve the `pypi` environment when GitHub asks.
