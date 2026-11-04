@@ -130,17 +130,19 @@ Ollama applies its own origin and host checks; keep them by leaving
 
 ## Verifying a release
 
-Releases are built by `.github/workflows/release.yml` from a tagged commit and
-uploaded to PyPI with Trusted Publishing: no long-lived API token exists that
-could be stolen. Each file has a Sigstore attestation on PyPI (shown on the
-project's *Verified details*) and a GitHub build-provenance attestation:
+Releases are built by `.github/workflows/release.yml` from a tagged commit, in
+GitHub Actions, never on a laptop. Each file on the
+[Releases page](https://github.com/Tejascodz/pramana/releases) has a
+build-provenance attestation signed with Sigstore, and the release lists
+`SHA256SUMS` for every file. To check a wheel you downloaded:
 
 ```bash
-pip download pramana-audit==0.6.0 --no-deps -d dl
-gh attestation verify dl/pramana_audit-0.6.0-py3-none-any.whl --repo Tejascodz/pramana
+gh attestation verify pramana_audit-0.6.0-py3-none-any.whl --repo Tejascodz/pramana
+shasum -a 256 -c SHA256SUMS
 ```
 
-The GitHub release also lists `SHA256SUMS` for every file.
+If PyPI publishing is switched on later, it uses Trusted Publishing, so no
+long-lived API token exists that could be stolen.
 
 ## Dependencies
 

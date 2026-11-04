@@ -1,17 +1,16 @@
-# Build, test and publish a release to PyPI when a version tag (v0.6.0) is pushed.
+# Build, test and release when a version tag (v0.6.0) is pushed.
 #
-# No API token exists anywhere: PyPI Trusted Publishing exchanges a short-lived
-# GitHub OIDC token for a one-time upload credential, and only the `pypi`
-# environment (which can require a manual approval) may request it. Every file
-# gets a Sigstore attestation on PyPI (PEP 740) and a GitHub build-provenance
-# attestation, so anyone can check the wheel was built here from this commit.
+# Every tag gets a GitHub release with the wheel, the source archive, SHA256SUMS
+# and a build-provenance attestation, so anyone can check a file was built here
+# from that commit.
 #
-# One-time setup (repository owner):
-#   1. pypi.org > Your projects > Publishing > Add a pending publisher:
-#      project pramana-audit, owner Tejascodz, repository pramana,
-#      workflow release.yml, environment pypi.
-#   2. GitHub > Settings > Environments > New environment "pypi"
-#      (add yourself as a required reviewer, and limit it to tags v*).
+# Publishing to PyPI is off until the repository variable PUBLISH_TO_PYPI is set
+# to "true" (Settings > Secrets and variables > Actions > Variables). It then uses
+# Trusted Publishing, so no API token exists anywhere. One-time setup first:
+#   1. pypi.org > Publishing > Add a pending publisher: project pramana-audit,
+#      owner Tejascodz, repository pramana, workflow release.yml, environment pypi.
+#   2. GitHub > Settings > Environments > New environment "pypi" with yourself as
+#      a required reviewer.
 name: Release
 
 on:
@@ -60,6 +59,7 @@ jobs:
 
   publish-pypi:
     needs: build
+    if: vars.PUBLISH_TO_PYPI == 'true'
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -76,7 +76,7 @@ jobs:
           attestations: true
 
   github-release:
-    needs: publish-pypi
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write # create the GitHub release

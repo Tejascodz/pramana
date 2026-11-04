@@ -52,19 +52,13 @@ flowchart LR
 ## Install
 
 ```bash
-pip install pramana-audit                 # the command and the import are both `pramana`
-pramana demo                              # runs three bundled audits, about 10 seconds
-```
-
-Optional extras: `pramana-audit[signing]` (Ed25519 signed packs), `pramana-audit[skops]` (load `.skops` models without pickle), `pramana-audit[dashboard]` (Streamlit viewer), or `pramana-audit[all]`. Python 3.10 to 3.13 on Linux, macOS and Windows.
-
-Until the first PyPI release, install straight from GitHub:
-
-```bash
 pip install "pramana-audit @ git+https://github.com/Tejascodz/pramana"
+pramana demo                              # runs three bundled audits in a few seconds
 ```
 
-Every release is built in GitHub Actions and published with PyPI Trusted Publishing, with a Sigstore build attestation, so you can check that a wheel came from this repository. See [Verifying a release](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md#verifying-a-release).
+The command and the import are both `pramana`. Pin a release with `@v0.6.0` at the end of the URL. Optional extras: `[signing]` (Ed25519 signed packs), `[skops]` (load `.skops` models without pickle), `[dashboard]` (Streamlit viewer) or `[all]`, for example `pip install "pramana-audit[all] @ git+https://github.com/Tejascodz/pramana"`. Python 3.10 to 3.13 on Linux, macOS and Windows.
+
+Each tagged release also has a ready-built wheel on the [Releases page](https://github.com/Tejascodz/pramana/releases), with SHA-256 checksums and a build attestation that proves it was built from this repository. See [Verifying a release](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md#verifying-a-release).
 
 ## Quick start from source
 

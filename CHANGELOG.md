@@ -2,10 +2,10 @@
 
 ## 0.6.0 — 2026-11-04
 
-Installable from PyPI as **`pramana-audit`** (the name `pramana` was taken); the command and the import stay `pramana`.
+Installable with pip as **`pramana-audit`**, from GitHub (`pip install "pramana-audit @ git+https://github.com/Tejascodz/pramana"`) or from the wheel on each GitHub release. The command and the import stay `pramana`. PyPI publishing is ready but switched off.
 
 **Install and first run**
-- `pip install pramana-audit`, then `pramana demo` runs the credit, chatbot and agent case studies from the installed package, verifies their packs and prints where the reports are. No clone needed.
+- Install, then `pramana demo` runs the credit, chatbot and agent case studies from the installed package, verifies their packs and prints where the reports are. No clone needed.
 - Extras: `signing`, `skops`, `dashboard` and `all`. SPDX licence metadata, `py.typed`, absolute README links so PyPI renders images.
 
 **Security**
@@ -16,7 +16,7 @@ Installable from PyPI as **`pramana-audit`** (the name `pramana` was taken); the
 - YAML inputs are capped at 5 MB; a spec that is not a mapping or not valid YAML is a spec error (exit 3), not a traceback; `builtin:` probe names must exist in the library.
 
 **Release engineering**
-- Tag-triggered release workflow: tests, build, clean-venv demo, PyPI Trusted Publishing with PEP 740 attestations, GitHub release with build provenance and `SHA256SUMS`.
+- Tag-triggered release workflow: tests, build, clean-venv demo, GitHub release with the wheel, build provenance and `SHA256SUMS`. Optional PyPI Trusted Publishing behind the `PUBLISH_TO_PYPI` repository variable.
 - CI: wheel smoke test on Linux, macOS and Windows; `pip-audit`; `bandit`; CodeQL; Dependabot. Tests enforce SHA-pinned actions and a per-job permission allowlist.
 
 **Fixes**
