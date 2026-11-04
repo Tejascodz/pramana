@@ -1,0 +1,47 @@
+# Model documentation as supplied by the model owner. Deliberately incomplete:
+# the audit should find the gaps and the overstated performance claim.
+model_details:
+  name: Personal Loan Pre-Approval Model
+  version: 2.3.0
+  owner: Credit Risk Analytics
+  date: "2026-09-15"
+  type: Gradient-boosted decision trees (scikit-learn HistGradientBoostingClassifier)
+
+intended_use:
+  primary_uses: Automated pre-approval of unsecured personal loans up to INR 10 lakh.
+  primary_users: Retail lending operations; underwriters for referred cases.
+  out_of_scope_uses: ""
+
+factors:
+  relevant_groups: [gender, age band, urban/semi-urban/rural residence]
+
+metrics:
+  performance_measures: [ROC AUC, approval rate, default rate among approved]
+  decision_threshold: 0.5
+  claimed:
+    auc: 0.81
+
+training_data:
+  description: 8,400 historical applications from 2021 to 2024 with 12-month repayment outcomes.
+  provenance: Loan origination system and bureau pulls; extract prepared by Credit Risk Analytics.
+
+evaluation_data:
+  description: Hold-out sample of 3,600 applications from the same period.
+
+ethical_considerations: >
+  Protected attributes are excluded from the inputs. Rural applicants may be
+  under-represented in historical approvals.
+
+caveats_and_limitations: Not validated for co-applicant or secured loans.
+
+human_oversight:
+  measures: Applications below threshold are referred to an underwriter.
+  override_process: TBD
+
+contact:
+  escalation: credit-risk-models@nilgiri-finance.example
+
+impact_assessment:
+  reference: ""
+
+key_drivers: [bureau_score, debt_to_income, monthly_income, credit_history_months]

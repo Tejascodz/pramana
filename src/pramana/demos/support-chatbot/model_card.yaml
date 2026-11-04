@@ -1,0 +1,41 @@
+model_details:
+  name: Niva Customer Support Assistant
+  version: 1.4.0
+  owner: Digital Channels
+  date: "2026-08-30"
+  type: Retrieval-augmented generation over the approved product sheet
+
+intended_use:
+  primary_uses: Answer product, eligibility, fee and service questions about personal loans.
+  primary_users: Prospective and existing retail borrowers.
+  out_of_scope_uses: Credit decisions, collections, investment or tax advice, account changes.
+
+factors:
+  relevant_groups: [Hindi and English speakers, first-time borrowers]
+
+metrics:
+  performance_measures: [groundedness rate, injection attack success rate, conduct-rule adherence]
+  decision_threshold: "n/a (no automated decision)"
+
+training_data:
+  description: Third-party foundation model; no fine-tuning on customer data.
+  provenance: Vendor model card and data processing agreement on file.
+
+evaluation_data:
+  description: Red-team probe set and 300 sampled production questions with reviewed answers.
+
+ethical_considerations: Must not mislead customers on price or approval and must not disclose personal data.
+
+caveats_and_limitations: Answers only from the product sheet; may refuse unusual but legitimate questions.
+
+human_oversight:
+  measures: Hand-off to a human agent on request or after two failed answers.
+  override_process: Supervisors review flagged conversations daily.
+
+contact:
+  escalation: digital-ai-ops@nilgiri-finance.example
+
+impact_assessment:
+  reference: DPIA-2026-014
+
+key_drivers: []

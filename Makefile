@@ -1,4 +1,4 @@
-.PHONY: install test lint example audits verify dashboard docs clean live-model live-baseline live-guarded live-audit
+.PHONY: demos build release-check install test lint example audits verify dashboard docs clean live-model live-baseline live-guarded live-audit
 
 install:
 	pip install -e ".[dev,dashboard]"
@@ -43,3 +43,15 @@ docs:
 clean:
 	rm -rf packs build dist .pytest_cache .ruff_cache src/*.egg-info
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +
+
+# Copy the case studies into the package so `pramana demo` works after pip install.
+demos:
+	python -c "import shutil; ig = shutil.ignore_patterns('data', 'model.joblib', '__pycache__'); [shutil.copytree('examples/' + s, 'src/pramana/demos/' + d, ignore=ig, dirs_exist_ok=True) for s, d in [('credit_scoring', 'credit-scoring'), ('support_chatbot', 'support-chatbot'), ('agent_traces', 'agent-traces')]]"
+
+build:
+	python -m build
+	twine check --strict dist/*
+
+release-check: build
+	python -m venv /tmp/pramana-release-check && /tmp/pramana-release-check/bin/pip install dist/*.whl
+	cd /tmp && /tmp/pramana-release-check/bin/pramana demo --out /tmp/pramana-release-check-demo

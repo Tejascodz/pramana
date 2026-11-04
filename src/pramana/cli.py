@@ -9,6 +9,7 @@
     pramana checks                                     list available checks
     pramana controls [--framework ID] [--markdown]     browse the control library
     pramana init [PATH]                                write a starter audit spec
+    pramana demo [credit|chatbot|agent|all]            run a bundled case study end to end
 
 Exit codes: 0 success, 1 release gate blocked, 2 verification failed, 3 bad input,
 4 endpoint unreachable.
@@ -504,6 +505,13 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_demo(args: argparse.Namespace) -> int:
+    from pramana.demo import DEMOS, run_demo
+
+    names = list(DEMOS) if args.name == "all" else [args.name]
+    return run_demo(names, Path(args.out))
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="pramana",
@@ -588,6 +596,15 @@ def build_parser() -> argparse.ArgumentParser:
     init = sub.add_parser("init", help="write a starter audit spec")
     init.add_argument("path", nargs="?", default="audit.yaml")
     init.set_defaults(fn=_cmd_init)
+
+    demo = sub.add_parser(
+        "demo", help="run a bundled case study end to end (no repository clone needed)"
+    )
+    demo.add_argument(
+        "name", nargs="?", default="all", choices=["credit", "chatbot", "agent", "all"]
+    )
+    demo.add_argument("--out", default="pramana-demo", help="folder for the demo files and packs")
+    demo.set_defaults(fn=_cmd_demo)
 
     scan = sub.add_parser(
         "scan-trace",

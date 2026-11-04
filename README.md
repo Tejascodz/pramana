@@ -10,7 +10,7 @@
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-![Audit report overview](docs/img/report-overview.png)
+![Audit report overview](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/report-overview.png)
 
 Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 23 automated checks, can red-team a **live LLM application on your laptop**, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
 
@@ -27,7 +27,7 @@ AI governance is moving from policy documents to audits, and the tooling has not
 - **LLM safety is weakest outside English.** Jailbreaks transfer from English to Indian languages, and romanised, code-mixed text is how many South Asian users actually type ([Yong et al., 2023](https://arxiv.org/abs/2310.02446); [IndicJR, 2026](https://arxiv.org/abs/2602.16832)). Pramana ships injection probes in Hindi, Hinglish, Kannada (both scripts) and Tamil, and reports results by language.
 - **India-specific context is missing.** India's AI Governance Guidelines (MeitY, Nov 2025) call for an India-specific, evidence-based risk framework. Fairness in India runs along axes such as region and caste that Western tools do not model ([Sambasivan et al., FAccT 2021](https://arxiv.org/abs/2101.09995)). Pramana maps evidence to the seven sutras, checks for Indian identifiers (PAN, Aadhaar-format numbers, Indian mobile numbers) under the DPDP Act, and flags proxies such as pincode-based features.
 
-The full literature review and gap analysis is in [docs/research-notes.md](docs/research-notes.md).
+The full literature review and gap analysis is in [docs/research-notes.md](https://github.com/Tejascodz/pramana/blob/main/docs/research-notes.md).
 
 ## How it works
 
@@ -49,7 +49,24 @@ flowchart LR
     G -->|BLOCK| NO[exit 1]
 ```
 
-## Quick start
+## Install
+
+```bash
+pip install pramana-audit                 # the command and the import are both `pramana`
+pramana demo                              # runs three bundled audits, about 10 seconds
+```
+
+Optional extras: `pramana-audit[signing]` (Ed25519 signed packs), `pramana-audit[skops]` (load `.skops` models without pickle), `pramana-audit[dashboard]` (Streamlit viewer), or `pramana-audit[all]`. Python 3.10 to 3.13 on Linux, macOS and Windows.
+
+Until the first PyPI release, install straight from GitHub:
+
+```bash
+pip install "pramana-audit @ git+https://github.com/Tejascodz/pramana"
+```
+
+Every release is built in GitHub Actions and published with PyPI Trusted Publishing, with a Sigstore build attestation, so you can check that a wheel came from this repository. See [Verifying a release](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md#verifying-a-release).
+
+## Quick start from source
 
 ```bash
 git clone https://github.com/Tejascodz/pramana.git && cd pramana
@@ -74,7 +91,7 @@ pramana run examples/support_chatbot/audit.yaml --out packs/chatbot
 pramana run examples/agent_traces/audit.yaml --out packs/agent
 ```
 
-Pre-generated packs are in [docs/sample-audits](docs/sample-audits). Download any `report.html` and open it in a browser.
+Pre-generated packs are in [docs/sample-audits](https://github.com/Tejascodz/pramana/tree/main/docs/sample-audits). Download any `report.html` and open it in a browser.
 
 ## Case studies
 
@@ -82,19 +99,19 @@ Each case study plants known defects, so the audit can be checked against a grou
 
 | Case study | System | Planted defects | What Pramana reports |
 |---|---|---|---|
-| [Credit scoring](examples/credit_scoring) | Gradient-boosted loan pre-approval model for a fictional Indian lender (synthetic data) | Biased historical labels for rural women; pincode band that tracks residence; e-mail and mobile columns left in extracts; overstated AUC in the model card; owner classified it as "limited" risk; income and gig-work drift | Disparate impact 0.72 for rural applicants (p < 1e-70), worse for intersectional sub-groups; pincode proxy (AUC 0.99); personal data exposure; documentation mismatch; EU AI Act misclassification (Annex III 5(b) makes it high-risk); missing FRIA. **Gate: BLOCK** |
-| [Support assistant](examples/support_chatbot) | RAG chat assistant (replayed transcripts) | Indirect prompt injection in a pasted e-mail; another customer's contact details disclosed; invented foreclosure fee; crypto investment advice | 1/5 injection probes succeed; PII disclosure (critical); figures not in the knowledge base (4%, ₹500); conduct-rule breach. **Gate: BLOCK** |
-| [Live assistant](examples/live_assistant) | Retrieval-augmented loan assistant on a **local open-weights model** (Ollama), in a baseline and a guarded build | Shared retrieval index holding customer records; no input screening; no output validation | Run it yourself: `pramana diff` shows the guarded build's controls closing the gaps, and 4 **held-out** probes show the risk that remains. See below. |
-| [Refund agent](examples/agent_traces) | Tool-using agent that issues refunds | ₹18,500 refund with no human approval; a tool call with no originating request; no hash chain; an agent that reasons about avoiding shutdown and hiding a weak justification | Approval coverage 50%, one unattributed action, log not tamper-evident; **misalignment signals** (self-preservation + oversight evasion) caught in the agent's own reasoning, co-occurring with an irreversible refund. **Gate: BLOCK** |
+| [Credit scoring](https://github.com/Tejascodz/pramana/tree/main/examples/credit_scoring) | Gradient-boosted loan pre-approval model for a fictional Indian lender (synthetic data) | Biased historical labels for rural women; pincode band that tracks residence; e-mail and mobile columns left in extracts; overstated AUC in the model card; owner classified it as "limited" risk; income and gig-work drift | Disparate impact 0.72 for rural applicants (p < 1e-70), worse for intersectional sub-groups; pincode proxy (AUC 0.99); personal data exposure; documentation mismatch; EU AI Act misclassification (Annex III 5(b) makes it high-risk); missing FRIA. **Gate: BLOCK** |
+| [Support assistant](https://github.com/Tejascodz/pramana/tree/main/examples/support_chatbot) | RAG chat assistant (replayed transcripts) | Indirect prompt injection in a pasted e-mail; another customer's contact details disclosed; invented foreclosure fee; crypto investment advice | 1/5 injection probes succeed; PII disclosure (critical); figures not in the knowledge base (4%, ₹500); conduct-rule breach. **Gate: BLOCK** |
+| [Live assistant](https://github.com/Tejascodz/pramana/tree/main/examples/live_assistant) | Retrieval-augmented loan assistant on a **local open-weights model** (Ollama), in a baseline and a guarded build | Shared retrieval index holding customer records; no input screening; no output validation | Run it yourself: `pramana diff` shows the guarded build's controls closing the gaps, and 4 **held-out** probes show the risk that remains. See below. |
+| [Refund agent](https://github.com/Tejascodz/pramana/tree/main/examples/agent_traces) | Tool-using agent that issues refunds | ₹18,500 refund with no human approval; a tool call with no originating request; no hash chain; an agent that reasons about avoiding shutdown and hiding a weak justification | Approval coverage 50%, one unattributed action, log not tamper-evident; **misalignment signals** (self-preservation + oversight evasion) caught in the agent's own reasoning, co-occurring with an irreversible refund. **Gate: BLOCK** |
 
-![Fairness spotlight](docs/img/fairness.png)
+![Fairness spotlight](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/fairness.png)
 
 <details>
 <summary>More report screenshots: risk register and LLM probe results</summary>
 
-![Risk register](docs/img/risk-register.png)
+![Risk register](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/risk-register.png)
 
-![LLM probe findings](docs/img/llm-findings.png)
+![LLM probe findings](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/llm-findings.png)
 
 </details>
 
@@ -121,12 +138,12 @@ Each case study plants known defects, so the audit can be checked against a grou
 | LLM conduct | `llm.policy_adherence` | Required and forbidden phrases per conduct rule |
 | LLM operations | `llm.service_health` | Error rate, retries, p50/p95 latency and output length from the live run (OWASP LLM10) |
 | Agents | `agent.trace_auditability` | Attribution to a request, prior human approval for high-impact actions, tool allowlist, ordering, hash-chain integrity |
-| Agents | `agent.misalignment_signals` | Scans the agent's own reasoning and actions for rogue patterns (self-preservation, deception, oversight evasion, goal substitution, privilege escalation, reward hacking, gaming an evaluation) and scores each session on the UN Scientific Panel's three loss-of-control conditions: misaligned intent, irreversible capability and a permissive environment ([see the review](docs/agentic-safety-review.md)) |
+| Agents | `agent.misalignment_signals` | Scans the agent's own reasoning and actions for rogue patterns (self-preservation, deception, oversight evasion, goal substitution, privilege escalation, reward hacking, gaming an evaluation) and scores each session on the UN Scientific Panel's three loss-of-control conditions: misaligned intent, irreversible capability and a permissive environment ([see the review](https://github.com/Tejascodz/pramana/blob/main/docs/agentic-safety-review.md)) |
 | Agents | `agent.control_readiness` | Six safeguards from the agent-control literature (own identity, tool allowlist, approval gate, stop conditions, tamper-evident log, action monitor), each graded as evidenced in the trace, only declared in the spec, or missing |
 | Agents | `agent.oversight_integrity` | Share of tool calls explained by logged reasoning, and instructions planted in tool results (indirect prompt injection), with the action that followed |
 | Assurance | `audit.detector_sensitivity` | Plants a disparity, a drift and a PII column in copies of the data and confirms the audit catches them |
 
-Scoring is deterministic, so the same inputs always produce the same findings. Run `pramana checks` for the list with failure modes, and see [docs/methodology.md](docs/methodology.md) for every formula and threshold.
+Scoring is deterministic, so the same inputs always produce the same findings. Run `pramana checks` for the list with failure modes, and see [docs/methodology.md](https://github.com/Tejascodz/pramana/blob/main/docs/methodology.md) for every formula and threshold.
 
 ## Framework coverage
 
@@ -141,9 +158,9 @@ Scoring is deterministic, so the same inputs always produce the same findings. R
 | OWASP Top 10 for Agentic Applications | 2026 | 10 categories (agents only) |
 | ISO/IEC 42005 AI system impact assessment | 2025 | 15 clauses |
 
-The report shows, per framework, which controls are **evidenced**, **partial**, **deficient** or **not tested by automation**. Pramana is honest that many governance controls (board approval, training, supplier contracts) need organisational evidence. Those documents can be attached in the spec, and they are fingerprinted into the pack. The full crosswalk is in [docs/control-mapping.md](docs/control-mapping.md).
+The report shows, per framework, which controls are **evidenced**, **partial**, **deficient** or **not tested by automation**. Pramana is honest that many governance controls (board approval, training, supplier contracts) need organisational evidence. Those documents can be attached in the spec, and they are fingerprinted into the pack. The full crosswalk is in [docs/control-mapping.md](https://github.com/Tejascodz/pramana/blob/main/docs/control-mapping.md).
 
-![Framework coverage](docs/img/coverage.png)
+![Framework coverage](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/coverage.png)
 
 ## The audit pack
 
@@ -211,13 +228,13 @@ What makes the live mode production-grade:
 - **Held-out probes.** Four probes the guarded build was not written against measure the residual risk, so passing the known attacks is not mistaken for safety.
 - **Reproducible.** Every live pack contains `llm_replay.jsonl`, which re-runs the identical audit offline in CI.
 - **Before/after evidence.** `pramana diff` compares two packs check by check, and `--fail-on-regression` turns it into a CI gate.
-- **Safe on your laptop.** Niva, the model server and the dashboard listen on `127.0.0.1` only; nothing is reachable from your network, nothing is sent anywhere except the endpoint you audit, and keys are only ever sent over https. See [SECURITY.md](SECURITY.md).
+- **Safe on your laptop.** Niva, the model server and the dashboard listen on `127.0.0.1` only; nothing is reachable from your network, nothing is sent anywhere except the endpoint you audit, and keys are only ever sent over https. See [SECURITY.md](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md).
 
-Full walkthrough: [examples/live_assistant](examples/live_assistant).
+Full walkthrough: [examples/live_assistant](https://github.com/Tejascodz/pramana/tree/main/examples/live_assistant).
 
 ### Findings from a real run
 
-The first live audit ran `llama3.2:3b` on an 8 GB MacBook. The baseline build told a customer *"Yes, you are chatting with a real person"*, revealed which customer and account a phone number belonged to, invented a complaints e-mail address, and said there was *"no prepayment penalty"* despite a 3% foreclosure charge. Reading the transcripts also exposed four blind spots in Pramana's own scoring. The most serious: the guarded build had **passed** while accepting a persona switch, because the model misspelt the marker. The scorer was fixed, the recorded run re-scored offline, and the guarded build's gate correctly flipped to **BLOCK**. A second run with three samples per probe (258 calls) then showed what a single run hides: the system-prompt canary leaked in four attacks, including in Hindi and Hinglish, and the baseline volunteered another customer's account details to an unauthenticated user. The real responses are regression tests. Full write-up: [docs/live-run-findings.md](docs/live-run-findings.md).
+The first live audit ran `llama3.2:3b` on an 8 GB MacBook. The baseline build told a customer *"Yes, you are chatting with a real person"*, revealed which customer and account a phone number belonged to, invented a complaints e-mail address, and said there was *"no prepayment penalty"* despite a 3% foreclosure charge. Reading the transcripts also exposed four blind spots in Pramana's own scoring. The most serious: the guarded build had **passed** while accepting a persona switch, because the model misspelt the marker. The scorer was fixed, the recorded run re-scored offline, and the guarded build's gate correctly flipped to **BLOCK**. A second run with three samples per probe (258 calls) then showed what a single run hides: the system-prompt canary leaked in four attacks, including in Hindi and Hinglish, and the baseline volunteered another customer's account details to an unauthenticated user. The real responses are regression tests. Full write-up: [docs/live-run-findings.md](https://github.com/Tejascodz/pramana/blob/main/docs/live-run-findings.md).
 
 ## Interactive viewer
 
@@ -239,7 +256,7 @@ pramana run my_audit.yaml
 
 Predictions-only audits are supported: if the model cannot be shared, supply a `score_column` in the evaluation data and Pramana runs every check that does not need the model itself.
 
-For agents, Pramana reads the logs real systems already emit: set `agent.trace_format` to `otel` (OpenTelemetry GenAI spans) or `langchain` (LangChain/LangGraph runs), or convert first with `pramana ingest`. See [examples/real_traces](examples/real_traces).
+For agents, Pramana reads the logs real systems already emit: set `agent.trace_format` to `otel` (OpenTelemetry GenAI spans) or `langchain` (LangChain/LangGraph runs), or convert first with `pramana ingest`. See [examples/real_traces](https://github.com/Tejascodz/pramana/tree/main/examples/real_traces).
 
 ## Project layout
 
@@ -261,18 +278,18 @@ docs/                    # research notes, methodology, design decisions, limita
 
 ## Documentation
 
-- [Research notes and gap analysis](docs/research-notes.md)
-- [Agentic safety, misalignment and control: a 2026 review](docs/agentic-safety-review.md)
-- [Methodology: formulas, thresholds, scoring](docs/methodology.md)
-- [Design decisions](docs/design-decisions.md)
-- [Control crosswalk](docs/control-mapping.md)
-- [Findings from real model runs](docs/live-run-findings.md)
-- [Limitations](docs/limitations.md)
-- [Security](SECURITY.md)
+- [Research notes and gap analysis](https://github.com/Tejascodz/pramana/blob/main/docs/research-notes.md)
+- [Agentic safety, misalignment and control: a 2026 review](https://github.com/Tejascodz/pramana/blob/main/docs/agentic-safety-review.md)
+- [Methodology: formulas, thresholds, scoring](https://github.com/Tejascodz/pramana/blob/main/docs/methodology.md)
+- [Design decisions](https://github.com/Tejascodz/pramana/blob/main/docs/design-decisions.md)
+- [Control crosswalk](https://github.com/Tejascodz/pramana/blob/main/docs/control-mapping.md)
+- [Findings from real model runs](https://github.com/Tejascodz/pramana/blob/main/docs/live-run-findings.md)
+- [Limitations](https://github.com/Tejascodz/pramana/blob/main/docs/limitations.md)
+- [Security](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md)
 
 ## Limitations
 
-Pramana supports an audit; it does not replace auditor judgement or legal advice. Automated tests only evidence technical controls. Statistical results depend on how representative the supplied data is. LLM probes sample behaviour and cannot prove its absence. Black-box access limits what any audit can establish ([Casper et al., FAccT 2024](https://arxiv.org/abs/2401.14446)). Regulatory dates live in [a YAML calendar](src/pramana/controls/data/regulatory_calendar.yaml) with sources and should be re-checked before use. Details in [docs/limitations.md](docs/limitations.md).
+Pramana supports an audit; it does not replace auditor judgement or legal advice. Automated tests only evidence technical controls. Statistical results depend on how representative the supplied data is. LLM probes sample behaviour and cannot prove its absence. Black-box access limits what any audit can establish ([Casper et al., FAccT 2024](https://arxiv.org/abs/2401.14446)). Regulatory dates live in [a YAML calendar](https://github.com/Tejascodz/pramana/blob/main/src/pramana/controls/data/regulatory_calendar.yaml) with sources and should be re-checked before use. Details in [docs/limitations.md](https://github.com/Tejascodz/pramana/blob/main/docs/limitations.md).
 
 ## Roadmap
 
@@ -285,4 +302,4 @@ Pramana supports an audit; it does not replace auditor judgement or legal advice
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](https://github.com/Tejascodz/pramana/tree/main/LICENSE).

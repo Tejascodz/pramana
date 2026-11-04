@@ -1,22 +1,34 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pramana"
-version = "0.5.1"
+name = "pramana-audit"
+version = "0.6.0"
 description = "Pramana, the AI Assurance & Evidence Engine: run technical tests, map results to NIST AI RMF, ISO/IEC 42001, the EU AI Act and India's AI Governance Guidelines, and produce a tamper-evident audit pack."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Tejas" }]
 keywords = [
   "ai-governance", "ai-audit", "responsible-ai", "nist-ai-rmf", "iso-42001",
   "eu-ai-act", "fairness", "model-risk-management", "llm-evaluation",
 ]
 classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Intended Audience :: Information Technology",
   "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+  "Typing :: Typed",
   "Operating System :: OS Independent",
   "Intended Audience :: Science/Research",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
@@ -34,10 +46,13 @@ dependencies = [
 [project.optional-dependencies]
 dashboard = ["streamlit>=1.46"]
 signing = ["cryptography>=42"]
+skops = ["skops>=0.10"]                                # load .skops models without pickle
+all = ["pramana-audit[dashboard,signing,skops]"]
 dev = [
     "pytest>=7.4",
     "ruff>=0.4",
     "cryptography>=42",                              # so CI runs the signing tests
+    "skops>=0.10",                                   # so CI runs the safe-model tests
     "cyclonedx-python-lib[json-validation]>=11.0",   # validates ml_bom.cdx.json against the schema
 ]
 
@@ -47,12 +62,25 @@ pramana = "pramana.cli:main"
 [project.urls]
 Homepage = "https://github.com/Tejascodz/pramana"
 Documentation = "https://github.com/Tejascodz/pramana/tree/main/docs"
+Source = "https://github.com/Tejascodz/pramana"
+Changelog = "https://github.com/Tejascodz/pramana/blob/main/CHANGELOG.md"
+Issues = "https://github.com/Tejascodz/pramana/issues"
+Security = "https://github.com/Tejascodz/pramana/security/policy"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
-pramana = ["controls/data/*.yaml", "reporting/templates/*.j2", "probes/packs/*.yaml"]
+pramana = [
+  "py.typed",
+  "controls/data/*.yaml",
+  "reporting/templates/*.j2",
+  "probes/packs/*.yaml",
+  "demos/**/*",
+]
+
+[tool.setuptools.exclude-package-data]
+"*" = ["__pycache__/*", "*.pyc"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
