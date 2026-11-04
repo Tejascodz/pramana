@@ -117,7 +117,7 @@ JOB_PERMISSIONS = {
 def test_actions_are_pinned_to_full_commit_shas():
     import re
 
-    for path in (ROOT / ".github" / "workflows").glob("*.yml"):
+    for path in [*(ROOT / ".github" / "workflows").glob("*.yml"), ROOT / "action.yml"]:
         for ref in re.findall(r"uses:\s*([^\s#]+)", path.read_text(encoding="utf-8")):
             if ref.startswith("./"):
                 continue

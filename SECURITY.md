@@ -128,6 +128,23 @@ Ollama applies its own origin and host checks; keep them by leaving
   fails if any other job gains a permission or any action is not pinned to a
   full commit SHA.
 
+## Proving who produced an audit pack
+
+The hash chain proves a pack is internally consistent, and `pramana sign` proves
+who holds a key. Neither stops someone from editing inputs and re-running the audit
+on a laptop. Running the audit in CI with `attest: "true"` in the GitHub Action
+closes that gap: GitHub signs the pack's `ledger.jsonl`, `results.json` and
+`report.html` with a short-lived Sigstore certificate that names the repository,
+commit, workflow and run. No signing key exists to steal or leak.
+
+```bash
+pramana verify pramana-audit --attested-by your-org/your-repo
+```
+
+This checks every file against the ledger, then asks the GitHub CLI to verify the
+ledger's attestation, and prints the workflow and commit that produced it. Any edit
+to the pack, or a pack built anywhere else, fails.
+
 ## Verifying a release
 
 Releases are built by `.github/workflows/release.yml` from a tagged commit, in

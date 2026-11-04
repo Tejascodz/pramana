@@ -201,7 +201,25 @@ The private key never belongs in a repository: `keygen` refuses to write inside 
     enforce: "true"        # fail the job on BLOCK
 ```
 
-The action uploads the audit pack as an artifact and writes a risk summary to the job page. The gate respects formal risk acceptances: a risk approved by a named person, with a justification and an expiry date, does not block until it expires.
+The action uploads the audit pack as an artifact and writes a risk summary to the job page.
+
+**Prove where a pack came from.** With `attest: "true"` the action signs the pack's ledger with a GitHub build-provenance attestation (Sigstore, no keys to manage). The ledger seals every file in the pack, so anyone can then prove the pack was produced by your repository's CI at a given commit, not edited or rebuilt on a laptop:
+
+```yaml
+permissions:
+  contents: read
+  id-token: write        # Sigstore signing
+  attestations: write
+steps:
+  - uses: Tejascodz/pramana@main
+    with:
+      spec: models/credit/audit.yaml
+      attest: "true"
+```
+
+```bash
+pramana verify pramana-audit --attested-by your-org/your-repo    # needs the gh CLI
+``` The gate respects formal risk acceptances: a risk approved by a named person, with a justification and an expiry date, does not block until it expires.
 
 ## Live red-team audit on your laptop
 
@@ -313,7 +331,6 @@ Pramana supports an audit; it does not replace auditor judgement or legal advice
 - NIST SP 800-53 AI control overlays (COSAiS) once final
 - RBI FREE-AI framework as a sector profile for Indian lenders
 - Ranking and recommendation fairness metrics
-- Signed packs (Sigstore) in addition to the hash chain
 
 ## License
 

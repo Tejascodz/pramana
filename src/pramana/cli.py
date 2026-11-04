@@ -97,6 +97,44 @@ def _cmd_run(args: argparse.Namespace) -> int:
     return EXIT_BLOCKED if result.gate["decision"] == "BLOCK" else EXIT_OK
 
 
+def _verify_attestation(pack: Path, repo: str) -> int:
+    """Check the GitHub attestation on the pack's ledger with the gh CLI."""
+    import shutil
+    import subprocess  # nosec B404 - fixed argument list, no shell
+
+    gh = shutil.which("gh")
+    if gh is None:
+        print("error: --attested-by needs the GitHub CLI (gh) on PATH", file=sys.stderr)
+        return EXIT_INPUT
+    ledger = pack / "ledger.jsonl"
+    proc = subprocess.run(  # nosec B603 - fixed argument list, no shell
+        [gh, "attestation", "verify", str(ledger), "--repo", repo, "--format", "json"],
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+    if proc.returncode != 0:
+        print(f"NOT ATTESTED: {ledger} has no valid attestation from {repo}")
+        detail = (proc.stderr or proc.stdout).strip().splitlines()
+        if detail:
+            print(f"  {detail[-1]}")
+        return EXIT_TAMPERED
+    try:
+        cert = json.loads(proc.stdout)[0]["verificationResult"]["signature"]["certificate"]
+        source = cert.get("sourceRepositoryURI", repo)
+        commit = cert.get("sourceRepositoryDigest", "")
+        workflow = cert.get("buildSignerURI", "")
+        run = cert.get("runInvocationURI", "")
+        print(
+            f"ATTESTED: built by {workflow or source} at commit {commit[:12]}"
+            + (f" ({run})" if run else "")
+        )
+    except (ValueError, KeyError, IndexError, TypeError):
+        print(f"ATTESTED: {ledger} carries a valid attestation from {repo}")
+    return EXIT_OK
+
+
 def _cmd_verify(args: argparse.Namespace) -> int:
     from pramana.audit.ledger import SIGNATURE_NAME_IF_ANY, verify_pack
 
@@ -106,6 +144,10 @@ def _cmd_verify(args: argparse.Namespace) -> int:
         for p in problems:
             print(f"  - {p}")
         return EXIT_TAMPERED
+    if getattr(args, "attested_by", None):
+        code = _verify_attestation(Path(args.pack), args.attested_by)
+        if code != EXIT_OK:
+            return code
 
     signed = (Path(args.pack) / SIGNATURE_NAME_IF_ANY).exists()
     if getattr(args, "require_signature", False) or getattr(args, "public_key", None) or signed:
@@ -568,6 +610,11 @@ def build_parser() -> argparse.ArgumentParser:
     verify.add_argument("--public-key", help="verify the pack is signed by this Ed25519 public key")
     verify.add_argument(
         "--require-signature", action="store_true", help="fail if the pack is not signed"
+    )
+    verify.add_argument(
+        "--attested-by",
+        metavar="OWNER/REPO",
+        help="also check the GitHub attestation on the ledger (pack made in that repo's CI)",
     )
     verify.set_defaults(fn=_cmd_verify)
 

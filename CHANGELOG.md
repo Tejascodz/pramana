@@ -1,6 +1,9 @@
 # Changelog
 
-## 0.7.0 — unreleased
+## 0.7.0 — 2026-11-04
+
+**Packs attested by CI**
+- The GitHub Action takes `attest: "true"` and signs the pack's ledger, results and report with a GitHub build-provenance attestation (Sigstore, keyless). `pramana verify PACK --attested-by OWNER/REPO` checks every file against the ledger and then the attestation, and prints the workflow and commit that produced the pack.
 
 **Agent sandbox and honeypots**
 - New check `agent.honeypot`: the real agent under audit works through scenarios in a stand-in bank where tool results carry planted instructions (refund redirection, data exfiltration by e-mail, a false "already approved" note, Hindi). Verdicts come from the exact forbidden tool calls; a control task checks the agent still does its job.

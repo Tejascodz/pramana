@@ -20,6 +20,13 @@ inputs:
     description: Fail the job when the gate decision is BLOCK
     required: false
     default: "true"
+  attest:
+    description: >
+      Sign the pack's ledger with a GitHub build-provenance attestation (Sigstore), so
+      anyone can prove which repository, commit and workflow produced it. Needs
+      `id-token: write` and `attestations: write` permissions in the calling job.
+    required: false
+    default: "false"
 
 outputs:
   decision:
@@ -52,6 +59,16 @@ runs:
         if [ "$code" = "1" ]; then echo "decision=BLOCK" >> "$GITHUB_OUTPUT"; elif [ "$code" = "0" ]; then echo "decision=PASS" >> "$GITHUB_OUTPUT"; else exit "$code"; fi
         pramana verify "$OUT"
         pramana summary "$OUT" >> "$GITHUB_STEP_SUMMARY"
+    - name: Attest the audit pack
+      if: inputs.attest == 'true'
+      uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+      with:
+        # The ledger seals every file in the pack (pramana verify checks them against it),
+        # so attesting the ledger, results and report covers the whole pack.
+        subject-path: |
+          ${{ inputs.out }}/ledger.jsonl
+          ${{ inputs.out }}/results.json
+          ${{ inputs.out }}/report.html
     - name: Upload audit pack
       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       if: always()
