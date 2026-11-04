@@ -96,6 +96,32 @@ def test_workflows_have_read_only_permissions_and_no_secrets():
         workflow = yaml.safe_load(text)
         assert workflow["permissions"] == {"contents": "read"}, path.name
         assert "secrets." not in text and "pull_request_target" not in text, path.name
+        for job_id, job in workflow["jobs"].items():
+            granted = job.get("permissions", {})
+            allowed = JOB_PERMISSIONS.get((path.name, job_id), {})
+            assert granted == allowed, f"{path.name}:{job_id} has unexpected permissions"
+
+
+# The only jobs allowed more than a read-only token, and exactly what each may have.
+JOB_PERMISSIONS = {
+    ("release.yml", "publish-pypi"): {"id-token": "write"},
+    ("release.yml", "github-release"): {
+        "contents": "write",
+        "id-token": "write",
+        "attestations": "write",
+    },
+    ("codeql.yml", "analyze"): {"security-events": "write"},
+}
+
+
+def test_actions_are_pinned_to_full_commit_shas():
+    import re
+
+    for path in (ROOT / ".github" / "workflows").glob("*.yml"):
+        for ref in re.findall(r"uses:\s*([^\s#]+)", path.read_text(encoding="utf-8")):
+            if ref.startswith("./"):
+                continue
+            assert re.search(r"@[0-9a-f]{40}$", ref), f"{path.name}: {ref} is not pinned"
 
 
 def test_model_output_cannot_run_script_in_the_report(tmp_path):
