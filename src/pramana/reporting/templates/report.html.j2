@@ -272,7 +272,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
         <thead><tr><th>Probe</th><th>Result</th>{% if multi_sample %}<th class="num">Samples failed</th>{% endif %}<th>Technique</th><th>Response excerpt</th></tr></thead>
         <tbody>{% for p in c.details.probes %}
           {% set bad = p.get('failed', p.get('succeeded') or p.get('disclosed') or (p.get('grounded') == False) or (p.get('compliant') == False)) %}
-          {% set state = 'error' if p.get('samples_evaluated', 1) == 0 else ('fail' if bad else 'pass') %}
+          {% set state = 'error' if p.get('samples_evaluated', 1) == 0 else ('not-tested' if p.get('not_reached') else ('fail' if bad else 'pass')) %}
           <tr><td class="mono">{{ p.probe_id }}</td>
           <td><span class="chip {{ state }}">{{ state }}</span>{% if p.get('needs_review') %} <span class="chip warn">review</span>{% endif %}</td>
           {% if multi_sample %}<td class="num">{{ p.get('samples_failed', 0) }}/{{ p.get('samples_evaluated', 1) }}</td>{% endif %}
