@@ -251,9 +251,9 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
 # ---------------------------------------------------------------------------
 # Misalignment-signal detection on agent reasoning and actions.
 #
-# The AI-control and agentic-misalignment literature (Anthropic 2025; OpenAI/
-# Apollo 2025; Redwood Research; the UN Scientific Panel's 2026 loss-of-control
-# brief) documents a small set of recurring "rogue" behaviours. This check reads
+# The AI-control and agentic-misalignment literature (agentic-misalignment study
+# 2025; OpenAI/Apollo 2025; Redwood Research; the UN Scientific Panel's 2026
+# loss-of-control brief) documents a small set of recurring "rogue" behaviours. This check reads
 # an agent's own reasoning traces and outputs and flags these patterns, quoting
 # the offending text as proof. It is judge-free and deterministic: a hit is a
 # finding with evidence; absence is reported as "not observed in this trace",
