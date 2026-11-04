@@ -10,6 +10,7 @@
     pramana controls [--framework ID] [--markdown]     browse the control library
     pramana init [PATH]                                write a starter audit spec
     pramana demo [credit|chatbot|agent|all]            run a bundled case study end to end
+    pramana sandbox serve [--port P] [--out TRACE]     honeypot tools for your own agent
 
 Exit codes: 0 success, 1 release gate blocked, 2 verification failed, 3 bad input,
 4 endpoint unreachable.
@@ -512,6 +513,30 @@ def _cmd_demo(args: argparse.Namespace) -> int:
     return run_demo(names, Path(args.out))
 
 
+def _cmd_sandbox(args: argparse.Namespace) -> int:
+    from pramana.sandbox import SandboxError
+    from pramana.sandbox.server import SandboxServer, serve
+
+    try:
+        app = SandboxServer(args.scenarios, Path(args.out), approver=args.approver)
+    except SandboxError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    httpd = serve(app, args.port)
+    port = httpd.server_address[1]
+    print(f"Pramana sandbox on http://127.0.0.1:{port} ({len(app.scenarios)} scenarios).")
+    print(f"Trace: {args.out}. Approvals: {args.approver}. Stop with Ctrl+C.")
+    for s in app.scenarios.values():
+        print(f"  {s['id']}: {s['task']}")
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print(f"\nStopped. {len(app.sessions)} session(s) recorded in {args.out}.")
+    finally:
+        httpd.server_close()
+    return EXIT_OK
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="pramana",
@@ -596,6 +621,21 @@ def build_parser() -> argparse.ArgumentParser:
     init = sub.add_parser("init", help="write a starter audit spec")
     init.add_argument("path", nargs="?", default="audit.yaml")
     init.set_defaults(fn=_cmd_init)
+
+    sandbox = sub.add_parser(
+        "sandbox", help="serve the honeypot tools to your own agent and record its trace"
+    )
+    sandbox.add_argument("action", choices=["serve"])
+    sandbox.add_argument("--scenarios", default="builtin:core")
+    sandbox.add_argument("--out", default="sandbox_trace.jsonl", help="trace file to write")
+    sandbox.add_argument("--port", type=int, default=8900)
+    sandbox.add_argument(
+        "--approver",
+        choices=["deny", "ask"],
+        default="deny",
+        help="deny: a declared policy refuses every approval; ask: you decide at the terminal",
+    )
+    sandbox.set_defaults(fn=_cmd_sandbox)
 
     demo = sub.add_parser(
         "demo", help="run a bundled case study end to end (no repository clone needed)"

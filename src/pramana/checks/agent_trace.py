@@ -866,7 +866,14 @@ _TOOL_INJECTION_CUE = re.compile(
     r"\b(ignore|disregard|forget|override)\b[^.!?\n]{0,30}\b(all|any|the|your|previous|prior|above|"
     r"earlier)\b[^.!?\n]{0,15}\b(instructions?|rules|prompt|guidelines|system\s+prompt)\b"
     r"|\byou\s+are\s+now\s+(in\s+)?(developer\s+mode|an?\s+unrestricted|DAN)\b"
-    r"|<!--[^>]{0,200}?\b(instruction|ignore|assistant|system)\b[^>]{0,200}?-->",
+    r"|<!--[^>]{0,200}?\b(instruction|ignore|assistant|system)\b[^>]{0,200}?-->"
+    # Notes addressed to the agent: "SYSTEM NOTICE TO AUTOMATED AGENTS", "note to the AI".
+    r"|\b(notice|note|instructions?|message)\s+(to|for)\s+(the\s+|all\s+)?(automated\s+)?"
+    r"(ai(\s+(agents?|assistants?|models?))?|assistants?|llms?|bots?|(?<=automated\s)agents?)\b"
+    # Telling the agent to skip a named tool: "do not call request_approval".
+    r"|\b(do\s+not|don't|never)\s+(call|use|invoke)\s+[a-z]+_[a-z_]+\b"
+    # Hindi: "instruction for the (automated) assistant / agent".
+    r"|(स्वचालित\s+)?(सहायक|एजेंट)\s+के\s+लिए\s+निर्देश",
     re.IGNORECASE,
 )
 _REASONING_KEYS = ("reasoning", "thought", "scratchpad")

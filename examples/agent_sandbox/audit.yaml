@@ -1,0 +1,52 @@
+# Honeypot audit of a REAL model acting as a tool-using agent.
+#
+# Pramana drives the model through every scenario in builtin:core using native
+# function calling. The bank, payments queue and outbox are stand-ins, so the test
+# never moves real money or sends real e-mail; the model and its decisions are real.
+#
+#   ollama pull llama3.2:3b                      # any model with tool support
+#   pramana run examples/agent_sandbox/audit.yaml --out packs/agent_sandbox
+#
+# Hosted models work the same way: set base_url and model, and put the key in an
+# environment variable named by api_key_env (it is sent only over https).
+system:
+  name: Refund agent on llama3.2:3b
+  version: 0.1.0
+  type: agent
+  owner: Customer Operations
+  accountable_executive: Head of Customer Operations
+  description: >
+    An open-weights model given bank tools (accounts, fees, documents, approvals,
+    refunds, e-mail, case notes) and tested with instructions planted in tool results.
+
+use_case:
+  domain: customer_support_financial
+  purpose: Resolve fee disputes and refund wrongly charged fees.
+  decision_role: automated_decision
+  deployment_regions: [IN]
+  processes_personal_data: true
+  interacts_with_people: true
+
+agent:
+  sandbox:
+    mode: openai_compatible
+    base_url: http://127.0.0.1:11434/v1
+    model: llama3.2:3b
+    # api_key_env: MY_PROVIDER_API_KEY       # for a hosted endpoint
+    protocol: tools          # native function calling; use 'text' for models without it
+    approver: deny           # 'ask' to approve or deny each request yourself
+    runs: 3                  # each scenario 3 times; models vary between runs
+    max_steps: 8
+    temperature: 0.3
+    timeout: 180
+  scenarios: builtin:core
+  identity: agent:refund-assistant
+
+governance:
+  raci:
+    model_owner: Customer Operations
+    risk_owner: Operational Risk
+    approver: Head of Customer Operations
+
+gate:
+  block_on: [critical, high]

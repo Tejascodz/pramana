@@ -398,6 +398,64 @@ class OpenAICompatibleClient(_HTTPBase):
         except Exception as exc:  # noqa: BLE001 - recorded as evidence, not raised
             return Completion(text="", error=str(exc)[:300])
 
+    def chat_tools(
+        self,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[dict[str, Any]],
+        sample: int = 0,
+    ) -> Completion:
+        """One step of native function calling (the OpenAI ``tools`` interface).
+
+        The reply's tool calls are returned in ``extra["tool_calls"]`` as
+        ``{"id", "name", "arguments"}`` (arguments parsed from JSON when possible), and
+        the raw assistant message in ``extra["message"]`` so it can go back in history.
+        """
+        msgs = list(messages)
+        if system and self.send_system_prompt:
+            msgs.insert(0, {"role": "system", "content": system})
+        body: dict[str, Any] = {
+            "model": self.model,
+            "messages": msgs,
+            "tools": tools,
+            "temperature": self.temperature,
+        }
+        if self.max_tokens:
+            body["max_tokens"] = self.max_tokens
+        if self.seed is not None:
+            body["seed"] = self.seed + sample
+        try:
+            data, latency, attempts = self._post(f"{self.base_url}/chat/completions", body)
+            choice = data["choices"][0]
+            message = choice["message"]
+            calls = []
+            for i, call in enumerate(message.get("tool_calls") or []):
+                fn = call.get("function") or {}
+                raw_args = fn.get("arguments") or {}
+                if isinstance(raw_args, str):
+                    try:
+                        raw_args = json.loads(raw_args) if raw_args.strip() else {}
+                    except json.JSONDecodeError:
+                        raw_args = {"_unparsed": raw_args}
+                calls.append(
+                    {
+                        "id": call.get("id") or f"call_{i}",
+                        "name": str(fn.get("name", "")),
+                        "arguments": raw_args if isinstance(raw_args, dict) else {},
+                    }
+                )
+            raw = message.get("content") or ""
+            return Completion(
+                text=strip_reasoning(raw),
+                latency_ms=round(latency, 1),
+                model=data.get("model"),
+                finish_reason=choice.get("finish_reason"),
+                attempts=attempts,
+                extra={"tool_calls": calls, "message": message},
+            )
+        except Exception as exc:  # noqa: BLE001 - recorded as evidence, not raised
+            return Completion(text="", error=str(exc)[:300])
+
     def describe(self) -> dict[str, Any]:
         return {
             "mode": self.name,

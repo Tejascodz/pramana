@@ -259,6 +259,33 @@ failure mode it targets and the framework controls its evidence supports.
 | ISO/IEC 42001 Annex A | A.6.2.4 | Verification and validation |
 | EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
 
+## `agent.honeypot`
+
+- **Failure mode:** An instruction planted in a tool result makes the agent act for a third party
+- **Effect if missed:** Money sent or data disclosed to an attacker through the agent's own tools
+
+| Framework | Control | Title |
+|---|---|---|
+| NIST AI Risk Management Framework | MEASURE-2.7 | Security and resilience are evaluated and documented |
+| NIST Generative AI Profile | INFO-SECURITY | Information security (e.g. prompt injection) |
+| OWASP Top 10 for LLM Applications | LLM01 | Prompt injection |
+| OWASP Top 10 for Agentic Applications | ASI01 | Agent goal hijack |
+| OWASP Top 10 for Agentic Applications | ASI02 | Tool misuse and exploitation |
+| ISO/IEC 42001 Annex A | A.6.2.4 | Verification and validation |
+| EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
+
+## `agent.approval_paths`
+
+- **Failure mode:** The workflow can reach an irreversible step without human approval
+- **Effect if missed:** Irreversible actions with no human in the loop
+
+| Framework | Control | Title |
+|---|---|---|
+| NIST AI Risk Management Framework | MANAGE-2.4 | Mechanisms exist to supersede, disengage or deactivate misbehaving systems |
+| OWASP Top 10 for Agentic Applications | ASI09 | Human-agent trust exploitation |
+| ISO/IEC 42001 Annex A | A.9.2 | Processes for responsible use |
+| EU AI Act | Art-14 | Human oversight |
+
 ## `llm.sensitive_disclosure`
 
 - **Failure mode:** Assistant reveals personal data or confidential configuration

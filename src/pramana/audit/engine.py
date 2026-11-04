@@ -361,6 +361,9 @@ def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) ->
     for r in results:
         r.controls = library.controls_for_check(r.check_id)
         r.evidence_hash = ledger.add_json("4-testing", r.check_id, r.to_dict())
+    if "sandbox_events" in ctx.__dict__:  # the sandbox ran: keep its trace for re-audit
+        trace = "".join(json.dumps(e, ensure_ascii=False) + "\n" for e in ctx.sandbox_events)
+        ledger.add_text("4-testing", "agent_sandbox_trace", "agent_sandbox_trace.jsonl", trace)
     llm_run = ctx.llm_run_summary() if spec.llm else {}
     if ctx.llm_transcript:
         ledger.add_json("4-testing", "llm_transcript", ctx.llm_transcript)

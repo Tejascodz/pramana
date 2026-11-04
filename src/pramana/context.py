@@ -59,6 +59,7 @@ class AuditContext:
         # Results one check publishes for a later one (e.g. plain injection verdicts
         # that the obfuscation check compares against).
         self.shared: dict[str, Any] = {}
+        self._sandbox_error: Exception | None = None
 
     # Tabular artifacts ---------------------------------------------------
 
@@ -396,10 +397,47 @@ class AuditContext:
     # Agents ---------------------------------------------------------------
 
     @cached_property
+    def scenarios(self) -> list[dict[str, Any]]:
+        source = self.spec.agent.get("scenarios")
+        if not source:
+            raise MissingArtifact("agent.scenarios (or agent.sandbox) is needed for honeypot tests")
+        from pramana.sandbox import load_scenarios
+
+        return load_scenarios(source)
+
+    @cached_property
+    def sandbox_events(self) -> list[dict[str, Any]]:
+        """Run the agent under audit through every scenario (live), once per audit."""
+        from pramana.sandbox import run_sandbox
+
+        if isinstance(self._sandbox_error, Exception):  # fail once, not once per check
+            raise self._sandbox_error
+        config = dict(self.spec.agent["sandbox"])
+        client = build_client(config)
+        probe = client.complete("You are a test.", "Reply with one short sentence.")
+        if not probe.ok:
+            label = client.describe().get("endpoint", "the endpoint")
+            self._sandbox_error = EndpointUnavailable(
+                f"Cannot reach the agent's model at {label}: {probe.error}"
+            )
+            raise self._sandbox_error
+        return run_sandbox(
+            client,
+            self.scenarios,
+            runs=max(1, int(config.get("runs", 1))),
+            max_steps=max(1, int(config.get("max_steps", 8))),
+            policy=str(config.get("system_prompt", "")),
+            protocol=str(config.get("protocol", "tools")),
+            approver=str(config.get("approver", "deny")),
+        )
+
+    @cached_property
     def agent_events(self) -> list[dict[str, Any]]:
+        if self.spec.agent.get("sandbox"):
+            return self.sandbox_events
         path = self.spec.agent.get("trace")
         if not path:
-            raise MissingArtifact("agent.trace is required for agent checks")
+            raise MissingArtifact("agent.trace or agent.sandbox is required for agent checks")
         fmt = self.spec.agent.get("trace_format", "native")
         from pramana.adapters.traces import load_trace
 

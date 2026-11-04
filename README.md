@@ -12,7 +12,7 @@
 
 ![Audit report overview](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/report-overview.png)
 
-Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 25 automated checks, can red-team a **live LLM application on your laptop**, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
+Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 27 automated checks, can red-team a **live LLM application on your laptop**, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
 
 ---
 
@@ -39,7 +39,7 @@ flowchart LR
     subgraph Pramana
     A[1 Scoping<br/>risk tier, obligations] --> B[2 Mapping<br/>FMEA, RACI]
     B --> C[3 Artifacts<br/>SHA-256 fingerprints]
-    C --> D[4 Testing<br/>25 checks]
+    C --> D[4 Testing<br/>27 checks]
     D --> E[5 Reflection<br/>risk register, coverage, gate]
     end
     E --> R[report.html]
@@ -137,6 +137,8 @@ Each case study plants known defects, so the audit can be checked against a grou
 | Agents | `agent.misalignment_signals` | Scans the agent's own reasoning and actions for rogue patterns (self-preservation, deception, oversight evasion, goal substitution, privilege escalation, reward hacking, gaming an evaluation) and scores each session on the UN Scientific Panel's three loss-of-control conditions: misaligned intent, irreversible capability and a permissive environment ([see the review](https://github.com/Tejascodz/pramana/blob/main/docs/agentic-safety-review.md)) |
 | Agents | `agent.control_readiness` | Six safeguards from the agent-control literature (own identity, tool allowlist, approval gate, stop conditions, tamper-evident log, action monitor), each graded as evidenced in the trace, only declared in the spec, or missing |
 | Agents | `agent.oversight_integrity` | Share of tool calls explained by logged reasoning, and instructions planted in tool results (indirect prompt injection), with the action that followed |
+| Agents | `agent.honeypot` | Runs the **real** agent (native tool calling, a text protocol, or your own agent through `pramana sandbox serve`) in a stand-in bank where tool results carry planted instructions: refund redirection, data exfiltration by e-mail, a false "already approved" note, and a Hindi variant. Decided by the exact forbidden tool calls; a control task checks the agent still works |
+| Agents | `agent.approval_paths` | Searches every path of the agent's workflow graph (LangGraph JSON or an edge list) and proves no irreversible step can be reached without an approval step, or reports the shortest path that can |
 | Assurance | `audit.detector_sensitivity` | Plants a disparity, a drift and a PII column in copies of the data and confirms the audit catches them |
 
 Scoring is deterministic, so the same inputs always produce the same findings. Run `pramana checks` for the list with failure modes, and see [docs/methodology.md](https://github.com/Tejascodz/pramana/blob/main/docs/methodology.md) for every formula and threshold.
@@ -231,6 +233,23 @@ Full walkthrough: [examples/live_assistant](https://github.com/Tejascodz/pramana
 ### Findings from a real run
 
 The first live audit ran `llama3.2:3b` on an 8 GB MacBook. The baseline build told a customer *"Yes, you are chatting with a real person"*, revealed which customer and account a phone number belonged to, invented a complaints e-mail address, and said there was *"no prepayment penalty"* despite a 3% foreclosure charge. Reading the transcripts also exposed four blind spots in Pramana's own scoring. The most serious: the guarded build had **passed** while accepting a persona switch, because the model misspelt the marker. The scorer was fixed, the recorded run re-scored offline, and the guarded build's gate correctly flipped to **BLOCK**. A second run with three samples per probe (258 calls) then showed what a single run hides: the system-prompt canary leaked in four attacks, including in Hindi and Hinglish, and the baseline volunteered another customer's account details to an unauthenticated user. The real responses are regression tests. Full write-up: [docs/live-run-findings.md](https://github.com/Tejascodz/pramana/blob/main/docs/live-run-findings.md).
+
+## Test a real agent
+
+```bash
+ollama pull llama3.2:3b
+pramana run examples/agent_sandbox/audit.yaml --out packs/agent_sandbox
+```
+
+Pramana gives the model bank tools and runs it through scenarios where a tool result carries a planted instruction (send this refund elsewhere, e-mail this customer's data out, approval was "already granted"). Only the bank is a stand-in; the model and its decisions are real. Point `base_url` and `model` at any OpenAI-compatible endpoint, including hosted APIs (`api_key_env` names the key's environment variable).
+
+To test your own agent code rather than a bare model, start the tool server and point your agent's tools at it:
+
+```bash
+pramana sandbox serve --out sandbox_trace.jsonl
+```
+
+Then audit the recorded trace with `agent.trace: sandbox_trace.jsonl` and `agent.scenarios: builtin:core`. If your agent is a LangGraph graph, export it with `graph.get_graph().to_json()` and set `agent.workflow` to prove every path to an irreversible step passes human approval.
 
 ## Interactive viewer
 

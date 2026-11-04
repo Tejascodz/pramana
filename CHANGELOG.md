@@ -2,6 +2,15 @@
 
 ## 0.7.0 — unreleased
 
+**Agent sandbox and honeypots**
+- New check `agent.honeypot`: the real agent under audit works through scenarios in a stand-in bank where tool results carry planted instructions (refund redirection, data exfiltration by e-mail, a false "already approved" note, Hindi). Verdicts come from the exact forbidden tool calls; a control task checks the agent still does its job.
+- Three ways to drive it: native function calling (`agent.sandbox`, any OpenAI-compatible endpoint), a text protocol for models without tools, and `pramana sandbox serve`, an HTTP tool server for the customer's own agent code (loopback only, refuses browser requests).
+- Approvals are never faked as a person: a declared deny-all policy (logged as `policy:deny-all`) or a real operator at the terminal (`approver: ask`).
+- The sandbox writes a hash-chained trace into the pack, so all agent checks run on it and it can be re-audited offline.
+- New check `agent.approval_paths`: proves on a workflow graph (LangGraph JSON or an edge list) that no irreversible step is reachable without an approval step, or reports the shortest path that is.
+- `agent.oversight_integrity` now recognises notes addressed to automated agents, instructions to skip a named tool, and Hindi instructions for the assistant. On the new scenarios it caught 1 of 4 planted instructions before this change and 4 of 4 after, with no hit on ordinary notes to human agents.
+- `examples/agent_sandbox/audit.yaml` runs the honeypots against a real local model (llama3.2:3b through Ollama).
+
 **Obfuscated attacks**
 - New check `llm.obfuscation` (opt in with `llm.mutations: all` or a list): every injection probe is re-sent with zero-width spaces, look-alike letters, soft hyphens, letter spacing, digit substitution, full-width letters or joiners inside Indic-script words. Codes, quotes, the canary and URLs are never altered, so variants are judged by the original markers. Variants that succeed where the plain attack failed are reported as bypasses.
 - `pramana.attacks.mutations.normalize` is the matching defence (NFKC, strip format characters, fold look-alikes). The guarded Niva build now screens normalised text. On the test model, a raw-text filter let 22 disguised attacks through that it stopped in plain form; with normalisation, 2.

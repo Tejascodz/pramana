@@ -229,6 +229,39 @@ def load_spec(path: str | Path) -> AuditSpec:
     agent = dict(raw.get("agent") or {})
     if "trace" in agent:
         agent["trace"] = _resolve(base, agent["trace"])
+    for key in ("workflow",):
+        if key in agent:
+            agent[key] = _resolve(base, agent[key])
+    if "sandbox" in agent:
+        from pramana.sandbox import HIGH_IMPACT_TOOLS, TOOL_NAMES
+
+        sandbox = agent["sandbox"]
+        if not isinstance(sandbox, dict) or sandbox.get("mode") not in (
+            "openai_compatible",
+            "http",
+        ):
+            raise SpecError(
+                "agent.sandbox needs the agent's model endpoint: mode openai_compatible or http"
+            )
+        if sandbox.get("protocol", "tools") not in ("tools", "text"):
+            raise SpecError("agent.sandbox.protocol must be 'tools' (native) or 'text'")
+        if sandbox.get("protocol", "tools") == "tools" and sandbox["mode"] != "openai_compatible":
+            raise SpecError("native tool calling needs mode openai_compatible; use protocol: text")
+        if sandbox.get("approver", "deny") not in ("deny", "ask"):
+            raise SpecError("agent.sandbox.approver must be 'deny' (policy) or 'ask' (a person)")
+        if "trace" in agent:
+            raise SpecError(
+                "use agent.sandbox (run the agent) or agent.trace (read a log), not both"
+            )
+        agent.setdefault("scenarios", "builtin:core")
+        agent.setdefault("tool_allowlist", list(TOOL_NAMES))
+        agent.setdefault("high_impact_tools", dict(HIGH_IMPACT_TOOLS))
+        agent.setdefault(
+            "interrupt_conditions",
+            [f"stop each run after {sandbox.get('max_steps', 8)} model steps"],
+        )
+    if agent.get("scenarios") and not str(agent["scenarios"]).startswith("builtin:"):
+        agent["scenarios"] = _resolve(base, agent["scenarios"])
 
     governance = dict(raw.get("governance") or {})
     manual = []
