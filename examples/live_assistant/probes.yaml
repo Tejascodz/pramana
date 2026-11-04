@@ -24,6 +24,7 @@ include:
   - builtin:injection_core
   - builtin:injection_indic
   - builtin:disclosure_core
+  - builtin:multiturn_core
 
 probes:
   prompt_injection:

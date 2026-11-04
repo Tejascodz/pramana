@@ -206,8 +206,13 @@ def test_guarded_build_controls_work_and_residual_risk_is_visible(live_results):
 def test_samples_and_replay_round_trip(niva, tmp_path):
     spec = _live_spec("guarded", niva["guarded"], samples=2)
     live = run_audit(spec, tmp_path / "live")
-    n_probes = sum(len(v) for v in load_probe_file(LIVE / "probes.yaml")["probes"].values())
-    assert len(live.llm_transcript) == n_probes * 2
+    groups = load_probe_file(LIVE / "probes.yaml")["probes"]
+    calls_per_sample = sum(
+        len(p["turns"]) if category == "multi_turn" else 1
+        for category, items in groups.items()
+        for p in items
+    )
+    assert len(live.llm_transcript) == calls_per_sample * 2
     assert live.llm_run["samples_per_probe"] == 2
 
     replay_spec = copy.deepcopy(spec)
@@ -224,10 +229,12 @@ def test_samples_and_replay_round_trip(niva, tmp_path):
         "llm.sensitive_disclosure",
         "llm.groundedness",
         "llm.policy_adherence",
+        "llm.multi_turn",
     ):
         a, b = live.result(check), replayed.result(check)
         assert a.status == b.status, check
-        assert a.metrics["probes"] == b.metrics["probes"]
+        assert a.metrics.get("probes") == b.metrics.get("probes")
+        assert a.metrics.get("conversations") == b.metrics.get("conversations")
     health = replayed.result("llm.service_health")
     assert health.status == Status.PASS and health.summary.startswith("Recorded run")
 

@@ -12,7 +12,7 @@
 
 ![Audit report overview](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/report-overview.png)
 
-Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 23 automated checks, can red-team a **live LLM application on your laptop**, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
+Pramana audits three kinds of systems: **tabular ML models** (credit, hiring, pricing), **LLM applications** (chat assistants, RAG) and **AI agents** (tool-using systems that take actions). It runs 24 automated checks, can red-team a **live LLM application on your laptop**, scores the findings as risks with owners and due dates, and decides whether the release can go ahead. The output is an audit pack that a second reviewer can verify with one command.
 
 ---
 
@@ -39,7 +39,7 @@ flowchart LR
     subgraph Pramana
     A[1 Scoping<br/>risk tier, obligations] --> B[2 Mapping<br/>FMEA, RACI]
     B --> C[3 Artifacts<br/>SHA-256 fingerprints]
-    C --> D[4 Testing<br/>23 checks]
+    C --> D[4 Testing<br/>24 checks]
     D --> E[5 Reflection<br/>risk register, coverage, gate]
     end
     E --> R[report.html]
@@ -127,6 +127,7 @@ Each case study plants known defects, so the audit can be checked against a grou
 | Privacy | `privacy.pii_exposure` | E-mail, Indian mobile, PAN, Aadhaar-format, card (Luhn) and IP patterns in every dataset |
 | Privacy | `privacy.membership_inference` | Loss-threshold attack (Yeom et al., 2018) on training vs. held-out rows, with the true-positive rate at 1% and 5% false-positive rate (Carlini et al., 2022) |
 | LLM security | `llm.prompt_injection` | 26 probes: direct, role-play, indirect (e-mail, web page, tool output, JSON), payload splitting, base64, few-shot, markdown-image exfiltration, and Indic-language attacks; system-prompt canary; per-language results |
+| LLM security | `llm.multi_turn` | Conversations of 2 to 4 turns with the real replies kept in history: gradual escalation (Crescendo), instructions planted early and triggered later, persona drift, refusal erosion, fabricated history, Hindi and Hinglish; reports the turn at which the defence broke |
 | LLM privacy | `llm.sensitive_disclosure` | Personal data and forbidden strings in responses |
 | LLM reliability | `llm.groundedness` | Required facts plus a numeric-claim check against the knowledge base |
 | LLM conduct | `llm.policy_adherence` | Required and forbidden phrases per conduct rule |
@@ -288,7 +289,7 @@ Pramana supports an audit; it does not replace auditor judgement or legal advice
 ## Roadmap
 
 - Model-graded LLM judging as an optional second opinion beside the deterministic scorers
-- Multi-turn attack sequences and more Indic languages (Bengali, Marathi, Telugu)
+- More Indic languages (Bengali, Marathi, Telugu)
 - NIST SP 800-53 AI control overlays (COSAiS) once final
 - RBI FREE-AI framework as a sector profile for Indian lenders
 - Ranking and recommendation fairness metrics

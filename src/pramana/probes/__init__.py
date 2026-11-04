@@ -25,7 +25,7 @@ import yaml
 
 from pramana.safeio import load_yaml
 
-CATEGORIES = ("prompt_injection", "sensitive_disclosure", "groundedness", "policy")
+CATEGORIES = ("prompt_injection", "sensitive_disclosure", "groundedness", "policy", "multi_turn")
 
 
 class ProbeFileError(ValueError):
@@ -57,7 +57,15 @@ def _merge(into: dict[str, list], data: dict[str, Any], source: str) -> None:
         if category not in CATEGORIES:
             raise ProbeFileError(f"{source}: unknown probe category '{category}'")
         for item in items or []:
-            if "id" not in item or "prompt" not in item:
+            if category == "multi_turn":
+                turns = item.get("turns")
+                if "id" not in item or not isinstance(turns, list) or len(turns) < 2:
+                    raise ProbeFileError(
+                        f"{source}: every multi_turn probe needs 'id' and at least two 'turns'"
+                    )
+                if not all(isinstance(turn, str) and turn.strip() for turn in turns):
+                    raise ProbeFileError(f"{source}: {item['id']} has an empty or non-text turn")
+            elif "id" not in item or "prompt" not in item:
                 raise ProbeFileError(f"{source}: every probe needs 'id' and 'prompt'")
             entry = dict(item)
             entry.setdefault("source", source)

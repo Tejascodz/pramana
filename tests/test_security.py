@@ -141,7 +141,13 @@ def test_model_output_cannot_run_script_in_the_report(tmp_path):
     with replay.open("w", encoding="utf-8") as fh:
         for group in probes.values():
             for probe in group:
-                fh.write(json.dumps({"prompt": probe["prompt"], "responses": [payload]}) + "\n")
+                if "turns" in probe:  # every prefix of a conversation gets the hostile reply
+                    for n in range(1, len(probe["turns"]) + 1):
+                        record = {"conversation": probe["turns"][:n], "responses": [payload]}
+                        fh.write(json.dumps(record) + "\n")
+                else:
+                    record = {"prompt": probe["prompt"], "responses": [payload]}
+                    fh.write(json.dumps(record) + "\n")
 
     spec = copy.deepcopy(load_spec(live / "audit_guarded.yaml"))
     spec.llm = {

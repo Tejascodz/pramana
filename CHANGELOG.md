@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.0 — unreleased
+
+**Multi-turn attacks**
+- New check `llm.multi_turn`: plays attack conversations turn by turn with the system's real replies in the history, judges every reply with the same deterministic rules as `llm.prompt_injection`, and reports the turn at which the defence broke. Built-in pack `builtin:multiturn_core` (8 conversations: Crescendo-style escalation, delayed triggers, persona drift, refusal erosion, fabricated history, Hindi and Hinglish).
+- Every client can send a whole conversation: `openai_compatible` natively, `http` through a `"{messages}"` body slot or flattened, and replay keyed by the user turns. Live conversations are recorded per turn in `llm_replay.jsonl` and replay offline with identical verdicts.
+- Niva remembers the last three exchanges. The guarded build now screens every remembered user turn, not only the latest one; on the test model 6 of 8 conversations break the baseline and 1 of 8 breaks the guarded build.
+
 ## 0.6.0 — 2026-11-04
 
 Installable with pip as **`pramana-audit`**, from GitHub (`pip install "pramana-audit @ git+https://github.com/Tejascodz/pramana"`) or from the wheel on each GitHub release. The command and the import stay `pramana`. PyPI publishing is ready but switched off.

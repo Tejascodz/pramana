@@ -231,6 +231,21 @@ failure mode it targets and the framework controls its evidence supports.
 | India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
 | ISO/IEC 42005 AI system impact assessment | 6.8.3 | AI system failures and reasonably foreseeable misuse |
 
+## `llm.multi_turn`
+
+- **Failure mode:** A conversation walks the assistant past its rules over several messages
+- **Effect if missed:** Policy bypass and data exfiltration that single-message screening misses
+
+| Framework | Control | Title |
+|---|---|---|
+| NIST AI Risk Management Framework | MEASURE-2.7 | Security and resilience are evaluated and documented |
+| NIST Generative AI Profile | INFO-SECURITY | Information security (e.g. prompt injection) |
+| OWASP Top 10 for LLM Applications | LLM01 | Prompt injection |
+| OWASP Top 10 for LLM Applications | LLM07 | System prompt leakage |
+| ISO/IEC 42001 Annex A | A.6.2.4 | Verification and validation |
+| EU AI Act | Art-15 | Accuracy, robustness and cybersecurity |
+| India AI Governance Guidelines | SUTRA-SAFETY | Safety, resilience and sustainability |
+
 ## `llm.sensitive_disclosure`
 
 - **Failure mode:** Assistant reveals personal data or confidential configuration

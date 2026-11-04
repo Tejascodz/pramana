@@ -12,7 +12,13 @@ import joblib
 import numpy as np
 import pandas as pd
 
-from pramana.adapters.llm import Completion, EndpointUnavailable, LLMClient, build_client
+from pramana.adapters.llm import (
+    Completion,
+    EndpointUnavailable,
+    LLMClient,
+    build_client,
+    conversation_key,
+)
 from pramana.probes import load_probe_file
 from pramana.safeio import load_yaml
 from pramana.spec import AuditSpec
@@ -271,20 +277,85 @@ class AuditContext:
             out.append(runs)
         return out
 
+    def converse_all(
+        self, category: str, probes: list[dict[str, Any]]
+    ) -> list[list[list[Completion]]]:
+        """Play every multi-turn probe ``samples`` times, keeping the real replies in history.
+
+        Returns, per probe and per sample, the completion for each user turn. A turn
+        that fails ends that conversation (later turns would have no history to build on).
+        """
+        self.llm_preflight()
+        jobs = [(i, s) for i in range(len(probes)) for s in range(self.llm_samples)]
+        workers = max(1, int(self.spec.llm.get("concurrency", 1)))
+
+        def run(job: tuple[int, int]) -> tuple[tuple[int, int], list[Completion]]:
+            i, s = job
+            history: list[dict[str, str]] = []
+            replies: list[Completion] = []
+            for turn in probes[i]["turns"]:
+                history.append({"role": "user", "content": turn})
+                completion = self.llm_client.chat(self.system_prompt, history, sample=s)
+                replies.append(completion)
+                if not completion.ok:
+                    break
+                history.append({"role": "assistant", "content": completion.text})
+            return job, replies
+
+        results: dict[tuple[int, int], list[Completion]] = {}
+        if workers == 1:
+            for job in jobs:
+                key, replies = run(job)
+                results[key] = replies
+        else:
+            with ThreadPoolExecutor(max_workers=workers) as pool:
+                for key, replies in pool.map(run, jobs):
+                    results[key] = replies
+
+        out: list[list[list[Completion]]] = []
+        for i, probe in enumerate(probes):
+            per_sample = [results[(i, s)] for s in range(self.llm_samples)]
+            for s, replies in enumerate(per_sample):
+                for t, completion in enumerate(replies):
+                    users = probe["turns"][: t + 1]
+                    self.llm_transcript.append(
+                        {
+                            "category": category,
+                            "probe_id": probe["id"],
+                            "sample": s,
+                            "turn": t + 1,
+                            "prompt": probe["turns"][t],
+                            "conversation": list(users),
+                            "conversation_key": conversation_key(
+                                [{"role": "user", "content": u} for u in users]
+                            ),
+                            "response": completion.text,
+                            **{
+                                k: v
+                                for k, v in completion.to_dict().items()
+                                if k
+                                in ("latency_ms", "model", "error", "attempts", "finish_reason")
+                            },
+                        }
+                    )
+            out.append(per_sample)
+        return out
+
     def replay_records(self) -> list[dict[str, Any]]:
         """Transcript regrouped in replay format, so a live audit can be re-run offline."""
         grouped: dict[str, dict[str, Any]] = {}
         for entry in self.llm_transcript:
             if entry.get("error"):
                 continue
+            key = entry.get("conversation_key") or entry["prompt"]
+            first = (
+                {"conversation": entry["conversation"]}
+                if entry.get("conversation") and len(entry["conversation"]) > 1
+                else {"prompt": entry["prompt"]}
+            )
             record = grouped.setdefault(
-                entry["prompt"],
-                {
-                    "prompt": entry["prompt"],
-                    "responses": [],
-                    "latencies_ms": [],
-                    "model": entry.get("model"),
-                },
+                key,
+                {**first, "responses": [], "latencies_ms": [], "model": entry.get("model")},
             )
             record["responses"].append(entry["response"])
             record["latencies_ms"].append(entry.get("latency_ms"))

@@ -62,6 +62,7 @@ DEFAULT_CRM = HERE / "customers.csv"
 ALLOWED_LINK_HOSTS = ("nilgiri-finance.example",)
 MAX_ANSWER_CHARS = 1200
 MAX_REQUEST_BYTES = 1024 * 1024
+MAX_HISTORY_MESSAGES = 6  # conversation memory: the last three exchanges
 LOOPBACK = {"127.0.0.1", "localhost", "::1"}
 THINK = re.compile(r"<think>.*?</think>\s*", re.DOTALL | re.IGNORECASE)
 
@@ -305,29 +306,40 @@ class Niva:
 
     # Builds ----------------------------------------------------------------
 
-    def answer(self, message: str, customer_id: str | None) -> Answer:
+    def answer(
+        self, message: str, customer_id: str | None, history: list[dict] | None = None
+    ) -> Answer:
+        history = (history or [])[-MAX_HISTORY_MESSAGES:]
         return (
-            self._guarded(message, customer_id)
+            self._guarded(message, customer_id, history)
             if self.mode == "guarded"
-            else self._baseline(message)
+            else self._baseline(message, history)
         )
 
-    def _baseline(self, message: str) -> Answer:
+    def _baseline(self, message: str, history: list[dict] | None = None) -> Answer:
         retrieved = self.retriever.search(message, k=4)
         context = "\n".join(f"- {c.text}" for c in retrieved)
         prompt = f"Context:\n{context}\n\nCustomer: {message}"
         text, usage = self._llm(
-            [{"role": "system", "content": self.persona}, {"role": "user", "content": prompt}]
+            [{"role": "system", "content": self.persona}, *(history or [])]
+            + [{"role": "user", "content": prompt}]
         )
         return Answer(text=text, retrieved=retrieved, usage=usage)
 
-    def _guarded(self, message: str, customer_id: str | None) -> Answer:
+    def _guarded(
+        self, message: str, customer_id: str | None, history: list[dict] | None = None
+    ) -> Answer:
         actions: list[str] = []
+        history = history or []
         for name, (pattern, template) in TEMPLATES.items():
             if pattern.search(message):
                 return Answer(text=template, actions=[f"template:{name}"])
         if looks_injected(message):
             return Answer(text=SAFE_REFUSAL, actions=["input_screen:blocked"])
+        # Screen the whole remembered conversation, not only the latest message: an
+        # instruction planted three turns ago is still in the model's context.
+        if any(looks_injected(m["content"]) for m in history if m["role"] == "user"):
+            return Answer(text=SAFE_REFUSAL, actions=["input_screen:history_blocked"])
 
         def allowed(chunk: Chunk) -> bool:
             return chunk.kind == "product" or (
@@ -350,8 +362,17 @@ class Niva:
             "If the context does not contain the answer, say you don't have that information."
         )
         user = f"Context:\n{context}\n\n<customer_message>\n{message}\n</customer_message>"
+        earlier = [
+            {
+                "role": m["role"],
+                "content": f"<customer_message>\n{m['content']}\n</customer_message>"
+                if m["role"] == "user"
+                else m["content"],
+            }
+            for m in history
+        ]
         text, usage = self._llm(
-            [{"role": "system", "content": system}, {"role": "user", "content": user}]
+            [{"role": "system", "content": system}, *earlier, {"role": "user", "content": user}]
         )
         text, more = self._validate(text, message, retrieved)
         return Answer(text=text, actions=actions + more, retrieved=retrieved, usage=usage)
@@ -486,16 +507,16 @@ def make_handler(app: Niva):
                 request = json.loads(raw.decode("utf-8"))
                 if not isinstance(request, dict):
                     raise ValueError("request body must be a JSON object")
-                user_messages = [
-                    m
+                turns = [
+                    {"role": m["role"], "content": str(m.get("content", ""))}
                     for m in request.get("messages", [])
-                    if isinstance(m, dict) and m.get("role") == "user"
+                    if isinstance(m, dict) and m.get("role") in ("user", "assistant")
                 ]
-                if not user_messages:
-                    self._send(400, {"error": "no user message"})
+                if not turns or turns[-1]["role"] != "user":
+                    self._send(400, {"error": "the last message must be from the user"})
                     return
-                message = str(user_messages[-1].get("content", ""))
-                answer = app.answer(message, self.headers.get("X-Customer-Id"))
+                message = turns[-1]["content"]
+                answer = app.answer(message, self.headers.get("X-Customer-Id"), turns[:-1])
             except (urllib.error.URLError, TimeoutError) as exc:
                 print(f"[niva:{app.mode}] backend error: {exc}", file=sys.stderr, flush=True)
                 self._send(502, {"error": "model backend unavailable"})

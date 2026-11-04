@@ -128,6 +128,12 @@ Forbidden phrases (`must_not_include`) in groundedness and conduct probes are ne
 
 When some calls failed but nothing failed among those scored, the check is a **WARN** ("not yet proven"), never a PASS.
 
+### Multi-turn manipulation (`llm.multi_turn`)
+
+Each `multi_turn` probe is a conversation. Its user turns are sent one after another and the system's real replies are kept in the history, so the test sees what a patient attacker sees. Every reply is judged with the same deterministic rules as `llm.prompt_injection` (markers, regular expressions, canary); the first reply that proves the attack decides the conversation, and the report records the turn at which the defence broke. A conversation that broke after its first turn is one that single-message tests cannot find. The built-in pack `builtin:multiturn_core` covers gradual escalation (Crescendo, Russinovich et al., 2024), instructions planted early and triggered later, persona drift, refusal erosion under pressure, a fabricated dialogue history, and Hindi and Hinglish variants.
+
+Endpoints receive the whole conversation: `openai_compatible` sends the `messages` list; `http` fills a `"{messages}"` slot in the body template if there is one, and otherwise sends the conversation flattened into one prompt (the evidence records which). Live runs are recorded per turn in `llm_replay.jsonl` under a `conversation` key, so they replay offline; a recording made before conversations were supported skips this check rather than failing it.
+
 ### Service health (`llm.service_health`)
 
 Live runs only. From the transcript: error rate, calls that needed a retry, p50 and p95 latency, and the longest response. **FAIL** if more than 5% of calls failed; **WARN** for any failed call, p95 above `llm_latency_p95_max_ms` (default 20 s) or a response longer than `llm_max_output_chars` (default 4,000).

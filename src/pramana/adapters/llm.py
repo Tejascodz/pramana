@@ -62,11 +62,41 @@ class LLMClient(Protocol):
 
     def complete(self, system: str, user: str, sample: int = 0) -> Completion: ...
 
+    def chat(self, system: str, messages: list[dict[str, str]], sample: int = 0) -> Completion:
+        """Send a whole conversation (``role``/``content`` dicts, ending with a user turn)."""
+        ...
+
     def describe(self) -> dict[str, Any]: ...
 
 
 class EndpointUnavailable(RuntimeError):
     """Raised when the endpoint under audit cannot be reached at all."""
+
+
+#: Separates the user turns of a conversation in replay keys.
+TURN_SEPARATOR = "\n\u241e\n"
+
+
+def conversation_key(messages: list[dict[str, str]]) -> str:
+    """Replay key for a conversation: its user turns, in order.
+
+    A single-turn conversation keys on the prompt itself, so recordings made before
+    conversations were supported keep working.
+    """
+    users = [str(m.get("content", "")).strip() for m in messages if m.get("role") == "user"]
+    return TURN_SEPARATOR.join(users)
+
+
+def flatten_conversation(messages: list[dict[str, str]]) -> str:
+    """A conversation as one prompt, for endpoints that accept a single message."""
+    lines = []
+    for m in messages[:-1]:
+        who = "User" if m.get("role") == "user" else "Assistant"
+        lines.append(f"{who}: {m.get('content', '')}")
+    last = messages[-1].get("content", "") if messages else ""
+    if not lines:
+        return str(last)
+    return "Conversation so far:\n" + "\n".join(lines) + f"\n\nUser: {last}"
 
 
 def strip_reasoning(text: str) -> str:
@@ -182,8 +212,14 @@ class ReplayClient:
             if not line.strip():
                 continue
             record = json.loads(line)
-            if "prompt" not in record or not ({"response", "responses"} & record.keys()):
+            if not ({"prompt", "conversation"} & record.keys()) or not (
+                {"response", "responses"} & record.keys()
+            ):
                 raise ValueError(f"{self.path.name}:{line_no} needs 'prompt' and 'response(s)'")
+            if "conversation" in record:
+                record["prompt"] = TURN_SEPARATOR.join(
+                    str(u).strip() for u in record["conversation"]
+                )
             responses = record.get("responses") or [record["response"]]
             latencies = record.get("latencies_ms") or [None] * len(responses)
             for response, latency in zip(responses, latencies, strict=False):
@@ -196,7 +232,7 @@ class ReplayClient:
             if entry.get("error") or "prompt" not in entry:
                 continue
             self._add(
-                entry["prompt"],
+                entry.get("conversation_key") or entry["prompt"],
                 entry.get("response", ""),
                 entry.get("latency_ms"),
                 entry.get("model"),
@@ -211,6 +247,14 @@ class ReplayClient:
         return Completion(
             text=responses[i], model=self._models.get(key), latency_ms=self._latencies[key][i]
         )
+
+    def chat(self, system: str, messages: list[dict[str, str]], sample: int = 0) -> Completion:
+        return self.complete(system, conversation_key(messages), sample=sample)
+
+    @property
+    def has_conversations(self) -> bool:
+        """True when the recording holds at least one multi-turn conversation."""
+        return any(TURN_SEPARATOR in key for key in self._responses)
 
     @property
     def has_latency(self) -> bool:
@@ -321,7 +365,10 @@ class OpenAICompatibleClient(_HTTPBase):
         self.send_system_prompt = send_system_prompt
 
     def complete(self, system: str, user: str, sample: int = 0) -> Completion:
-        messages = [{"role": "user", "content": user}]
+        return self.chat(system, [{"role": "user", "content": user}], sample=sample)
+
+    def chat(self, system: str, messages: list[dict[str, str]], sample: int = 0) -> Completion:
+        messages = [{"role": m["role"], "content": m["content"]} for m in messages]
         if system and self.send_system_prompt:
             messages.insert(0, {"role": "system", "content": system})
         body: dict[str, Any] = {
@@ -387,8 +434,22 @@ class HTTPJSONClient(_HTTPBase):
         self.model_path = model_path
         self.method = method.upper()
 
+    @property
+    def native_history(self) -> bool:
+        """True when the body template has a ``{messages}`` slot for the whole conversation."""
+        return "{messages}" in json.dumps(self.body)
+
     def complete(self, system: str, user: str, sample: int = 0) -> Completion:
-        body = _fill(self.body, {"prompt": user, "system": system, "sample": sample})
+        return self.chat(system, [{"role": "user", "content": user}], sample=sample)
+
+    def chat(self, system: str, messages: list[dict[str, str]], sample: int = 0) -> Completion:
+        last = str(messages[-1]["content"]) if messages else ""
+        values: dict[str, Any] = {"system": system, "sample": sample}
+        if self.native_history:
+            values.update(messages=[dict(m) for m in messages], prompt=last)
+        else:
+            values["prompt"] = flatten_conversation(messages)
+        body = _fill(self.body, values)
         try:
             data, latency, attempts = self._post(self.url, body, method=self.method)
             raw = str(json_path(data, self.response_path))
@@ -416,6 +477,7 @@ class HTTPJSONClient(_HTTPBase):
             "mode": self.name,
             "endpoint": endpoint_label(self.url),
             "response_path": self.response_path,
+            "conversation_history": "native" if self.native_history else "flattened",
             "timeout_s": self.timeout,
             "max_retries": self.max_retries,
         }
