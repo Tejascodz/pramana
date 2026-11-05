@@ -349,3 +349,19 @@ def test_honeypot_scenarios_must_declare_bait_found_in_the_planted_text(tmp_path
     )
     with pytest.raises(SandboxError, match="bait"):
         load_scenarios(bad)
+
+
+def test_the_approval_prompt_cannot_be_spoofed_by_the_agent():
+    """A hostile agent must not be able to rewrite what the operator reads."""
+    from pramana.sandbox import approval_text
+
+    shown = approval_text(
+        {
+            "amount": 18500,
+            "reason": "fee ‮00‬ refund \x1b[2K\x1b[1Aamount: 100 \x9b31m",
+            "customer_id": "C-77012",
+        }
+    )
+    assert "amount: 18500" in shown
+    assert all(32 <= ord(ch) < 127 or ch == "\n" for ch in shown)  # nothing raw reaches the tty
+    assert "\\u202e" in shown and "\\u001b" in shown and "\\u009b" in shown

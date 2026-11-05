@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.7.5 — 2026-11-05
+
+From a full review of the repository (code, history and documentation).
+
+**Security**
+- The sandbox's human-approval prompt (`approver: ask`) and `pramana scan-trace` output on a terminal now escape every character outside printable ASCII. A hostile agent could otherwise use terminal control sequences or right-to-left overrides to change what the operator reads, for example the amount of a refund awaiting approval.
+- Full-history scan: no keys, tokens, private keys or personal paths in any of the 33 commits (detect-secrets and pattern search; the only hits are SHA-256 fingerprints, Pramana's own encoded test probes and fake credentials in tests). `bandit` reports no issues at any severity; `pip-audit` finds no vulnerable dependency, extras included.
+
+**Documentation**
+- README: fixed a code block that swallowed a paragraph, the `pramana-audit[signing]` install name, probe and held-out counts, the project layout (attacks, sandbox, demos), and the real-run summary (six runs). Every link checked.
+- `examples/README.md` lists all eight examples; the live assistant README describes conversation memory, normalised screening and the held-out conversations; `docs/limitations.md` covers multi-turn, obfuscation, the sandbox and approval paths; `SECURITY.md` lists the sandbox tool server.
+
 ## 0.7.4 — 2026-11-05
 
 Found by real run 5 (`docs/live-run-findings.md`).

@@ -10,6 +10,7 @@ sets out what it listens on, what it sends, what it stores, and what it trusts.
 | `pramana` CLI | Nothing | A client only. It makes requests to the endpoint named in the audit spec and to nothing else |
 | Niva reference app (`examples/live_assistant`) | `127.0.0.1` | Refuses any other address unless started with `--allow-remote`, and refuses requests a web page could make (see below) |
 | Dashboard (`dashboard/app.py`) | `127.0.0.1:8501` | Set in `.streamlit/config.toml`; usage statistics are off |
+| Sandbox tool server (`pramana sandbox serve`) | `127.0.0.1:8900` | Loopback only, no option to bind elsewhere; refuses any `Origin` header, foreign `Host` headers and non-JSON bodies; bodies capped at 1 MB |
 | Test stubs | `127.0.0.1`, random port | Only while the tests run |
 | Ollama (separate software) | `127.0.0.1:11434` by default | Keep *Expose Ollama to the network* off, do not set `OLLAMA_HOST=0.0.0.0`, and leave `OLLAMA_ORIGINS` unset |
 
@@ -96,6 +97,7 @@ Ollama applies its own origin and host checks; keep them by leaving
 - **Configuration files are size-capped.** Specs, probe packs and model cards
   above 5 MB are refused (`PRAMANA_MAX_YAML_BYTES` changes the limit), and
   `builtin:` probe names must name a pack that ships with Pramana.
+- **Agent output shown on a terminal is escaped.** When the sandbox asks a person to approve a request (`approver: ask`), and when `pramana scan-trace` prints signals, every character outside printable ASCII is shown as an escape, so an agent cannot use terminal control sequences or right-to-left overrides to change what the operator reads.
 - **Model output is untrusted text.** The HTML report escapes everything it
   shows, so an answer containing HTML or script is displayed, never run. The
   report also carries a Content-Security-Policy that forbids every script,

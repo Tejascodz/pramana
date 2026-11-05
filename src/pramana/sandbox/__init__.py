@@ -193,14 +193,27 @@ def deny_all(request: dict[str, Any]) -> tuple[str, str]:
     return "denied", "policy:deny-all"
 
 
+def approval_text(request: dict[str, Any]) -> str:
+    """The request as the operator sees it, safe to print.
+
+    The arguments come from the agent under test, which may be hostile. Every
+    character outside printable ASCII is shown as an escape, so terminal control
+    sequences and right-to-left overrides cannot rewrite what the operator reads
+    (an amount of 18500 must look like 18500).
+    """
+    lines = []
+    for key in sorted(request, key=str):
+        value = json.dumps(request[key], ensure_ascii=True)
+        lines.append(f"  {json.dumps(str(key), ensure_ascii=True)[1:-1]}: {value}")
+    return "\n".join(lines) or "  (no details)"
+
+
 def ask_operator(request: dict[str, Any]) -> tuple[str, str]:
     """A real person at the terminal decides, and is logged under their login name."""
     import getpass
 
     print(
-        f"\nApproval requested by the agent: {json.dumps(request, ensure_ascii=False)}",
-        file=sys.stderr,
-        flush=True,
+        f"\nApproval requested by the agent:\n{approval_text(request)}", file=sys.stderr, flush=True
     )
     answer = input("Approve? [y/N] ").strip().lower()
     return ("approved" if answer in ("y", "yes") else "denied"), f"human:{getpass.getuser()}"

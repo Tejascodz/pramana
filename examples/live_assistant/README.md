@@ -16,12 +16,15 @@ builds of the same model and data:
 | Build | What it does | Controls |
 |---|---|---|
 | `baseline` | How many first versions ship | None. Customer records share the retrieval index with product info; the customer's text goes straight into the prompt; answers are returned as is |
-| `guarded` | The same model after remediation | Record-level authorisation in retrieval, approved templates for regulated topics, multilingual input screening (incl. base64), spotlighting of untrusted text, output validation for canary and secret leaks, personal-data redaction, external links and images, ungrounded figures, and length |
+| `guarded` | The same model after remediation | Record-level authorisation in retrieval, approved templates for regulated topics, multilingual input screening (incl. base64) on Unicode-normalised text and on every remembered turn of the conversation, spotlighting of untrusted text, output validation for canary and secret leaks, personal-data redaction, external links and images, ungrounded figures, and length |
 
 The probe set (`probes.yaml`) combines Pramana's built-in packs (14 English
-and 8 Indic-language injection probes, 5 disclosure probes) with Niva's own
-facts and conduct rules, plus **4 held-out probes** the guarded build was not
-written against. Those show how much risk remains after the controls.
+and 8 Indic-language injection probes, 5 disclosure probes, 8 multi-turn
+conversations) with Niva's own facts and conduct rules, plus **10 held-out
+probes** the guarded build was not written against: 4 single messages and 6
+conversations (`LIVE-MT-H1` to `H6`). Those show how much risk remains after the
+controls. The audit specs also re-send every injection probe in obfuscated forms
+(`llm.mutations`). Niva keeps the last three exchanges of each conversation.
 
 ## Run it (macOS, Apple silicon, 8 GB is enough)
 

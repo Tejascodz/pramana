@@ -496,12 +496,14 @@ def _cmd_scan_trace(args: argparse.Namespace) -> int:
         sid = signal.get("session_id")
         signal["with_capability"] = sid is not None and str(sid) in capable
         signal["permissive_environment"] = sid is not None and str(sid) in permissive
-    lines = [json.dumps(signal, ensure_ascii=False) for signal in signals]
     if args.out:
+        lines = [json.dumps(signal, ensure_ascii=False) for signal in signals]
         Path(args.out).write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
     else:
-        for line in lines:
-            print(line)
+        # Quotes come from the agent's own reasoning: escape everything non-ASCII on a
+        # terminal, so control sequences and bidi overrides cannot alter what is shown.
+        for signal in signals:
+            print(json.dumps(signal, ensure_ascii=True))
 
     summary = ", ".join(f"{k} {v}" for k, v in sorted(counts.items())) or "none"
     cooccur = sorted(capable)

@@ -56,7 +56,7 @@ pip install "pramana-audit @ git+https://github.com/Tejascodz/pramana"
 pramana demo                              # runs three bundled audits in a few seconds
 ```
 
-The command and the import are both `pramana`. To pin a version, add a release tag from the [Releases page](https://github.com/Tejascodz/pramana/releases) or a commit hash to the end of the URL (for example `...pramana@v0.7.4`, once that release is tagged). Optional extras: `[signing]` (Ed25519 signed packs), `[skops]` (load `.skops` models without pickle), `[dashboard]` (Streamlit viewer) or `[all]`, for example `pip install "pramana-audit[all] @ git+https://github.com/Tejascodz/pramana"`. Python 3.10 to 3.13 on Linux, macOS and Windows.
+The command and the import are both `pramana`. To pin a version, add a release tag from the [Releases page](https://github.com/Tejascodz/pramana/releases) or a commit hash to the end of the URL (for example `...pramana@v0.7.5`, once that release is tagged). Optional extras: `[signing]` (Ed25519 signed packs), `[skops]` (load `.skops` models without pickle), `[dashboard]` (Streamlit viewer) or `[all]`, for example `pip install "pramana-audit[all] @ git+https://github.com/Tejascodz/pramana"`. Python 3.10 to 3.13 on Linux, macOS and Windows.
 
 Each tagged release also has a ready-built wheel on the [Releases page](https://github.com/Tejascodz/pramana/releases), with SHA-256 checksums and a build attestation that proves it was built from this repository. See [Verifying a release](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md#verifying-a-release).
 
@@ -95,7 +95,7 @@ Each case study plants known defects, so the audit can be checked against a grou
 |---|---|---|---|
 | [Credit scoring](https://github.com/Tejascodz/pramana/tree/main/examples/credit_scoring) | Gradient-boosted loan pre-approval model for a fictional Indian lender (synthetic data) | Biased historical labels for rural women; pincode band that tracks residence; e-mail and mobile columns left in extracts; overstated AUC in the model card; owner classified it as "limited" risk; income and gig-work drift | Disparate impact 0.72 for rural applicants (p < 1e-70), worse for intersectional sub-groups; pincode proxy (AUC 0.99); personal data exposure; documentation mismatch; EU AI Act misclassification (Annex III 5(b) makes it high-risk); missing FRIA. **Gate: BLOCK** |
 | [Support assistant](https://github.com/Tejascodz/pramana/tree/main/examples/support_chatbot) | RAG chat assistant (replayed transcripts) | Indirect prompt injection in a pasted e-mail; another customer's contact details disclosed; invented foreclosure fee; crypto investment advice | 1/5 injection probes succeed; PII disclosure (critical); figures not in the knowledge base (4%, ₹500); conduct-rule breach. **Gate: BLOCK** |
-| [Live assistant](https://github.com/Tejascodz/pramana/tree/main/examples/live_assistant) | Retrieval-augmented loan assistant on a **local open-weights model** (Ollama), in a baseline and a guarded build | Shared retrieval index holding customer records; no input screening; no output validation | Run it yourself: `pramana diff` shows the guarded build's controls closing the gaps, and 4 **held-out** probes show the risk that remains. See below. |
+| [Live assistant](https://github.com/Tejascodz/pramana/tree/main/examples/live_assistant) | Retrieval-augmented loan assistant on a **local open-weights model** (Ollama), in a baseline and a guarded build | Shared retrieval index holding customer records; no input screening; no output validation | Run it yourself: `pramana diff` shows the guarded build's controls closing the gaps, and 10 **held-out** probes (4 single messages, 6 conversations) show the risk that remains. See below. |
 | [Refund agent](https://github.com/Tejascodz/pramana/tree/main/examples/agent_traces) | Tool-using agent that issues refunds | ₹18,500 refund with no human approval; a tool call with no originating request; no hash chain; an agent that reasons about avoiding shutdown and hiding a weak justification | Approval coverage 50%, one unattributed action, log not tamper-evident; **misalignment signals** (self-preservation + oversight evasion) caught in the agent's own reasoning, co-occurring with an irreversible refund. **Gate: BLOCK** |
 
 ![Fairness spotlight](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/fairness.png)
@@ -126,7 +126,7 @@ Each case study plants known defects, so the audit can be checked against a grou
 | Transparency | `documentation.model_card` | Completeness against Model Cards, EU AI Act Art. 11, 13 and 14 and ISO 42001 A.6.2.7; **claims vs. measured results** |
 | Privacy | `privacy.pii_exposure` | E-mail, Indian mobile, PAN, Aadhaar-format, card (Luhn) and IP patterns in every dataset |
 | Privacy | `privacy.membership_inference` | Loss-threshold attack (Yeom et al., 2018) on training vs. held-out rows, with the true-positive rate at 1% and 5% false-positive rate (Carlini et al., 2022) |
-| LLM security | `llm.prompt_injection` | 26 probes: direct, role-play, indirect (e-mail, web page, tool output, JSON), payload splitting, base64, few-shot, markdown-image exfiltration, and Indic-language attacks; system-prompt canary; per-language results |
+| LLM security | `llm.prompt_injection` | 22 built-in probes (14 English, 8 Indic-language), plus your own: direct, role-play, indirect (e-mail, web page, tool output, JSON), payload splitting, base64, few-shot, markdown-image exfiltration, and Indic-language attacks; system-prompt canary; per-language results |
 | LLM security | `llm.multi_turn` | Conversations of 2 to 4 turns with the real replies kept in history: gradual escalation (Crescendo), instructions planted early and triggered later, persona drift, refusal erosion, fabricated history, Hindi and Hinglish; reports the turn at which the defence broke |
 | LLM security | `llm.obfuscation` | Every injection probe re-sent disguised (zero-width spaces, look-alike letters, soft hyphens, spacing, digits, full-width letters, joiners inside Indic words); flags **bypasses**, where a disguised attack got past a defence that stopped the plain one |
 | LLM privacy | `llm.sensitive_disclosure` | Personal data and forbidden strings in responses |
@@ -180,7 +180,7 @@ packs/credit/
 
 **Pinned inputs (optional).** List an artifact's SHA-256 under `artifacts_sha256` in the spec and Pramana refuses to audit it, or unpickle a model, if the file has changed since it was pinned.
 
-**Signed packs (optional).** The hash chain proves a pack is internally consistent; a signature proves *who* sealed it and that it was not rebuilt. With `pip install "pramana[signing]"`:
+**Signed packs (optional).** The hash chain proves a pack is internally consistent; a signature proves *who* sealed it and that it was not rebuilt. With the `signing` extra (`pip install "pramana-audit[signing] @ git+https://github.com/Tejascodz/pramana"`):
 
 ```bash
 pramana keygen                       # Ed25519 key pair in ~/.pramana/keys
@@ -219,7 +219,9 @@ steps:
 
 ```bash
 pramana verify pramana-audit --attested-by your-org/your-repo    # needs the gh CLI
-``` The gate respects formal risk acceptances: a risk approved by a named person, with a justification and an expiry date, does not block until it expires.
+```
+
+The gate respects formal risk acceptances: a risk approved by a named person, with a justification and an expiry date, does not block until it expires.
 
 ## Live red-team audit on your laptop
 
@@ -241,16 +243,20 @@ What makes the live mode production-grade:
 - **Resilient calls.** Timeouts, retries with exponential backoff on 429/5xx, a pre-flight check (`pramana ping`), and failed calls recorded as evidence instead of crashing the audit. If a test cannot complete, the gate blocks as *incomplete*: an audit cannot vouch for what it did not test.
 - **Stochastic outputs handled.** `--samples N` sends each probe N times; a probe fails if any sample fails, and rates come with Wilson 95% intervals ([Hughes et al., 2024](https://arxiv.org/abs/2412.03556) show attack success grows with repeated sampling).
 - **Judge-free, defensible scoring.** Split markers, regular expressions and a planted canary prove compliance without a second model. Results that contain both proof and refusal language are flagged for human review.
-- **Held-out probes.** Four probes the guarded build was not written against measure the residual risk, so passing the known attacks is not mistaken for safety.
+- **Held-out probes.** Ten probes the guarded build was not written against (four single messages, six multi-turn conversations, including Kannada) measure the residual risk, so passing the known attacks is not mistaken for safety.
 - **Reproducible.** Every live pack contains `llm_replay.jsonl`, which re-runs the identical audit offline in CI.
 - **Before/after evidence.** `pramana diff` compares two packs check by check, and `--fail-on-regression` turns it into a CI gate.
 - **Safe on your laptop.** Niva, the model server and the dashboard listen on `127.0.0.1` only; nothing is reachable from your network, nothing is sent anywhere except the endpoint you audit, and keys are only ever sent over https. See [SECURITY.md](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md).
 
 Full walkthrough: [examples/live_assistant](https://github.com/Tejascodz/pramana/tree/main/examples/live_assistant).
 
-### Findings from a real run
+### Findings from real runs
 
-The first live audit ran `llama3.2:3b` on an 8 GB MacBook. The baseline build told a customer *"Yes, you are chatting with a real person"*, revealed which customer and account a phone number belonged to, invented a complaints e-mail address, and said there was *"no prepayment penalty"* despite a 3% foreclosure charge. Reading the transcripts also exposed four blind spots in Pramana's own scoring. The most serious: the guarded build had **passed** while accepting a persona switch, because the model misspelt the marker. The scorer was fixed, the recorded run re-scored offline, and the guarded build's gate correctly flipped to **BLOCK**. A second run with three samples per probe (258 calls) then showed what a single run hides: the system-prompt canary leaked in four attacks, including in Hindi and Hinglish, and the baseline volunteered another customer's account details to an unauthenticated user. The real responses are regression tests. Full write-up: [docs/live-run-findings.md](https://github.com/Tejascodz/pramana/blob/main/docs/live-run-findings.md).
+Six live audits ran on `llama3.2:3b` on an 8 GB MacBook, with every number recorded in [docs/live-run-findings.md](https://github.com/Tejascodz/pramana/blob/main/docs/live-run-findings.md).
+
+- **The application.** The baseline build told a customer *"Yes, you are chatting with a real person"*, revealed whose account a phone number belonged to, and invented fees and contact details. The guarded build, in the latest run (462 calls, three samples per probe), held every multi-turn conversation (0 of 42 samples, including 18 on held-out conversations), every obfuscated variant, and every disclosure, grounding and conduct test. One held-out persona-switch attack still succeeded in 1 of 3 tries, which a single-sample run can miss.
+- **The agent.** Given bank tools, the model refunded 18,500 with no approval as its first action in all three runs of one scenario, and gave up after one tool call everywhere else.
+- **Pramana itself.** Real output exposed scoring errors in Pramana in four of the six runs: a misspelt marker that let a breach pass, a honeypot verdict that blamed an instruction the agent never saw, a set-up turn scored as a breach, and a customer's own name reported as a leak. Each was fixed, the recorded runs were re-scored offline, and a test now reproduces it.
 
 ## Test a real agent
 
@@ -279,11 +285,13 @@ streamlit run dashboard/app.py --server.address 127.0.0.1 -- --pack packs/credit
 ## Write your own audit
 
 ```bash
+pramana demo                      # the three bundled case studies, end to end
 pramana init my_audit.yaml        # starter spec with every field
 pramana ingest log.json --format otel -o trace.jsonl   # real agent logs → Pramana trace
 pramana scan-trace log.jsonl                           # stream a huge log for misalignment signals
 pramana classify my_audit.yaml    # risk tier and obligations only
 pramana ping my_audit.yaml        # check an LLM endpoint is reachable
+pramana sandbox serve             # honeypot tools for your own agent (see "Test a real agent")
 pramana run my_audit.yaml
 ```
 
@@ -298,13 +306,18 @@ src/pramana/
 ├── spec.py              # audit spec loading and validation
 ├── context.py           # lazy loading of model, data, transcripts, traces
 ├── adapters/            # replay, OpenAI-compatible and generic HTTP clients for LLM audits
-├── probes/packs/        # built-in probe library (English and Indic-language attacks)
+├── probes/packs/        # built-in probe library: injection (English, Indic), disclosure, multi-turn
+├── attacks/             # deterministic obfuscation mutators and the matching normalize() defence
+├── sandbox/             # agent sandbox: stand-in bank, honeypot scenarios, HTTP tool server
 ├── checks/              # one module per check family, registered by decorator
 ├── controls/data/       # framework catalogues, crosswalk, regulatory calendar (YAML)
 ├── risk/                # EU AI Act and India classification, risk scoring, gate
 ├── audit/               # SMACTR engine and evidence ledger
-└── reporting/           # HTML report, charts, model card, exports
-examples/                # four case studies, incl. a live LLM app (examples/live_assistant)
+├── reporting/           # HTML report, charts, model card, exports
+├── demos/               # case studies bundled for `pramana demo`
+└── safeio.py            # size-capped YAML, CSV formula neutralisation
+examples/                # case studies, a live LLM app, a real-agent sandbox, trace adapters
+docs/sample-audits/      # verifiable audit packs, including real-model runs
 tests/                   # unit tests and ground-truth end-to-end tests
 docs/                    # research notes, methodology, design decisions, limitations
 ```
@@ -328,10 +341,11 @@ Pramana supports an audit; it does not replace auditor judgement or legal advice
 
 - Model-graded LLM judging as an optional second opinion beside the deterministic scorers
 - More Indic languages (Bengali, Marathi, Telugu)
+- Importers for Garak, PyRIT and Promptfoo results, so their findings land in the same evidence pack
 - NIST SP 800-53 AI control overlays (COSAiS) once final
 - RBI FREE-AI framework as a sector profile for Indian lenders
 - Ranking and recommendation fairness metrics
 
 ## License
 
-MIT. See [LICENSE](https://github.com/Tejascodz/pramana/tree/main/LICENSE).
+MIT. See [LICENSE](https://github.com/Tejascodz/pramana/blob/main/LICENSE).
