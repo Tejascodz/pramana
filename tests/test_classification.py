@@ -77,3 +77,37 @@ def test_obligations_respect_jurisdiction_and_tier():
     high_risk = [o for o in items if "Annex III" in o["obligation"]]
     assert high_risk and high_risk[0]["date"] == "2027-12-02"
     assert high_risk[0]["status"] == "upcoming"
+
+
+# A typo used to lower the tier silently: "credit-scoring" was classed as minimal risk.
+
+
+def _spec(tmp_path, use_case: str):
+    from pramana.spec import load_spec
+
+    p = tmp_path / "audit.yaml"
+    p.write_text(
+        "system: {name: M, version: '1', type: tabular_classifier, owner: O}\n"
+        f"use_case: {use_case}\n"
+        "artifacts: {evaluation_data: e.csv}\ntarget: y\nscore_column: s\n",
+        encoding="utf-8",
+    )
+    return load_spec(p)
+
+
+def test_an_unknown_domain_is_refused_with_a_suggestion(tmp_path):
+    import pytest
+
+    from pramana.spec import SpecError
+
+    with pytest.raises(SpecError, match="Did you mean 'credit_scoring'"):
+        _spec(tmp_path, "{domain: credit-scoring}")
+
+
+def test_an_unknown_prohibited_practice_flag_is_refused(tmp_path):
+    import pytest
+
+    from pramana.spec import SpecError
+
+    with pytest.raises(SpecError, match="Did you mean 'social_scoring'"):
+        _spec(tmp_path, "{domain: other, prohibited_practice_flags: [social-scoring]}")

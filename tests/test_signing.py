@@ -94,3 +94,21 @@ def test_cli_verify_detects_a_wrong_pinned_key(pack, tmp_path):
         main(["verify", str(pack), "--public-key", str(tmp_path / "k2" / "pramana_ed25519.pub")])
         == 2
     )
+
+
+def test_a_malformed_signature_file_is_reported_not_raised(pack, tmp_path):
+    from pramana.audit.signing import verify_pack_signature
+
+    (pack / "signature.json").write_text('{"algorithm": "ed25519"}', encoding="utf-8")
+    ok, problems = verify_pack_signature(pack)
+    assert not ok and "malformed" in problems[0]
+
+
+def test_verify_without_a_trusted_key_says_it_does_not_prove_who_signed(pack, capsys):
+    from pramana.cli import main
+
+    private, _ = generate_keypair()
+    sign_pack(pack, private)
+    assert main(["verify", str(pack)]) == 0
+    out = capsys.readouterr().out
+    assert "not who signed it" in out and "--public-key" in out

@@ -40,7 +40,9 @@ def _acceptance_for(
         if acc.get("check") != check_id:
             continue
         expires = acc.get("expires")
-        if expires and date.fromisoformat(str(expires)) < today:
+        # An acceptance without an expiry date never lapses, so it is not honoured: a
+        # risk is accepted until a named date, then it must be reviewed again.
+        if not expires or date.fromisoformat(str(expires)) < today:
             continue
         if not acc.get("approved_by") or not acc.get("justification"):
             continue

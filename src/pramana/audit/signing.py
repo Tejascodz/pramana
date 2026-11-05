@@ -150,7 +150,15 @@ def verify_pack_signature(
     if not ok:
         problems.extend(chain_problems)
 
-    record = json.loads(sig_path.read_text(encoding="utf-8"))
+    try:
+        record = json.loads(sig_path.read_text(encoding="utf-8"))
+        if not isinstance(record, dict) or not isinstance(record.get("payload"), dict):
+            raise ValueError("not a signature record")
+        record["payload"]["signed_at"], record["public_key"], record["signature"]  # noqa: B018
+    except (ValueError, KeyError, TypeError) as exc:
+        return False, [
+            f"{SIGNATURE_NAME} is malformed ({exc}); the pack's signature cannot be trusted"
+        ]
     if record.get("algorithm") != ALGORITHM:
         return False, [f"unsupported signature algorithm {record.get('algorithm')!r}"]
 

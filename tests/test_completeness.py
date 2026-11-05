@@ -10,8 +10,10 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+import pytest
+
 from pramana.audit.engine import run_audit
-from pramana.spec import load_spec
+from pramana.spec import SpecError, load_spec
 from pramana.types import Status
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -98,3 +100,49 @@ def test_diff_counts_a_dropped_check_against_fail_on_regression(tmp_path, capsys
     out = capsys.readouterr().out
     assert f"`{dropped['check_id']}` | fail | - | **removed**" in out
     assert "1 removed after running in the earlier audit" in out
+
+
+def _spec_with_acceptance(tmp_path: Path, acceptance: str) -> Path:
+    spec = tmp_path / "audit.yaml"
+    spec.write_text(
+        "system: {name: A, version: '1', type: agent, owner: O}\n"
+        "use_case: {domain: customer_support_financial}\n"
+        f"agent: {{trace: {ROOT / 'examples/agent_traces/refund_agent_trace.jsonl'}}}\n"
+        f"governance:\n  risk_acceptances:\n    - {acceptance}\n",
+        encoding="utf-8",
+    )
+    return spec
+
+
+@pytest.mark.parametrize(
+    "acceptance, problem",
+    [
+        ("{check: agent.trace_auditability, approved_by: CRO, justification: ok}", "expires"),
+        (
+            "{check: agent.trace_auditability, approved_by: CRO, justification: ok, expires: soon}",
+            "date",
+        ),
+        (
+            "{check: agent.trace_audit, approved_by: CRO, justification: ok, expires: '2027-01-01'}",
+            "not a Pramana check",
+        ),
+        (
+            "{check: agent.trace_auditability, justification: ok, expires: '2027-01-01'}",
+            "approved_by",
+        ),
+    ],
+)
+def test_malformed_risk_acceptances_are_refused(tmp_path, acceptance, problem):
+    with pytest.raises(SpecError, match=problem):
+        load_spec(_spec_with_acceptance(tmp_path, acceptance))
+
+
+def test_an_acceptance_stops_blocking_only_until_it_expires(tmp_path):
+    from datetime import date
+
+    acc = "{check: agent.trace_auditability, approved_by: CRO, justification: ok, expires: '2027-01-01'}"
+    spec = load_spec(_spec_with_acceptance(tmp_path, acc))
+    before = run_audit(spec, tmp_path / "a", audit_date=date(2026, 12, 31))
+    after = run_audit(spec, tmp_path / "b", audit_date=date(2027, 1, 2))
+    risk = lambda r: next(x for x in r.risks if x.source_check == "agent.trace_auditability")  # noqa: E731
+    assert risk(before).accepted and not risk(after).accepted

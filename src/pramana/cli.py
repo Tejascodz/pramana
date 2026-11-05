@@ -167,7 +167,14 @@ def _cmd_verify(args: argparse.Namespace) -> int:
             for p in sproblems:
                 print(f"  - {p}")
             return EXIT_TAMPERED
-        print(f"OK: {args.pack} verifies and its signature is valid.")
+        if key is None:
+            print(
+                f"OK: {args.pack} verifies and its signature is valid for the key stored in the "
+                "pack. That proves the pack was not changed after signing, not who signed it: "
+                "pass --public-key with the signer's published key to check that."
+            )
+        else:
+            print(f"OK: {args.pack} verifies and is signed by the key you provided.")
         return EXIT_OK
 
     print(f"OK: every evidence file and ledger entry in {args.pack} verifies.")
@@ -663,7 +670,15 @@ def build_parser() -> argparse.ArgumentParser:
     ping.add_argument("spec")
     ping.set_defaults(fn=_cmd_ping)
 
-    classify = sub.add_parser("classify", help="show the risk classification for a spec")
+    from pramana.risk.classification import ANNEX_III, KNOWN_DOMAINS
+
+    classify = sub.add_parser(
+        "classify",
+        help="show the risk classification for a spec",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="known use_case.domain values (Annex III areas marked *):\n  "
+        + "\n  ".join(f"{d}{' *' if d in ANNEX_III else ''}" for d in sorted(KNOWN_DOMAINS)),
+    )
     classify.add_argument("spec")
     classify.set_defaults(fn=_cmd_classify)
 

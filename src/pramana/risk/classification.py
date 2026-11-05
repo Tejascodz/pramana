@@ -59,6 +59,9 @@ ESSENTIAL_DOMAINS = {
     "customer_support_financial",
 }
 
+#: Every domain the classifier understands; anything else is refused by the spec loader.
+KNOWN_DOMAINS = set(ANNEX_III) | ESSENTIAL_DOMAINS | {"other"}
+
 TIER_ORDER = ["minimal", "limited", "gpai", "high", "prohibited"]
 
 

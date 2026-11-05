@@ -157,6 +157,65 @@ def _resolve(base: Path, value: str | None) -> Path | None:
     return path if path.is_absolute() else (base / path)
 
 
+def _check_use_case(use_case: Any) -> None:
+    """Unknown domains and prohibited-practice flags are refused, not ignored.
+
+    A typo would otherwise lower the risk tier silently: "credit-scoring" is not an
+    Annex III area, so a credit model would be classed as minimal risk, and an
+    unknown Art. 5 flag would let a prohibited practice through.
+    """
+    import difflib
+
+    from pramana.risk.classification import KNOWN_DOMAINS, PROHIBITED
+
+    if not isinstance(use_case, dict):
+        raise SpecError("use_case must be a mapping")
+
+    def hint(value: str, options: set[str]) -> str:
+        close = difflib.get_close_matches(value, sorted(options), n=1)
+        return f" Did you mean '{close[0]}'?" if close else ""
+
+    domain = use_case.get("domain", "other")
+    if domain not in KNOWN_DOMAINS:
+        raise SpecError(
+            f"use_case.domain '{domain}' is not a known domain.{hint(str(domain), KNOWN_DOMAINS)} "
+            f"Use 'other' if none fits. Known: {', '.join(sorted(KNOWN_DOMAINS))}"
+        )
+    flags = use_case.get("prohibited_practice_flags") or []
+    if not isinstance(flags, list):
+        raise SpecError("use_case.prohibited_practice_flags must be a list")
+    for flag in flags:
+        if flag not in PROHIBITED:
+            raise SpecError(
+                f"use_case.prohibited_practice_flags: unknown flag '{flag}'."
+                f"{hint(str(flag), set(PROHIBITED))} Known: {', '.join(sorted(PROHIBITED))}"
+            )
+
+
+def _check_acceptances(acceptances: Any) -> None:
+    """A risk acceptance needs a real check, a named approver, a reason and an expiry date."""
+    from datetime import date
+
+    from pramana.registry import all_checks
+
+    known = {d.check_id for d in all_checks()} | {"governance.manual_evidence"}
+    if not isinstance(acceptances, list):
+        raise SpecError("governance.risk_acceptances must be a list")
+    for i, acc in enumerate(acceptances, 1):
+        where = f"governance.risk_acceptances[{i}]"
+        if not isinstance(acc, dict):
+            raise SpecError(f"{where} must be a mapping")
+        if acc.get("check") not in known:
+            raise SpecError(f"{where}.check '{acc.get('check')}' is not a Pramana check id")
+        for field_name in ("approved_by", "justification", "expires"):
+            if not str(acc.get(field_name) or "").strip():
+                raise SpecError(f"{where}.{field_name} is required")
+        try:
+            date.fromisoformat(str(acc["expires"]))
+        except ValueError as exc:
+            raise SpecError(f"{where}.expires must be a date (YYYY-MM-DD)") from exc
+
+
 def load_spec(path: str | Path) -> AuditSpec:
     spec_path = Path(path)
     if not spec_path.exists():
@@ -173,6 +232,7 @@ def load_spec(path: str | Path) -> AuditSpec:
     for key in ("system", "use_case"):
         if key not in raw:
             raise SpecError(f"Spec is missing the '{key}' section")
+    _check_use_case(raw["use_case"])
     system = raw["system"]
     for key in ("name", "version", "type", "owner"):
         if key not in system:
@@ -266,6 +326,7 @@ def load_spec(path: str | Path) -> AuditSpec:
         agent["scenarios"] = _resolve(base, agent["scenarios"])
 
     governance = dict(raw.get("governance") or {})
+    _check_acceptances(governance.get("risk_acceptances") or [])
     manual = []
     for item in governance.get("manual_evidence", []) or []:
         entry = dict(item)

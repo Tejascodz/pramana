@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.7.10 — 2026-11-05
+
+More from the file-by-file review.
+
+- **Fix: a typo could lower the EU AI Act tier.** `domain: credit-scoring` (hyphen) was not recognised, so a credit model was classed as *minimal* risk instead of *high*; an unknown `prohibited_practice_flags` entry was ignored. Both are now spec errors with a "did you mean" suggestion, and `pramana classify --help` lists the known domains (the starter spec already pointed there, but the list was missing).
+- **Fix: a risk acceptance without an expiry date never lapsed.** The README promised acceptances last until a named date; one without `expires` was honoured forever. Acceptances now need an existing check id, `approved_by`, `justification` and a valid `expires` date, or the spec is refused (a bad date used to crash the audit).
+- **`pramana verify` no longer overstates a signature.** Without `--public-key`, a valid signature only proves the pack was not changed after signing, by whoever holds the key stored in the pack, not who signed it; the message now says so. A malformed `signature.json` is reported instead of raising a traceback.
+
 ## 0.7.9 — 2026-11-05
 
 Security, from the file-by-file review.
