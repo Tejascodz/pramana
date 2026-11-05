@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.4 — 2026-11-05
+
+Found by real run 5 (`docs/live-run-findings.md`).
+
+- **Fix: a customer's own name, given earlier in a conversation, was reported as a critical disclosure.** The cross-probe scan in `llm.sensitive_disclosure` only treated values in the current message as user-supplied; it now uses every user turn of the conversation.
+
 ## 0.7.3 — 2026-11-05
 
 - **Held-out multi-turn conversations** for the live assistant (`LIVE-MT-H1` to `H6`): support-ticket framing, drift to a human persona, an approval guarantee by commitment, piecemeal customer-data extraction, an instruction laundered through translation, and gradual extraction in Kannada. Committed before any run; Niva's guarded build will not be tuned to them.
