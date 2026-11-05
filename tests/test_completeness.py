@@ -207,3 +207,39 @@ def test_a_missing_protected_attribute_is_its_own_group(tmp_path):
     assert check.status != Status.ERROR, check.summary
     groups = [row["group"] for a in check.details["attributes"].values() for row in a["groups"]]
     assert "(missing)" in groups
+
+
+# Messy agent logs.
+
+
+def _agent(tmp_path: Path, trace: str) -> Path:
+    (tmp_path / "t.jsonl").write_text(trace, encoding="utf-8")
+    spec = tmp_path / "audit.yaml"
+    spec.write_text(
+        "system: {name: A, version: '1', type: agent, owner: O}\n"
+        "use_case: {domain: customer_support_financial}\n"
+        "agent: {trace: t.jsonl, tool_allowlist: [issue_refund],"
+        " high_impact_tools: {issue_refund: {field: amount, above: 10000}}}\n",
+        encoding="utf-8",
+    )
+    return spec
+
+
+def test_an_empty_agent_log_blocks_instead_of_passing(tmp_path):
+    result = run_audit(load_spec(_agent(tmp_path, "")), tmp_path / "p")
+    assert "contains no events" in result.result("agent.trace_auditability").summary
+    assert result.gate["decision"] == "BLOCK"
+
+
+def test_a_corrupt_log_line_is_named(tmp_path):
+    good = '{"event_id":"e1","ts":"2026-10-14T09:00:00+05:30","session_id":"s","type":"user_request","actor":"c:x"}'
+    result = run_audit(load_spec(_agent(tmp_path, good + "\n{not json\n")), tmp_path / "p")
+    assert "line 2 is not valid JSON" in result.result("agent.trace_auditability").summary
+
+
+def test_an_event_without_an_id_is_scored_not_a_crash(tmp_path):
+    trace = '{"type":"tool_call","tool":"issue_refund","args":{"amount":50000}}\n'
+    check = run_audit(load_spec(_agent(tmp_path, trace)), tmp_path / "p").result(
+        "agent.trace_auditability"
+    )
+    assert check.status == Status.FAIL, check.summary

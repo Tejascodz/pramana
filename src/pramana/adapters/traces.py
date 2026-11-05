@@ -165,13 +165,23 @@ def _read_records(path: Path) -> list[dict[str, Any]]:
     if not text:
         return []
     if text[0] == "[":
-        data = json.loads(text)
+        try:
+            data = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"{path.name} is not valid JSON ({exc.msg}, line {exc.lineno})"
+            ) from exc
         return list(data) if isinstance(data, list) else [data]
     records = []
-    for line in text.splitlines():
+    for line_no, line in enumerate(text.splitlines(), 1):
         line = line.strip()
         if line:
-            records.append(json.loads(line))
+            try:
+                records.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                raise ValueError(
+                    f"{path.name} line {line_no} is not valid JSON ({exc.msg}); fix or remove it"
+                ) from exc
     return records
 
 
@@ -203,11 +213,16 @@ def _iter_raw_records(path: Path) -> Iterator[dict[str, Any]]:
             return
         # JSON Lines: one object per line, constant memory.
         buffer = first
-        for line in fh:
+        for line_no, line in enumerate(fh, 1):
             record = (buffer + line).strip()
             buffer = ""
             if record:
-                yield json.loads(record)
+                try:
+                    yield json.loads(record)
+                except json.JSONDecodeError as exc:
+                    raise ValueError(
+                        f"{path.name} line {line_no} is not valid JSON ({exc.msg}); fix or remove it"
+                    ) from exc
 
 
 def stream_events(path: str | Path, fmt: str = "native") -> Iterator[dict[str, Any]]:

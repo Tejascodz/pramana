@@ -2,7 +2,10 @@
 
 ## 0.7.11 — 2026-11-05
 
-From feeding awkward but realistic data to the tabular checks.
+From feeding awkward but realistic data to the tabular checks and messy logs to the agent checks.
+
+- **Fix: an empty agent log passed the gate.** A trace file with no events (the signature of a broken logging pipeline) gave Gate: PASS. It is now "Not tested: … contains no events" and blocks.
+- A corrupt line in an agent log is named ("t.jsonl line 2 is not valid JSON") instead of a raw `JSONDecodeError`, and an event without an `event_id` is scored by the auditability check instead of crashing it with `KeyError`.
 
 - **Fix: one outcome class gave a performance PASS.** With every evaluation row labelled the same, AUC is undefined (NaN), every comparison with the threshold was false, and the check fell through to PASS. It now reports "Not tested: … only one outcome class", which blocks the gate as incomplete.
 - **Fix: a missing protected attribute crashed fairness.** A blank in a sensitive column (common in real data) raised a `TypeError` in the fairness and calibration checks. Missing values now form their own group, `(missing)`, and stay visible in the results.

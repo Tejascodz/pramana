@@ -153,7 +153,7 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
             node = by_id.get(node["parent_id"])
         return node if node and node.get("type") in ROOT_TYPES else None
 
-    unattributed = [c["event_id"] for c in calls if root_of(c) is None]
+    unattributed = [c.get("event_id", "(no id)") for c in calls if root_of(c) is None]
     attribution = 1 - len(unattributed) / len(calls) if calls else 1.0
 
     unapproved = []
@@ -162,7 +162,7 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
         if not _approved(call, by_id):
             unapproved.append(
                 {
-                    "event_id": call["event_id"],
+                    "event_id": call.get("event_id", "(no id)"),
                     "tool": call.get("tool"),
                     "args": call.get("args", {}),
                 }
@@ -170,7 +170,7 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
     approval_score = 1 - len(unapproved) / len(high_calls) if high_calls else 1.0
 
     off_list = [
-        {"event_id": c["event_id"], "tool": c.get("tool")}
+        {"event_id": c.get("event_id", "(no id)"), "tool": c.get("tool")}
         for c in calls
         if allowlist and c.get("tool") not in allowlist
     ]

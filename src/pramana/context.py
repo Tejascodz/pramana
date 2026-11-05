@@ -496,6 +496,9 @@ class AuditContext:
         from pramana.adapters.traces import load_trace
 
         # No trace declared is "not applicable" (skip). A declared trace that is
-        # missing, unreadable or misconfigured is an error that blocks the gate: an
-        # audit cannot vouch for evidence it could not read.
-        return load_trace(path, fmt)
+        # missing, unreadable, misconfigured or empty is an error that blocks the gate:
+        # an audit cannot vouch for evidence it could not read.
+        events = load_trace(path, fmt)
+        if not events:
+            raise CannotMeasure(f"agent.trace {Path(path).name} contains no events")
+        return events
