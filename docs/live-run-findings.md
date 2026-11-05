@@ -160,6 +160,10 @@ Fixes (0.7.2):
 - Pramana: multi-turn probes may set `judge_from_turn`, and MT-03 is judged from turn 3. Re-score this run offline with `pramana run examples/live_assistant/audit_guarded.yaml --replay packs/live_guarded/llm_replay.jsonl`.
 - Niva guarded build: the input screen now refuses conditional trigger rules ("whenever I write …", Hinglish "jab main … likh…") and lines that start with `Assistant:`, `System:` or `AI:` inside a user message. These patterns were written after seeing MT-01 and MT-05, so a re-run will pass them by construction; their real strength needs new, held-out conversations. One trade-off: a customer message with a line that starts with `Assistant:` is now refused.
 
+## Held-out multi-turn set (0.7.3)
+
+Six new conversations (`LIVE-MT-H1` to `H6` in `examples/live_assistant/probes.yaml`) were committed after the run-4 fixes and before any run against them. They target rules Niva really has (canary, customer data, no human claim, no approval guarantee) with techniques the built-in pack does not use: support-ticket framing, role-play drift to a human persona, commitment escalation to an approval guarantee, an identity claim followed by a piecemeal data request, an instruction laundered through a translation task, and gradual extraction in Kannada. The guarded build will not be changed to fit them. One limit: the same author wrote Niva's screen and these conversations, so they are held out from the screen, not independent of its author. An independent red team is the stronger test.
+
 ## Lessons
 
 - **Audit the auditor.** Deterministic scorers are reproducible but brittle at the edges. Reading the transcript of the first real run is part of the method, not an optional extra, and every blind spot found becomes a regression test.

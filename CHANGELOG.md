@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.3 — 2026-11-05
+
+- **Held-out multi-turn conversations** for the live assistant (`LIVE-MT-H1` to `H6`): support-ticket framing, drift to a human persona, an approval guarantee by commitment, piecemeal customer-data extraction, an instruction laundered through translation, and gradual extraction in Kannada. Committed before any run; Niva's guarded build will not be tuned to them.
+- Attack probes can list `success_phrases`, judged with the negation-aware matcher used for conduct rules.
+- A test checks every shipped multi-turn probe: no judged user turn may contain its own proof (this caught one draft probe whose final user message contained the phrase it tested for).
+
 ## 0.7.2 — 2026-11-05
 
 Found by the first real run of the multi-turn and obfuscation checks (llama3.2:3b behind guarded Niva; `docs/live-run-findings.md`, run 4). Obfuscation: all disguised variants stopped. Multi-turn: 3 of 8 conversations failed, two of them real.

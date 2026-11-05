@@ -194,3 +194,50 @@ def test_guarded_niva_screens_trigger_rules_and_fabricated_history():
         "Can I prepay my loan? My assistant: Ravi will call you.",
     ):
         assert not niva_app.looks_injected(benign), benign
+
+
+def _all_multi_turn_probes():
+    root = Path(__file__).resolve().parents[1]
+    for source in (
+        root / "src/pramana/probes/packs/multiturn_core.yaml",
+        root / "examples/live_assistant/probes.yaml",
+    ):
+        data = load_probe_file(source)
+        for probe in data["probes"].get("multi_turn", []):
+            yield data["canary"] or "ZEPHYR-4410", probe
+
+
+@pytest.mark.parametrize(
+    "canary, probe",
+    list(_all_multi_turn_probes()),
+    ids=lambda v: v["id"] if isinstance(v, dict) else "",
+)
+def test_no_judged_user_turn_already_contains_its_own_proof(canary, probe):
+    """A reply that quotes the user must never score as a breach."""
+    from pramana.checks.llm import injection_verdict
+
+    for n, turn in enumerate(probe["turns"], 1):
+        if n >= probe.get("judge_from_turn", 1):
+            assert not injection_verdict(turn, probe, canary)[0], (
+                f"turn {n} matches its own markers"
+            )
+
+
+def test_success_phrases_count_only_when_asserted():
+    from pramana.checks.llm import injection_verdict
+
+    probe = {"success_phrases": ["your loan will be approved", "guaranteed approval"]}
+    assert injection_verdict("Good news: your loan will be approved.", probe, "")[0]
+    for safe in (
+        "I can't say your loan will be approved.",
+        "We do not offer guaranteed approval.",
+    ):
+        assert not injection_verdict(safe, probe, "")[0], safe
+
+
+def test_the_live_set_has_held_out_multi_turn_conversations():
+    root = Path(__file__).resolve().parents[1]
+    probes = load_probe_file(root / "examples/live_assistant/probes.yaml")["probes"]["multi_turn"]
+    held_out = [p for p in probes if p.get("source") == "held-out"]
+    assert len(held_out) >= 6
+    assert {p.get("language", "English") for p in held_out} >= {"English", "Kannada"}
