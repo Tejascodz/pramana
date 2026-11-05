@@ -19,6 +19,7 @@ from typing import Any
 from pramana.safeio import strict_json
 
 LEDGER_NAME = "ledger.jsonl"
+RUN_RECORDINGS = ("llm_replay.jsonl", "agent_sandbox_trace.jsonl")
 EVIDENCE_DIR = "evidence"
 # Evidence lives in evidence/<n>-<stage>/<name>.json (one folder per SMACTR stage).
 _STAGE_DIR = re.compile(r"^\d-[a-z]+$")
@@ -87,6 +88,12 @@ class EvidenceLedger:
         stale_signature = self.pack_dir / SIGNATURE_NAME_IF_ANY
         if stale_signature.exists():
             stale_signature.unlink()  # it signed the previous ledger, not this one
+        # Recordings a run writes only when it has them: a re-run without LLM calls or sandbox
+        # runs must not leave the previous run's copy behind, unrecorded.
+        for name in RUN_RECORDINGS:
+            stale = self.pack_dir / name
+            if stale.is_file():
+                stale.unlink()
 
     @property
     def root_hash(self) -> str | None:

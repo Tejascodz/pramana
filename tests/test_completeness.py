@@ -622,3 +622,30 @@ def test_probe_files_that_could_never_fail_are_refused(tmp_path, body, problem):
     path.write_text(body)
     with pytest.raises(ProbeFileError, match=problem):
         load_probe_file(path)
+
+
+def test_run_refuses_a_folder_that_is_not_a_pack_and_a_bad_date(tmp_path, credit_example, capsys):
+    from pramana.cli import main
+
+    spec = str(_credit_copy(tmp_path, with_data=credit_example))
+    project = tmp_path / "project"
+    project.mkdir()
+    (project / "notes.txt").write_text("mine")
+    assert main(["run", spec, "--out", str(project)]) == 3
+    assert "not an earlier audit pack" in capsys.readouterr().err
+    assert main(["run", spec, "--out", str(tmp_path / "p"), "--date", "21-10-2026"]) == 3
+    assert "is not a date" in capsys.readouterr().err
+
+
+def test_a_rerun_into_the_same_pack_drops_old_recordings(tmp_path, credit_example):
+    from pramana.audit.ledger import verify_pack
+    from pramana.cli import main
+
+    spec = str(_credit_copy(tmp_path, with_data=credit_example))
+    out = tmp_path / "pack"
+    main(["run", spec, "--out", str(out)])
+    (out / "llm_replay.jsonl").write_text('{"left": "from an earlier run"}\n')
+    main(["run", spec, "--out", str(out)])
+    assert not (out / "llm_replay.jsonl").exists()
+    ok, problems = verify_pack(out)
+    assert ok, problems

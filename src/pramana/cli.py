@@ -55,7 +55,20 @@ def _cmd_run(args: argparse.Namespace) -> int:
     if args.trust_model:
         spec.trust_pickled_model = True
     out = Path(args.out or f"audit-{spec.system['version']}")
-    audit_date = date.fromisoformat(args.date) if args.date else None
+    # A pack folder holds one audit. Writing into a folder of other files (for example
+    # "--out .") would mix them into the pack, and verification would then fail.
+    if out.is_dir() and any(out.iterdir()) and not (out / "ledger.jsonl").is_file():
+        print(
+            f"error: {out} already contains files and is not an earlier audit pack; "
+            "choose an empty or new folder for --out",
+            file=sys.stderr,
+        )
+        return EXIT_INPUT
+    try:
+        audit_date = date.fromisoformat(args.date) if args.date else None
+    except ValueError:
+        print(f"error: --date {args.date!r} is not a date (use YYYY-MM-DD)", file=sys.stderr)
+        return EXIT_INPUT
 
     print(f"Pramana {__version__}: auditing {spec.name} v{spec.system['version']}")
     try:
