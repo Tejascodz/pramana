@@ -20,6 +20,23 @@ STATE_CLASS = {
 STATE_ORDER = ["evidenced", "partial", "deficient", "not tested"]
 
 
+#: Characters that fit the coverage chart's label column on one line.
+LABEL_CHARS = 32
+
+
+def _wrap_label(text: str, width: int) -> list[str]:
+    """Split a label into at most two lines at a word boundary, so long names stay visible."""
+    if len(text) <= width:
+        return [text]
+    cut = text.rfind(" ", 0, width + 1)
+    if cut <= 0:
+        cut = width
+    first, rest = text[:cut].rstrip(), text[cut:].strip()
+    if len(rest) > width:
+        rest = rest[: width - 1].rstrip() + "…"
+    return [first, rest]
+
+
 def coverage_bars(frameworks: dict[str, Any]) -> str:
     rows = [
         (fid, fw) for fid, fw in frameworks.items() if sum(fw["totals"][s] for s in STATE_ORDER) > 0
@@ -35,10 +52,13 @@ def coverage_bars(frameworks: dict[str, Any]) -> str:
         y = 4 + i * (row_h + gap)
         totals = fw["totals"]
         applicable = sum(totals[s] for s in STATE_ORDER)
-        parts.append(
-            f'<text class="t-label" x="{label_w - 12}" y="{y + row_h / 2 + 4}" text-anchor="end">'
-            f"{escape(fw['name'])}</text>"
+        lines = _wrap_label(fw["name"], LABEL_CHARS)
+        first_y = y + row_h / 2 + 4 - (len(lines) - 1) * 6.5
+        spans = "".join(
+            f'<tspan x="{label_w - 12}" y="{first_y + j * 13:.1f}">{escape(line)}</tspan>'
+            for j, line in enumerate(lines)
         )
+        parts.append(f'<text class="t-label" text-anchor="end">{spans}</text>')
         x = float(label_w)
         for state in STATE_ORDER:
             n = totals[state]

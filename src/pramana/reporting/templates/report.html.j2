@@ -99,6 +99,11 @@ section.card { background: var(--surface-1); border: 1px solid var(--border); bo
 .lead { color: var(--text-secondary); margin: 0 0 16px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media (max-width: 760px) { .grid2 { grid-template-columns: 1fr; } }
+/* Heatmap beside the register on wide screens, above it on narrower ones, so the
+   table never has to scroll sideways on a laptop or tablet. */
+.risk-grid { grid-template-columns: 380px 1fr; align-items: start; }
+.risk-grid > * { min-width: 0; }
+@media (max-width: 1180px) { .risk-grid { grid-template-columns: 1fr; } .risk-grid svg { max-width: 420px; } }
 ul.clean { list-style: none; padding: 0; margin: 0; }
 ul.clean li { padding: 8px 0; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: baseline; }
 ul.clean li:first-child { border-top: none; }
@@ -241,7 +246,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 <section class="card" id="risks">
   <p class="eyebrow">Risk register</p>
   <h2>{{ r.risks | length }} risk{{ '' if r.risks | length == 1 else 's' }} from {{ findings_count }} finding{{ '' if findings_count == 1 else 's' }}</h2>
-  <div class="grid2" style="grid-template-columns: 380px 1fr; align-items:start">
+  <div class="grid2 risk-grid">
     <div>{{ heatmap | safe }}<p class="note">Score = likelihood × impact. * marks a formally accepted risk.</p></div>
     <div class="table-wrap">
       <table>
@@ -276,7 +281,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
           <tr><td class="mono">{{ p.probe_id }}</td>
           <td><span class="chip {{ state }}">{{ state }}</span>{% if p.get('needs_review') %} <span class="chip warn">review</span>{% endif %}</td>
           {% if multi_sample %}<td class="num">{{ p.get('samples_failed', 0) }}/{{ p.get('samples_evaluated', 1) }}</td>{% endif %}
-          <td class="note">{{ p.get('technique') or p.get('rule') or '' }}{% if p.get('language') %} · {{ p.language }}{% endif %}{% if p.get('source') == 'held-out' %} · held out{% endif %}</td>
+          {% set tech = p.get('technique') or p.get('rule') or '' %}
+          <td class="note">{{ tech }}{% if p.get('language') and p.language not in tech %} · {{ p.language }}{% endif %}{% if p.get('source') == 'held-out' and 'held out' not in tech %} · held out{% endif %}</td>
           <td>{{ p.response_excerpt }}</td></tr>
         {% endfor %}</tbody></table></div>
       {% endif %}

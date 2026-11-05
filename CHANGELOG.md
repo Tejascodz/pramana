@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.7.6 — 2026-11-05
+
+- **Report layout fixes** found while regenerating the README screenshots: long framework names in the coverage chart ran off its left edge (they now wrap onto two lines), the risk register squeezed its table beside the heatmap below laptop width (it now stacks), and probe rows repeated their language or "held out" when the technique already said so.
+- README screenshots regenerated from the current reports at 1600 px (2.4 MB → 0.5 MB). The LLM screenshot now shows real `llama3.2:3b` replies from run 6, re-scored from its recording with the current template.
+
 ## 0.7.5 — 2026-11-05
 
 From a full review of the repository (code, history and documentation).

@@ -56,7 +56,7 @@ pip install "pramana-audit @ git+https://github.com/Tejascodz/pramana"
 pramana demo                              # runs three bundled audits in a few seconds
 ```
 
-The command and the import are both `pramana`. To pin a version, add a release tag from the [Releases page](https://github.com/Tejascodz/pramana/releases) or a commit hash to the end of the URL (for example `...pramana@v0.7.5`, once that release is tagged). Optional extras: `[signing]` (Ed25519 signed packs), `[skops]` (load `.skops` models without pickle), `[dashboard]` (Streamlit viewer) or `[all]`, for example `pip install "pramana-audit[all] @ git+https://github.com/Tejascodz/pramana"`. Python 3.10 to 3.13 on Linux, macOS and Windows.
+The command and the import are both `pramana`. To pin a version, add a release tag from the [Releases page](https://github.com/Tejascodz/pramana/releases) or a commit hash to the end of the URL (for example `...pramana@v0.7.6`, once that release is tagged). Optional extras: `[signing]` (Ed25519 signed packs), `[skops]` (load `.skops` models without pickle), `[dashboard]` (Streamlit viewer) or `[all]`, for example `pip install "pramana-audit[all] @ git+https://github.com/Tejascodz/pramana"`. Python 3.10 to 3.13 on Linux, macOS and Windows.
 
 Each tagged release also has a ready-built wheel on the [Releases page](https://github.com/Tejascodz/pramana/releases), with SHA-256 checksums and a build attestation that proves it was built from this repository. See [Verifying a release](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md#verifying-a-release).
 
@@ -101,11 +101,13 @@ Each case study plants known defects, so the audit can be checked against a grou
 ![Fairness spotlight](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/fairness.png)
 
 <details>
-<summary>More report screenshots: risk register and LLM probe results</summary>
+<summary>More report screenshots: risk register, and multi-turn results from a real llama3.2:3b run</summary>
 
 ![Risk register](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/risk-register.png)
 
-![LLM probe findings](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/llm-findings.png)
+![Multi-turn findings from a real llama3.2:3b run](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/llm-findings.png)
+
+*Above: guarded Niva on `llama3.2:3b`, three samples per conversation, including six held-out conversations. The replies are the model's own, recorded on a MacBook (run 6 in [live-run-findings.md](https://github.com/Tejascodz/pramana/blob/main/docs/live-run-findings.md)). The other screenshots come from the bundled credit-scoring case study.*
 
 </details>
 

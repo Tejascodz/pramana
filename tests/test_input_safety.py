@@ -185,3 +185,21 @@ def test_builtin_pack_names_cannot_escape_the_library(tmp_path, name):
     p.write_text(f"include: ['builtin:{name}']\n", encoding="utf-8")
     with pytest.raises(ProbeFileError, match="Unknown built-in"):
         load_probe_file(p)
+
+
+def test_long_framework_names_wrap_instead_of_running_off_the_chart():
+    from pramana.reporting.charts import LABEL_CHARS, _wrap_label, coverage_bars
+
+    name = "ISO/IEC 42005 AI system impact assessment"
+    lines = _wrap_label(name, LABEL_CHARS)
+    assert len(lines) == 2 and all(len(line) <= LABEL_CHARS for line in lines)
+    assert " ".join(lines) == name
+    svg = coverage_bars(
+        {
+            "x": {
+                "name": name,
+                "totals": {"evidenced": 1, "partial": 0, "deficient": 0, "not tested": 1},
+            }
+        }
+    )
+    assert svg.count("<tspan") == 2
