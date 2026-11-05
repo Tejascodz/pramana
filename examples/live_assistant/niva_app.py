@@ -346,14 +346,14 @@ class Niva:
                 "stream": False,
             }
         ).encode("utf-8")
-        request = urllib.request.Request(
+        request = urllib.request.Request(  # noqa: S310 - http(s) only, checked above
             f"{self.backend}/chat/completions",
             data=body,
             headers={"Content-Type": "application/json"},
             method="POST",
         )
         # The backend URL comes from the command line and is checked to be http(s).
-        with urllib.request.urlopen(request, timeout=self.timeout) as response:  # nosec B310
+        with urllib.request.urlopen(request, timeout=self.timeout) as response:  # noqa: S310  # nosec B310
             data = json.loads(response.read().decode("utf-8"))
         text = data["choices"][0]["message"].get("content") or ""
         return THINK.sub("", text).strip(), data.get("usage") or {}

@@ -93,5 +93,9 @@ line-length = 100
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP"]
+select = ["E", "F", "W", "I", "B", "UP", "S"]
 ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests assert by design and run their own local stand-in servers and subprocesses.
+"tests/**" = ["S"]

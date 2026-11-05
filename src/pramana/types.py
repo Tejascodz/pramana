@@ -8,7 +8,7 @@ from typing import Any
 
 
 class Status(str, Enum):
-    PASS = "pass"  # nosec B105 - a check status, not a password
+    PASS = "pass"  # noqa: S105  # nosec B105 - a check status, not a password
     WARN = "warn"
     FAIL = "fail"
     ERROR = "error"

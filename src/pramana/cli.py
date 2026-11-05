@@ -120,7 +120,7 @@ def _verify_attestation(pack: Path, repo: str) -> int:
         print("error: --attested-by needs the GitHub CLI (gh) on PATH", file=sys.stderr)
         return EXIT_INPUT
     ledger = pack / "ledger.jsonl"
-    proc = subprocess.run(  # nosec B603 - fixed argument list, no shell
+    proc = subprocess.run(  # noqa: S603  # nosec B603 - fixed argument list, no shell
         [gh, "attestation", "verify", str(ledger), "--repo", repo, "--format", "json"],
         capture_output=True,
         text=True,

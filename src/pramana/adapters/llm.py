@@ -305,7 +305,7 @@ class _HTTPBase:
         headers = {"Content-Type": "application/json", "Accept": "application/json", **self.headers}
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 2):
-            request = urllib.request.Request(url, data=payload, headers=headers, method=method)
+            request = urllib.request.Request(url, data=payload, headers=headers, method=method)  # noqa: S310 - http(s) only, checked above
             started = time.perf_counter()
             try:
                 # Scheme and host were checked by check_endpoint; redirects are refused.
@@ -331,7 +331,7 @@ class _HTTPBase:
             except json.JSONDecodeError as exc:
                 raise RuntimeError(f"endpoint did not return JSON: {exc}") from exc
             if attempt <= self.max_retries:
-                jitter = 1 + random.random() * 0.25  # nosec B311 - retry jitter, not security
+                jitter = 1 + random.random() * 0.25  # noqa: S311  # nosec B311 - retry jitter, not security
                 time.sleep(self.backoff * (2 ** (attempt - 1)) * jitter)
         raise last_error or RuntimeError("request failed")
 
