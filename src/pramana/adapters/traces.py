@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterable, Iterator
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -63,6 +64,29 @@ def _as_text(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, default=str)
 
 
+def _otel_time(span: dict[str, Any]) -> str:
+    """The span's start as ISO 8601. OTLP JSON gives nanoseconds since the epoch."""
+    value = _first(span, "start_time", "startTime", "timestamp")
+    if value is not None:
+        return str(value)
+    nanos = _first(span, "startTimeUnixNano", "start_time_unix_nano")
+    try:
+        return datetime.fromtimestamp(int(nanos) / 1e9, tz=timezone.utc).isoformat()
+    except (TypeError, ValueError, OverflowError, OSError):
+        return ""
+
+
+def _otel_args(value: Any) -> dict[str, Any]:
+    """Tool arguments as a dict. The GenAI conventions record them as a JSON string."""
+    if isinstance(value, str):
+        try:
+            parsed = json.loads(value)
+        except json.JSONDecodeError:
+            return {"input": value}
+        return parsed if isinstance(parsed, dict) else {"input": parsed}
+    return value if isinstance(value, dict) else {"input": value}
+
+
 def from_otel_spans(spans: Iterable[dict[str, Any]]) -> Iterator[dict[str, Any]]:
     """Map OpenTelemetry GenAI spans to Pramana events.
 
@@ -82,7 +106,7 @@ def from_otel_spans(spans: Iterable[dict[str, Any]]) -> Iterator[dict[str, Any]]
         agent_name = _first(attr, "gen_ai.agent.name", default=system)
         event: dict[str, Any] = {
             "event_id": _first(span, "span_id", "spanId", "id"),
-            "ts": _first(span, "start_time", "startTime", "timestamp", default=""),
+            "ts": _otel_time(span),
             "session_id": _first(attr, "gen_ai.conversation.id", "session.id")
             or _first(span, "trace_id", "traceId", default=""),
             "type": etype,
@@ -93,7 +117,7 @@ def from_otel_spans(spans: Iterable[dict[str, Any]]) -> Iterator[dict[str, Any]]
             event["tool"] = tool
             args = _first(attr, "gen_ai.tool.call.arguments", "gen_ai.tool.arguments")
             if args is not None:
-                event["args"] = args if isinstance(args, dict) else {"input": args}
+                event["args"] = _otel_args(args)
         model = _first(attr, "gen_ai.request.model", "gen_ai.response.model")
         if model:
             event["model"] = model
@@ -159,6 +183,12 @@ def from_langchain_runs(runs: Iterable[dict[str, Any]]) -> Iterator[dict[str, An
         yield event
 
 
+def _object(record: Any, where: str) -> dict[str, Any]:
+    if not isinstance(record, dict):
+        raise ValueError(f"{where} is not a JSON object (got {type(record).__name__})")
+    return record
+
+
 def _read_records(path: Path) -> list[dict[str, Any]]:
     """Read either a JSON array or JSON Lines file into a list of dicts."""
     text = path.read_text(encoding="utf-8").strip()
@@ -171,17 +201,19 @@ def _read_records(path: Path) -> list[dict[str, Any]]:
             raise ValueError(
                 f"{path.name} is not valid JSON ({exc.msg}, line {exc.lineno})"
             ) from exc
-        return list(data) if isinstance(data, list) else [data]
+        data = data if isinstance(data, list) else [data]
+        return [_object(r, f"{path.name} item {i}") for i, r in enumerate(data, 1)]
     records = []
     for line_no, line in enumerate(text.splitlines(), 1):
         line = line.strip()
         if line:
             try:
-                records.append(json.loads(line))
+                record = json.loads(line)
             except json.JSONDecodeError as exc:
                 raise ValueError(
                     f"{path.name} line {line_no} is not valid JSON ({exc.msg}); fix or remove it"
                 ) from exc
+            records.append(_object(record, f"{path.name} line {line_no}"))
     return records
 
 
@@ -203,26 +235,35 @@ def load_trace(path: str | Path, fmt: str = "native") -> list[dict[str, Any]]:
 def _iter_raw_records(path: Path) -> Iterator[dict[str, Any]]:
     """Yield raw records one at a time. JSON Lines streams; a JSON array is read whole."""
     with path.open(encoding="utf-8") as fh:
+        skipped_lines = 0
         first = fh.read(1)
         while first and first.isspace():
+            skipped_lines += first == "\n"
             first = fh.read(1)
         if first == "[":
-            rest = first + fh.read()
-            data = json.loads(rest)
-            yield from (data if isinstance(data, list) else [data])
+            try:
+                data = json.loads(first + fh.read())
+            except json.JSONDecodeError as exc:
+                raise ValueError(
+                    f"{path.name} is not valid JSON ({exc.msg}, line {exc.lineno + skipped_lines})"
+                ) from exc
+            data = data if isinstance(data, list) else [data]
+            for i, r in enumerate(data, 1):
+                yield _object(r, f"{path.name} item {i}")
             return
         # JSON Lines: one object per line, constant memory.
         buffer = first
-        for line_no, line in enumerate(fh, 1):
+        for line_no, line in enumerate(fh, 1 + skipped_lines):
             record = (buffer + line).strip()
             buffer = ""
             if record:
                 try:
-                    yield json.loads(record)
+                    parsed = json.loads(record)
                 except json.JSONDecodeError as exc:
                     raise ValueError(
                         f"{path.name} line {line_no} is not valid JSON ({exc.msg}); fix or remove it"
                     ) from exc
+                yield _object(parsed, f"{path.name} line {line_no}")
 
 
 def stream_events(path: str | Path, fmt: str = "native") -> Iterator[dict[str, Any]]:

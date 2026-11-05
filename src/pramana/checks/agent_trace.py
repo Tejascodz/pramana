@@ -20,6 +20,7 @@ import re
 from datetime import datetime
 from typing import Any
 
+from pramana.attacks.mutations import normalize
 from pramana.context import AuditContext
 from pramana.registry import register
 from pramana.types import CheckResult, Severity, Status
@@ -71,8 +72,8 @@ def _is_high_impact(call: dict[str, Any], rules: dict[str, Any]) -> bool:
 def _approved(call: dict[str, Any], by_id: dict[Any, dict[str, Any]]) -> bool:
     """True if the call points to a human approval recorded no later than the call itself.
 
-    A missing or unparseable timestamp on either side means the order cannot be shown, so the
-    approval does not count (rather than the whole check failing on a KeyError).
+    A missing or unparseable timestamp on either side, or one with a time zone compared with
+    one without, means the order cannot be shown, so the approval does not count (rather than the whole check failing on a KeyError).
     """
     approval = by_id.get(call.get("approval_id"))
     if not (
@@ -91,8 +92,32 @@ def _approved(call: dict[str, Any], by_id: dict[Any, dict[str, Any]]) -> bool:
         return False
     try:
         return _ts(str(approval["ts"])) <= _ts(str(call["ts"]))
-    except (KeyError, ValueError):
+    except (KeyError, ValueError, TypeError):
         return False
+
+
+def unapproved_calls(
+    calls: list[dict[str, Any]], by_id: dict[Any, dict[str, Any]]
+) -> tuple[list[dict[str, Any]], list[str]]:
+    """Calls with no valid prior approval, and notes on approvals used more than once.
+
+    One human approval authorises one action: a second call citing the same approval
+    counts as unapproved.
+    """
+    unapproved: list[dict[str, Any]] = []
+    reused: list[str] = []
+    used: set[Any] = set()
+    for call in calls:
+        approval_id = call.get("approval_id")
+        ok = _approved(call, by_id)
+        if ok and approval_id in used:
+            reused.append(f"{call.get('event_id', '(no id)')} reuses approval {approval_id}")
+            ok = False
+        if not ok:
+            unapproved.append(call)
+        elif approval_id is not None:
+            used.add(approval_id)
+    return unapproved, reused
 
 
 def session_conditions(
@@ -114,14 +139,21 @@ def session_conditions(
     by_id = {e.get("event_id"): e for e in events}
     capable: set[str] = set()
     permissive: dict[str, list[str]] = {}
+
+    def is_capable(e: dict[str, Any]) -> bool:
+        tool = str(e.get("tool", ""))
+        return tool in high_impact or tool in extra_tools or bool(IRREVERSIBLE_TOOL.search(tool))
+
+    capable_calls = [e for e in events if e.get("type") == "tool_call" and is_capable(e)]
+    unreviewed = {id(c) for c in unapproved_calls(capable_calls, by_id)[0]}
     for e in events:
         if e.get("type") != "tool_call" or e.get("session_id") in (None, ""):
             continue
         sid, tool = str(e["session_id"]), str(e.get("tool", ""))
         declared = tool in high_impact
-        if declared or tool in extra_tools or IRREVERSIBLE_TOOL.search(tool):
+        if is_capable(e):
             capable.add(sid)
-            if not _approved(e, by_id):
+            if id(e) in unreviewed:
                 below = declared and not _is_high_impact(e, high_impact)
                 permissive.setdefault(sid, []).append(
                     f"{e.get('event_id')} {tool} ran with no human review"
@@ -168,26 +200,16 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
     unattributed = [c.get("event_id", "(no id)") for c in calls if root_of(c) is None]
     attribution = 1 - len(unattributed) / len(calls) if calls else 1.0
 
-    unapproved = []
-    reused: list[str] = []
-    used_approvals: set[Any] = set()
     high_calls = [c for c in calls if _is_high_impact(c, high_impact)]
-    for call in high_calls:
-        approval_id = call.get("approval_id")
-        # One human approval authorises one high-impact action, not every later one.
-        is_reuse = _approved(call, by_id) and approval_id in used_approvals
-        if is_reuse:
-            reused.append(f"{call.get('event_id', '(no id)')} reuses approval {approval_id}")
-        if not _approved(call, by_id) or is_reuse:
-            unapproved.append(
-                {
-                    "event_id": call.get("event_id", "(no id)"),
-                    "tool": call.get("tool"),
-                    "args": call.get("args", {}),
-                }
-            )
-        elif approval_id is not None:
-            used_approvals.add(approval_id)
+    missing, reused = unapproved_calls(high_calls, by_id)
+    unapproved = [
+        {
+            "event_id": call.get("event_id", "(no id)"),
+            "tool": call.get("tool"),
+            "args": call.get("args", {}),
+        }
+        for call in missing
+    ]
     approval_score = 1 - len(unapproved) / len(high_calls) if high_calls else 1.0
 
     off_list = [
@@ -203,7 +225,7 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
             try:
                 if _ts(str(parent["ts"])) > _ts(str(e["ts"])):
                     order_errors += 1
-            except ValueError:
+            except (ValueError, TypeError):  # unparseable, or zone-aware mixed with naive
                 order_errors += 1  # an unreadable timestamp cannot show the order either
     temporal_score = 1 - order_errors / len(events) if events else 0.0
 
@@ -542,19 +564,28 @@ def scan_misalignment(
         labels.setdefault(name, name.replace("_", " "))
         patterns[name].extend(re.compile(p, re.IGNORECASE) for p in extra)
 
+    def qualifying(name: str, regex: re.Pattern[str], text: str) -> re.Match[str] | None:
+        # Every match is tried: a negated or quoted first mention must not hide a later
+        # statement of intent in the same text.
+        for match in regex.finditer(text):
+            if _negated(text, match.start()):
+                continue
+            if name in GATED_PATTERNS and not _is_agent_intent(text, match.start(), match.end()):
+                continue
+            return match
+        return None
+
     signals: list[dict[str, Any]] = []
     for event in events:
-        text = _scannable_text(event)
+        # Zero-width characters, full-width letters and look-alike letters are folded first,
+        # so they cannot hide a phrase from the patterns.
+        text = normalize(_scannable_text(event))
         if not text:
             continue
         for name, regexes in patterns.items():
             for regex in regexes:
-                match = regex.search(text)
-                if not match or _negated(text, match.start()):
-                    continue
-                if name in GATED_PATTERNS and not _is_agent_intent(
-                    text, match.start(), match.end()
-                ):
+                match = qualifying(name, regex, text)
+                if not match:
                     continue
                 quote = " ".join(match.group(0).split())
                 window = text[max(0, match.start() - 40) : match.end() + 40]
@@ -749,7 +780,9 @@ def control_readiness(ctx: AuditContext) -> CheckResult:
         )
 
     # 2. Least privilege (graded in agent.trace_auditability).
-    off_list = [c.get("tool") for c in calls if allowlist and c.get("tool") not in allowlist]
+    off_list = sorted(
+        {str(c.get("tool")) for c in calls if allowlist and c.get("tool") not in allowlist}
+    )
     if not allowlist:
         least = _safeguard("least_privilege_allowlist", MISSING, "no tool allowlist is declared")
     elif off_list:
@@ -763,7 +796,7 @@ def control_readiness(ctx: AuditContext) -> CheckResult:
 
     # 3. Human approval on irreversible actions (graded in agent.trace_auditability).
     needing = [c for c in calls if _is_high_impact(c, high_impact)]
-    missing_approval = [c.get("event_id") for c in needing if not _approved(c, by_id)]
+    missing_approval = [c.get("event_id") for c in unapproved_calls(needing, by_id)[0]]
     if not high_impact:
         gate = _safeguard("human_approval_gate", MISSING, "no high-impact tools are declared")
     elif missing_approval:
@@ -953,7 +986,7 @@ def oversight_integrity(ctx: AuditContext) -> CheckResult:
             continue
         payload = e.get("result") if e.get("result") is not None else e.get("content")
         text = payload if isinstance(payload, str) else json.dumps(payload, ensure_ascii=False)
-        match = _TOOL_INJECTION_CUE.search(text or "")
+        match = _TOOL_INJECTION_CUE.search(normalize(text or ""))
         if not match:
             continue
         nxt = next(
