@@ -47,6 +47,16 @@ def _lookup(doc: dict[str, Any], dotted: str) -> Any:
     return node
 
 
+def _number(value: Any) -> float | None:
+    """A documented figure as a number, or None if it is not one (reported, never a crash)."""
+    if isinstance(value, bool):
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def _filled(value: Any) -> bool:
     if value is None:
         return False
@@ -79,17 +89,24 @@ def model_card(ctx: AuditContext) -> CheckResult:
     completeness = 1 - len(missing) / len(required)
 
     mismatches = []
+    tabular = ctx.spec.system_type == "tabular_classifier"
     documented_threshold = _lookup(doc, "metrics.decision_threshold")
-    if documented_threshold is not None and ctx.spec.system_type == "tabular_classifier":
-        if abs(float(documented_threshold) - ctx.spec.decision_threshold) > 1e-9:
+    if documented_threshold is not None and tabular:
+        value = _number(documented_threshold)
+        if value is None:
+            mismatches.append(f"documented threshold {documented_threshold!r} is not a number")
+        elif abs(value - ctx.spec.decision_threshold) > 1e-9:
             mismatches.append(
                 f"documented threshold {documented_threshold} differs from deployed "
                 f"{ctx.spec.decision_threshold}"
             )
-    claimed = _lookup(doc, "metrics.claimed") or {}
-    if "auc" in claimed and ctx.spec.system_type == "tabular_classifier":
+    claimed = _lookup(doc, "metrics.claimed")
+    if isinstance(claimed, dict) and "auc" in claimed and tabular:
+        value = _number(claimed["auc"])
         measured = safe_auc(ctx.eval_y, ctx.eval_scores)
-        if float(claimed["auc"]) - measured > 0.02:
+        if value is None:
+            mismatches.append(f"documented AUC {claimed['auc']!r} is not a number")
+        elif value - measured > 0.02:
             mismatches.append(f"documented AUC {claimed['auc']} but measured {measured:.3f}")
 
     if completeness < 0.6:

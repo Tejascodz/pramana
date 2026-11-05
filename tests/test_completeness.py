@@ -348,3 +348,29 @@ def test_a_misspelt_monotonicity_rule_is_reported_not_silently_dropped(tmp_path,
     check = run_audit(spec, tmp_path / "p").result("robustness.perturbation")
     assert check.status != Status.PASS
     assert "monthly_incom (increasing)" in check.summary
+
+
+def test_identifiers_in_a_column_with_a_blank_are_still_found():
+    import io
+
+    import pandas as pd
+
+    from pramana.checks.privacy import scan_frame
+
+    gap = pd.read_csv(io.StringIO("mob,x\n9876501234,1\n,2\n9812345670,3\n"))
+    assert [h["kind"] for h in scan_frame(gap, "d")] == ["india_mobile"]
+    assert scan_frame(pd.DataFrame({0: ["a@b.com"] * 3}), "d")  # non-text column names
+
+
+def test_non_numeric_documented_figures_are_findings_not_crashes(tmp_path, credit_example):
+    spec_path = _credit_copy(tmp_path, with_data=credit_example)
+    card = spec_path.parent / "model_card.yaml"
+    text = card.read_text(encoding="utf-8")
+    import re
+
+    text = re.sub(r"decision_threshold: .*", 'decision_threshold: "0.5 (tuned)"', text)
+    card.write_text(text, encoding="utf-8")
+    spec = load_spec(spec_path)
+    spec.checks = {"include": ["documentation.model_card"]}
+    check = run_audit(spec, tmp_path / "p").result("documentation.model_card")
+    assert check.status == Status.FAIL and "is not a number" in check.summary

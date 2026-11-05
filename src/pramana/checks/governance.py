@@ -21,6 +21,8 @@ def risk_classification(ctx: AuditContext) -> CheckResult:
     result = classify(use_case, ctx.spec.system_type)
     result.obligations = obligations(result, use_case, load_library(), ctx.audit_date)
     declared = use_case.get("declared_eu_tier")
+    if isinstance(declared, str):
+        declared = declared.strip().lower() or None
 
     if result.eu_tier == "prohibited":
         status, severity = Status.FAIL, Severity.CRITICAL

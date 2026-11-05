@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from pramana.context import AuditContext, MissingArtifact
+from pramana.context import AuditContext, CannotMeasure, MissingArtifact
 from pramana.metrics import safe_auc
 from pramana.registry import register
 from pramana.types import CheckResult, Severity, Status
@@ -44,9 +44,13 @@ def scan_frame(df: pd.DataFrame, dataset: str) -> list[dict[str, Any]]:
     hits = []
     for col in df.columns:
         series = df[col].dropna()
-        hint = any(h in col.lower() for h in NAME_HINTS)
+        hint = any(h in str(col).lower() for h in NAME_HINTS)
         if series.empty:
             continue
+        if pd.api.types.is_float_dtype(series) and (series % 1 == 0).all():
+            # Whole numbers stored as float because the column has a blank somewhere: a
+            # mobile number read as 9876501234.0 must still be recognised.
+            series = series.astype("int64")
         sample = series.astype(str).head(SAMPLE)
         best_kind, best_rate = None, 0.0
         if not pd.api.types.is_float_dtype(series):
@@ -159,6 +163,11 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
     limit = ctx.spec.threshold("mia_auc_max")
     members, non_members = ctx.ref_df, ctx.eval_df
     n = min(len(members), len(non_members), 5000)
+    min_n = int(ctx.spec.threshold("min_group_size"))
+    if n < min_n:
+        raise CannotMeasure(
+            f"membership inference needs at least {min_n} training and {min_n} held-out rows, got {n}"
+        )
     members = members.sample(n, random_state=ctx.spec.seed)
     non_members = non_members.sample(n, random_state=ctx.spec.seed)
 
