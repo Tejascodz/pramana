@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 import pandas as pd
 
 from pramana.context import AuditContext
@@ -26,13 +28,22 @@ def integrity(ctx: AuditContext) -> CheckResult:
     if ctx.ref_df is not None:
         datasets["reference_data"] = ctx.ref_df
 
-    issues = []
+    issues, notes = [], []
     per_dataset = {}
     for name, df in datasets.items():
         cols = [c for c in ctx.feature_columns + [ctx.spec.target] if c in df.columns]
         missing = df[cols].isna().mean()
         high_missing = {c: round(float(v), 4) for c, v in missing.items() if v > miss_max}
-        dup_rate = float(df[cols].duplicated().mean())
+        # A duplicate is a row repeated in full, record identifier included. Without an
+        # identifier, two identical rows may be two people who share every recorded value
+        # (common when there are few, coarse columns), so they are noted, not graded.
+        id_cols = [
+            c
+            for c in df.columns
+            if re.search(r"(^|_)id$", str(c), re.IGNORECASE)
+            or (c in ctx.spec.exclude_columns and df[c].nunique() >= 0.9 * len(df))
+        ]
+        dup_rate = float(df.duplicated().mean())
         # Balance from labelled rows: this check reports missing labels (above), it must
         # not fail on them the way the metric checks do.
         labelled = df[df[ctx.spec.target].notna()] if ctx.spec.target in df.columns else None
@@ -49,8 +60,14 @@ def integrity(ctx: AuditContext) -> CheckResult:
             issues.append(
                 f"{name}: missing values above {miss_max:.0%} in {', '.join(high_missing)}"
             )
-        if dup_rate > dup_max:
+        per_dataset[name]["record_identifier"] = id_cols or None
+        if dup_rate > dup_max and id_cols:
             issues.append(f"{name}: {dup_rate:.1%} duplicate rows")
+        elif dup_rate > dup_max:
+            notes.append(
+                f"{name}: {dup_rate:.1%} of rows are identical to another, but the data has no "
+                "record identifier, so they may be different people with the same values"
+            )
         if target_balance is not None and min(target_balance, 1 - target_balance) < 0.05:
             issues.append(f"{name}: severe class imbalance ({target_balance:.1%} positive)")
 
@@ -82,9 +99,14 @@ def integrity(ctx: AuditContext) -> CheckResult:
         category="Data",
         status=status,
         severity=severity,
-        summary=("Issues: " + "; ".join(issues) + ".")
-        if issues
-        else "No data-quality issues above thresholds.",
+        summary=(
+            (
+                "Issues: " + "; ".join(issues) + "."
+                if issues
+                else "No data-quality issues above thresholds."
+            )
+            + (" Note: " + "; ".join(notes) + "." if notes else "")
+        ),
         plain_summary=(
             "Some input data is incomplete or duplicated, which can skew test results."
             if issues and not leakage

@@ -48,7 +48,13 @@ def risk_classification(ctx: AuditContext) -> CheckResult:
     upcoming = [o for o in result.obligations if o["status"] == "upcoming"]
     summary = (
         f"EU AI Act tier: {result.eu_tier} ({'; '.join(result.eu_basis)}); the Act {scope}. "
-        f"India context sensitivity: {result.india_sensitivity} (score {result.india_score}/10). "
+        f"India context sensitivity: {result.india_sensitivity} (score {result.india_score}/10)"
+        + (
+            ""
+            if "IN" in {str(r).upper() for r in ctx.spec.use_case.get("deployment_regions") or []}
+            else ", shown as a benchmark (India is not a declared deployment region)"
+        )
+        + ". "
         f"{verdict} {len(upcoming)} upcoming regulatory milestone(s) apply."
     )
     plain = {

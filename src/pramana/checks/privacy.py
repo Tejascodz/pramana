@@ -182,6 +182,22 @@ def _per_sample_loss(y: np.ndarray, p: np.ndarray) -> np.ndarray:
     return -(y * np.log(p) + (1 - y) * np.log(1 - p))
 
 
+def _tpr_at_fpr(loss_in: np.ndarray, loss_out: np.ndarray, fpr: float) -> float | None:
+    """Share of members flagged at the loosest loss cut that flags at most ``fpr`` of non-members.
+
+    A quantile cut can overshoot when losses are tied (a model with a few distinct scores):
+    every row at the cut is flagged, so the false-positive rate actually reached is higher than
+    the one reported. None when no cut keeps the false-positive rate at or below ``fpr``.
+    """
+    ordered = np.sort(loss_out)
+    values = np.unique(ordered)
+    reached = np.searchsorted(ordered, values, side="right") / len(ordered)
+    allowed = values[reached <= fpr]
+    if not len(allowed):
+        return None
+    return round(float((loss_in <= allowed.max()).mean()), 4)
+
+
 @register(
     "privacy.membership_inference",
     title="Membership-inference risk",
@@ -192,6 +208,18 @@ def _per_sample_loss(y: np.ndarray, p: np.ndarray) -> np.ndarray:
 def membership_inference(ctx: AuditContext) -> CheckResult:
     if ctx.ref_df is None or ctx.spec.target not in ctx.ref_df.columns:
         raise MissingArtifact("Membership inference needs labelled training data as reference_data")
+    # The attack compares the model's losses on its own training rows with unseen rows, so it
+    # only means something when reference_data is the training set. That is assumed when the
+    # model itself is audited; in a predictions-only audit the reference is often just an
+    # earlier period, so it must be declared.
+    is_training = ctx.spec.reference_is_training
+    if is_training is None:
+        is_training = "model" in ctx.spec.artifacts
+    if not is_training:
+        raise MissingArtifact(
+            "membership inference needs the model's training data as reference_data; this is a "
+            "predictions-only audit, so set reference_is_training: true if that is what it is"
+        )
     limit = ctx.spec.threshold("mia_auc_max")
     members, non_members = ctx.ref_df, ctx.eval_df
     n = min(len(members), len(non_members), 5000)
@@ -213,11 +241,7 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
     # false-positive rate; here for the same loss-threshold attack, at 1% and 5% FPR.
     tail = {}
     for fpr in (0.01, 0.05):
-        if n * fpr >= 1:
-            cut = float(np.quantile(loss_out, fpr))
-            tail[fpr] = round(float((loss_in <= cut).mean()), 4)
-        else:
-            tail[fpr] = None
+        tail[fpr] = _tpr_at_fpr(loss_in, loss_out, fpr) if n * fpr >= 1 else None
 
     if attack_auc > limit + 0.10:
         status, severity = Status.FAIL, Severity.HIGH
@@ -240,7 +264,8 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
                 f" At a 1% false-positive rate the attack identifies {tail[0.01]:.1%} of training "
                 f"rows (5% FPR: {tail[0.05]:.1%})."
                 if tail[0.01] is not None and tail[0.05] is not None
-                else ""
+                else " The true-positive rate at a low false-positive rate is not measurable: "
+                "too many rows share the same loss to hold the false-positive rate that low."
             )
         ),
         plain_summary=(

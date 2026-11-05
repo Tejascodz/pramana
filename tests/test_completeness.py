@@ -796,3 +796,90 @@ def test_a_refused_ordinary_question_is_reported_as_over_refusal(tmp_path):
     assert rows["GR-07"]["over_refusal"] and check["metrics"]["over_refusals"] >= 1
     assert "over-refusal" in check["summary"]
     assert rows["GR-05"]["grounded"]  # "2 business days" is an accepted wording
+
+
+# Found by auditing ProPublica's COMPAS data, a system Pramana's authors did not build.
+
+
+def test_membership_inference_is_skipped_when_the_reference_is_not_training_data(
+    tmp_path, credit_example
+):
+    def predictions_only(text):
+        lines = [x for x in text.splitlines() if not x.startswith(("  model:", "trust_pickled"))]
+        return "\n".join(lines).replace("target: repaid", "score_column: score\ntarget: repaid")
+
+    import pandas as pd
+
+    spec_path = _credit_copy(tmp_path, with_data=credit_example)
+
+    for name in ("train.csv", "test.csv", "production_sample.csv"):
+        path = spec_path.parent / "data" / name
+        df = pd.read_csv(path)
+        df["score"] = 0.5
+        df.to_csv(path, index=False)
+    spec_path.write_text(predictions_only(spec_path.read_text()))
+    check = run_audit(load_spec(spec_path), tmp_path / "p").result("privacy.membership_inference")
+    assert check.status == Status.SKIPPED and "reference_is_training" in check.summary
+
+
+def test_the_low_false_positive_rate_tail_is_not_overstated_by_ties():
+    import numpy as np
+
+    from pramana.checks.privacy import _tpr_at_fpr
+
+    # Ten distinct losses, as from a score with ten values: no cut holds the rate at 1%.
+    loss_out = np.repeat(np.arange(10.0), 100)
+    loss_in = np.repeat(np.arange(10.0), 100)
+    assert _tpr_at_fpr(loss_in, loss_out, 0.01) is None
+    assert _tpr_at_fpr(loss_in, loss_out, 0.10) == 0.1
+
+
+def test_identical_rows_without_a_record_identifier_are_noted_not_graded(tmp_path):
+    import pandas as pd
+
+    def mutate(df: pd.DataFrame, rng) -> pd.DataFrame:
+        return pd.concat([df, df.head(200)])  # many identical rows, no identifier
+
+    spec = _tabular(tmp_path, mutate)
+    check = run_audit(load_spec(spec), tmp_path / "p").result("data_quality.integrity")
+    assert "duplicate rows" not in check.summary.split("Note:")[0]
+    assert "no record identifier" in check.summary
+
+
+def test_the_india_rating_is_marked_as_a_benchmark_outside_india():
+    from types import SimpleNamespace
+
+    from pramana.checks.governance import risk_classification
+
+    spec = SimpleNamespace(
+        use_case={"domain": "law_enforcement", "deployment_regions": ["US"]},
+        system_type="tabular_classifier",
+        governance={},
+    )
+    from datetime import date
+
+    ctx = SimpleNamespace(spec=spec, audit_date=date(2026, 11, 5))
+    assert "India is not a declared deployment region" in risk_classification(ctx).summary
+
+
+COMPAS = ROOT / "examples" / "compas"
+
+
+@pytest.mark.skipif(
+    not (COMPAS / "data" / "compas_all.csv").exists(),
+    reason="run examples/compas/prepare.py to download ProPublica's data",
+)
+def test_compas_audit_reproduces_propublicas_published_findings(tmp_path):
+    result = run_audit(load_spec(COMPAS / "audit.yaml"), tmp_path / "p")
+    groups = {
+        g["group"]: g
+        for g in result.result("fairness.group_parity").details["attributes"]["race"]["groups"]
+    }
+    black, white = groups["African-American"], groups["Caucasian"]
+    assert black["n"] + white["n"] == 5278  # ProPublica's filtered counts: 3,175 and 2,103
+    # Labelled higher risk but did not reoffend: ProPublica 44.9% (Black) vs 23.5% (white).
+    assert abs((1 - black["tpr"]) - 0.449) < 0.03 and abs((1 - white["tpr"]) - 0.235) < 0.03
+    # Labelled lower risk but did reoffend: 28.0% (Black) vs 47.7% (white).
+    assert abs(black["fpr"] - 0.280) < 0.03 and abs(white["fpr"] - 0.477) < 0.03
+    assert result.result("fairness.group_parity").status == Status.FAIL
+    assert result.gate["decision"] == "BLOCK"

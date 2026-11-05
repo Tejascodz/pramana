@@ -1,0 +1,47 @@
+# Predictions-only audit of COMPAS recidivism risk scores, a real deployed system.
+# Run `python examples/compas/prepare.py` first: it downloads ProPublica's public data
+# (https://github.com/propublica/compas-analysis), checks its hash and drops names.
+system:
+  name: COMPAS recidivism risk scores (Broward County, Florida)
+  version: "2013-2014"
+  type: tabular_classifier
+  owner: Northpointe (now equivant); scores as published by ProPublica
+  accountable_executive: Not applicable (third-party data audit)
+  description: >
+    Commercial risk assessment that gives each defendant a decile score from 1 (lowest
+    risk) to 10. ProPublica obtained the scores given in Broward County in 2013 and 2014
+    and matched them with criminal records over the next two years. This audit treats a
+    decile of 1 to 4 as a low-risk (favourable) decision, as ProPublica did.
+
+use_case:
+  domain: law_enforcement
+  purpose: Assess the risk that a defendant will reoffend, to inform pre-trial decisions.
+  decision_role: decision_support
+  affected_persons: Defendants awaiting trial
+  deployment_regions: [US]
+  processes_personal_data: true
+  interacts_with_people: false
+  generates_synthetic_content: false
+  annual_decisions: 10000
+  vulnerable_groups: true
+  contestability: low
+  prohibited_practice_flags: []
+
+artifacts:
+  evaluation_data: data/compas_all.csv
+  reference_data: data/compas_2013.csv
+  production_data: data/compas_2014.csv
+
+score_column: low_risk_score
+target: no_recid
+positive_label: 1
+decision_threshold: 0.65   # decile 1-4 (score 0.7 and above) is a low-risk decision
+features:
+  - age
+  - priors_count
+  - juv_fel_count
+  - juv_misd_count
+  - juv_other_count
+  - c_charge_degree
+sensitive_features: [race, sex, age_cat]
+exclude_columns: [decile_score]

@@ -78,6 +78,7 @@ class AuditSpec:
     seed: int = 7
     artifacts_sha256: dict[str, str] = field(default_factory=dict)
     trust_pickled_model: bool = False
+    reference_is_training: bool | None = None
 
     def check_model_trust(self) -> None:
         """Refuse to unpickle a model nobody has vouched for.
@@ -384,6 +385,11 @@ def load_spec(path: str | Path) -> AuditSpec:
         seed=int(raw.get("seed", 7)),
         artifacts_sha256=pins,
         trust_pickled_model=raw.get("trust_pickled_model", False) is True,
+        reference_is_training=(
+            raw["reference_is_training"]
+            if isinstance(raw.get("reference_is_training"), bool)
+            else None
+        ),
     )
 
 
