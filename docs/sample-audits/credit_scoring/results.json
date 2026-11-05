@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-BF3CD5",
+  "audit_id": "PRM-20261021-FAD25D",
   "tool": {
     "name": "pramana",
-    "version": "0.7.13"
+    "version": "0.7.14"
   },
   "system": {
     "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
@@ -31,8 +31,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-11-05T13:57:30+00:00",
-  "finished": "2026-11-05T13:57:34+00:00",
+  "started": "2026-11-05T18:15:09+00:00",
+  "finished": "2026-11-05T18:15:12+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -1416,37 +1416,49 @@
             "dataset": "evaluation_data",
             "column": "contact_email",
             "kind": "email",
-            "match_rate": 1.0
+            "match_rate": 1.0,
+            "matches": 3660,
+            "values_scanned": 3660
           },
           {
             "dataset": "evaluation_data",
             "column": "mobile",
             "kind": "india_mobile",
-            "match_rate": 1.0
+            "match_rate": 1.0,
+            "matches": 3660,
+            "values_scanned": 3660
           },
           {
             "dataset": "reference_data",
             "column": "contact_email",
             "kind": "email",
-            "match_rate": 1.0
+            "match_rate": 1.0,
+            "matches": 8400,
+            "values_scanned": 8400
           },
           {
             "dataset": "reference_data",
             "column": "mobile",
             "kind": "india_mobile",
-            "match_rate": 1.0
+            "match_rate": 1.0,
+            "matches": 8400,
+            "values_scanned": 8400
           },
           {
             "dataset": "production_data",
             "column": "contact_email",
             "kind": "email",
-            "match_rate": 1.0
+            "match_rate": 1.0,
+            "matches": 3000,
+            "values_scanned": 3000
           },
           {
             "dataset": "production_data",
             "column": "mobile",
             "kind": "india_mobile",
-            "match_rate": 1.0
+            "match_rate": 1.0,
+            "matches": 3000,
+            "values_scanned": 3000
           }
         ]
       },
@@ -1458,7 +1470,7 @@
         "INDIA:DPDP-2023",
         "NIST-GAI:DATA-PRIVACY"
       ],
-      "evidence_hash": "ac118c3dd8ddd2e3bde322fb1acad573c9be04aeb75497314182723bd841bb14"
+      "evidence_hash": "3d21dc14a56b4305c6e9be80470151764198768e8e78ca0d9ca23114e1d4f068"
     },
     {
       "check_id": "privacy.membership_inference",
@@ -1533,19 +1545,25 @@
       "category": "Assurance",
       "status": "pass",
       "severity": "info",
-      "summary": "3/3 planted defects detected. halve favourable decisions for gender=female: DI 0.48; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.",
-      "plain_summary": "The audit tests caught every defect deliberately planted to check them.",
+      "summary": "6/6 self-tests passed (3 planted defects, 3 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.",
+      "plain_summary": "The audit tests caught every defect deliberately planted to check them, and raised no alarm on clean copies.",
       "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
       "metrics": {
-        "canaries": 3,
+        "canaries": 6,
         "missed": 0
       },
       "details": {
         "canaries": [
           {
-            "canary": "halve favourable decisions for gender=female",
+            "canary": "balanced copy, then halve favourable decisions for gender=male",
             "detected": true,
-            "observed": "DI 0.48"
+            "observed": "DI 0.50 after 608 decisions flipped"
+          },
+          {
+            "canary": "balanced copy of gender is not flagged (false-alarm control)",
+            "detected": true,
+            "observed": "DI 1.00",
+            "control": true
           },
           {
             "canary": "shift monthly_income by 1.5 standard deviations",
@@ -1553,9 +1571,21 @@
             "observed": "PSI 7.26"
           },
           {
-            "canary": "plant an email column in a copy of the data",
+            "canary": "two random halves of the data on monthly_income (false-alarm control)",
+            "detected": true,
+            "observed": "PSI 0.01",
+            "control": true
+          },
+          {
+            "canary": "plant 5 e-mail addresses in 100 values of an unnamed column",
             "detected": true,
             "observed": "scanner run on planted column"
+          },
+          {
+            "canary": "a column of customer references is not flagged (false-alarm control)",
+            "detected": true,
+            "observed": "not flagged",
+            "control": true
           }
         ]
       },
@@ -1564,7 +1594,7 @@
         "NIST:MEASURE-1.2",
         "ISO42001:A.6.2.4"
       ],
-      "evidence_hash": "9369f9a5db7095255caf7a6b91311edfe6b6811531c96abb797a156799b167d7"
+      "evidence_hash": "000a09774e63ccc9247b56bdee095fe67595249a5cb25cf3ca9a4a7edcb3f7fe"
     },
     {
       "check_id": "governance.manual_evidence",
@@ -4918,9 +4948,9 @@
     }
   ],
   "llm_run": {},
-  "ledger_root": "d6ea571942f9491168847bb75a5486a9506563c0e0b7d5913a928223923f351e",
+  "ledger_root": "5d8a13ca5438cf9e3e17ff2506e4e8813b098e20bddaa9fa4c2314d15bfbe9c1",
   "environment": {
     "python": "3.13.18",
-    "pramana": "0.7.13"
+    "pramana": "0.7.14"
   }
 }

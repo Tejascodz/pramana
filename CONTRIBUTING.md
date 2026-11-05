@@ -36,4 +36,4 @@ Ruff handles linting and formatting (`ruff check` and `ruff format`). Keep repor
 1. Bump `version` in `pyproject.toml` and `__version__` in `src/pramana/__init__.py`, and add a CHANGELOG entry.
 2. If you changed a case study in `examples/`, run `make demos` so the bundled copy matches (a test checks this).
 3. `make release-check` builds the wheel, installs it in a clean environment and runs `pramana demo`.
-4. Merge to `main`, then tag: `git tag v0.7.13 && git push origin v0.7.13` (the tag must match `version` in `pyproject.toml`; the workflow refuses a mismatch). The release workflow tests, builds and creates the GitHub release. PyPI publishing runs only when the `PUBLISH_TO_PYPI` repository variable is `true`.
+4. Merge to `main`, then tag: `git tag v0.7.14 && git push origin v0.7.14` (the tag must match `version` in `pyproject.toml`; the workflow refuses a mismatch). The release workflow tests, builds and creates the GitHub release. PyPI publishing runs only when the `PUBLISH_TO_PYPI` repository variable is `true`.

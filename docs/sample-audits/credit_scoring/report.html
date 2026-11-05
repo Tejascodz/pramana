@@ -178,7 +178,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <header class="top">
   <div>
-    <p class="eyebrow">AI system audit report · PRM-20261021-BF3CD5</p>
+    <p class="eyebrow">AI system audit report · PRM-20261021-FAD25D</p>
     <h1>Nilgiri Finance Personal Loan Pre-Approval Model</h1>
     <div class="meta">
       Version 2.3.0 · Owner Credit Risk Analytics
@@ -216,7 +216,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <div>
       <h3>What is working</h3>
       <ul class="clean">
-<li><span class="chip pass">pass</span><span>Risk scores can be read as real probabilities.</span></li><li><span class="chip pass">pass</span><span>The model does not reveal who was in its training data beyond chance level.</span></li><li><span class="chip pass">pass</span><span>The audit tests caught every defect deliberately planted to check them.</span></li>      </ul>
+<li><span class="chip pass">pass</span><span>Risk scores can be read as real probabilities.</span></li><li><span class="chip pass">pass</span><span>The model does not reveal who was in its training data beyond chance level.</span></li><li><span class="chip pass">pass</span><span>The audit tests caught every defect deliberately planted to check them, and raised no alarm on clean copies.</span></li>      </ul>
       <h3>Decisions and actions required</h3>
       <ul class="clean">
 <li><span>Credit Risk Analytics: Complete the missing sections, correct documented figures to match validated results, and make the model card part of the release checklist (by 2026-11-20)</span></li><li><span>Model Risk Management: Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner (by 2026-11-20)</span></li><li><span>Model Risk Management: Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance (by 2026-11-20)</span></li><li><span>Model Risk Management: For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance (by 2026-11-20)</span></li><li><span>Accepted risk R-12 (Data quality) expires 2027-03-31; re-approval needed from Head of Credit Risk.</span></li>      </ul>
@@ -229,7 +229,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <div class="kpi"><div class="v">4/16</div><div class="l">checks passed</div></div>
   <div class="kpi"><div class="v">7</div><div class="l">open high or critical risks</div></div>
   <div class="kpi"><div class="v">75/151</div><div class="l">applicable controls tested by automation</div></div>
-  <div class="kpi"><div class="v mono" style="font-size:18px">d6ea571942f9</div><div class="l">evidence root hash</div></div>
+  <div class="kpi"><div class="v mono" style="font-size:18px">5d8a13ca5438</div><div class="l">evidence root hash</div></div>
 </section>
 
 <section class="card" id="risks">
@@ -349,7 +349,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <div class="finding-body">
       <p>Direct identifiers found in 2 column(s): contact_email [email] in evaluation_data, mobile [india_mobile] in evaluation_data, contact_email [email] in reference_data, mobile [india_mobile] in reference_data, contact_email [email] in production_data, mobile [india_mobile] in production_data. None are model inputs.</p>
 <p><strong>Recommendation.</strong> Drop or pseudonymise identifier columns before data reaches modelling and evaluation environments, and record the purpose and lawful basis for any personal data retained (DPDP Act 2023 purpose limitation and data minimisation).</p><p><span class="tag">NIST:MEASURE-2.10</span><span class="tag">ISO42001:A.7.2</span><span class="tag">ISO42001:A.7.5</span><span class="tag">EUAIA:Art-10</span><span class="tag">INDIA:DPDP-2023</span><span class="tag">NIST-GAI:DATA-PRIVACY</span></p>      <p class="note">identifier_columns = <span class="mono">2</span> · identifiers_in_model_inputs = <span class="mono">0</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">ac118c3dd8ddd2e3bde322fb1acad573c9be04aeb75497314182723bd841bb14</span></p>    </div>
+<p class="note">Evidence SHA-256 <span class="mono hash">3d21dc14a56b4305c6e9be80470151764198768e8e78ca0d9ca23114e1d4f068</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip pass">pass</span>Membership-inference risk <span class="note mono">privacy.membership_inference</span></summary>
@@ -368,9 +368,9 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <details >
     <summary><span class="chip pass">pass</span>Audit self-test (canaries) <span class="note mono">audit.detector_sensitivity</span></summary>
     <div class="finding-body">
-      <p>3/3 planted defects detected. halve favourable decisions for gender=female: DI 0.48; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.</p>
-<p><span class="tag">NIST:MEASURE-2.13</span><span class="tag">NIST:MEASURE-1.2</span><span class="tag">ISO42001:A.6.2.4</span></p>      <p class="note">canaries = <span class="mono">3</span> · missed = <span class="mono">0</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">9369f9a5db7095255caf7a6b91311edfe6b6811531c96abb797a156799b167d7</span></p>    </div>
+      <p>6/6 self-tests passed (3 planted defects, 3 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.</p>
+<p><span class="tag">NIST:MEASURE-2.13</span><span class="tag">NIST:MEASURE-1.2</span><span class="tag">ISO42001:A.6.2.4</span></p>      <p class="note">canaries = <span class="mono">6</span> · missed = <span class="mono">0</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">000a09774e63ccc9247b56bdee095fe67595249a5cb25cf3ca9a4a7edcb3f7fe</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Governance evidence on file <span class="note mono">governance.manual_evidence</span></summary>
@@ -850,13 +850,13 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     </table></div>
   </details>
   <h3>Verifying this pack</h3>
-  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">d6ea571942f9491168847bb75a5486a9506563c0e0b7d5913a928223923f351e</span>.</p>
+  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">5d8a13ca5438cf9e3e17ff2506e4e8813b098e20bddaa9fa4c2314d15bfbe9c1</span>.</p>
   <h3>Limitations</h3>
   <p class="note">Automated tests evidence technical controls only. Controls marked "not tested" need organisational evidence. Statistical tests depend on the representativeness of the data supplied. LLM probes are a sample of behaviour, not proof of safety. The classification is an assessment to support legal review, not legal advice. See docs/limitations.md in the Pramana repository.</p>
 </section>
 
 <footer>
-  Generated by Pramana 0.7.13 · Python 3.13.18 · audit PRM-20261021-BF3CD5 · started 2026-11-05T13:57:30+00:00
+  Generated by Pramana 0.7.14 · Python 3.13.18 · audit PRM-20261021-FAD25D · started 2026-11-05T18:15:09+00:00
 </footer>
 </div>
 </body>

@@ -1,6 +1,6 @@
 # Sample audit packs
 
-Complete audit packs for the three case studies, generated with Pramana 0.7.13 and `--date 2026-10-21`. All data is synthetic and the organisations are fictional; the prompts are Pramana's own probes. The `llama32_3b_*` packs re-score real responses recorded from `llama3.2:3b` on a MacBook: run 1 with one sample per probe, and `x3` with three (see [live-run-findings.md](../live-run-findings.md)).
+Complete audit packs for the three case studies, generated with Pramana 0.7.14 and `--date 2026-10-21`. All data is synthetic and the organisations are fictional; the prompts are Pramana's own probes. The `llama32_3b_*` packs re-score real responses recorded from `llama3.2:3b` on a MacBook: run 1 with one sample per probe, and `x3` with three (see [live-run-findings.md](../live-run-findings.md)).
 
 | Pack | Open the report | Gate |
 |---|---|---|

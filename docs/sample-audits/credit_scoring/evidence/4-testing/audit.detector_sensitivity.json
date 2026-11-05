@@ -9,9 +9,15 @@
   "details": {
     "canaries": [
       {
-        "canary": "halve favourable decisions for gender=female",
+        "canary": "balanced copy, then halve favourable decisions for gender=male",
         "detected": true,
-        "observed": "DI 0.48"
+        "observed": "DI 0.50 after 608 decisions flipped"
+      },
+      {
+        "canary": "balanced copy of gender is not flagged (false-alarm control)",
+        "control": true,
+        "detected": true,
+        "observed": "DI 1.00"
       },
       {
         "canary": "shift monthly_income by 1.5 standard deviations",
@@ -19,21 +25,33 @@
         "observed": "PSI 7.26"
       },
       {
-        "canary": "plant an email column in a copy of the data",
+        "canary": "two random halves of the data on monthly_income (false-alarm control)",
+        "control": true,
+        "detected": true,
+        "observed": "PSI 0.01"
+      },
+      {
+        "canary": "plant 5 e-mail addresses in 100 values of an unnamed column",
         "detected": true,
         "observed": "scanner run on planted column"
+      },
+      {
+        "canary": "a column of customer references is not flagged (false-alarm control)",
+        "control": true,
+        "detected": true,
+        "observed": "not flagged"
       }
     ]
   },
   "evidence_hash": null,
   "metrics": {
-    "canaries": 3,
+    "canaries": 6,
     "missed": 0
   },
-  "plain_summary": "The audit tests caught every defect deliberately planted to check them.",
+  "plain_summary": "The audit tests caught every defect deliberately planted to check them, and raised no alarm on clean copies.",
   "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
   "severity": "info",
   "status": "pass",
-  "summary": "3/3 planted defects detected. halve favourable decisions for gender=female: DI 0.48; shift monthly_income by 1.5 standard deviations: PSI 7.26; plant an email column in a copy of the data: scanner run on planted column.",
+  "summary": "6/6 self-tests passed (3 planted defects, 3 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.",
   "title": "Audit self-test (canaries)"
 }

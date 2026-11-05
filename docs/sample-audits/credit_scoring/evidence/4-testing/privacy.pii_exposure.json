@@ -15,37 +15,49 @@
         "column": "contact_email",
         "dataset": "evaluation_data",
         "kind": "email",
-        "match_rate": 1.0
+        "match_rate": 1.0,
+        "matches": 3660,
+        "values_scanned": 3660
       },
       {
         "column": "mobile",
         "dataset": "evaluation_data",
         "kind": "india_mobile",
-        "match_rate": 1.0
+        "match_rate": 1.0,
+        "matches": 3660,
+        "values_scanned": 3660
       },
       {
         "column": "contact_email",
         "dataset": "reference_data",
         "kind": "email",
-        "match_rate": 1.0
+        "match_rate": 1.0,
+        "matches": 8400,
+        "values_scanned": 8400
       },
       {
         "column": "mobile",
         "dataset": "reference_data",
         "kind": "india_mobile",
-        "match_rate": 1.0
+        "match_rate": 1.0,
+        "matches": 8400,
+        "values_scanned": 8400
       },
       {
         "column": "contact_email",
         "dataset": "production_data",
         "kind": "email",
-        "match_rate": 1.0
+        "match_rate": 1.0,
+        "matches": 3000,
+        "values_scanned": 3000
       },
       {
         "column": "mobile",
         "dataset": "production_data",
         "kind": "india_mobile",
-        "match_rate": 1.0
+        "match_rate": 1.0,
+        "matches": 3000,
+        "values_scanned": 3000
       }
     ]
   },

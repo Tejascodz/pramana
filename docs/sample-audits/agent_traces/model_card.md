@@ -1,6 +1,6 @@
 # Model card: Fee Refund Agent
 
-Audit PRM-20261021-592525 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-62923E · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 0.9.2
@@ -40,4 +40,4 @@ _Not documented. Flagged in the audit._
 - **R-03 (medium):** The deployment is missing safeguards the agent-safety literature expects: interrupt conditions, action monitor.
 - **R-04 (medium):** Many of the agent's actions have no recorded reasoning, so a monitor could not review why it acted.
 
-_Evidence root hash: `235d94c18bb81fc1c9f71a86b179ed8dab5c6413bb832892743b741d3466a9ff`_
+_Evidence root hash: `6d8398807d4497af6f86a0bd2d70c9be4e7f4362f4e64eab3a1c1c85f533b611`_
