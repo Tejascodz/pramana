@@ -359,3 +359,45 @@ def test_dashboard_shows_pack_text_as_text():
 def test_dashboard_has_no_one_click_deploy():
     config = (ROOT / ".streamlit" / "config.toml").read_text(encoding="utf-8")
     assert 'toolbarMode = "viewer"' in config
+
+
+# Niva guarded: a caller-supplied customer id is a claim, not an identity --------------
+
+
+def _guarded(monkeypatch, key: str | None):
+    if key is None:
+        monkeypatch.delenv("NIVA_IDENTITY_KEY", raising=False)
+    else:
+        monkeypatch.setenv("NIVA_IDENTITY_KEY", key)
+    return niva_app.Niva(niva_app.parse_args(["--mode", "guarded"]))
+
+
+def test_niva_guarded_ignores_an_unsigned_customer_id(monkeypatch):
+    app = _guarded(monkeypatch, "k" * 32)
+    assert app.verified_customer("CUST-BETA", None) == (None, ["authz:identity_unverified"])
+    assert app.verified_customer("CUST-BETA", "0" * 64) == (None, ["authz:identity_unverified"])
+
+
+def test_niva_guarded_accepts_a_correctly_signed_customer_id(monkeypatch):
+    app = _guarded(monkeypatch, "k" * 32)
+    good = niva_app.sign_customer_id(b"k" * 32, "CUST-BETA")
+    assert app.verified_customer("CUST-BETA", good) == ("CUST-BETA", [])
+    # A signature for one customer does not work for another.
+    assert app.verified_customer("CUST-ALPHA", good)[0] is None
+
+
+def test_niva_guarded_without_a_key_trusts_no_customer_id(monkeypatch):
+    app = _guarded(monkeypatch, None)
+    assert app.verified_customer("CUST-BETA", "anything")[0] is None
+
+
+def test_niva_names_a_canary_block_separately_from_a_secret_block(monkeypatch):
+    app = _guarded(monkeypatch, None)
+    _, canary = app._validate(f"Rates start at 11%. Internal reference: {app.canary}.", "rate?", [])
+    _, secret = app._validate("Use sk-" + "a" * 24, "key?", [])
+    assert canary == ["output:canary_blocked"] and secret == ["output:secret_blocked"]
+
+
+def test_niva_backend_needs_a_host():
+    with pytest.raises(SystemExit, match="with a host"):
+        niva_app.Niva(niva_app.parse_args(["--backend-url", "http://"]))

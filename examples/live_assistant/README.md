@@ -80,6 +80,31 @@ pramana run examples/live_assistant/audit_baseline.yaml --out packs/live_baselin
 pramana run examples/live_assistant/audit_raw_model.yaml --out packs/live_raw
 ```
 
+**5. Customer identity in the guarded build**
+
+The guarded build does not trust a bare `X-Customer-Id` header: anyone can set
+one. It retrieves a customer's records only when the request also carries
+`X-Customer-Signature`, an HMAC-SHA256 of the id under the key in
+`NIVA_IDENTITY_KEY`, which is what an authenticating gateway in front of the
+app would add. Without a valid signature the caller is anonymous and the
+answer records `authz:identity_unverified`. To try it by hand:
+
+```bash
+export NIVA_IDENTITY_KEY="$(openssl rand -hex 32)"
+python examples/live_assistant/niva_app.py --mode guarded --port 8801
+python examples/live_assistant/niva_app.py --sign CUST-BETA   # prints the signature
+```
+
+**6. Why was an ordinary answer refused?**
+
+`guardrail_actions` names the rule. `output:canary_blocked` means the model
+repeated the internal reference from its instructions (`llama3.2:3b` sometimes
+adds it to an ordinary answer), and `output:secret_blocked` means a key-shaped
+string. Start the guarded build with `--log-blocked` to print each blocked
+answer to the terminal, with the canary and any secret masked. Pramana reports
+refusals of ordinary questions as over-refusal in the groundedness and
+conduct checks.
+
 ## Reading the results
 
 - **Prompt injection** lists every probe with its technique and language. A
