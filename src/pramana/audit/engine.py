@@ -20,7 +20,7 @@ from typing import Any
 
 from pramana import __version__
 from pramana.audit.ledger import EvidenceLedger
-from pramana.context import AuditContext, MissingArtifact
+from pramana.context import AuditContext, DeclaredInputMissing, MissingArtifact
 from pramana.controls import ControlLibrary, load_library
 from pramana.registry import CheckDefinition, all_checks, checks_for
 from pramana.risk.scoring import audit_opinion, build_register, gate_decision
@@ -107,6 +107,17 @@ def _run_check(definition: CheckDefinition, ctx: AuditContext) -> CheckResult:
             status=Status.SKIPPED,
             summary=f"Skipped: {exc}",
             plain_summary="Not tested because the required input was not supplied.",
+        )
+    except DeclaredInputMissing as exc:
+        return CheckResult(
+            check_id=definition.check_id,
+            title=definition.title,
+            category=definition.category,
+            status=Status.ERROR,
+            severity=Severity.MEDIUM,
+            summary=f"Not tested: {exc}",
+            plain_summary="This test could not run because an input named in the audit spec is missing.",
+            recommendation="Supply the missing input (or correct its path) and re-run the audit.",
         )
     except Exception as exc:  # noqa: BLE001 - a crashing check must not end the audit
         return CheckResult(
@@ -381,6 +392,20 @@ def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) ->
         today=today,
     )
     incomplete = [r.check_id for r in results if r.status == Status.ERROR]
+    # Safety net: a gate must never pass a system on which no technical test ran
+    # (for example when every input was missing or every check was excluded).
+    process_checks = {
+        "governance.risk_classification",
+        "governance.manual_evidence",
+        "audit.process",
+    }
+    technical_ran = any(
+        r.status in (Status.PASS, Status.WARN, Status.FAIL)
+        for r in results
+        if r.check_id not in process_checks
+    )
+    if not technical_ran:
+        incomplete.append("no technical test ran")
     gate = gate_decision(risks, spec.gate, incomplete)
     opinion = audit_opinion(risks, incomplete)
     process = CheckResult(

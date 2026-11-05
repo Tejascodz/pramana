@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.8 — 2026-11-05
+
+From a file-by-file review of the repository (every data file parsed, every pack verified, every example audit run).
+
+- **Critical fix: the gate could pass a system that was never tested.** With every data file of a credit model missing and its risk tier declared correctly, all thirteen model checks were *skipped* and the gate said **PASS**. Missing inputs were treated as "not applicable" even when the spec named them. Now an input declared in the spec but not found is an error (the check reads "Not tested: … is declared in the spec but not found"), which makes the audit incomplete and blocks the gate. Inputs that were never declared are still not applicable. As a safety net, the gate also blocks when no technical test ran at all.
+- A declared agent trace that does not exist yet (for example before `run_agent.py` has been run) used to surface as a raw `FileNotFoundError` on every agent check; it now says which file is missing and what to do.
+
 ## 0.7.7 — 2026-11-05
 
 The interactive viewer had not been tested since the 0.6 features landed. It was run in a real browser against the credit, real-model and agent-sandbox packs (every tab, every finding open): no errors, and the integrity check worked. Fixes from that run:

@@ -25,7 +25,24 @@ from pramana.spec import AuditSpec
 
 
 class MissingArtifact(RuntimeError):
-    """Raised by a check when an artifact it needs was not supplied."""
+    """Raised by a check when an artifact it needs was not supplied (not applicable)."""
+
+
+class DeclaredInputMissing(RuntimeError):
+    """The spec names an input that does not exist.
+
+    Unlike an input that was never supplied, this makes the audit incomplete: the
+    check is reported as an error, so the gate blocks instead of passing a system
+    whose tests could not run.
+    """
+
+
+def require_file(path: Path, what: str) -> Path:
+    if not path.exists():
+        raise DeclaredInputMissing(
+            f"{what} is declared in the spec but not found: {path}. Create it or fix the path."
+        )
+    return path
 
 
 #: Module prefixes whose types a .skops model may contain. skops rebuilds objects from
@@ -67,8 +84,7 @@ class AuditContext:
         path = self.spec.artifact(key)
         if path is None:
             return None
-        if not path.exists():
-            raise MissingArtifact(f"artifacts.{key} not found: {path.name}")
+        require_file(path, f"artifacts.{key}")
         if path.suffix.lower() == ".parquet":
             return pd.read_parquet(path)
         return pd.read_csv(path)
@@ -97,8 +113,7 @@ class AuditContext:
         path = self.spec.artifact("model")
         if path is None:
             raise MissingArtifact("No model artifact supplied (predictions-only audit)")
-        if not path.exists():
-            raise MissingArtifact(f"Model file not found: {path.name}")
+        require_file(path, "artifacts.model")
         self.spec.verify_artifact("model")
         if path.suffix.lower() == ".skops":
             return _load_skops(path)
@@ -165,8 +180,9 @@ class AuditContext:
     @cached_property
     def documentation(self) -> dict[str, Any] | None:
         path = self.spec.artifact("documentation")
-        if path is None or not path.exists():
+        if path is None:
             return None
+        require_file(path, "artifacts.documentation")
         return load_yaml(path) or {}
 
     # LLM applications ----------------------------------------------------
@@ -190,12 +206,17 @@ class AuditContext:
         path = self.spec.llm.get("probes")
         if not path:
             raise MissingArtifact("llm.probes is required for LLM checks")
+        require_file(Path(path), "llm.probes")
         return load_probe_file(path)
 
     @cached_property
     def knowledge_base(self) -> str:
         path = self.spec.llm.get("knowledge_base")
-        return Path(path).read_text(encoding="utf-8") if path else ""
+        return (
+            require_file(Path(path), "llm.knowledge_base").read_text(encoding="utf-8")
+            if path
+            else ""
+        )
 
     @cached_property
     def system_prompt(self) -> str:
@@ -438,10 +459,11 @@ class AuditContext:
         path = self.spec.agent.get("trace")
         if not path:
             raise MissingArtifact("agent.trace or agent.sandbox is required for agent checks")
+        require_file(Path(path), "agent.trace")
         fmt = self.spec.agent.get("trace_format", "native")
         from pramana.adapters.traces import load_trace
 
-        # A missing trace is "not applicable" (skip); a present-but-unreadable or
-        # misconfigured trace is an error that blocks the gate — an audit cannot
-        # vouch for evidence it could not parse.
+        # No trace declared is "not applicable" (skip). A declared trace that is
+        # missing, unreadable or misconfigured is an error that blocks the gate: an
+        # audit cannot vouch for evidence it could not read.
         return load_trace(path, fmt)

@@ -21,7 +21,7 @@ from collections import deque
 from pathlib import Path
 from typing import Any
 
-from pramana.context import AuditContext, MissingArtifact
+from pramana.context import AuditContext, MissingArtifact, require_file
 from pramana.metrics import wilson_interval
 from pramana.registry import register
 from pramana.safeio import load_yaml, read_text_limited
@@ -260,8 +260,7 @@ def approval_paths(ctx: AuditContext) -> CheckResult:
     if not path:
         raise MissingArtifact("agent.workflow (the agent's workflow graph) is not declared")
     path = Path(path)
-    if not path.exists():
-        raise MissingArtifact(f"agent.workflow not found: {path.name}")
+    require_file(path, "agent.workflow")
     irreversible = {str(n) for n in cfg.get("irreversible_nodes") or []}
     approvals = {str(n) for n in cfg.get("approval_nodes") or []}
     if not irreversible:
