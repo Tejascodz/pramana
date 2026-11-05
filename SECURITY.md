@@ -110,7 +110,10 @@ Ollama applies its own origin and host checks; keep them by leaving
   left as they are.
 - **Audit packs from someone else are untrusted data.** `pramana verify` only
   reads files inside the pack, and the dashboard shows a pack's text as plain
-  text, so it cannot load images or links from it.
+  text, so it cannot load images or links from it. Bare web and e-mail
+  addresses, which Streamlit would otherwise turn into links, are defanged with
+  an invisible word joiner, and the one-click *Deploy* button is hidden so a
+  pack is never published by accident.
 
 ## CI
 

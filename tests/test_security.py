@@ -348,3 +348,14 @@ def test_dashboard_shows_pack_text_as_text():
 
     shown = app.plain("![x](http://attacker.example/p.png) **bold**")
     assert "![" not in shown and "](" not in shown and "**" not in shown
+    # Bare URLs and e-mail addresses are auto-linked by Streamlit even when escaped,
+    # so they are defanged: found by opening a hostile pack in a real browser.
+    for linkable in ("https://evil.example/login", "www.phish.example", "help@evil.example"):
+        shown = app.plain(f"click {linkable} now")
+        assert "://" not in shown and "www." not in shown and "@evil" not in shown
+        assert shown.replace("\u2060", "").replace("\\", "") == f"click {linkable} now"
+
+
+def test_dashboard_has_no_one_click_deploy():
+    config = (ROOT / ".streamlit" / "config.toml").read_text(encoding="utf-8")
+    assert 'toolbarMode = "viewer"' in config

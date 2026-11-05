@@ -2,6 +2,11 @@
 [server]
 address = "127.0.0.1"
 
+# Hide the "Deploy" button: an audit pack must never be published to a cloud
+# service by a single click.
+[client]
+toolbarMode = "viewer"
+
 [browser]
 serverAddress = "localhost"
 gatherUsageStats = false

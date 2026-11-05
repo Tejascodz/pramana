@@ -21,11 +21,20 @@ import streamlit as st
 
 STATE_ORDER = ["evidenced", "partial", "deficient", "not tested"]
 MARKDOWN_SPECIAL = re.compile(r"([\\`*_{}\[\]()#+\-.!|<>~])")
+# Streamlit's Markdown auto-links bare URLs and e-mail addresses even when escaped, so
+# they are defanged with an invisible word joiner (U+2060): the text reads the same,
+# but a URL in a model's answer never becomes something a reviewer can click.
+WORD_JOINER = "\u2060"
+LINKABLE = re.compile(r"(://|www\.|@)", re.IGNORECASE)
+
+
+def defang(value: str) -> str:
+    return LINKABLE.sub(lambda m: m.group(0)[0] + WORD_JOINER + m.group(0)[1:], value)
 
 
 def plain(value: object) -> str:
     """Show text from a pack as text: no links, images or formatting from its contents."""
-    return MARKDOWN_SPECIAL.sub(r"\\\1", str(value))
+    return MARKDOWN_SPECIAL.sub(r"\\\1", defang(str(value)))
 
 
 def load_results() -> tuple[dict | None, Path | None]:
@@ -40,6 +49,49 @@ def load_results() -> tuple[dict | None, Path | None]:
         st.error(f"No results.json in {args.pack}")
     uploaded = st.sidebar.file_uploader("Upload results.json", type="json")
     return (json.load(uploaded) if uploaded else None), None
+
+
+#: Columns of a finding's per-test table, in display order, when present.
+PROBE_COLUMNS = {
+    "probe_id": "Test",
+    "result": "Result",
+    "samples": "Samples failed",
+    "technique": "Technique",
+    "broken_at_turn": "Broke at turn",
+    "outcome": "Outcome",
+    "language": "Language",
+    "response_excerpt": "Response excerpt",
+}
+
+
+def probe_table(probes: list[dict]) -> pd.DataFrame:
+    """A finding's per-test rows as a plain table (st.dataframe renders text as text)."""
+    rows = []
+    for p in probes:
+        failed = p.get(
+            "failed", p.get("succeeded") or p.get("disclosed") or p.get("compliant") is False
+        )
+        if p.get("samples_evaluated", 1) == 0:
+            result = "error"
+        elif p.get("not_reached"):
+            result = "not tested"
+        else:
+            result = "fail" if failed else "pass"
+        row = {
+            "probe_id": p.get("probe_id", ""),
+            "result": result,
+            "technique": p.get("technique") or p.get("rule") or "",
+            "response_excerpt": p.get("response_excerpt", ""),
+        }
+        if "samples_failed" in p:
+            row["samples"] = f"{p['samples_failed']}/{p.get('samples_evaluated', 0)}"
+        for key in ("broken_at_turn", "outcome", "language"):
+            if p.get(key) not in (None, ""):
+                row[key] = p[key]
+        rows.append(row)
+    frame = pd.DataFrame(rows).fillna("")
+    cols = [c for c in PROBE_COLUMNS if c in frame.columns]
+    return frame[cols].rename(columns=PROBE_COLUMNS)
 
 
 def show_integrity(pack: Path | None) -> None:
@@ -70,6 +122,18 @@ def main() -> None:
     st.title(plain(f"{system['name']} v{system['version']}"))
     st.caption(plain(f"Audit {data['audit_id']} · {data['audit_date']} · owner {system['owner']}"))
     show_integrity(pack)
+    run = data.get("llm_run") or {}
+    if run.get("calls"):
+        where = run.get("endpoint") or run.get("source") or run.get("mode", "")
+        models = ", ".join(run.get("models_reported") or []) or run.get("model_requested", "")
+        st.caption(
+            plain(
+                f"{'Live run against ' + where if run.get('mode') != 'replay' else 'Replayed from ' + where}"
+                f" · {run['calls']} calls, {run.get('errors', 0)} failed"
+                f" · {run.get('samples_per_probe', 1)} sample(s) per probe"
+                + (f" · model {models}" if models else "")
+            )
+        )
 
     risks = pd.DataFrame(data["risks"])
     open_risks = risks[~risks["accepted"]] if not risks.empty else risks
@@ -116,10 +180,13 @@ def main() -> None:
             label = plain(f"[{row['status'].upper()}] {row['title']} · {row['check_id']}")
             with st.expander(label):
                 st.markdown(plain(row["summary"]))
-                if row["recommendation"]:
+                if row["recommendation"] and row["status"] in ("fail", "warn", "error"):
                     st.markdown(f"**Recommendation.** {plain(row['recommendation'])}")
                 if row["controls"]:
                     st.caption(plain("Controls: " + ", ".join(row["controls"])))
+                details = row.get("details") if isinstance(row.get("details"), dict) else {}
+                if details.get("probes"):
+                    st.dataframe(probe_table(details["probes"]), hide_index=True, width="stretch")
                 if row["metrics"]:
                     st.json(row["metrics"], expanded=False)
 

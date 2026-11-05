@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.7 — 2026-11-05
+
+The interactive viewer had not been tested since the 0.6 features landed. It was run in a real browser against the credit, real-model and agent-sandbox packs (every tab, every finding open): no errors, and the integrity check worked. Fixes from that run:
+
+- **Security: URLs in a pack became clickable links.** The viewer escaped Markdown, but Streamlit still auto-linked bare web and e-mail addresses, so a URL in a model's answer showed up as a link a reviewer could click. They are now defanged with an invisible word joiner; a hostile test pack now renders no links.
+- **Per-test detail in findings.** Each finding shows its table: test, result, samples failed, technique, turn at which a conversation broke, honeypot outcome, language and the reply. Before, only the summary and raw metrics were shown, so multi-turn, obfuscation and honeypot results were invisible in the viewer.
+- Recommendations are shown only for failures and warnings, the live-run line (endpoint, calls, samples, model) is shown, and the one-click *Deploy* button is hidden.
+- Viewer tests (`tests/test_dashboard.py`, Streamlit AppTest) now run in CI: `streamlit` is in the `dev` extra.
+
 ## 0.7.6 — 2026-11-05
 
 - **Report layout fixes** found while regenerating the README screenshots: long framework names in the coverage chart ran off its left edge (they now wrap onto two lines), the risk register squeezed its table beside the heatmap below laptop width (it now stacks), and probe rows repeated their language or "held out" when the technique already said so.
