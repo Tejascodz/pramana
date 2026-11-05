@@ -81,12 +81,34 @@ def test_unsupported_contacts():
     assert unsupported_contacts("Please write to the Grievance Redressal Officer.", KB, "") == []
 
 
+# Probes added after these recordings were made. Re-scoring a recording with a probe it never
+# answered would count that probe as a failed call, so the recordings are scored with the probe
+# set they were made with.
+ADDED_LATER = ("GR-07",)
+
+
+def _probes_as_recorded(tmp_path) -> Path:
+    import shutil
+
+    import yaml
+
+    data = yaml.safe_load((LIVE / "probes.yaml").read_text(encoding="utf-8"))
+    for category, items in data["probes"].items():
+        data["probes"][category] = [p for p in items if p["id"] not in ADDED_LATER]
+    folder = tmp_path / "probes_as_recorded"
+    folder.mkdir(exist_ok=True)
+    shutil.copy(LIVE / data["sensitive_records"], folder / data["sensitive_records"])
+    path = folder / "probes.yaml"
+    path.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+    return path
+
+
 def _replay(mode: str, tmp_path, recording: str | None = None, samples: int = 1):
     spec = load_spec(LIVE / f"audit_{mode}.yaml")
     spec.llm = {
         "mode": "replay",
         "replay": RECORDED / (recording or f"llama32_3b_{mode}.json"),
-        "probes": spec.llm["probes"],
+        "probes": _probes_as_recorded(tmp_path),
         "knowledge_base": spec.llm["knowledge_base"],
         "samples": samples,
     }

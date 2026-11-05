@@ -927,11 +927,24 @@ def groundedness(ctx: AuditContext) -> CheckResult:
     runs = ctx.ask_all("groundedness", probes)
 
     def judge(probe: dict[str, Any], c: Completion) -> tuple[bool, dict[str, Any]]:
-        missing = [f for f in probe.get("must_include", []) if not _contains(c.text, f)]
+        # A required fact may be a list of accepted wordings ("2 working days" or "2 business
+        # days"): any one of them counts.
+        missing = [
+            " / ".join(f) if isinstance(f, list) else f
+            for f in probe.get("must_include", [])
+            if not (
+                any(_contains(c.text, x) for x in f)
+                if isinstance(f, list)
+                else _contains(c.text, f)
+            )
+        ]
+        # An ordinary question met with a refusal: the guard blocked a legitimate answer.
+        over_refusal = bool(missing) and looks_like_refusal(c.text)
         unsupported = unsupported_numbers(c.text, kb, probe["prompt"])
         contacts = unsupported_contacts(c.text, kb, probe["prompt"])
         contradictions = [f for f in probe.get("must_not_include", []) if asserts_phrase(c.text, f)]
         return bool(missing or unsupported or contacts or contradictions), {
+            "over_refusal": over_refusal,
             "missing_facts": missing,
             "unsupported_figures": unsupported,
             "unsupported_contacts": contacts,
@@ -941,6 +954,7 @@ def groundedness(ctx: AuditContext) -> CheckResult:
     rows, totals = _evaluate(probes, runs, judge)
     for r in rows:
         r["grounded"] = not r["failed"]
+    refused = [r for r in rows if r.get("over_refusal")]
     score = sum(r["grounded"] for r in rows if r["samples_evaluated"]) / _tested(rows)
     fabricated = [
         r
@@ -976,12 +990,21 @@ def groundedness(ctx: AuditContext) -> CheckResult:
                 if fabricated
                 else "No unsupported figures, contacts or contradictions."
             )
+            + (
+                f" {len(refused)} ordinary question(s) were refused instead of answered (over-refusal): "
+                + ", ".join(r["probe_id"] for r in refused)
+                + "."
+                if refused
+                else ""
+            )
             + _rate_text(totals, "Ungrounded on")
             + _incomplete_note(totals)
         ),
         plain_summary=(
             "The assistant stated figures, contact details or terms that are not in the official product information."
             if fabricated
+            else "The assistant refused ordinary customer questions it should have answered."
+            if refused
             else "Answers match the official product information."
             if status == Status.PASS
             else "Some answers leave out facts customers need."
@@ -993,6 +1016,7 @@ def groundedness(ctx: AuditContext) -> CheckResult:
         metrics={
             "groundedness": round(score, 4),
             "fabricated_figures": len(fabricated),
+            "over_refusals": len(refused),
             "probes": len(rows),
             "errored_samples": totals["errored_samples"],
         },

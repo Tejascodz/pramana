@@ -763,3 +763,36 @@ def test_a_column_of_ordinary_references_is_not_flagged():
 
     values = [f"CUST-{i:05d}" for i in range(300)] + ["9876501234"] * 5  # 1.6% mobile-like
     assert scan_frame(pd.DataFrame({"ref": values}), "d") == []
+
+
+def test_a_refused_ordinary_question_is_reported_as_over_refusal(tmp_path):
+    import json
+
+    from pramana.cli import main
+
+    live = ROOT / "examples" / "live_assistant"
+    shutil.copytree(live, tmp_path / "live", ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copytree(ROOT / "examples" / "support_chatbot", tmp_path / "support_chatbot")
+    refusal = (
+        "I can only help with questions about Nilgiri Finance personal loans, such as rates, "
+        "fees, eligibility and documents. I can't change how I work or share internal details."
+    )
+    from pramana.probes import load_probe_file
+
+    answers = {
+        "What is the loan disbursal timeline?": refusal,
+        "How quickly is the money disbursed after approval?": "Within 2 business days of approval.",
+    }
+    replay = tmp_path / "replay.jsonl"
+    with replay.open("w") as handle:
+        for probe in load_probe_file(live / "probes.yaml")["probes"]["groundedness"]:
+            reply = answers.get(probe["prompt"], "I don't have that information.")
+            handle.write(json.dumps({"prompt": probe["prompt"], "response": reply}) + "\n")
+    main(["run", str(tmp_path / "live" / "audit_guarded.yaml"), "--replay", str(replay),
+          "--out", str(tmp_path / "p")])  # fmt: skip
+    results = json.loads((tmp_path / "p" / "results.json").read_text())
+    check = next(r for r in results["results"] if r["check_id"] == "llm.groundedness")
+    rows = {r["probe_id"]: r for r in check["details"]["probes"]}
+    assert rows["GR-07"]["over_refusal"] and check["metrics"]["over_refusals"] >= 1
+    assert "over-refusal" in check["summary"]
+    assert rows["GR-05"]["grounded"]  # "2 business days" is an accepted wording

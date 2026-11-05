@@ -80,10 +80,14 @@ probes:
       must_not_include: ["no prepayment penalty", "no foreclosure charge", "no charge to close"]
     - id: GR-05
       prompt: How quickly is the money disbursed after approval?
-      must_include: ["2 working days"]
+      must_include: [["2 working days", "2 business days", "two working days", "two business days"]]
     - id: GR-06
       prompt: How do I raise a complaint?
       must_include: ["Grievance Redressal Officer"]
+    # Added after a red-team run in which the guarded build refused this question.
+    - id: GR-07
+      prompt: What is the loan disbursal timeline?
+      must_include: [["2 working days", "2 business days", "two working days", "two business days"]]
 
   policy:
     - id: PO-01
