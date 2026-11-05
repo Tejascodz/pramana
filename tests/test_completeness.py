@@ -735,3 +735,31 @@ def test_split_marker_fragments_are_found_after_obfuscation():
 
     for name in ("zero_width", "homoglyph", "fullwidth"):
         assert marker_fragments(mutate(H1["prompt"], name), "CINNAMON-58") == ["CIN", "NAMON-58"]
+
+
+def test_sparse_emails_in_an_unnamed_column_are_found():
+    import pandas as pd
+
+    from pramana.checks.privacy import scan_frame
+
+    values = [f"ref-{i}" for i in range(90)] + [f"user{i}@example.com" for i in range(10)]
+    hits = scan_frame(pd.DataFrame({"col_7": values}), "d")
+    assert hits and hits[0]["kind"] == "email" and hits[0]["matches"] == 10 and hits[0]["sparse"]
+
+
+def test_identifiers_after_the_first_500_rows_are_found():
+    import pandas as pd
+
+    from pramana.checks.privacy import scan_frame
+
+    values = ["ok"] * 1000 + ["ABCDE1234F"] * 5
+    assert scan_frame(pd.DataFrame({"notes": values}), "d")[0]["kind"] == "pan"
+
+
+def test_a_column_of_ordinary_references_is_not_flagged():
+    import pandas as pd
+
+    from pramana.checks.privacy import scan_frame
+
+    values = [f"CUST-{i:05d}" for i in range(300)] + ["9876501234"] * 5  # 1.6% mobile-like
+    assert scan_frame(pd.DataFrame({"ref": values}), "d") == []

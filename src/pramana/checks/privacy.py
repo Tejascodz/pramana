@@ -22,8 +22,14 @@ PII_PATTERNS: dict[str, re.Pattern[str]] = {
     "card_like": re.compile(r"\b(?:\d[ -]?){13,16}\b"),
 }
 NAME_HINTS = ("name", "email", "phone", "mobile", "address", "aadhaar", "pan_no", "passport", "dob")
-SAMPLE = 500
+# Columns are scanned whole up to this many values; longer ones are sampled evenly across the
+# column, so identifiers near the end of a file are not missed.
+MAX_SCAN = 200_000
 MIN_MATCH_RATE = 0.30
+# Formats that ordinary values almost never match by chance: one hit is evidence, so a free-text
+# or unnamed column with a few e-mail addresses or PANs is flagged however rare they are. Digit
+# patterns (mobile, Aadhaar-like, card, IP) match plain numbers too and keep the rate threshold.
+HIGH_PRECISION = ("email", "pan")
 
 
 def _luhn_ok(text: str) -> bool:
@@ -51,8 +57,13 @@ def scan_frame(df: pd.DataFrame, dataset: str) -> list[dict[str, Any]]:
             # Whole numbers stored as float because the column has a blank somewhere: a
             # mobile number read as 9876501234.0 must still be recognised.
             series = series.astype("int64")
-        sample = series.astype(str).head(SAMPLE)
-        best_kind, best_rate = None, 0.0
+        values = series.astype(str)
+        if len(values) > MAX_SCAN:
+            step = len(values) / MAX_SCAN
+            values = values.iloc[[int(i * step) for i in range(MAX_SCAN)]]
+        sample = values
+        best_kind, best_rate, best_count = None, 0.0, 0
+        sparse_kind, sparse_count = None, 0
         if not pd.api.types.is_float_dtype(series):
             for kind, pattern in PII_PATTERNS.items():
                 matches = sample.str.contains(pattern).astype(bool)
@@ -63,7 +74,9 @@ def scan_frame(df: pd.DataFrame, dataset: str) -> list[dict[str, Any]]:
                     )
                 match_rate = float(matches.mean())
                 if match_rate > best_rate:
-                    best_kind, best_rate = kind, match_rate
+                    best_kind, best_rate, best_count = kind, match_rate, int(matches.sum())
+                if kind in HIGH_PRECISION and int(matches.sum()) > sparse_count:
+                    sparse_kind, sparse_count = kind, int(matches.sum())
         if best_rate >= MIN_MATCH_RATE or (hint and best_rate > 0):
             hits.append(
                 {
@@ -71,6 +84,20 @@ def scan_frame(df: pd.DataFrame, dataset: str) -> list[dict[str, Any]]:
                     "column": col,
                     "kind": best_kind,
                     "match_rate": round(best_rate, 3),
+                    "matches": best_count,
+                    "values_scanned": int(len(sample)),
+                }
+            )
+        elif sparse_count:
+            hits.append(
+                {
+                    "dataset": dataset,
+                    "column": col,
+                    "kind": sparse_kind,
+                    "match_rate": round(sparse_count / len(sample), 3),
+                    "matches": sparse_count,
+                    "values_scanned": int(len(sample)),
+                    "sparse": True,
                 }
             )
         elif hint and pd.api.types.is_object_dtype(series):
@@ -110,7 +137,12 @@ def pii_exposure(ctx: AuditContext) -> CheckResult:
 
     summary = (
         f"Direct identifiers found in {len(columns)} column(s): "
-        + ", ".join(f"{h['column']} [{h['kind']}] in {h['dataset']}" for h in hits[:6])
+        + ", ".join(
+            f"{h['column']} [{h['kind']}"
+            + (f", {h['matches']} of {h['values_scanned']} values" if h.get("sparse") else "")
+            + f"] in {h['dataset']}"
+            for h in hits[:6]
+        )
         + "."
         + (
             f" Used as model inputs: {', '.join(in_model)}."

@@ -149,13 +149,16 @@ def test_fairness_reports_not_assessed_when_groups_are_too_small(tmp_path):
 
 
 def test_self_test_detects_its_canary_when_the_majority_is_favoured(tmp_path):
-    # Majority A is favoured (90%), minority B gets half that (45%). Halving the
-    # majority would equalise the rates and hide the canary; halving B cannot.
+    # Majority A is favoured (90%), minority B gets half that (45%). The canary is planted on a
+    # balanced copy, so the real gap can neither hide it nor make it look detected.
     spec = _tabular_case(tmp_path, 600, 0.9, 200, 0.45)
     r = run_audit(spec, tmp_path / "pack").result("audit.detector_sensitivity")
-    di_canary = next(c for c in r.details["canaries"] if c["canary"].startswith("halve"))
-    assert di_canary["detected"], di_canary
-    assert "group=B" in di_canary["canary"]
+    planted = next(
+        c for c in r.details["canaries"] if c["canary"].startswith("balanced copy, then")
+    )
+    control = next(c for c in r.details["canaries"] if "false-alarm" in c["canary"])
+    assert planted["detected"], planted
+    assert control["detected"], control
 
 
 # P1: drift must not crash or mis-sort on degenerate features ---------------------

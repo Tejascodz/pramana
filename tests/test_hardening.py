@@ -57,7 +57,9 @@ def test_untestable_attribute_never_gets_an_empty_action_list(tmp_path):
 # Self-test ------------------------------------------------------------------------
 
 
-def test_self_test_skips_the_fairness_canary_when_no_one_is_approved(tmp_path):
+def test_self_test_plants_a_real_disparity_even_when_no_one_is_approved(tmp_path):
+    # The model approves no one, so halving its own approvals would flip nothing. The canary is
+    # planted on a balanced copy instead, so it still changes decisions and is still graded.
     rng = np.random.default_rng(2)
     n = 200
     spec = _case(
@@ -68,8 +70,9 @@ def test_self_test_skips_the_fairness_canary_when_no_one_is_approved(tmp_path):
         income=rng.normal(50, 10, n),
     )
     r = run_audit(spec, tmp_path / "pack").result("audit.detector_sensitivity")
-    assert not any(c["canary"].startswith("halve") for c in r.details["canaries"])
-    assert r.status != Status.FAIL
+    canary = next(c for c in r.details["canaries"] if c["canary"].startswith("balanced copy, then"))
+    assert canary["detected"] and " 0 decisions flipped" not in canary["observed"]
+    assert r.status == Status.PASS, r.summary
 
 
 # Groundedness in both directions --------------------------------------------------
