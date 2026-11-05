@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from pramana.safeio import strict_json
+
 LEDGER_NAME = "ledger.jsonl"
 EVIDENCE_DIR = "evidence"
 # Evidence lives in evidence/<n>-<stage>/<name>.json (one folder per SMACTR stage).
@@ -46,9 +48,14 @@ def sha256_file(path: Path) -> str:
 
 
 def canonical_json(data: Any) -> bytes:
-    return json.dumps(data, sort_keys=True, indent=2, default=str, ensure_ascii=False).encode(
-        "utf-8"
-    )
+    return json.dumps(
+        strict_json(data),
+        sort_keys=True,
+        indent=2,
+        default=str,
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")
 
 
 def _entry_hash(entry: dict[str, Any]) -> str:

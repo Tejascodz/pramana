@@ -557,3 +557,15 @@ def test_rates_are_over_tested_probes_only():
     ]
     rows, _ = _evaluate(probes, runs, lambda p, c: (c.text == "bad", {}))
     assert _tested(rows) == 2
+
+
+def test_results_and_evidence_are_strict_json():
+    import json
+    import math
+
+    from pramana.audit.ledger import canonical_json
+    from pramana.safeio import strict_json
+
+    data = {"a": math.nan, "b": [math.inf, 1.5], "c": {"d": -math.inf}}
+    assert strict_json(data) == {"a": None, "b": [None, 1.5], "c": {"d": None}}
+    json.loads(canonical_json(data), parse_constant=lambda c: pytest.fail(c))

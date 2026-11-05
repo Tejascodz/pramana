@@ -18,7 +18,7 @@ from pramana.reporting.charts import coverage_bars, group_bars, risk_heatmap
 from pramana.reporting.ml_bom import render_ml_bom
 from pramana.reporting.model_card import render_model_card
 from pramana.reporting.narrative import executive_summary
-from pramana.safeio import csv_safe
+from pramana.safeio import csv_safe, strict_json
 from pramana.types import Status
 
 REPORT_FILES = {
@@ -128,7 +128,8 @@ def write_outputs(result, out_dir: Path, ledger: EvidenceLedger | None = None) -
 
     paths["report"].write_text(render_html(result), encoding="utf-8")
     paths["results"].write_text(
-        json.dumps(result.to_dict(), indent=2, default=str), encoding="utf-8"
+        json.dumps(strict_json(result.to_dict()), indent=2, default=str, allow_nan=False),
+        encoding="utf-8",
     )
     _write_csv(
         paths["risk_register"],

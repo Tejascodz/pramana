@@ -13,6 +13,7 @@ helpers here apply the same limits everywhere:
 
 from __future__ import annotations
 
+import math
 import os
 import re
 from pathlib import Path
@@ -63,4 +64,16 @@ def csv_safe(value: Any) -> Any:
         return value
     if value.startswith(_FORMULA_START) and not _PLAIN_NUMBER.match(value):
         return "'" + value
+    return value
+
+
+def strict_json(value: Any) -> Any:
+    """``value`` with NaN and infinities replaced by null, so the file is standard JSON
+    that jq, JavaScript and other strict parsers can read."""
+    if isinstance(value, float):
+        return value if math.isfinite(value) else None
+    if isinstance(value, dict):
+        return {k: strict_json(v) for k, v in value.items()}
+    if isinstance(value, list | tuple):
+        return [strict_json(v) for v in value]
     return value
