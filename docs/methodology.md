@@ -210,7 +210,8 @@ A risk is **accepted** only if the spec has an acceptance for that check with an
 
 ## 5. Gate and opinion
 
-- **Gate**: BLOCK if any open (not accepted) risk has a rating in `gate.block_on` (default critical and high), or if any check ended in ERROR (the audit is *incomplete*; set `gate.allow_incomplete: true` to override). `pramana run` exits 1 on BLOCK.
+- **Gate**: BLOCK if any open (not accepted) risk has a rating in `gate.block_on` (default critical and high), or if any check ended in ERROR (the audit is *incomplete*; set `gate.allow_incomplete: true` to override), or if no technical test ran at all. `pramana run` exits 1 on BLOCK.
+- **Skipped versus incomplete**: a check is *skipped* (not applicable) when the spec does not supply what it needs, for example no `production_data` or no `agent.workflow`. An input that the spec **declares** but that does not exist is an ERROR ("Not tested: … is declared in the spec but not found"), so the audit is incomplete and the gate blocks: a missing file must never turn into a pass.
 - **Opinion**: *Ineffective* if any open high or critical risk; otherwise *Incomplete* if any check errored; otherwise *Partially effective* if the worst open risk is medium; otherwise *Effective*.
 
 ## 6. Comparing audits

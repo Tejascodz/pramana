@@ -336,11 +336,19 @@ def _cmd_diff(args: argparse.Namespace) -> int:
     after = {r["check_id"]: r for r in new["results"]}
     order = {"pass": 0, "skipped": 1, "warn": 2, "error": 3, "fail": 4}  # nosec B105 - statuses
     print("| Check | Before | After | Change | Key metrics |\n|---|---|---|---|---|")
-    improved = regressed = 0
+    improved = regressed = added = removed = 0
     for check_id in list(dict.fromkeys([*before, *after])):
         b, a = before.get(check_id), after.get(check_id)
         sb, sa = (b or {}).get("status", "-"), (a or {}).get("status", "-")
-        if sb in order and sa in order and order[sa] < order[sb]:
+        if b is not None and a is None:
+            # A check that ran before and is gone now: dropping a failing test must not
+            # look like progress, so it counts against --fail-on-regression.
+            change = "**removed**"
+            if sb in ("pass", "warn", "fail"):
+                removed += 1
+        elif b is None and a is not None:
+            change, added = "added", added + 1
+        elif sb in order and sa in order and order[sa] < order[sb]:
             change, improved = "improved", improved + 1
         elif sb in order and sa in order and order[sa] > order[sb]:
             change, regressed = "**regressed**", regressed + 1
@@ -349,12 +357,15 @@ def _cmd_diff(args: argparse.Namespace) -> int:
         metrics = []
         for key in KEY_METRICS:
             vb, va = (b or {}).get("metrics", {}).get(key), (a or {}).get("metrics", {}).get(key)
-            if vb is not None or va is not None:
-                if vb != va:
-                    metrics.append(f"{key} {vb} → {va}")
+            if (vb is not None or va is not None) and vb != va:
+                metrics.append(f"{key} {'–' if vb is None else vb} → {'–' if va is None else va}")
         print(f"| `{check_id}` | {sb} | {sa} | {change} | {'; '.join(metrics[:3])} |")
-    print(f"\n{improved} check(s) improved, {regressed} regressed.")
-    return EXIT_BLOCKED if regressed and args.fail_on_regression else EXIT_OK
+    print(
+        f"\n{improved} check(s) improved, {regressed} regressed, {added} added, "
+        f"{removed} removed after running in the earlier audit."
+    )
+    worse = regressed + removed
+    return EXIT_BLOCKED if worse and args.fail_on_regression else EXIT_OK
 
 
 def _cmd_ping(args: argparse.Namespace) -> int:

@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.9 — 2026-11-05
+
+Security, from the file-by-file review.
+
+- **Fix: a truncated ledger let results.json be forged.** `pramana verify` checked every ledger entry and every file under `evidence/`, but `results.json`, the report and the CSV exports sit at the top of the pack. Cutting the last entries off the ledger left a valid chain, and `results.json` could then be edited: a test turned a BLOCK into a PASS and *Ineffective* into *Effective*, and verification still said OK. Every file in the pack must now be recorded in the ledger (only the ledger itself, `signature.json` and file-manager metadata are exempt), and `results.json` must be recorded. Rebuilding a whole pack from scratch is still only stopped by a signature or a CI attestation, as documented.
+- `pramana diff` counts a check that ran in the earlier audit and is missing from the later one as **removed**, which fails `--fail-on-regression`; dropping a failing test no longer looks like progress. New checks are listed as **added**.
+- `pramana init` followed by `run` reports the missing files instead of a pickle-trust error for a model file that does not exist yet.
+- The `signing` extra is named `pramana-audit[signing]` in the error message and docs; stale version numbers removed from SECURITY.md and the release workflow; `make lint` also checks formatting, like CI.
+
 ## 0.7.8 — 2026-11-05
 
 From a file-by-file review of the repository (every data file parsed, every pack verified, every example audit run).

@@ -90,6 +90,8 @@ class AuditSpec:
         path = self.artifacts.get("model")
         if path is None or Path(path).suffix.lower() in SAFE_MODEL_SUFFIXES:
             return
+        if not Path(path).exists():
+            return  # nothing to unpickle; the checks report the missing file instead
         if "model" in self.artifacts_sha256 or self.trust_pickled_model:
             return
         raise UntrustedModelError(

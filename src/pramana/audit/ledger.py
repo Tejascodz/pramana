@@ -25,6 +25,12 @@ _STAGE_DIR = re.compile(r"^\d-[a-z]+$")
 # Named here so `verify` can detect it without importing the signing module
 # (which needs the optional 'cryptography' dependency).
 SIGNATURE_NAME_IF_ANY = "signature.json"
+RESULTS_NAME = "results.json"
+#: Files in a pack that are not sealed in its own ledger: the ledger itself and the
+#: detached signature over it.
+UNSEALED_FILES = {LEDGER_NAME, SIGNATURE_NAME_IF_ANY}
+#: Metadata a file manager may drop into any folder; never read by Pramana.
+OS_METADATA = {".DS_Store", "Thumbs.db", "desktop.ini"}
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -185,16 +191,22 @@ def verify_pack(pack_dir: Path) -> tuple[bool, list[str]]:
                 problems.append(f"{label}: evidence file content changed")
         prev = entry.get("entry_hash")
 
-    # Every file under evidence/ must be recorded in the ledger. A planted file would
-    # otherwise sit beside genuine evidence with nothing to show it was never part of the audit.
+    # Every file in the pack must be recorded in the ledger, not only those under
+    # evidence/. Otherwise cutting the tail off the ledger (where results.json and the
+    # report are recorded) leaves a valid-looking chain, and results.json could then be
+    # edited freely (found in the 0.7.8 review: a BLOCK was turned into a PASS).
     recorded = {
         json.loads(line).get("path") for line in lines if json.loads(line).get("kind") == "evidence"
     }
-    evidence_dir = pack_dir / EVIDENCE_DIR
-    if evidence_dir.is_dir():
-        for f in sorted(evidence_dir.rglob("*")):
-            if f.is_file():
-                rel = f.relative_to(pack_dir).as_posix()
-                if rel not in recorded:
-                    problems.append(f"unrecorded file in evidence: {rel}")
+    for f in sorted(pack_dir.rglob("*")):
+        if not f.is_file() or f.name in UNSEALED_FILES or f.name in OS_METADATA:
+            continue
+        rel = f.relative_to(pack_dir).as_posix()
+        if rel not in recorded:
+            where = "in evidence" if rel.startswith(f"{EVIDENCE_DIR}/") else "in the pack"
+            problems.append(f"unrecorded file {where}: {rel}")
+    if RESULTS_NAME not in recorded:
+        problems.append(
+            f"{RESULTS_NAME} is not recorded in the ledger (pack incomplete or truncated)"
+        )
     return not problems, problems

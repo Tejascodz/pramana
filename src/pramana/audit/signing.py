@@ -12,7 +12,7 @@ has not been rebuilt. This is provenance and non-repudiation on top of the
 chain's tamper-evidence.
 
 Signing is optional and needs the ``cryptography`` package
-(``pip install "pramana[signing]"``). Ed25519 keys are small, fast and standard.
+(``pip install "pramana-audit[signing]"``). Ed25519 keys are small, fast and standard.
 
 What a valid signature proves, and does not:
 * **Proves:** the pack was signed by the holder of the private key, and the
@@ -45,7 +45,7 @@ def _require_crypto():
     except ImportError as exc:  # pragma: no cover - exercised via the error path
         raise SigningError(
             "Signing needs the 'cryptography' package. Install it with: "
-            'pip install "pramana[signing]"'
+            'pip install "pramana-audit[signing]"'
         ) from exc
     return ed25519, serialization
 

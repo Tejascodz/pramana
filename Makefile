@@ -8,6 +8,7 @@ test:
 
 lint:
 	ruff check src tests dashboard examples
+	ruff format --check src tests dashboard examples
 
 example:
 	python examples/credit_scoring/build_model.py

@@ -159,7 +159,7 @@ build-provenance attestation signed with Sigstore, and the release lists
 `SHA256SUMS` for every file. To check a wheel you downloaded:
 
 ```bash
-gh attestation verify pramana_audit-0.6.0-py3-none-any.whl --repo Tejascodz/pramana
+gh attestation verify pramana_audit-<version>-py3-none-any.whl --repo Tejascodz/pramana
 shasum -a 256 -c SHA256SUMS
 ```
 
@@ -168,9 +168,9 @@ long-lived API token exists that could be stolen.
 
 ## Dependencies
 
-The package and every optional extra had no known vulnerable dependencies
-when 0.6.0 was released (`pip-audit`, run in CI on every push). Minimum
-versions sit above known advisories (Jinja2 3.1.6, scikit-learn 1.5).
+CI runs `pip-audit` on the package and every optional extra on every push, so
+a dependency with a known vulnerability fails the build. Minimum versions sit
+above known advisories (Jinja2 3.1.6, scikit-learn 1.5).
 
 ## Reporting a problem
 

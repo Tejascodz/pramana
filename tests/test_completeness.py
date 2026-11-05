@@ -78,3 +78,23 @@ def test_the_gate_blocks_when_no_technical_test_ran(tmp_path, credit_example):
     result = run_audit(spec, tmp_path / "pack")
     assert "no technical test ran" in result.gate["incomplete_checks"]
     assert result.gate["decision"] == "BLOCK"
+
+
+def test_diff_counts_a_dropped_check_against_fail_on_regression(tmp_path, capsys):
+    """Excluding a failing test from the next audit must not pass a regression gate."""
+    import json
+
+    from pramana.cli import main
+
+    old = ROOT / "docs" / "sample-audits" / "support_chatbot"
+    new = tmp_path / "new"
+    new.mkdir()
+    results = json.loads((old / "results.json").read_text(encoding="utf-8"))
+    dropped = next(r for r in results["results"] if r["status"] == "fail")
+    results["results"] = [r for r in results["results"] if r is not dropped]
+    (new / "results.json").write_text(json.dumps(results), encoding="utf-8")
+    assert main(["diff", str(old), str(new)]) == 0
+    assert main(["diff", str(old), str(new), "--fail-on-regression"]) == 1
+    out = capsys.readouterr().out
+    assert f"`{dropped['check_id']}` | fail | - | **removed**" in out
+    assert "1 removed after running in the earlier audit" in out

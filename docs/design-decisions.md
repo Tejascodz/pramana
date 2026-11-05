@@ -73,7 +73,7 @@ Short records of the main choices in Pramana and the alternatives that were reje
 ### 14. Failed calls are evidence, and incomplete audits block
 
 **Decision.** Adapters return errors instead of raising; checks with failed calls cannot PASS; any errored check blocks the gate as *incomplete*.
-**Why.** A security test that silently skips half its probes would otherwise look like a pass. Treating "could not test" as "cannot vouch" is the conservative assurance position.
+**Why.** A security test that silently skips half its probes would otherwise look like a pass. Treating "could not test" as "cannot vouch" is the conservative assurance position. The same applies to inputs: a file the spec declares but that is missing is an error, not a skip (before 0.7.8 a credit model with every data file missing passed the gate untested), and the gate blocks if no technical test ran.
 
 ### 15. Repeated sampling with intervals, not single runs
 
