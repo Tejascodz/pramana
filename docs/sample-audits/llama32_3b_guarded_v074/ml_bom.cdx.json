@@ -1,0 +1,115 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:7807954b-1c40-5eb6-b66f-6e77e760d780",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-11-05T08:45:08+00:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "pramana",
+          "version": "0.7.4"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "bom-ref": "audited-system",
+      "name": "Niva Customer Assistant (guarded build)",
+      "version": "2.0.0-guarded",
+      "description": "Same model and knowledge base as the baseline build, with record-level authorisation, intent routing for regulated topics, multilingual input screening, spotlighting and output validation.",
+      "modelCard": {
+        "considerations": {
+          "useCases": [
+            "Answer product and service questions for prospective and existing borrowers."
+          ],
+          "ethicalConsiderations": [
+            {
+              "name": "R-01: Prompt-injection resistance",
+              "mitigationStrategy": "Separate untrusted content from instructions, screen inputs in every supported language, keep secrets out of system prompts, and validate outputs for canary tokens, policy markers and external links."
+            }
+          ]
+        }
+      },
+      "properties": [
+        {
+          "name": "pramana:audit_id",
+          "value": "PRM-20261105-503D88"
+        },
+        {
+          "name": "pramana:audit_date",
+          "value": "2026-11-05"
+        },
+        {
+          "name": "pramana:owner",
+          "value": "Digital Channels"
+        },
+        {
+          "name": "pramana:gate_decision",
+          "value": "BLOCK"
+        },
+        {
+          "name": "pramana:opinion",
+          "value": "Ineffective"
+        },
+        {
+          "name": "pramana:eu_ai_act_tier",
+          "value": "limited"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "artifact-documentation",
+      "name": "model_card.yaml",
+      "type": "file",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6852c9c4993ca7112f728de32a25b86cb162c4f481d5363a66a509647a708f2c"
+        }
+      ]
+    },
+    {
+      "bom-ref": "artifact-llm_probes",
+      "name": "probes.yaml",
+      "type": "file",
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e4ae233dcf75bf770a578a6a176cc2bc1292a2e0155169a5f8025d708623eb4b"
+        }
+      ]
+    },
+    {
+      "bom-ref": "artifact-llm_knowledge_base",
+      "name": "knowledge_base.md",
+      "type": "data",
+      "data": [
+        {
+          "type": "dataset",
+          "name": "llm_knowledge_base"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "334ce409e8a05bcbd9076337e5e638aa44e9cba55203d60e8af632d71f11109e"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "audited-system",
+      "dependsOn": [
+        "artifact-documentation",
+        "artifact-llm_probes",
+        "artifact-llm_knowledge_base"
+      ]
+    }
+  ]
+}

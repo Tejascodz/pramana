@@ -1,0 +1,20 @@
+{
+  "artifacts": [
+    {
+      "artifact": "documentation",
+      "file": "model_card.yaml",
+      "sha256": "6852c9c4993ca7112f728de32a25b86cb162c4f481d5363a66a509647a708f2c"
+    },
+    {
+      "artifact": "llm_probes",
+      "file": "probes.yaml",
+      "sha256": "e4ae233dcf75bf770a578a6a176cc2bc1292a2e0155169a5f8025d708623eb4b"
+    },
+    {
+      "artifact": "llm_knowledge_base",
+      "file": "knowledge_base.md",
+      "sha256": "334ce409e8a05bcbd9076337e5e638aa44e9cba55203d60e8af632d71f11109e"
+    }
+  ],
+  "manual_evidence": []
+}

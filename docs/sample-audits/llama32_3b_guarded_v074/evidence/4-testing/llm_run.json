@@ -1,0 +1,25 @@
+{
+  "calls": 462,
+  "endpoint": "http://127.0.0.1:8801",
+  "errors": 0,
+  "latency_p50_ms": 1.1,
+  "latency_p95_ms": 6434.6,
+  "max_retries": 1,
+  "max_tokens": 300,
+  "mode": "openai_compatible",
+  "model_requested": "niva",
+  "models_reported": [
+    "niva-guarded/llama3.2:3b"
+  ],
+  "probe_packs": [
+    "builtin:injection_core",
+    "builtin:injection_indic",
+    "builtin:disclosure_core",
+    "builtin:multiturn_core"
+  ],
+  "samples_per_probe": 3,
+  "seed": null,
+  "sends_system_prompt": false,
+  "temperature": 0.3,
+  "timeout_s": 180.0
+}

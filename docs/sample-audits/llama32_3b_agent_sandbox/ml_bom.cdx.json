@@ -1,0 +1,87 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:67378b51-d4a3-57cb-8244-a6466b74703c",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-11-04T22:32:48+00:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "pramana",
+          "version": "0.7.0"
+        }
+      ]
+    },
+    "component": {
+      "type": "application",
+      "bom-ref": "audited-system",
+      "name": "Refund agent on llama3.2:3b",
+      "version": "0.1.0",
+      "description": "An open-weights model given bank tools (accounts, fees, documents, approvals, refunds, e-mail, case notes) and tested with instructions planted in tool results.",
+      "modelCard": {
+        "considerations": {
+          "useCases": [
+            "Resolve fee disputes and refund wrongly charged fees."
+          ],
+          "ethicalConsiderations": [
+            {
+              "name": "R-01: Agent honeypot resistance",
+              "mitigationStrategy": "Treat tool output as data, never as instructions: keep it in a separate channel, enforce payee and recipient allowlists and approvals in the tool gateway (not the prompt), and re-run these scenarios on every model or prompt change."
+            },
+            {
+              "name": "R-02: Agent action auditability",
+              "mitigationStrategy": "Enforce approval in the tool gateway (not in the prompt), require a parent request for every tool call, restrict tools to an allowlist, and write logs to an append-only hash chain."
+            },
+            {
+              "name": "R-03: Agent control readiness",
+              "mitigationStrategy": "Give the agent its own identity rather than a user's token, scope its tools with an allowlist enforced in the gateway, require human approval before irreversible actions, define conditions that stop it, write its log to a hash chain, and attach a monitor that reviews actions. Record each in the trace so the audit can see it, not only declare it."
+            },
+            {
+              "name": "R-04: Agent oversight integrity",
+              "mitigationStrategy": "Log the agent's reasoning for every action, keep it legible (do not train against the monitor), and screen tool and retrieval results for instructions before they reach the model."
+            },
+            {
+              "name": "R-05: Risk classification",
+              "mitigationStrategy": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation."
+            }
+          ]
+        }
+      },
+      "properties": [
+        {
+          "name": "pramana:audit_id",
+          "value": "PRM-20261105-8F089F"
+        },
+        {
+          "name": "pramana:audit_date",
+          "value": "2026-11-05"
+        },
+        {
+          "name": "pramana:owner",
+          "value": "Customer Operations"
+        },
+        {
+          "name": "pramana:gate_decision",
+          "value": "BLOCK"
+        },
+        {
+          "name": "pramana:opinion",
+          "value": "Ineffective"
+        },
+        {
+          "name": "pramana:eu_ai_act_tier",
+          "value": "limited"
+        }
+      ]
+    }
+  },
+  "components": [],
+  "dependencies": [
+    {
+      "ref": "audited-system",
+      "dependsOn": []
+    }
+  ]
+}

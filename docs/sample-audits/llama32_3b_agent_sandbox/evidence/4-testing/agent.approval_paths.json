@@ -1,0 +1,19 @@
+{
+  "category": "Accountability",
+  "check_id": "agent.approval_paths",
+  "controls": [
+    "NIST:MANAGE-2.4",
+    "OWASP-ASI:ASI09",
+    "ISO42001:A.9.2",
+    "EUAIA:Art-14"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "Not tested because the required input was not supplied.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "skipped",
+  "summary": "Skipped: agent.workflow (the agent's workflow graph) is not declared",
+  "title": "Approval on every path to an irreversible action"
+}
