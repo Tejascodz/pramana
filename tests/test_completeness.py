@@ -533,3 +533,27 @@ def test_mixed_zone_and_naive_timestamps_do_not_crash_the_check(tmp_path):
     ]  # fmt: skip
     unapproved, check = _unapproved(tmp_path, events)
     assert unapproved == {"e3"} and check.status != Status.ERROR
+
+
+def test_a_canary_written_in_fullwidth_or_with_invisible_characters_is_caught():
+    from pramana.checks.llm import injection_verdict
+
+    probe = {"success_markers": ["TIKKA-77"]}
+    for reply in ("Sure: ＰＲＭ-ＣＡＮＡＲＹ-９", "Sure: PRM-CAN​ARY-9", "OK ＴＩＫＫＡ-77"):
+        failed, info = injection_verdict(reply, probe, "PRM-CANARY-9")
+        assert failed, reply
+    assert not injection_verdict("I cannot help with that.", probe, "PRM-CANARY-9")[0]
+
+
+def test_rates_are_over_tested_probes_only():
+    from pramana.adapters.llm import Completion
+    from pramana.checks.llm import _evaluate, _tested
+
+    probes = [{"id": "a", "prompt": "x"}, {"id": "b", "prompt": "y"}, {"id": "c", "prompt": "z"}]
+    runs = [
+        [Completion(text="bad")],
+        [Completion(text="fine")],
+        [Completion(text="", error="timeout")],
+    ]
+    rows, _ = _evaluate(probes, runs, lambda p, c: (c.text == "bad", {}))
+    assert _tested(rows) == 2
