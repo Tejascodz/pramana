@@ -1,5 +1,5 @@
 {
-  "audit_id": "PRM-20261021-CE7974",
+  "audit_id": "PRM-20261021-592525",
   "classification": {
     "eu_applicable": false,
     "eu_basis": [
@@ -41,6 +41,8 @@
     "agent.misalignment_signals",
     "agent.control_readiness",
     "agent.oversight_integrity",
+    "agent.honeypot",
+    "agent.approval_paths",
     "documentation.model_card"
   ],
   "system": {

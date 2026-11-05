@@ -229,7 +229,7 @@
       "INDIA:SUTRA-SAFETY",
       "ISO42005:6.8.3"
     ],
-    "description": "Decisions stay stable under small input changes; some business-logic expectations are violated.",
+    "description": "Decisions stay stable under small input changes; but some business-logic expectations are violated.",
     "impact": 3,
     "likelihood": 3,
     "owner": "Credit Risk Analytics",

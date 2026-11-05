@@ -20,6 +20,7 @@
             "fpr": 0.5142857142857142,
             "group": "18-25 × rural",
             "mean_score": 0.5725703471358736,
+            "missing_attribute": false,
             "n": 168,
             "selection_rate": 0.6309523809523809,
             "tpr": 0.7142857142857143
@@ -32,6 +33,7 @@
             "fpr": 0.734375,
             "group": "18-25 × semi_urban",
             "mean_score": 0.7245046523344797,
+            "missing_attribute": false,
             "n": 219,
             "selection_rate": 0.8721461187214612,
             "tpr": 0.9290322580645162
@@ -44,6 +46,7 @@
             "fpr": 0.8,
             "group": "18-25 × urban",
             "mean_score": 0.8030989537743167,
+            "missing_attribute": false,
             "n": 306,
             "selection_rate": 0.9313725490196079,
             "tpr": 0.966804979253112
@@ -56,6 +59,7 @@
             "fpr": 0.5414364640883977,
             "group": "26-40 × rural",
             "mean_score": 0.6004010012699342,
+            "missing_attribute": false,
             "n": 409,
             "selection_rate": 0.6821515892420538,
             "tpr": 0.793859649122807
@@ -68,6 +72,7 @@
             "fpr": 0.7413793103448276,
             "group": "26-40 × semi_urban",
             "mean_score": 0.7643331602008278,
+            "missing_attribute": false,
             "n": 500,
             "selection_rate": 0.894,
             "tpr": 0.9401041666666666
@@ -80,6 +85,7 @@
             "fpr": 0.7857142857142857,
             "group": "26-40 × urban",
             "mean_score": 0.8401091514277091,
+            "missing_attribute": false,
             "n": 735,
             "selection_rate": 0.9442176870748299,
             "tpr": 0.9727126805778491
@@ -92,6 +98,7 @@
             "fpr": 0.5849056603773585,
             "group": "41-60 × rural",
             "mean_score": 0.599704075721838,
+            "missing_attribute": false,
             "n": 266,
             "selection_rate": 0.6879699248120301,
             "tpr": 0.75625
@@ -104,6 +111,7 @@
             "fpr": 0.7777777777777778,
             "group": "41-60 × semi_urban",
             "mean_score": 0.781363367053855,
+            "missing_attribute": false,
             "n": 318,
             "selection_rate": 0.9025157232704403,
             "tpr": 0.9333333333333333
@@ -116,6 +124,7 @@
             "fpr": 0.7866666666666666,
             "group": "41-60 × urban",
             "mean_score": 0.8362972615091903,
+            "missing_attribute": false,
             "n": 496,
             "selection_rate": 0.9435483870967742,
             "tpr": 0.9714964370546318
@@ -128,6 +137,7 @@
             "fpr": 0.6666666666666666,
             "group": "60+ × rural",
             "mean_score": 0.6152909503652139,
+            "missing_attribute": false,
             "n": 63,
             "selection_rate": 0.7301587301587301,
             "tpr": 0.7619047619047619
@@ -140,6 +150,7 @@
             "fpr": 0.5384615384615384,
             "group": "60+ × semi_urban",
             "mean_score": 0.7844580495450818,
+            "missing_attribute": false,
             "n": 69,
             "selection_rate": 0.8840579710144928,
             "tpr": 0.9642857142857143
@@ -152,6 +163,7 @@
             "fpr": 0.7916666666666666,
             "group": "60+ × urban",
             "mean_score": 0.8378457356559593,
+            "missing_attribute": false,
             "n": 111,
             "selection_rate": 0.954954954954955,
             "tpr": 1.0
@@ -167,6 +179,7 @@
           "equalized_odds_difference": 0.2857,
           "least_favoured": "18-25 × rural",
           "marginal_min_di": 0.7192,
+          "missing_attribute_rows": 0,
           "most_favoured": "60+ × urban",
           "p_value": 5.610740178662765e-10
         }
@@ -181,6 +194,7 @@
             "fpr": 0.6666666666666666,
             "group": "female × 18-25",
             "mean_score": 0.7175119411532602,
+            "missing_attribute": false,
             "n": 310,
             "selection_rate": 0.8419354838709677,
             "tpr": 0.9241706161137441
@@ -193,6 +207,7 @@
             "fpr": 0.6394849785407726,
             "group": "female × 26-40",
             "mean_score": 0.7398297800856447,
+            "missing_attribute": false,
             "n": 751,
             "selection_rate": 0.844207723035952,
             "tpr": 0.9362934362934363
@@ -205,6 +220,7 @@
             "fpr": 0.7045454545454546,
             "group": "female × 41-60",
             "mean_score": 0.7554868143044214,
+            "missing_attribute": false,
             "n": 469,
             "selection_rate": 0.8550106609808102,
             "tpr": 0.913946587537092
@@ -217,6 +233,7 @@
             "fpr": 0.59375,
             "group": "female × 60+",
             "mean_score": 0.740707757098728,
+            "missing_attribute": false,
             "n": 103,
             "selection_rate": 0.8349514563106796,
             "tpr": 0.9436619718309859
@@ -229,6 +246,7 @@
             "fpr": 0.69,
             "group": "male × 18-25",
             "mean_score": 0.7263130947193419,
+            "missing_attribute": false,
             "n": 383,
             "selection_rate": 0.8381201044386423,
             "tpr": 0.8904593639575972
@@ -241,6 +259,7 @@
             "fpr": 0.6988636363636364,
             "group": "male × 26-40",
             "mean_score": 0.7722269328945848,
+            "missing_attribute": false,
             "n": 893,
             "selection_rate": 0.8801791713325868,
             "tpr": 0.9246861924686193
@@ -253,6 +272,7 @@
             "fpr": 0.6875,
             "group": "male × 41-60",
             "mean_score": 0.7667347965055965,
+            "missing_attribute": false,
             "n": 611,
             "selection_rate": 0.8788870703764321,
             "tpr": 0.9218436873747495
@@ -265,6 +285,7 @@
             "fpr": 0.8076923076923077,
             "group": "male × 60+",
             "mean_score": 0.7828493783447257,
+            "missing_attribute": false,
             "n": 140,
             "selection_rate": 0.9071428571428571,
             "tpr": 0.9298245614035088
@@ -280,6 +301,7 @@
           "equalized_odds_difference": 0.2139,
           "least_favoured": "female × 60+",
           "marginal_min_di": 0.9581,
+          "missing_attribute_rows": 0,
           "most_favoured": "male × 60+",
           "p_value": 0.09092814778957198
         }
@@ -294,6 +316,7 @@
             "fpr": 0.5714285714285714,
             "group": "female × rural",
             "mean_score": 0.5728863145461569,
+            "missing_attribute": false,
             "n": 426,
             "selection_rate": 0.6267605633802817,
             "tpr": 0.7068965517241379
@@ -306,6 +329,7 @@
             "fpr": 0.728,
             "group": "female × semi_urban",
             "mean_score": 0.7611065825901134,
+            "missing_attribute": false,
             "n": 500,
             "selection_rate": 0.894,
             "tpr": 0.9493333333333334
@@ -318,6 +342,7 @@
             "fpr": 0.773109243697479,
             "group": "female × urban",
             "mean_score": 0.8261021502122392,
+            "missing_attribute": false,
             "n": 707,
             "selection_rate": 0.9448373408769448,
             "tpr": 0.9795918367346939
@@ -330,6 +355,7 @@
             "fpr": 0.5238095238095238,
             "group": "male × rural",
             "mean_score": 0.6166476497012174,
+            "missing_attribute": false,
             "n": 480,
             "selection_rate": 0.7229166666666667,
             "tpr": 0.7937853107344632
@@ -342,6 +368,7 @@
             "fpr": 0.7480916030534351,
             "group": "male × semi_urban",
             "mean_score": 0.763829973281097,
+            "missing_attribute": false,
             "n": 606,
             "selection_rate": 0.8894389438943895,
             "tpr": 0.9284210526315789
@@ -354,6 +381,7 @@
             "fpr": 0.802547770700637,
             "group": "male × urban",
             "mean_score": 0.836321577386423,
+            "missing_attribute": false,
             "n": 941,
             "selection_rate": 0.9404888416578109,
             "tpr": 0.9681122448979592
@@ -369,6 +397,7 @@
           "equalized_odds_difference": 0.2787,
           "least_favoured": "female × rural",
           "marginal_min_di": 0.7192,
+          "missing_attribute_rows": 0,
           "most_favoured": "female × urban",
           "p_value": 1.8595833165257757e-42
         }

@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.7.13 — 2026-11-05
+
+From a line-by-line review of every remaining module. Each fix below has a regression test.
+
+**Agent checks (bypasses closed)**
+
+- **Fix: renaming the amount field skipped human approval.** A refund logged as `{"amt": 50000}` instead of `{"amount": 50000}` was treated as below the approval threshold. A missing, renamed or unreadable amount now needs approval.
+- **Fix: one approval authorised any number of actions.** Two refunds citing the same approval both counted as approved; the second is now unapproved and reported as "reuses approval …".
+- **Fix: an approval from one session authorised an action in another.** It no longer counts.
+- **Fix: the misalignment scanner read only the first match.** "I won't delete the logs … Later I will delete the logs so no one notices" was missed because the first mention was negated. Every match is now tried. Zero-width characters and full-width or look-alike letters are folded first, in agent reasoning and in tool results screened for planted instructions.
+- A timestamp with a time zone compared with one without crashed the check; the order is now "cannot be shown" and the approval does not count. A tool call with no tool name no longer crashes control readiness, and control readiness now agrees with the auditability check on reused approvals.
+- OpenTelemetry traces: tool arguments recorded as a JSON string (as the GenAI conventions specify) are parsed, so approval thresholds apply, and `startTimeUnixNano` is read as a time. A log line that is valid JSON but not an object is named instead of crashing.
+
+**LLM checks**
+
+- **Fix: a reply could hide a leak with invisible or full-width characters.** A canary written as "ＰＲＭ-…" or split with a zero-width space was not detected. Replies are now also read in folded form for markers, the canary, personal data and known record values.
+- Attack, groundedness and conduct rates are computed over probes that were actually tested; a probe whose every call failed no longer counts as resisted or grounded (it was already reported as not tested).
+- Whitespace-only answers count as empty in service health.
+- **Probe files that could never fail are refused when loaded:** `{canary}` used with no `canary` set (the marker would be empty), an invalid `success_regex` (it used to fail only after every call was made), an empty prompt, and an `include` nested inside an included file (it was silently ignored).
+
+**Tabular checks** (also listed in the commits before this release)
+
+- Score drift is reported as not measured when production data has no scores, while input drift is still measured. Rows with a missing protected attribute are shown but never compared, and are not used as a "group" in calibration or the proxy screen. A misspelt monotonicity feature is reported as an untested rule instead of vanishing. An AUC confidence interval that cannot be computed is a warning, not a pass. Data-quality class balance and leakage use labelled rows. Identifier columns with a blank cell (read as floats) are scanned for personal data. A non-numeric documented threshold or AUC is a finding, not a crash. A declared EU tier in capitals is read correctly.
+
+**Spec, reports and command line**
+
+- **Fix: a formatting slip could lower the risk tier.** `deployment_regions: EU` was read as the letters E and U, so the EU AI Act did not apply, and `fraud_detection_only: "no"` (a string, so true) classed a credit model as minimal risk. Tier-moving fields must now have the right type.
+- The report headline follows the gate's own `block_on` rule, so a gate that blocks on medium findings no longer reads "0 high or critical risks need treatment".
+- `results.json` and evidence files are always standard JSON: NaN or infinity becomes `null`.
+- `pramana run` refuses an output folder that already holds other files and is not an earlier pack (for example `--out .`), and reports a bad `--date` instead of a traceback. A re-run into the same pack removes the previous run's `llm_replay.jsonl` and `agent_sandbox_trace.jsonl`, which would otherwise fail verification.
+- `pramana diff`: a check that ran before and is now skipped or errored is "not tested now" and counts against `--fail-on-regression`; it used to count as an improvement. `pramana summary` and `diff` escape `|` and line breaks in table cells (the summary goes into the GitHub job summary). An unreadable key file is an input error, not a traceback.
+
 ## 0.7.12 — 2026-11-05
 
 - **Fix: an endpoint that answered every message with an empty string passed the security checks.** With HTTP 200 and an empty reply to everything, prompt injection, disclosure and service health all said PASS ("longest response 0 characters"); only failing conduct tests blocked the gate. An empty answer proves nothing, so it now counts as a failed call ("empty response") in every probe check, and service health fails when answers are empty. A dead endpoint now blocks even with no conduct tests defined.

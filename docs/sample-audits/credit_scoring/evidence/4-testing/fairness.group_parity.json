@@ -23,6 +23,7 @@
             "fpr": 0.678391959798995,
             "group": "18-25",
             "mean_score": 0.7223760707576028,
+            "missing_attribute": false,
             "n": 693,
             "selection_rate": 0.8398268398268398,
             "tpr": 0.9048582995951417
@@ -35,6 +36,7 @@
             "fpr": 0.6650366748166259,
             "group": "26-40",
             "mean_score": 0.7574275036004765,
+            "missing_attribute": false,
             "n": 1644,
             "selection_rate": 0.8637469586374696,
             "tpr": 0.9295546558704454
@@ -47,6 +49,7 @@
             "fpr": 0.6967213114754098,
             "group": "41-60",
             "mean_score": 0.7618502560867529,
+            "missing_attribute": false,
             "n": 1080,
             "selection_rate": 0.8685185185185185,
             "tpr": 0.9186602870813397
@@ -59,6 +62,7 @@
             "fpr": 0.6896551724137931,
             "group": "60+",
             "mean_score": 0.7649868804503316,
+            "missing_attribute": false,
             "n": 243,
             "selection_rate": 0.8765432098765432,
             "tpr": 0.9351351351351351
@@ -73,6 +77,7 @@
           "equal_opportunity_difference": 0.0303,
           "equalized_odds_difference": 0.0317,
           "least_favoured": "18-25",
+          "missing_attribute_rows": 0,
           "most_favoured": "60+",
           "p_value": 0.16857071945394242
         }
@@ -87,6 +92,7 @@
             "fpr": 0.6592741935483871,
             "group": "female",
             "mean_score": 0.7401451815626288,
+            "missing_attribute": false,
             "n": 1633,
             "selection_rate": 0.8462951622780159,
             "tpr": 0.9278803869832893
@@ -99,6 +105,7 @@
             "fpr": 0.7004830917874396,
             "group": "male",
             "mean_score": 0.7626297187891234,
+            "missing_attribute": false,
             "n": 2027,
             "selection_rate": 0.8737049827331032,
             "tpr": 0.9181649101053937
@@ -113,6 +120,7 @@
           "equal_opportunity_difference": 0.0097,
           "equalized_odds_difference": 0.0412,
           "least_favoured": "female",
+          "missing_attribute_rows": 0,
           "most_favoured": "male",
           "p_value": 0.017025043464364786
         }
@@ -127,6 +135,7 @@
             "fpr": 0.5555555555555556,
             "group": "rural",
             "mean_score": 0.5960711278733413,
+            "missing_attribute": false,
             "n": 906,
             "selection_rate": 0.6777041942604857,
             "tpr": 0.7651515151515151
@@ -139,6 +148,7 @@
             "fpr": 0.73828125,
             "group": "semi_urban",
             "mean_score": 0.7625987839994588,
+            "missing_attribute": false,
             "n": 1106,
             "selection_rate": 0.891500904159132,
             "tpr": 0.9376470588235294
@@ -151,6 +161,7 @@
             "fpr": 0.7898550724637681,
             "group": "urban",
             "mean_score": 0.8319373935198282,
+            "missing_attribute": false,
             "n": 1648,
             "selection_rate": 0.9423543689320388,
             "tpr": 0.9730320699708455
@@ -165,6 +176,7 @@
           "equal_opportunity_difference": 0.2079,
           "equalized_odds_difference": 0.2343,
           "least_favoured": "rural",
+          "missing_attribute_rows": 0,
           "most_favoured": "urban",
           "p_value": 3.1060747046243966e-71
         }

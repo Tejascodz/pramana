@@ -36,6 +36,21 @@
     "failure_mode": "Instructions embedded in user or retrieved content override system rules"
   },
   {
+    "check_id": "llm.multi_turn",
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-LLM:LLM07",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "detection": "Multi-turn manipulation resistance",
+    "effect": "Policy bypass and data exfiltration that single-message screening misses",
+    "failure_mode": "A conversation walks the assistant past its rules over several messages"
+  },
+  {
     "check_id": "llm.groundedness",
     "controls": [
       "NIST:MEASURE-2.5",
@@ -63,6 +78,19 @@
     "detection": "Conduct-policy adherence",
     "effect": "Consumer harm; breach of conduct rules",
     "failure_mode": "Assistant gives prohibited advice or omits required disclosures"
+  },
+  {
+    "check_id": "llm.obfuscation",
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15"
+    ],
+    "detection": "Obfuscated-attack resistance",
+    "effect": "Defences that read raw text are bypassed while the model still obeys",
+    "failure_mode": "Attacks disguised with invisible or look-alike characters pass input filters"
   },
   {
     "check_id": "llm.sensitive_disclosure",

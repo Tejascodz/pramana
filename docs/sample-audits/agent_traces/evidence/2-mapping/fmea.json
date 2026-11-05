@@ -105,6 +105,33 @@
     "failure_mode": "Agent actions are not explained by logged reasoning, or data the agent reads carries planted instructions"
   },
   {
+    "check_id": "agent.honeypot",
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-ASI:ASI01",
+      "OWASP-ASI:ASI02",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15"
+    ],
+    "detection": "Agent honeypot resistance",
+    "effect": "Money sent or data disclosed to an attacker through the agent's own tools",
+    "failure_mode": "An instruction planted in a tool result makes the agent act for a third party"
+  },
+  {
+    "check_id": "agent.approval_paths",
+    "controls": [
+      "NIST:MANAGE-2.4",
+      "OWASP-ASI:ASI09",
+      "ISO42001:A.9.2",
+      "EUAIA:Art-14"
+    ],
+    "detection": "Approval on every path to an irreversible action",
+    "effect": "Irreversible actions with no human in the loop",
+    "failure_mode": "The workflow can reach an irreversible step without human approval"
+  },
+  {
     "check_id": "documentation.model_card",
     "controls": [
       "NIST:MAP-2.2",

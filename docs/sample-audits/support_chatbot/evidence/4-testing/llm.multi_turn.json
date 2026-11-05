@@ -1,0 +1,22 @@
+{
+  "category": "Security",
+  "check_id": "llm.multi_turn",
+  "controls": [
+    "NIST:MEASURE-2.7",
+    "NIST-GAI:INFO-SECURITY",
+    "OWASP-LLM:LLM01",
+    "OWASP-LLM:LLM07",
+    "ISO42001:A.6.2.4",
+    "EUAIA:Art-15",
+    "INDIA:SUTRA-SAFETY"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "Not tested because the required input was not supplied.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "skipped",
+  "summary": "Skipped: No 'multi_turn' probes defined in llm.probes",
+  "title": "Multi-turn manipulation resistance"
+}

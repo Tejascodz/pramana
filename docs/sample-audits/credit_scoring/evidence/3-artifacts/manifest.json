@@ -3,7 +3,7 @@
     {
       "artifact": "model",
       "file": "model.joblib",
-      "sha256": "bea25a1865913e3f126be0fb8ac9949ef3c02427054a716158bbcf1c1c9577b5"
+      "sha256": "1cdc0960040e39cf7940f6dc538a49eff1729ea8c083d0c6229f4afcf1fe75b9"
     },
     {
       "artifact": "reference_data",

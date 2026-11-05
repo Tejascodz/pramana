@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-6E6BB8",
+  "audit_id": "PRM-20261021-BF3CD5",
   "tool": {
     "name": "pramana",
-    "version": "0.5.0"
+    "version": "0.7.13"
   },
   "system": {
     "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
@@ -31,8 +31,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-10-23T03:27:42+00:00",
-  "finished": "2026-10-23T03:27:45+00:00",
+  "started": "2026-11-05T13:57:30+00:00",
+  "finished": "2026-11-05T13:57:34+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -458,6 +458,7 @@
               {
                 "group": "female",
                 "n": 1633,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8462951622780159,
                 "favourable": 1382,
@@ -470,6 +471,7 @@
               {
                 "group": "male",
                 "n": 2027,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8737049827331032,
                 "favourable": 1771,
@@ -482,6 +484,7 @@
             ],
             "summary": {
               "comparable_groups": 2,
+              "missing_attribute_rows": 0,
               "most_favoured": "male",
               "least_favoured": "female",
               "disparate_impact_ratio": 0.9686,
@@ -498,6 +501,7 @@
               {
                 "group": "18-25",
                 "n": 693,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8398268398268398,
                 "favourable": 582,
@@ -510,6 +514,7 @@
               {
                 "group": "26-40",
                 "n": 1644,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8637469586374696,
                 "favourable": 1420,
@@ -522,6 +527,7 @@
               {
                 "group": "41-60",
                 "n": 1080,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8685185185185185,
                 "favourable": 938,
@@ -534,6 +540,7 @@
               {
                 "group": "60+",
                 "n": 243,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8765432098765432,
                 "favourable": 213,
@@ -546,6 +553,7 @@
             ],
             "summary": {
               "comparable_groups": 4,
+              "missing_attribute_rows": 0,
               "most_favoured": "60+",
               "least_favoured": "18-25",
               "disparate_impact_ratio": 0.9581,
@@ -562,6 +570,7 @@
               {
                 "group": "rural",
                 "n": 906,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.6777041942604857,
                 "favourable": 614,
@@ -574,6 +583,7 @@
               {
                 "group": "semi_urban",
                 "n": 1106,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.891500904159132,
                 "favourable": 986,
@@ -586,6 +596,7 @@
               {
                 "group": "urban",
                 "n": 1648,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.9423543689320388,
                 "favourable": 1553,
@@ -598,6 +609,7 @@
             ],
             "summary": {
               "comparable_groups": 3,
+              "missing_attribute_rows": 0,
               "most_favoured": "urban",
               "least_favoured": "rural",
               "disparate_impact_ratio": 0.7192,
@@ -621,7 +633,7 @@
         "NIST-GAI:HARMFUL-BIAS",
         "ISO42005:6.8.2"
       ],
-      "evidence_hash": "9a9536e6189b69ab85ce8056eff71ef1cc7f978554065530c55bbbf765c3753d"
+      "evidence_hash": "c778616b5c710621e0e7e0003c6636db5ea74c8149fd0ee97f102558647efef4"
     },
     {
       "check_id": "fairness.intersectional",
@@ -643,6 +655,7 @@
               {
                 "group": "female \u00d7 18-25",
                 "n": 310,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8419354838709677,
                 "favourable": 261,
@@ -655,6 +668,7 @@
               {
                 "group": "female \u00d7 26-40",
                 "n": 751,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.844207723035952,
                 "favourable": 634,
@@ -667,6 +681,7 @@
               {
                 "group": "female \u00d7 41-60",
                 "n": 469,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8550106609808102,
                 "favourable": 401,
@@ -679,6 +694,7 @@
               {
                 "group": "female \u00d7 60+",
                 "n": 103,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8349514563106796,
                 "favourable": 86,
@@ -691,6 +707,7 @@
               {
                 "group": "male \u00d7 18-25",
                 "n": 383,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8381201044386423,
                 "favourable": 321,
@@ -703,6 +720,7 @@
               {
                 "group": "male \u00d7 26-40",
                 "n": 893,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8801791713325868,
                 "favourable": 786,
@@ -715,6 +733,7 @@
               {
                 "group": "male \u00d7 41-60",
                 "n": 611,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8788870703764321,
                 "favourable": 537,
@@ -727,6 +746,7 @@
               {
                 "group": "male \u00d7 60+",
                 "n": 140,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.9071428571428571,
                 "favourable": 127,
@@ -739,6 +759,7 @@
             ],
             "summary": {
               "comparable_groups": 8,
+              "missing_attribute_rows": 0,
               "most_favoured": "male \u00d7 60+",
               "least_favoured": "female \u00d7 60+",
               "disparate_impact_ratio": 0.9204,
@@ -756,6 +777,7 @@
               {
                 "group": "female \u00d7 rural",
                 "n": 426,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.6267605633802817,
                 "favourable": 267,
@@ -768,6 +790,7 @@
               {
                 "group": "female \u00d7 semi_urban",
                 "n": 500,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.894,
                 "favourable": 447,
@@ -780,6 +803,7 @@
               {
                 "group": "female \u00d7 urban",
                 "n": 707,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.9448373408769448,
                 "favourable": 668,
@@ -792,6 +816,7 @@
               {
                 "group": "male \u00d7 rural",
                 "n": 480,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.7229166666666667,
                 "favourable": 347,
@@ -804,6 +829,7 @@
               {
                 "group": "male \u00d7 semi_urban",
                 "n": 606,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8894389438943895,
                 "favourable": 539,
@@ -816,6 +842,7 @@
               {
                 "group": "male \u00d7 urban",
                 "n": 941,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.9404888416578109,
                 "favourable": 885,
@@ -828,6 +855,7 @@
             ],
             "summary": {
               "comparable_groups": 6,
+              "missing_attribute_rows": 0,
               "most_favoured": "female \u00d7 urban",
               "least_favoured": "female \u00d7 rural",
               "disparate_impact_ratio": 0.6634,
@@ -845,6 +873,7 @@
               {
                 "group": "18-25 \u00d7 rural",
                 "n": 168,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.6309523809523809,
                 "favourable": 106,
@@ -857,6 +886,7 @@
               {
                 "group": "18-25 \u00d7 semi_urban",
                 "n": 219,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8721461187214612,
                 "favourable": 191,
@@ -869,6 +899,7 @@
               {
                 "group": "18-25 \u00d7 urban",
                 "n": 306,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.9313725490196079,
                 "favourable": 285,
@@ -881,6 +912,7 @@
               {
                 "group": "26-40 \u00d7 rural",
                 "n": 409,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.6821515892420538,
                 "favourable": 279,
@@ -893,6 +925,7 @@
               {
                 "group": "26-40 \u00d7 semi_urban",
                 "n": 500,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.894,
                 "favourable": 447,
@@ -905,6 +938,7 @@
               {
                 "group": "26-40 \u00d7 urban",
                 "n": 735,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.9442176870748299,
                 "favourable": 694,
@@ -917,6 +951,7 @@
               {
                 "group": "41-60 \u00d7 rural",
                 "n": 266,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.6879699248120301,
                 "favourable": 183,
@@ -929,6 +964,7 @@
               {
                 "group": "41-60 \u00d7 semi_urban",
                 "n": 318,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.9025157232704403,
                 "favourable": 287,
@@ -941,6 +977,7 @@
               {
                 "group": "41-60 \u00d7 urban",
                 "n": 496,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.9435483870967742,
                 "favourable": 468,
@@ -953,6 +990,7 @@
               {
                 "group": "60+ \u00d7 rural",
                 "n": 63,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.7301587301587301,
                 "favourable": 46,
@@ -965,6 +1003,7 @@
               {
                 "group": "60+ \u00d7 semi_urban",
                 "n": 69,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.8840579710144928,
                 "favourable": 61,
@@ -977,6 +1016,7 @@
               {
                 "group": "60+ \u00d7 urban",
                 "n": 111,
+                "missing_attribute": false,
                 "adequate_sample": true,
                 "selection_rate": 0.954954954954955,
                 "favourable": 106,
@@ -989,6 +1029,7 @@
             ],
             "summary": {
               "comparable_groups": 12,
+              "missing_attribute_rows": 0,
               "most_favoured": "60+ \u00d7 urban",
               "least_favoured": "18-25 \u00d7 rural",
               "disparate_impact_ratio": 0.6607,
@@ -1010,7 +1051,7 @@
         "INDIA:SUTRA-FAIRNESS",
         "ISO42005:6.8.2"
       ],
-      "evidence_hash": "db883c5a791651b2663d125f5383c2b302ce9ecf1509defcd3973a9f40f90f54"
+      "evidence_hash": "135908e87eadc932ef772711b0e328a5a4f6debec041c0d2ff3ad5195a69878b"
     },
     {
       "check_id": "fairness.proxy_features",
@@ -1118,7 +1159,7 @@
       "status": "warn",
       "severity": "medium",
       "summary": "Decision flip rate 1.3% at 1% noise, 4.0% at 5%, 5.7% at 10% of each feature's std (limit 5%). 10% missing numeric values flip 2.9% of decisions. monthly_income should be increasing: violated for 14.4% of rows. bureau_score should be increasing: violated for 7.8% of rows. debt_to_income should be decreasing: violated for 18.0% of rows.",
-      "plain_summary": "Decisions stay stable under small input changes; some business-logic expectations are violated.",
+      "plain_summary": "Decisions stay stable under small input changes; but some business-logic expectations are violated.",
       "recommendation": "Add input validation and imputation, apply monotonic constraints where the business logic requires them, and add a manual-review band around the decision threshold.",
       "metrics": {
         "flip_rate_1pct": 0.0126,
@@ -1161,7 +1202,8 @@
             "expected": "decreasing",
             "violation_rate": 0.1798
           }
-        ]
+        ],
+        "untested_monotonicity_rules": []
       },
       "controls": [
         "NIST:MEASURE-2.5",
@@ -1172,7 +1214,7 @@
         "INDIA:SUTRA-SAFETY",
         "ISO42005:6.8.3"
       ],
-      "evidence_hash": "a134c131062297d64480d1f6ad8f1a4009627caf5f6d637b39822e68e9935e33"
+      "evidence_hash": "92029cd28dd7a84ba5a947e1cf109042709d1cf7b365eab83c692e642f822933"
     },
     {
       "check_id": "drift.population_stability",
@@ -1793,7 +1835,7 @@
     {
       "risk_id": "R-10",
       "title": "Robustness to perturbation",
-      "description": "Decisions stay stable under small input changes; some business-logic expectations are violated.",
+      "description": "Decisions stay stable under small input changes; but some business-logic expectations are violated.",
       "source_check": "robustness.perturbation",
       "likelihood": 3,
       "impact": 3,
@@ -4810,7 +4852,7 @@
     {
       "artifact": "model",
       "file": "model.joblib",
-      "sha256": "bea25a1865913e3f126be0fb8ac9949ef3c02427054a716158bbcf1c1c9577b5"
+      "sha256": "1cdc0960040e39cf7940f6dc538a49eff1729ea8c083d0c6229f4afcf1fe75b9"
     },
     {
       "artifact": "reference_data",
@@ -4876,9 +4918,9 @@
     }
   ],
   "llm_run": {},
-  "ledger_root": "008d4715f87388ea1591cd0cbde2871eb880a5b7ed19dd78d82612d2999703ec",
+  "ledger_root": "d6ea571942f9491168847bb75a5486a9506563c0e0b7d5913a928223923f351e",
   "environment": {
-    "python": "3.13.16",
-    "pramana": "0.5.0"
+    "python": "3.13.18",
+    "pramana": "0.7.13"
   }
 }

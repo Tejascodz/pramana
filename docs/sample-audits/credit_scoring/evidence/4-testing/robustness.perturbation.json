@@ -44,7 +44,8 @@
         "flip_rate": 0.0568,
         "noise_sigma": 0.1
       }
-    ]
+    ],
+    "untested_monotonicity_rules": []
   },
   "evidence_hash": null,
   "metrics": {
@@ -54,7 +55,7 @@
     "handles_missing": true,
     "missing_value_flip_rate": 0.0292
   },
-  "plain_summary": "Decisions stay stable under small input changes; some business-logic expectations are violated.",
+  "plain_summary": "Decisions stay stable under small input changes; but some business-logic expectations are violated.",
   "recommendation": "Add input validation and imputation, apply monotonic constraints where the business logic requires them, and add a manual-review band around the decision threshold.",
   "severity": "medium",
   "status": "warn",
