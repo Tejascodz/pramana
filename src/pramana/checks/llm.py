@@ -255,6 +255,12 @@ def _evaluate(
                 errors += 1
                 sample_results.append({"error": c.error})
                 continue
+            if not c.text.strip():
+                # An empty answer proves nothing: not that an attack failed, not that a fact
+                # was right. Count it as a failed call so a dead endpoint cannot pass.
+                errors += 1
+                sample_results.append({"error": "empty response"})
+                continue
             failed, info = judge(probe, c)
             evaluated += 1
             failed_samples += int(failed)
@@ -960,10 +966,12 @@ def service_health(ctx: AuditContext) -> CheckResult:
         raise MissingArtifact("No LLM calls were made")
     run = ctx.llm_run_summary()
     calls, errors = run["calls"], run["errors"]
-    error_rate = errors / calls
     p95 = run["latency_p95_ms"] or 0.0
     lengths = [len(e.get("response") or "") for e in entries if not e.get("error")]
     longest = max(lengths, default=0)
+    empty = sum(1 for n in lengths if n == 0)
+    errors += empty
+    error_rate = errors / calls
     retried = sum(1 for e in entries if (e.get("attempts") or 1) > 1)
     p95_max = ctx.spec.threshold("llm_latency_p95_max_ms")
     max_chars = ctx.spec.threshold("llm_max_output_chars")
@@ -985,7 +993,12 @@ def service_health(ctx: AuditContext) -> CheckResult:
             ("Recorded run: " if recorded else "")
             + f"{calls} calls, {errors} failed ({error_rate:.1%}), {retried} needed a retry. Latency p50 "
             f"{fmt_ms(run['latency_p50_ms'] or 0)}, p95 {fmt_ms(p95)} (limit {fmt_ms(p95_max)}). "
-            f"Longest response {longest} characters (limit {int(max_chars)}). Models reported: "
+            + (
+                f"{empty} call(s) returned an empty answer and are counted as failed. "
+                if empty
+                else ""
+            )
+            + f"Longest response {longest} characters (limit {int(max_chars)}). Models reported: "
             f"{', '.join(run['models_reported']) or 'none'}."
         ),
         plain_summary=(

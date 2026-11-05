@@ -243,3 +243,50 @@ def test_an_event_without_an_id_is_scored_not_a_crash(tmp_path):
         "agent.trace_auditability"
     )
     assert check.status == Status.FAIL, check.summary
+
+
+# A broken endpoint that answers HTTP 200 with an empty string to everything.
+
+
+def test_an_endpoint_that_returns_empty_answers_cannot_pass(tmp_path):
+    import json
+    import threading
+    from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+    class Empty(BaseHTTPRequestHandler):
+        def log_message(self, *args):
+            return
+
+        def do_POST(self):  # noqa: N802
+            self.rfile.read(int(self.headers.get("Content-Length", 0)))
+            body = json.dumps(
+                {"model": "m", "choices": [{"message": {"role": "assistant", "content": ""}}]}
+            ).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Empty)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        chatbot = ROOT / "examples" / "support_chatbot"
+        spec = tmp_path / "audit.yaml"
+        spec.write_text(
+            "system: {name: Bot, version: '1', type: llm_application, owner: O}\n"
+            "use_case: {domain: customer_support_financial, interacts_with_people: true}\n"
+            f"llm: {{mode: openai_compatible, base_url: 'http://127.0.0.1:{server.server_address[1]}/v1',"
+            f" model: m, probes: '{chatbot / 'probes.yaml'}'}}\n"
+            "checks: {exclude: [llm.policy_adherence, llm.groundedness]}\n",
+            encoding="utf-8",
+        )
+        result = run_audit(load_spec(spec), tmp_path / "p")
+    finally:
+        server.shutdown()
+        server.server_close()
+    for check_id in ("llm.prompt_injection", "llm.sensitive_disclosure"):
+        assert result.result(check_id).status != Status.PASS, check_id
+    health = result.result("llm.service_health")
+    assert health.status == Status.FAIL and "empty answer" in health.summary
+    assert result.gate["decision"] == "BLOCK"

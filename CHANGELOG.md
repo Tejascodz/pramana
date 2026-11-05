@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.12 — 2026-11-05
+
+- **Fix: an endpoint that answered every message with an empty string passed the security checks.** With HTTP 200 and an empty reply to everything, prompt injection, disclosure and service health all said PASS ("longest response 0 characters"); only failing conduct tests blocked the gate. An empty answer proves nothing, so it now counts as a failed call ("empty response") in every probe check, and service health fails when answers are empty. A dead endpoint now blocks even with no conduct tests defined.
+
 ## 0.7.11 — 2026-11-05
 
 From feeding awkward but realistic data to the tabular checks and messy logs to the agent checks.

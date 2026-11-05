@@ -56,7 +56,7 @@ pip install "pramana-audit @ git+https://github.com/Tejascodz/pramana"
 pramana demo                              # runs three bundled audits in a few seconds
 ```
 
-The command and the import are both `pramana`. To pin a version, add a release tag from the [Releases page](https://github.com/Tejascodz/pramana/releases) or a commit hash to the end of the URL (for example `...pramana@v0.7.11`, once that release is tagged). Optional extras: `[signing]` (Ed25519 signed packs), `[skops]` (load `.skops` models without pickle), `[dashboard]` (Streamlit viewer) or `[all]`, for example `pip install "pramana-audit[all] @ git+https://github.com/Tejascodz/pramana"`. Python 3.10 to 3.13 on Linux, macOS and Windows.
+The command and the import are both `pramana`. To pin a version, add a release tag from the [Releases page](https://github.com/Tejascodz/pramana/releases) or a commit hash to the end of the URL (for example `...pramana@v0.7.12`, once that release is tagged). Optional extras: `[signing]` (Ed25519 signed packs), `[skops]` (load `.skops` models without pickle), `[dashboard]` (Streamlit viewer) or `[all]`, for example `pip install "pramana-audit[all] @ git+https://github.com/Tejascodz/pramana"`. Python 3.10 to 3.13 on Linux, macOS and Windows.
 
 Each tagged release also has a ready-built wheel on the [Releases page](https://github.com/Tejascodz/pramana/releases), with SHA-256 checksums and a build attestation that proves it was built from this repository. See [Verifying a release](https://github.com/Tejascodz/pramana/blob/main/SECURITY.md#verifying-a-release).
 
