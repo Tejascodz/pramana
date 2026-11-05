@@ -181,6 +181,35 @@ def _check_use_case(use_case: Any) -> None:
             f"use_case.domain '{domain}' is not a known domain.{hint(str(domain), KNOWN_DOMAINS)} "
             f"Use 'other' if none fits. Known: {', '.join(sorted(KNOWN_DOMAINS))}"
         )
+    # Fields that move the tier must have the right type: "deployment_regions: EU" would be
+    # read as the letters E and U (so the EU AI Act would not apply), and the string "no"
+    # in "fraud_detection_only: no" is true in Python and would lower a credit model to
+    # minimal risk. YAML's own yes/no and true/false are booleans and are accepted.
+    regions = use_case.get("deployment_regions", [])
+    if regions is not None and not (
+        isinstance(regions, list) and all(isinstance(r, str) for r in regions)
+    ):
+        raise SpecError("use_case.deployment_regions must be a list of region codes, e.g. [IN, EU]")
+    for key in (
+        "eu_market",
+        "gpai_provider",
+        "interacts_with_people",
+        "generates_synthetic_content",
+        "article_6_3_exemption",
+        "performs_profiling",
+        "fraud_detection_only",
+        "processes_personal_data",
+    ):
+        if key in use_case and use_case[key] is not None and not isinstance(use_case[key], bool):
+            raise SpecError(f"use_case.{key} must be true or false, not {use_case[key]!r}")
+    vulnerable = use_case.get("vulnerable_groups")
+    if vulnerable is not None and not isinstance(vulnerable, bool | list):
+        raise SpecError(
+            "use_case.vulnerable_groups must be true, false or a list of the groups affected"
+        )
+    decisions = use_case.get("annual_decisions")
+    if decisions is not None and (isinstance(decisions, bool) or not isinstance(decisions, int)):
+        raise SpecError(f"use_case.annual_decisions must be a whole number, not {decisions!r}")
     flags = use_case.get("prohibited_practice_flags") or []
     if not isinstance(flags, list):
         raise SpecError("use_case.prohibited_practice_flags must be a list")

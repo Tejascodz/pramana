@@ -10,6 +10,7 @@ the ``cyclonedx-python-lib`` package is installed.
 
 from __future__ import annotations
 
+import math
 import uuid
 from typing import Any
 
@@ -35,7 +36,7 @@ def _metric(kind: str, value: Any, low: Any = None, high: Any = None, slice_: st
     entry: dict[str, Any] = {"type": kind, "value": f"{float(value):.4g}"}
     if slice_:
         entry["slice"] = slice_
-    if low is not None and high is not None:
+    if low is not None and high is not None and math.isfinite(low) and math.isfinite(high):
         entry["confidenceInterval"] = {"lowerBound": f"{low:.4g}", "upperBound": f"{high:.4g}"}
     return entry
 
@@ -76,7 +77,11 @@ def _fairness_assessments(result) -> list[dict[str, str]]:
     out = []
     for attr, data in parity.details.get("attributes", {}).items():
         s = data["summary"]
-        if s.get("least_favoured") is None or data["status"] == Status.PASS.value:
+        if (
+            s.get("least_favoured") is None
+            or s.get("disparate_impact_ratio") is None
+            or data["status"] == Status.PASS.value
+        ):
             continue
         out.append(
             {

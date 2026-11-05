@@ -20,26 +20,43 @@ def executive_summary(result) -> dict[str, Any]:
     spec = result.spec
     cls = result.classification
     open_risks = [r for r in result.risks if not r.accepted]
-    serious = [r for r in open_risks if r.rating.rank >= Severity.HIGH.rank]
     applicable = sum(1 for c in result.coverage["controls"] if c["state"] != "not applicable")
     evidenced = sum(1 for c in result.coverage["controls"] if c["state"] == "evidenced")
 
     incomplete = result.gate.get("incomplete_checks", [])
-    if result.gate["decision"] == "BLOCK" and incomplete and not serious:
+    # The gate's own list, so a gate set to block on medium findings is described correctly.
+    blocking = result.gate.get("blocking_risks", [])
+    rated = " or ".join(
+        sorted(result.gate.get("block_on", ["critical", "high"]), key=lambda s: -Severity(s).rank)
+    )
+    release = f"{spec.name} v{spec.system['version']}"
+    if result.gate["decision"] == "BLOCK" and incomplete and not blocking:
         headline = (
             f"Release is blocked: {len(incomplete)} test{'s' if len(incomplete) != 1 else ''} could not "
-            f"be completed for {spec.name} v{spec.system['version']}, so the audit cannot vouch for it yet."
+            f"be completed for {release}, so the audit cannot vouch for it yet."
         )
     elif result.gate["decision"] == "BLOCK":
         headline = (
-            f"Release is blocked: {len(serious)} high or critical "
-            f"{'risks need' if len(serious) != 1 else 'risk needs'} treatment before {spec.name} "
-            f"v{spec.system['version']} goes live."
+            f"Release is blocked: {len(blocking)} {rated}-rated "
+            f"{'risks need' if len(blocking) != 1 else 'risk needs'} treatment before {release} "
+            "goes live."
+            + (
+                f" {len(incomplete)} test{'s' if len(incomplete) != 1 else ''} also could not be "
+                "completed."
+                if incomplete
+                else ""
+            )
         )
     else:
         headline = (
-            f"{spec.name} v{spec.system['version']} can be released; "
+            f"{release} can be released; "
             f"{len(open_risks)} lower-rated finding{'s' if len(open_risks) != 1 else ''} remain open."
+            + (
+                f" {len(incomplete)} test{'s' if len(incomplete) != 1 else ''} could not be completed "
+                "and were allowed by the gate setting allow_incomplete."
+                if incomplete
+                else ""
+            )
         )
 
     by_check = {r.check_id: r for r in result.results}

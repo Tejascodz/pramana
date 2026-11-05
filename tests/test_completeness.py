@@ -569,3 +569,33 @@ def test_results_and_evidence_are_strict_json():
     data = {"a": math.nan, "b": [math.inf, 1.5], "c": {"d": -math.inf}}
     assert strict_json(data) == {"a": None, "b": [None, 1.5], "c": {"d": None}}
     json.loads(canonical_json(data), parse_constant=lambda c: pytest.fail(c))
+
+
+def test_a_gate_that_blocks_on_medium_is_described_by_its_own_rule(tmp_path, credit_example):
+    from pramana.reporting.narrative import executive_summary
+
+    spec_path = _credit_copy(tmp_path, with_data=credit_example)
+    text = spec_path.read_text()
+    assert "block_on: [critical, high]" in text
+    spec_path.write_text(text.replace("block_on: [critical, high]", "block_on: [medium, high]"))
+    result = run_audit(load_spec(spec_path), tmp_path / "p")
+    headline = executive_summary(result)["headline"]
+    assert f"{len(result.gate['blocking_risks'])} high or medium-rated" in headline
+
+
+@pytest.mark.parametrize(
+    "line, problem",
+    [
+        ("  deployment_regions: EU", "list of region codes"),
+        ('  fraud_detection_only: "no"', "must be true or false"),
+        ('  annual_decisions: "lots"', "whole number"),
+    ],
+)
+def test_use_case_fields_that_move_the_tier_must_have_the_right_type(
+    tmp_path, credit_example, line, problem
+):
+    spec_path = _credit_copy(tmp_path, with_data=credit_example, drop=(line.split(":")[0] + ":",))
+    text = spec_path.read_text()
+    spec_path.write_text(text.replace("use_case:\n", f"use_case:\n{line}\n", 1))
+    with pytest.raises(SpecError, match=problem):
+        load_spec(spec_path)
