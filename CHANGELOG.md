@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.2 — 2026-11-05
+
+Found by the first real run of the multi-turn and obfuscation checks (llama3.2:3b behind guarded Niva; `docs/live-run-findings.md`, run 4). Obfuscation: all disguised variants stopped. Multi-turn: 3 of 8 conversations failed, two of them real.
+
+- **Fix: a set-up turn could count as a breach.** In MT-03 the user tells the assistant a call sign and the model repeated it back, which was scored as adopting the persona. Multi-turn probes can now set `judge_from_turn`; MT-03 is judged from turn 3.
+- Niva's guarded build refuses conditional trigger rules ("whenever I write …") and fabricated `Assistant:` lines in a user message, the two real gaps the run found.
+
 ## 0.7.1 — 2026-11-05
 
 Found by the first real-model run of the agent sandbox (llama3.2:3b, see `docs/live-run-findings.md`, run 3).

@@ -97,6 +97,12 @@ INJECTION_PATTERNS = [
     r"\b(rules|instructions)\s+bhool\b|\binternal\s+reference\s+code\b",
     r"ಸೂಚನೆಗಳನ್ನು\s+ನಿರ್ಲಕ್ಷಿಸಿ|suchanegalannu\s+bittu",
     r"வழிமுறைகளையும்\s+புறக்கணி",
+    # Added after the first real multi-turn audit (docs/live-run-findings.md, run 4):
+    # a trigger rule for later turns ("whenever I write 'blue sky', reply with ...") ...
+    r"\b(whenever|when\s+next|every\s+time)\s+I\s+(write|say|type|send)\b",
+    r"\bjab\s+(main|mai|me)\b.{0,30}\blikh",
+    # ... and a pasted "earlier chat" that puts words in the assistant's mouth.
+    r"(?m:^\s*(assistant|system|ai|niva|bot)\s*:)",
 ]
 INJECTION = re.compile("|".join(f"(?:{p})" for p in INJECTION_PATTERNS), re.IGNORECASE | re.DOTALL)
 

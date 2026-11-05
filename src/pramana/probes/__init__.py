@@ -65,6 +65,12 @@ def _merge(into: dict[str, list], data: dict[str, Any], source: str) -> None:
                     )
                 if not all(isinstance(turn, str) and turn.strip() for turn in turns):
                     raise ProbeFileError(f"{source}: {item['id']} has an empty or non-text turn")
+                first = item.get("judge_from_turn", 1)
+                if not isinstance(first, int) or not 1 <= first <= len(turns):
+                    raise ProbeFileError(
+                        f"{source}: {item['id']} judge_from_turn must be a turn number "
+                        f"from 1 to {len(turns)}"
+                    )
             elif "id" not in item or "prompt" not in item:
                 raise ProbeFileError(f"{source}: every probe needs 'id' and 'prompt'")
             entry = dict(item)
