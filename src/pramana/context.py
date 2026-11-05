@@ -37,6 +37,20 @@ class DeclaredInputMissing(RuntimeError):
     """
 
 
+class CannotMeasure(RuntimeError):
+    """The data cannot support this measurement (one outcome class, missing scores...).
+
+    Reported as "Not tested", which makes the audit incomplete and blocks the gate. A
+    metric that cannot be computed must never fall through to a pass (an undefined AUC
+    compares false with every threshold).
+    """
+
+
+#: Label given to rows whose protected attribute is missing, so they stay visible as a
+#: group in fairness results instead of being dropped or breaking the comparison.
+MISSING_GROUP = "(missing)"
+
+
 def require_file(path: Path, what: str) -> Path:
     if not path.exists():
         raise DeclaredInputMissing(
@@ -86,8 +100,13 @@ class AuditContext:
             return None
         require_file(path, f"artifacts.{key}")
         if path.suffix.lower() == ".parquet":
-            return pd.read_parquet(path)
-        return pd.read_csv(path)
+            df = pd.read_parquet(path)
+        else:
+            df = pd.read_csv(path)
+        for col in self.spec.sensitive_features:
+            if col in df.columns:
+                df[col] = df[col].where(df[col].notna(), MISSING_GROUP).astype(str)
+        return df
 
     @cached_property
     def eval_df(self) -> pd.DataFrame:
@@ -134,13 +153,26 @@ class AuditContext:
         return df[self.feature_columns]
 
     def y(self, df: pd.DataFrame) -> np.ndarray:
+        missing = int(df[self.spec.target].isna().sum())
+        if missing:
+            # A missing label would otherwise count as a negative outcome and skew every metric.
+            raise CannotMeasure(
+                f"target column '{self.spec.target}' has {missing} missing label(s); remove or "
+                "label those rows"
+            )
         return (df[self.spec.target] == self.spec.positive_label).astype(int).to_numpy()
 
     def score(self, df: pd.DataFrame) -> np.ndarray:
         """Probability of the positive class for each row."""
         if not self.has_model:
             if self.spec.score_column and self.spec.score_column in df.columns:
-                return df[self.spec.score_column].to_numpy(dtype=float)
+                scores = df[self.spec.score_column].to_numpy(dtype=float)
+                missing = int(np.isnan(scores).sum())
+                if missing:
+                    raise CannotMeasure(
+                        f"score_column '{self.spec.score_column}' has {missing} missing value(s)"
+                    )
+                return scores
             raise MissingArtifact("Scores need a model or a score_column")
         model = self.model
         X = self.X(df)

@@ -146,3 +146,64 @@ def test_an_acceptance_stops_blocking_only_until_it_expires(tmp_path):
     after = run_audit(spec, tmp_path / "b", audit_date=date(2027, 1, 2))
     risk = lambda r: next(x for x in r.risks if x.source_check == "agent.trace_auditability")  # noqa: E731
     assert risk(before).accepted and not risk(after).accepted
+
+
+# Awkward but realistic data: found by feeding edge cases to the tabular checks.
+
+
+def _tabular(tmp_path: Path, mutate) -> Path:
+    import numpy as np
+    import pandas as pd
+
+    rng = np.random.default_rng(1)
+    df = pd.DataFrame({"x1": rng.normal(size=400), "group": rng.choice(["A", "B"], size=400)})
+    df["y"] = (df.x1 + rng.normal(scale=0.5, size=400) > 0).astype(int)
+    df["s"] = 1 / (1 + np.exp(-2 * df.x1))
+    mutate(df, rng).to_csv(tmp_path / "eval.csv", index=False)
+    spec = tmp_path / "audit.yaml"
+    spec.write_text(
+        "system: {name: M, version: '1', type: tabular_classifier, owner: O}\n"
+        "use_case: {domain: credit_scoring}\n"
+        "artifacts: {evaluation_data: eval.csv}\ntarget: y\nscore_column: s\n"
+        "sensitive_features: [group]\nfeatures: [x1]\n",
+        encoding="utf-8",
+    )
+    return spec
+
+
+def test_one_outcome_class_is_not_a_performance_pass(tmp_path):
+    spec = _tabular(tmp_path, lambda d, rng: d.assign(y=1))
+    check = run_audit(load_spec(spec), tmp_path / "p").result("performance.discrimination")
+    assert check.status == Status.ERROR and "only one outcome class" in check.summary
+
+
+def test_missing_scores_are_named_not_a_raw_nan_error(tmp_path):
+    import numpy as np
+
+    spec = _tabular(
+        tmp_path, lambda d, rng: d.assign(s=np.where(rng.random(len(d)) < 0.3, np.nan, d.s))
+    )
+    check = run_audit(load_spec(spec), tmp_path / "p").result("fairness.group_parity")
+    assert check.status == Status.ERROR and "score_column 's' has" in check.summary
+
+
+def test_missing_labels_are_not_counted_as_negative_outcomes(tmp_path):
+    import numpy as np
+
+    spec = _tabular(
+        tmp_path, lambda d, rng: d.assign(y=np.where(rng.random(len(d)) < 0.1, np.nan, d.y))
+    )
+    check = run_audit(load_spec(spec), tmp_path / "p").result("performance.discrimination")
+    assert check.status == Status.ERROR and "missing label" in check.summary
+
+
+def test_a_missing_protected_attribute_is_its_own_group(tmp_path):
+    import numpy as np
+
+    spec = _tabular(
+        tmp_path, lambda d, rng: d.assign(group=np.where(rng.random(len(d)) < 0.2, None, d.group))
+    )
+    check = run_audit(load_spec(spec), tmp_path / "p").result("fairness.group_parity")
+    assert check.status != Status.ERROR, check.summary
+    groups = [row["group"] for a in check.details["attributes"].values() for row in a["groups"]]
+    assert "(missing)" in groups

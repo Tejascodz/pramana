@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.7.11 — 2026-11-05
+
+From feeding awkward but realistic data to the tabular checks.
+
+- **Fix: one outcome class gave a performance PASS.** With every evaluation row labelled the same, AUC is undefined (NaN), every comparison with the threshold was false, and the check fell through to PASS. It now reports "Not tested: … only one outcome class", which blocks the gate as incomplete.
+- **Fix: a missing protected attribute crashed fairness.** A blank in a sensitive column (common in real data) raised a `TypeError` in the fairness and calibration checks. Missing values now form their own group, `(missing)`, and stay visible in the results.
+- **Fix: missing target labels counted as negative outcomes,** skewing every metric silently. They are now reported ("target column … has N missing label(s)") and the affected checks are not tested.
+- Missing values in the score column are named ("score_column 's' has 131 missing value(s)") instead of a raw "Input contains NaN".
+
 ## 0.7.10 — 2026-11-05
 
 More from the file-by-file review.

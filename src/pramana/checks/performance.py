@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
-from pramana.context import AuditContext
+from pramana.context import AuditContext, CannotMeasure
 from pramana.metrics import bootstrap_ci, safe_auc
 from pramana.registry import register
 from pramana.types import CheckResult, Severity, Status
@@ -22,6 +23,11 @@ def discrimination(ctx: AuditContext) -> CheckResult:
     min_auc = ctx.spec.threshold("min_auc")
 
     auc = safe_auc(y, scores)
+    if np.isnan(auc):
+        raise CannotMeasure(
+            "the evaluation data has only one outcome class, so discrimination (AUC) cannot "
+            "be measured; evaluate on data with both outcomes"
+        )
     lo, hi = bootstrap_ci(lambda idx: safe_auc(y[idx], scores[idx]), len(y), seed=ctx.spec.seed)
     metrics = {
         "auc": round(auc, 4),

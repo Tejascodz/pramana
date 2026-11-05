@@ -20,7 +20,7 @@ from typing import Any
 
 from pramana import __version__
 from pramana.audit.ledger import EvidenceLedger
-from pramana.context import AuditContext, DeclaredInputMissing, MissingArtifact
+from pramana.context import AuditContext, CannotMeasure, DeclaredInputMissing, MissingArtifact
 from pramana.controls import ControlLibrary, load_library
 from pramana.registry import CheckDefinition, all_checks, checks_for
 from pramana.risk.scoring import audit_opinion, build_register, gate_decision
@@ -107,6 +107,17 @@ def _run_check(definition: CheckDefinition, ctx: AuditContext) -> CheckResult:
             status=Status.SKIPPED,
             summary=f"Skipped: {exc}",
             plain_summary="Not tested because the required input was not supplied.",
+        )
+    except CannotMeasure as exc:
+        return CheckResult(
+            check_id=definition.check_id,
+            title=definition.title,
+            category=definition.category,
+            status=Status.ERROR,
+            severity=Severity.MEDIUM,
+            summary=f"Not tested: {exc}.",
+            plain_summary="The data supplied cannot support this test, so its result is unknown.",
+            recommendation="Fix the data issue described above and re-run the audit.",
         )
     except DeclaredInputMissing as exc:
         return CheckResult(

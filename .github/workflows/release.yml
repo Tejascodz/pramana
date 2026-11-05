@@ -1,4 +1,4 @@
-# Build, test and release when a version tag (for example v0.7.10) is pushed.
+# Build, test and release when a version tag (for example v0.7.11) is pushed.
 #
 # Every tag gets a GitHub release with the wheel, the source archive, SHA256SUMS
 # and a build-provenance attestation, so anyone can check a file was built here
