@@ -599,3 +599,26 @@ def test_use_case_fields_that_move_the_tier_must_have_the_right_type(
     spec_path.write_text(text.replace("use_case:\n", f"use_case:\n{line}\n", 1))
     with pytest.raises(SpecError, match=problem):
         load_spec(spec_path)
+
+
+@pytest.mark.parametrize(
+    "body, problem",
+    [
+        ("include: [builtin:injection_core]\n", "no 'canary' value"),
+        (
+            "canary: X-1\nprobes:\n  prompt_injection:\n"
+            "    - {id: a, prompt: hi, success_regex: ['(unclosed']}\n",
+            "is not valid",
+        ),
+        ("canary: X-1\nprobes:\n  policy:\n    - {id: a, prompt: ''}\n", "empty or non-text"),
+        ("canary: X-1\ninclude: [inner.yaml]\n", "one level deep"),
+    ],
+)
+def test_probe_files_that_could_never_fail_are_refused(tmp_path, body, problem):
+    from pramana.probes import ProbeFileError, load_probe_file
+
+    (tmp_path / "inner.yaml").write_text("include: [builtin:injection_core]\n")
+    path = tmp_path / "probes.yaml"
+    path.write_text(body)
+    with pytest.raises(ProbeFileError, match=problem):
+        load_probe_file(path)

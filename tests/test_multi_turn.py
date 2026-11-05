@@ -58,14 +58,17 @@ def guarded_run(tmp_path_factory):
     return result, tmp, histories
 
 
-def test_the_builtin_pack_loads():
-    probes = load_probe_file(_write_include(Path(__file__).parent))["probes"]["multi_turn"]
+def test_the_builtin_pack_loads(tmp_path):
+    probes = _builtin_multi_turn(tmp_path)
     assert len(probes) >= 8
     assert all(len(p["turns"]) >= 2 for p in probes)
 
 
-def _write_include(folder: Path) -> Path:
-    return folder.parent / "src" / "pramana" / "probes" / "packs" / "multiturn_core.yaml"
+def _builtin_multi_turn(folder: Path) -> list[dict]:
+    """The built-in pack, loaded the way a deployment uses it: included with a canary."""
+    probe_file = folder / "probes.yaml"
+    probe_file.write_text("canary: ZEPHYR-4410\ninclude: [builtin:multiturn_core]\n")
+    return load_probe_file(probe_file)["probes"]["multi_turn"]
 
 
 def test_history_is_sent_with_every_turn(guarded_run):
@@ -179,12 +182,11 @@ def test_judge_from_turn_must_name_a_real_turn(tmp_path, value):
         load_probe_file(p)
 
 
-def test_guarded_niva_screens_trigger_rules_and_fabricated_history():
+def test_guarded_niva_screens_trigger_rules_and_fabricated_history(tmp_path):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "examples" / "live_assistant"))
     import niva_app
 
-    pack = Path(__file__).resolve().parents[1] / "src/pramana/probes/packs/multiturn_core.yaml"
-    probes = {p["id"]: p for p in load_probe_file(pack)["probes"]["multi_turn"]}
+    probes = {p["id"]: p for p in _builtin_multi_turn(tmp_path)}
     for pid in ("MT-01", "MT-05", "MT-07"):  # MT-01 and MT-05 got through in the real run
         assert niva_app.looks_injected(probes[pid]["turns"][0]), pid
     for benign in (
@@ -197,14 +199,16 @@ def test_guarded_niva_screens_trigger_rules_and_fabricated_history():
 
 
 def _all_multi_turn_probes():
+    from pramana.probes import _fill, _read_builtin
+
+    # A built-in pack has no canary of its own; the file that includes it supplies one.
+    pack = _fill(_read_builtin("multiturn_core").get("probes", {}), "ZEPHYR-4410")
+    for probe in pack.get("multi_turn", []):
+        yield "ZEPHYR-4410", probe
     root = Path(__file__).resolve().parents[1]
-    for source in (
-        root / "src/pramana/probes/packs/multiturn_core.yaml",
-        root / "examples/live_assistant/probes.yaml",
-    ):
-        data = load_probe_file(source)
-        for probe in data["probes"].get("multi_turn", []):
-            yield data["canary"] or "ZEPHYR-4410", probe
+    data = load_probe_file(root / "examples/live_assistant/probes.yaml")
+    for probe in data["probes"].get("multi_turn", []):
+        yield data["canary"], probe
 
 
 @pytest.mark.parametrize(

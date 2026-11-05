@@ -17,6 +17,8 @@ detector can recognise. ``sensitive_columns`` limits which CSV columns count.
 from __future__ import annotations
 
 import csv
+import json
+import re
 from importlib import resources
 from pathlib import Path
 from typing import Any
@@ -73,6 +75,16 @@ def _merge(into: dict[str, list], data: dict[str, Any], source: str) -> None:
                     )
             elif "id" not in item or "prompt" not in item:
                 raise ProbeFileError(f"{source}: every probe needs 'id' and 'prompt'")
+            elif not isinstance(item["prompt"], str) or not item["prompt"].strip():
+                raise ProbeFileError(f"{source}: {item['id']} has an empty or non-text prompt")
+            # A bad pattern would otherwise fail only after every call had been made and paid for.
+            for pattern in item.get("success_regex") or []:
+                try:
+                    re.compile(pattern)
+                except (re.error, TypeError) as exc:
+                    raise ProbeFileError(
+                        f"{source}: {item['id']} success_regex {pattern!r} is not valid: {exc}"
+                    ) from exc
             entry = dict(item)
             entry.setdefault("source", source)
             into.setdefault(category, []).append(entry)
@@ -124,7 +136,13 @@ def load_probe_file(path: str | Path) -> dict[str, Any]:
             included = path.parent / ref
             if not included.is_file():
                 raise ProbeFileError(f"included probe file not found: {ref}")
-            _merge(probes, load_yaml(included) or {}, included.name)
+            included_data = load_yaml(included) or {}
+            if included_data.get("include"):
+                raise ProbeFileError(
+                    f"{included.name} has its own 'include'; list every file in {path.name} "
+                    "instead (includes are one level deep)"
+                )
+            _merge(probes, included_data, included.name)
         sources.append(str(ref))
     _merge(probes, data, path.name)
 
@@ -135,7 +153,13 @@ def load_probe_file(path: str | Path) -> dict[str, Any]:
                 raise ProbeFileError(f"Duplicate probe id '{item['id']}'")
             seen.add(item["id"])
 
-    canary = str(data.get("canary", ""))
+    canary = str(data.get("canary", "") or "")
+    # Without a canary "{canary}" would become an empty marker, and a probe that looks for
+    # nothing can never fail.
+    if not canary and "{canary}" in json.dumps([probes, data.get("system_prompt", "")]):
+        raise ProbeFileError(
+            f"{path.name}: probes use {{canary}} but no 'canary' value is set in this file"
+        )
     return {
         "sensitive_values": _sensitive_values(path, data),
         "canary": canary,
