@@ -57,8 +57,13 @@ def _is_high_impact(call: dict[str, Any], rules: dict[str, Any]) -> bool:
     if rule is True:
         return True
     field, limit = rule.get("field"), rule.get("above")
+    args = call.get("args")
+    # An amount that is missing, renamed or unreadable is unknown, and an unknown amount
+    # needs approval: otherwise "amt" instead of "amount" would skip the human check.
+    if not isinstance(args, dict) or field not in args:
+        return True
     try:
-        return float(call.get("args", {}).get(field, 0)) > float(limit)
+        return float(args[field]) > float(limit)
     except (TypeError, ValueError):
         return True
 
@@ -75,6 +80,13 @@ def _approved(call: dict[str, Any], by_id: dict[Any, dict[str, Any]]) -> bool:
         and approval.get("type") == "approval"
         and str(approval.get("actor", "")).startswith("human:")
         and approval.get("decision", "approved") == "approved"
+    ):
+        return False
+    # An approval given in one session does not authorise an action in another.
+    if (
+        approval.get("session_id") not in (None, "")
+        and call.get("session_id") not in (None, "")
+        and approval["session_id"] != call["session_id"]
     ):
         return False
     try:
@@ -157,9 +169,16 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
     attribution = 1 - len(unattributed) / len(calls) if calls else 1.0
 
     unapproved = []
+    reused: list[str] = []
+    used_approvals: set[Any] = set()
     high_calls = [c for c in calls if _is_high_impact(c, high_impact)]
     for call in high_calls:
-        if not _approved(call, by_id):
+        approval_id = call.get("approval_id")
+        # One human approval authorises one high-impact action, not every later one.
+        is_reuse = _approved(call, by_id) and approval_id in used_approvals
+        if is_reuse:
+            reused.append(f"{call.get('event_id', '(no id)')} reuses approval {approval_id}")
+        if not _approved(call, by_id) or is_reuse:
             unapproved.append(
                 {
                     "event_id": call.get("event_id", "(no id)"),
@@ -167,6 +186,8 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
                     "args": call.get("args", {}),
                 }
             )
+        elif approval_id is not None:
+            used_approvals.add(approval_id)
     approval_score = 1 - len(unapproved) / len(high_calls) if high_calls else 1.0
 
     off_list = [
@@ -178,8 +199,12 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
     order_errors = 0
     for e in events:
         parent = by_id.get(e.get("parent_id"))
-        if parent and "ts" in parent and "ts" in e and _ts(parent["ts"]) > _ts(e["ts"]):
-            order_errors += 1
+        if parent and "ts" in parent and "ts" in e:
+            try:
+                if _ts(str(parent["ts"])) > _ts(str(e["ts"])):
+                    order_errors += 1
+            except ValueError:
+                order_errors += 1  # an unreadable timestamp cannot show the order either
     temporal_score = 1 - order_errors / len(events) if events else 0.0
 
     integrity = chain_status(events)
@@ -201,6 +226,8 @@ def trace_auditability(ctx: AuditContext) -> CheckResult:
             + ", ".join(f"{u['event_id']} {u['tool']}" for u in unapproved)
             + ")"
         )
+    if reused:
+        problems.append("approval reused for more than one action (" + "; ".join(reused) + ")")
     if unattributed:
         problems.append(
             f"{len(unattributed)} tool call(s) not traceable to a request ({', '.join(unattributed)})"

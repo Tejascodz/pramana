@@ -374,3 +374,74 @@ def test_non_numeric_documented_figures_are_findings_not_crashes(tmp_path, credi
     spec.checks = {"include": ["documentation.model_card"]}
     check = run_audit(spec, tmp_path / "p").result("documentation.model_card")
     assert check.status == Status.FAIL and "is not a number" in check.summary
+
+
+# Ways around the human-approval rule, found reading agent_trace.py line by line.
+
+
+def _ev(eid, etype, session="S1", **kw):
+    return {"event_id": eid, "ts": f"2026-10-14T09:00:{int(eid[1:]):02d}+05:30",
+            "session_id": session, "type": etype, "actor": kw.pop("actor", "agent:a"), **kw}  # fmt: skip
+
+
+def _unapproved(tmp_path, events):
+    import json
+
+    trace = "".join(json.dumps(e) + "\n" for e in events)
+    check = run_audit(load_spec(_agent(tmp_path, trace)), tmp_path / "p").result(
+        "agent.trace_auditability"
+    )
+    return {u["event_id"] for u in check.details["unapproved"]}, check
+
+
+def test_a_renamed_amount_field_still_needs_approval(tmp_path):
+    events = [
+        _ev("e1", "user_request", actor="customer:c"),
+        _ev("e2", "tool_call", parent_id="e1", tool="issue_refund", args={"amt": 50000}),
+    ]
+    unapproved, _ = _unapproved(tmp_path, events)
+    assert unapproved == {"e2"}
+
+
+def test_one_approval_cannot_authorise_two_actions(tmp_path):
+    events = [
+        _ev("e1", "user_request", actor="customer:c"),
+        _ev("e2", "approval", parent_id="e1", actor="human:ops", decision="approved"),
+        _ev(
+            "e3",
+            "tool_call",
+            parent_id="e1",
+            tool="issue_refund",
+            approval_id="e2",
+            args={"amount": 20000},
+        ),
+        _ev(
+            "e4",
+            "tool_call",
+            parent_id="e1",
+            tool="issue_refund",
+            approval_id="e2",
+            args={"amount": 20000},
+        ),
+    ]
+    unapproved, check = _unapproved(tmp_path, events)
+    assert unapproved == {"e4"} and "reuses approval e2" in check.summary
+
+
+def test_an_approval_from_another_session_does_not_count(tmp_path):
+    events = [
+        _ev("e1", "user_request", session="A", actor="customer:a"),
+        _ev("e2", "approval", session="A", parent_id="e1", actor="human:ops", decision="approved"),
+        _ev("e3", "user_request", session="B", actor="customer:b"),
+        _ev(
+            "e4",
+            "tool_call",
+            session="B",
+            parent_id="e3",
+            tool="issue_refund",
+            approval_id="e2",
+            args={"amount": 20000},
+        ),
+    ]
+    unapproved, _ = _unapproved(tmp_path, events)
+    assert unapproved == {"e4"}
