@@ -99,7 +99,37 @@ def test_diff_counts_a_dropped_check_against_fail_on_regression(tmp_path, capsys
     assert main(["diff", str(old), str(new), "--fail-on-regression"]) == 1
     out = capsys.readouterr().out
     assert f"`{dropped['check_id']}` | fail | - | **removed**" in out
-    assert "1 removed after running in the earlier audit" in out
+    assert "1 no longer tested after running in the earlier audit" in out
+
+
+def test_diff_a_failing_check_that_is_now_skipped_is_not_an_improvement(tmp_path, capsys):
+    import json
+
+    from pramana.cli import main
+
+    old = ROOT / "docs" / "sample-audits" / "support_chatbot"
+    new = tmp_path / "new"
+    new.mkdir()
+    results = json.loads((old / "results.json").read_text(encoding="utf-8"))
+    failing = next(r for r in results["results"] if r["status"] == "fail")
+    failing["status"] = "skipped"
+    (new / "results.json").write_text(json.dumps(results), encoding="utf-8")
+    assert main(["diff", str(old), str(new), "--fail-on-regression"]) == 1
+    assert "**not tested now**" in capsys.readouterr().out
+
+
+def test_summary_keeps_a_pipe_in_a_title_inside_its_cell(tmp_path, capsys):
+    import json
+
+    from pramana.cli import main
+
+    pack = ROOT / "docs" / "sample-audits" / "support_chatbot"
+    results = json.loads((pack / "results.json").read_text(encoding="utf-8"))
+    results["risks"][0]["title"] = "A | B\nC"
+    (tmp_path / "results.json").write_text(json.dumps(results), encoding="utf-8")
+    assert main(["summary", str(tmp_path)]) == 0
+    row = next(line for line in capsys.readouterr().out.splitlines() if "A \\| B C" in line)
+    assert row.count(" | ") == 4
 
 
 def _spec_with_acceptance(tmp_path: Path, acceptance: str) -> Path:

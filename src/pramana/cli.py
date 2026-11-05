@@ -169,7 +169,11 @@ def _cmd_verify(args: argparse.Namespace) -> int:
         if not signed and getattr(args, "require_signature", False):
             print(f"UNSIGNED: {args.pack} has no signature but --require-signature was given")
             return EXIT_TAMPERED
-        key = Path(args.public_key).read_bytes() if getattr(args, "public_key", None) else None
+        try:
+            key = Path(args.public_key).read_bytes() if getattr(args, "public_key", None) else None
+        except OSError as exc:
+            print(f"error: cannot read the public key: {exc}", file=sys.stderr)
+            return EXIT_INPUT
         try:
             sok, sproblems = verify_pack_signature(Path(args.pack), key)
         except SigningError as exc:
@@ -280,7 +284,7 @@ def _cmd_sign(args: argparse.Namespace) -> int:
 
     try:
         sign_pack(Path(args.pack), _signing_key(args.key))
-    except (SigningError, FileNotFoundError) as exc:
+    except (SigningError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return EXIT_INPUT
     print(
@@ -289,14 +293,23 @@ def _cmd_sign(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cell(value: object) -> str:
+    """Text safe inside a Markdown table cell: no column breaks, no line breaks."""
+    return " ".join(str(value).split()).replace("|", "\\|")
+
+
 def _cmd_summary(args: argparse.Namespace) -> int:
     path = Path(args.pack) / "results.json"
     if not path.exists():
         print(f"error: {path} not found", file=sys.stderr)
         return EXIT_INPUT
-    data = json.loads(path.read_text(encoding="utf-8"))
-    system = data["system"]
-    print(f"## Pramana audit: {system['name']} v{system['version']}")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        system = data["system"]
+    except (ValueError, KeyError, TypeError) as exc:
+        print(f"error: {path} is not a Pramana results file ({exc})", file=sys.stderr)
+        return EXIT_INPUT
+    print(f"## Pramana audit: {_cell(system['name'])} v{_cell(system['version'])}")
     print()
     print(
         f"**Gate:** {data['gate']['decision']} · **Opinion:** {data['opinion']['rating']} · "
@@ -308,9 +321,8 @@ def _cmd_summary(args: argparse.Namespace) -> int:
         print("| Risk | Title | Rating | Owner | Treatment |")
         print("|---|---|---|---|---|")
         for r in data["risks"]:
-            print(
-                f"| {r['risk_id']} | {r['title']} | {r['rating']} | {r['owner']} | {r['treatment']} |"
-            )
+            cells = (r["risk_id"], r["title"], r["rating"], r["owner"], r["treatment"])
+            print("| " + " | ".join(_cell(x) for x in cells) + " |")
     else:
         print("No risks identified.")
     return EXIT_OK
@@ -335,8 +347,8 @@ def _cmd_diff(args: argparse.Namespace) -> int:
     old, new = _load_results(args.old), _load_results(args.new)
     if old is None or new is None:
         return EXIT_INPUT
-    label_old = f"{old['system']['name']} v{old['system']['version']}"
-    label_new = f"{new['system']['name']} v{new['system']['version']}"
+    label_old = _cell(f"{old['system']['name']} v{old['system']['version']}")
+    label_new = _cell(f"{new['system']['name']} v{new['system']['version']}")
     print(f"## Pramana diff\n\n**Before:** {label_old}  \n**After:** {label_new}\n")
     print("| | Before | After |\n|---|---|---|")
     print(f"| Release gate | {old['gate']['decision']} | {new['gate']['decision']} |")
@@ -368,6 +380,10 @@ def _cmd_diff(args: argparse.Namespace) -> int:
                 removed += 1
         elif b is None and a is not None:
             change, added = "added", added + 1
+        elif sb in ("pass", "warn", "fail") and sa in ("skipped", "error"):
+            # A test that ran before and did not run now proves nothing: a failing check
+            # whose input was removed must not read as fixed.
+            change, removed = "**not tested now**", removed + 1
         elif sb in order and sa in order and order[sa] < order[sb]:
             change, improved = "improved", improved + 1
         elif sb in order and sa in order and order[sa] > order[sb]:
@@ -379,10 +395,10 @@ def _cmd_diff(args: argparse.Namespace) -> int:
             vb, va = (b or {}).get("metrics", {}).get(key), (a or {}).get("metrics", {}).get(key)
             if (vb is not None or va is not None) and vb != va:
                 metrics.append(f"{key} {'–' if vb is None else vb} → {'–' if va is None else va}")
-        print(f"| `{check_id}` | {sb} | {sa} | {change} | {'; '.join(metrics[:3])} |")
+        print(f"| `{_cell(check_id)}` | {sb} | {sa} | {change} | {_cell('; '.join(metrics[:3]))} |")
     print(
         f"\n{improved} check(s) improved, {regressed} regressed, {added} added, "
-        f"{removed} removed after running in the earlier audit."
+        f"{removed} no longer tested after running in the earlier audit."
     )
     worse = regressed + removed
     return EXIT_BLOCKED if worse and args.fail_on_regression else EXIT_OK
