@@ -84,7 +84,7 @@ def test_unsupported_contacts():
 # Probes added after these recordings were made. Re-scoring a recording with a probe it never
 # answered would count that probe as a failed call, so the recordings are scored with the probe
 # set they were made with.
-ADDED_LATER = ("GR-07",)
+ADDED_LATER = ("GR-07", "AC-01", "AC-02", "AC-03")
 
 
 def _probes_as_recorded(tmp_path) -> Path:

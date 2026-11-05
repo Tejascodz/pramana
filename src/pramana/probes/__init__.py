@@ -27,7 +27,14 @@ import yaml
 
 from pramana.safeio import load_yaml
 
-CATEGORIES = ("prompt_injection", "sensitive_disclosure", "groundedness", "policy", "multi_turn")
+CATEGORIES = (
+    "prompt_injection",
+    "sensitive_disclosure",
+    "groundedness",
+    "policy",
+    "multi_turn",
+    "access_control",
+)
 
 
 class ProbeFileError(ValueError):
@@ -77,6 +84,8 @@ def _merge(into: dict[str, list], data: dict[str, Any], source: str) -> None:
                 raise ProbeFileError(f"{source}: every probe needs 'id' and 'prompt'")
             elif not isinstance(item["prompt"], str) or not item["prompt"].strip():
                 raise ProbeFileError(f"{source}: {item['id']} has an empty or non-text prompt")
+            if category == "access_control":
+                _check_access_probe(item, source)
             # A bad pattern would otherwise fail only after every call had been made and paid for.
             for pattern in item.get("success_regex") or []:
                 try:
@@ -88,6 +97,31 @@ def _merge(into: dict[str, list], data: dict[str, Any], source: str) -> None:
             entry = dict(item)
             entry.setdefault("source", source)
             into.setdefault(category, []).append(entry)
+
+
+def _check_access_probe(item: dict[str, Any], source: str) -> None:
+    """An access-control probe claims an identity and names data that must not come back."""
+    headers = item.get("headers") or {}
+    if not isinstance(headers, dict) or not all(
+        isinstance(k, str) and (v is None or isinstance(v, str)) for k, v in headers.items()
+    ):
+        raise ProbeFileError(f"{source}: {item['id']} headers must map names to text (or null)")
+    if any("\r" in f"{k}{v}" or "\n" in f"{k}{v}" for k, v in headers.items()):
+        raise ProbeFileError(f"{source}: {item['id']} headers must not contain line breaks")
+    if not (item.get("must_not_include") or item.get("forbidden_record")):
+        raise ProbeFileError(
+            f"{source}: {item['id']} needs must_not_include or forbidden_record: the data that "
+            "must not be returned to this caller"
+        )
+
+
+def _sensitive_rows(path: Path, data: dict[str, Any]) -> list[dict[str, str]]:
+    """Whole records from ``sensitive_records``, for probes that name one (forbidden_record)."""
+    records = data.get("sensitive_records")
+    if not records:
+        return []
+    with (path.parent / records).open(encoding="utf-8") as handle:
+        return [{k: (v or "").strip() for k, v in row.items()} for row in csv.DictReader(handle)]
 
 
 def _fill(value: Any, canary: str) -> Any:
@@ -162,6 +196,7 @@ def load_probe_file(path: str | Path) -> dict[str, Any]:
         )
     return {
         "sensitive_values": _sensitive_values(path, data),
+        "sensitive_rows": _sensitive_rows(path, data),
         "canary": canary,
         "system_prompt": _fill(data.get("system_prompt", ""), canary),
         "probes": _fill(probes, canary),

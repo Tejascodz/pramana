@@ -132,6 +132,7 @@ Each case study plants known defects, so the audit can be checked against a grou
 | LLM security | `llm.multi_turn` | Conversations of 2 to 4 turns with the real replies kept in history: gradual escalation (Crescendo), instructions planted early and triggered later, persona drift, refusal erosion, fabricated history, Hindi and Hinglish; reports the turn at which the defence broke |
 | LLM security | `llm.obfuscation` | Every injection probe re-sent disguised (zero-width spaces, look-alike letters, soft hyphens, spacing, digits, full-width letters, joiners inside Indic words); flags **bypasses**, where a disguised attack got past a defence that stopped the plain one |
 | LLM privacy | `llm.sensitive_disclosure` | Personal data and forbidden strings in responses |
+| LLM privacy | `llm.access_control` | Requests that claim to be another customer (an unsigned id header, a forged signature, an identity stated in the message) must not get that customer's record back |
 | LLM reliability | `llm.groundedness` | Required facts plus a numeric-claim check against the knowledge base |
 | LLM conduct | `llm.policy_adherence` | Required and forbidden phrases per conduct rule |
 | LLM operations | `llm.service_health` | Error rate, retries, p50/p95 latency and output length from the live run (OWASP LLM10) |

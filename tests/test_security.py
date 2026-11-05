@@ -401,3 +401,46 @@ def test_niva_names_a_canary_block_separately_from_a_secret_block(monkeypatch):
 def test_niva_backend_needs_a_host():
     with pytest.raises(SystemExit, match="with a host"):
         niva_app.Niva(niva_app.parse_args(["--backend-url", "http://"]))
+
+
+# llm.access_control against the real Niva app (stub model) ------------------------------
+
+
+def _audit_niva_access(tmp_path, monkeypatch, mode: str, trust_header: bool = False):
+    import threading
+
+    from stub_llm import NaiveModelServer
+
+    from pramana.audit.engine import run_audit
+    from pramana.spec import load_spec
+
+    monkeypatch.setenv("NIVA_IDENTITY_KEY", "k" * 32)
+    if trust_header:  # the behaviour before 0.7.14: any caller-set id was believed
+        monkeypatch.setattr(
+            niva_app.Niva, "verified_customer", lambda self, cid, sig: (cid or None, [])
+        )
+    with NaiveModelServer() as model:
+        args = niva_app.parse_args(
+            ["--mode", mode, "--port", "0", "--backend-url", model.url, "--model", "m"]
+        )
+        server = niva_app.build_server(args)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        try:
+            spec = load_spec(ROOT / "examples" / "live_assistant" / f"audit_{mode}.yaml")
+            spec.llm["base_url"] = f"http://127.0.0.1:{server.server_address[1]}/v1"
+            result = run_audit(spec, tmp_path / mode)
+        finally:
+            server.shutdown()
+            server.server_close()
+    return result.result("llm.access_control")
+
+
+def test_access_control_catches_an_app_that_trusts_a_caller_set_identity(tmp_path, monkeypatch):
+    check = _audit_niva_access(tmp_path, monkeypatch, "guarded", trust_header=True)
+    failed = {r["probe_id"] for r in check.details["probes"] if r["failed"]}
+    assert check.status.value == "fail" and {"AC-01", "AC-02"} <= failed, check.summary
+
+
+def test_access_control_passes_when_identity_must_be_signed(tmp_path, monkeypatch):
+    check = _audit_niva_access(tmp_path, monkeypatch, "guarded")
+    assert check.status.value == "pass", check.summary

@@ -60,7 +60,9 @@ class Completion:
 class LLMClient(Protocol):
     name: str
 
-    def complete(self, system: str, user: str, sample: int = 0) -> Completion: ...
+    def complete(
+        self, system: str, user: str, sample: int = 0, headers: dict[str, str | None] | None = None
+    ) -> Completion: ...
 
     def chat(self, system: str, messages: list[dict[str, str]], sample: int = 0) -> Completion:
         """Send a whole conversation (``role``/``content`` dicts, ending with a user turn)."""
@@ -238,7 +240,10 @@ class ReplayClient:
                 entry.get("model"),
             )
 
-    def complete(self, system: str, user: str, sample: int = 0) -> Completion:
+    def complete(
+        self, system: str, user: str, sample: int = 0, headers: dict[str, str | None] | None = None
+    ) -> Completion:
+        # Keyed by prompt: an access-control probe's headers are part of its recorded run.
         key = user.strip()
         if key not in self._responses:
             return Completion(text="", error=f"no recorded response for prompt: {key[:60]!r}")
@@ -299,10 +304,26 @@ class _HTTPBase:
             k.lower() in CREDENTIAL_HEADERS or ENV_VAR.search(v) for k, v in raw.items()
         )
 
-    def _post(self, url: str, body: dict[str, Any], method: str = "POST") -> tuple[Any, float, int]:
-        """POST JSON with retries. Returns (parsed JSON, latency ms of last attempt, attempts)."""
+    def _post(
+        self,
+        url: str,
+        body: dict[str, Any],
+        method: str = "POST",
+        extra_headers: dict[str, str | None] | None = None,
+    ) -> tuple[Any, float, int]:
+        """POST JSON with retries. Returns (parsed JSON, latency ms of last attempt, attempts).
+
+        ``extra_headers`` come from a probe (an access-control test claiming another identity).
+        They are sent exactly as written, never expanded from the environment, and a value of
+        None removes that header, for example to send a request without the configured token.
+        """
         payload = json.dumps(body).encode("utf-8")
         headers = {"Content-Type": "application/json", "Accept": "application/json", **self.headers}
+        for name, value in (extra_headers or {}).items():
+            for existing in [k for k in headers if k.lower() == name.lower()]:
+                del headers[existing]
+            if value is not None:
+                headers[name] = str(value)
         last_error: Exception | None = None
         for attempt in range(1, self.max_retries + 2):
             request = urllib.request.Request(url, data=payload, headers=headers, method=method)  # noqa: S310 - http(s) only, checked above
@@ -364,10 +385,20 @@ class OpenAICompatibleClient(_HTTPBase):
         self.seed = seed
         self.send_system_prompt = send_system_prompt
 
-    def complete(self, system: str, user: str, sample: int = 0) -> Completion:
-        return self.chat(system, [{"role": "user", "content": user}], sample=sample)
+    def complete(
+        self, system: str, user: str, sample: int = 0, headers: dict[str, str | None] | None = None
+    ) -> Completion:
+        return self.chat(
+            system, [{"role": "user", "content": user}], sample=sample, headers=headers
+        )
 
-    def chat(self, system: str, messages: list[dict[str, str]], sample: int = 0) -> Completion:
+    def chat(
+        self,
+        system: str,
+        messages: list[dict[str, str]],
+        sample: int = 0,
+        headers: dict[str, str | None] | None = None,
+    ) -> Completion:
         messages = [{"role": m["role"], "content": m["content"]} for m in messages]
         if system and self.send_system_prompt:
             messages.insert(0, {"role": "system", "content": system})
@@ -381,7 +412,9 @@ class OpenAICompatibleClient(_HTTPBase):
         if self.seed is not None:
             body["seed"] = self.seed + sample
         try:
-            data, latency, attempts = self._post(f"{self.base_url}/chat/completions", body)
+            data, latency, attempts = self._post(
+                f"{self.base_url}/chat/completions", body, extra_headers=headers
+            )
             choice = data["choices"][0]
             raw = choice["message"].get("content") or ""
             usage = data.get("usage") or {}
@@ -497,10 +530,20 @@ class HTTPJSONClient(_HTTPBase):
         """True when the body template has a ``{messages}`` slot for the whole conversation."""
         return "{messages}" in json.dumps(self.body)
 
-    def complete(self, system: str, user: str, sample: int = 0) -> Completion:
-        return self.chat(system, [{"role": "user", "content": user}], sample=sample)
+    def complete(
+        self, system: str, user: str, sample: int = 0, headers: dict[str, str | None] | None = None
+    ) -> Completion:
+        return self.chat(
+            system, [{"role": "user", "content": user}], sample=sample, headers=headers
+        )
 
-    def chat(self, system: str, messages: list[dict[str, str]], sample: int = 0) -> Completion:
+    def chat(
+        self,
+        system: str,
+        messages: list[dict[str, str]],
+        sample: int = 0,
+        headers: dict[str, str | None] | None = None,
+    ) -> Completion:
         last = str(messages[-1]["content"]) if messages else ""
         values: dict[str, Any] = {"system": system, "sample": sample}
         if self.native_history:
@@ -509,7 +552,9 @@ class HTTPJSONClient(_HTTPBase):
             values["prompt"] = flatten_conversation(messages)
         body = _fill(self.body, values)
         try:
-            data, latency, attempts = self._post(self.url, body, method=self.method)
+            data, latency, attempts = self._post(
+                self.url, body, method=self.method, extra_headers=headers
+            )
             raw = str(json_path(data, self.response_path))
             model = None
             if self.model_path:

@@ -294,6 +294,11 @@ class AuditContext:
 
         def run(job: tuple[int, int]) -> tuple[tuple[int, int], Completion]:
             i, s = job
+            extra = probes[i].get("headers")
+            if extra:  # an access-control probe sends its own identity headers
+                return job, self.llm_client.complete(
+                    self.system_prompt, probes[i]["prompt"], sample=s, headers=extra
+                )
             return job, self.llm_client.complete(self.system_prompt, probes[i]["prompt"], sample=s)
 
         if workers == 1:

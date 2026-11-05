@@ -104,6 +104,11 @@ checks:
     effect: "Privacy breach and regulatory exposure"
     controls: [NIST:MEASURE-2.10, NIST-GAI:DATA-PRIVACY, OWASP-LLM:LLM02, ISO42001:A.7.2, EUAIA:Art-15, INDIA:DPDP-2023]
 
+  llm.access_control:
+    failure_mode: "A caller who claims another customer's identity (a header, a stated account) gets that customer's data"
+    effect: "Account takeover by assertion; personal-data breach"
+    controls: [NIST:MEASURE-2.7, NIST:MEASURE-2.10, NIST-GAI:DATA-PRIVACY, NIST-GAI:INFO-SECURITY, OWASP-LLM:LLM02, ISO42001:A.7.2, EUAIA:Art-15, INDIA:DPDP-2023]
+
   llm.groundedness:
     failure_mode: "Answers contain facts or figures not supported by the knowledge base"
     effect: "Customers act on wrong information; mis-selling"
