@@ -117,6 +117,18 @@ def reliability_table(y_true: np.ndarray, probs: np.ndarray, bins: int = 10) -> 
     return rows
 
 
+def _categories(series: pd.Series) -> pd.Series:
+    """Values as category labels that compare equal across files.
+
+    A numeric column read with one blank becomes float, so 1 would print as "1.0" in one
+    file and "1" in the other and every value would look new. Numbers are therefore
+    labelled by their float value in both samples.
+    """
+    if pd.api.types.is_numeric_dtype(series) and not pd.api.types.is_bool_dtype(series):
+        return series.astype(float).map(repr)
+    return series.astype(str)
+
+
 def population_stability_index(reference: pd.Series, current: pd.Series, bins: int = 10) -> float:
     """PSI between two samples. Numeric columns use reference quantile bins."""
     eps = 1e-6
@@ -130,9 +142,10 @@ def population_stability_index(reference: pd.Series, current: pd.Series, bins: i
         ref_counts = np.histogram(ref, bins=edges)[0]
         cur_counts = np.histogram(cur, bins=edges)[0]
     else:
-        cats = sorted(set(ref.astype(str)) | set(cur.astype(str)))
-        ref_counts = ref.astype(str).value_counts().reindex(cats, fill_value=0).to_numpy()
-        cur_counts = cur.astype(str).value_counts().reindex(cats, fill_value=0).to_numpy()
+        ref_c, cur_c = _categories(ref), _categories(cur)
+        cats = sorted(set(ref_c) | set(cur_c))
+        ref_counts = ref_c.value_counts().reindex(cats, fill_value=0).to_numpy()
+        cur_counts = cur_c.value_counts().reindex(cats, fill_value=0).to_numpy()
     ref_pct = ref_counts / max(ref_counts.sum(), 1) + eps
     cur_pct = cur_counts / max(cur_counts.sum(), 1) + eps
     return float(np.sum((cur_pct - ref_pct) * np.log(cur_pct / ref_pct)))
@@ -144,11 +157,12 @@ def distribution_test(reference: pd.Series, current: pd.Series) -> tuple[str, fl
     cur = current.dropna()
     if pd.api.types.is_numeric_dtype(ref) and ref.nunique() > 10:
         return "ks", float(stats.ks_2samp(ref, cur).pvalue)
-    cats = sorted(set(ref.astype(str)) | set(cur.astype(str)))
+    ref_c, cur_c = _categories(ref), _categories(cur)
+    cats = sorted(set(ref_c) | set(cur_c))
     table = np.vstack(
         [
-            ref.astype(str).value_counts().reindex(cats, fill_value=0).to_numpy(),
-            cur.astype(str).value_counts().reindex(cats, fill_value=0).to_numpy(),
+            ref_c.value_counts().reindex(cats, fill_value=0).to_numpy(),
+            cur_c.value_counts().reindex(cats, fill_value=0).to_numpy(),
         ]
     )
     table = table[:, table.sum(axis=0) > 0]
@@ -187,9 +201,15 @@ def single_feature_auc(feature: pd.Series, target: pd.Series) -> float:
 
 
 def proxy_strength(feature: pd.Series, protected: pd.Series) -> float:
-    """Max one-vs-rest AUC of a feature for predicting any protected group."""
+    """Max one-vs-rest AUC of a feature for predicting any protected group.
+
+    Rows where the attribute is unknown are left out rather than counted as "not in the
+    group", which would turn the screen into a test of whether the attribute was recorded.
+    """
+    known = protected.notna()
+    feature, protected = feature[known], protected[known]
     best = 0.5
-    for group in protected.dropna().unique():
+    for group in protected.unique():
         best = max(best, single_feature_auc(feature, (protected == group).astype(int)))
     return best
 

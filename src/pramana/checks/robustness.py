@@ -59,9 +59,12 @@ def perturbation(ctx: AuditContext) -> CheckResult:
         missing_ok = False
 
     monotonic: list[dict[str, Any]] = []
+    untested_rules: list[str] = []
     for direction in ("increasing", "decreasing"):
         for feature in options.get(f"monotone_{direction}", []):
             if feature not in numeric:
+                # A misspelt or non-numeric feature must not make a declared rule vanish.
+                untested_rules.append(f"{feature} ({direction})")
                 continue
             bumped = df.copy()
             bumped[feature] = df[feature] + stds[feature]
@@ -79,7 +82,7 @@ def perturbation(ctx: AuditContext) -> CheckResult:
     bad_mono = [m for m in monotonic if m["violation_rate"] > 0.05]
     if small > max_flip:
         status, severity = Status.FAIL, Severity.HIGH
-    elif medium > max_flip or not missing_ok or bad_mono:
+    elif medium > max_flip or not missing_ok or bad_mono or untested_rules:
         status, severity = Status.WARN, Severity.MEDIUM
     else:
         status, severity = Status.PASS, Severity.INFO
@@ -97,13 +100,28 @@ def perturbation(ctx: AuditContext) -> CheckResult:
         parts.append(
             f"{m['feature']} should be {m['expected']}: violated for {m['violation_rate']:.1%} of rows."
         )
+    if untested_rules:
+        parts.append(
+            "Monotonicity rules not tested because the feature is not a numeric model input: "
+            + ", ".join(untested_rules)
+            + "."
+        )
 
-    plain = (
-        "Tiny changes to applicant data can change the decision, so outcomes are not reliably repeatable."
-        if status == Status.FAIL
-        else "Decisions stay stable under small input changes"
-        + ("; some business-logic expectations are violated." if bad_mono else ".")
-    )
+    if status == Status.FAIL:
+        plain = "Tiny changes to applicant data can change the decision, so outcomes are not reliably repeatable."
+    elif medium > max_flip:
+        plain = "Decisions are stable under very small input changes but flip under moderate ones."
+    else:
+        concerns = []
+        if not missing_ok:
+            concerns.append("the model fails when inputs are missing")
+        if bad_mono:
+            concerns.append("some business-logic expectations are violated")
+        if untested_rules:
+            concerns.append("some declared business rules could not be tested")
+        plain = "Decisions stay stable under small input changes" + (
+            "; but " + " and ".join(concerns) + "." if concerns else "."
+        )
     return CheckResult(
         check_id="robustness.perturbation",
         title="Robustness to perturbation",
@@ -123,5 +141,9 @@ def perturbation(ctx: AuditContext) -> CheckResult:
             "missing_value_flip_rate": missing_flip,
             "handles_missing": missing_ok,
         },
-        details={"noise": noise_results, "monotonicity": monotonic},
+        details={
+            "noise": noise_results,
+            "monotonicity": monotonic,
+            "untested_monotonicity_rules": untested_rules,
+        },
     )

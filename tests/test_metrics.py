@@ -74,3 +74,20 @@ def test_proxy_strength_flags_a_strong_proxy():
     noise = pd.Series(rng.normal(size=2000))
     assert proxy_strength(proxy, group) > 0.95
     assert proxy_strength(noise, group) < 0.6
+
+
+def test_one_blank_in_a_numeric_column_is_not_reported_as_drift():
+    """A blank makes pandas read 1 as 1.0; the labels must still match (PSI was 24.4)."""
+    import numpy as np
+    import pandas as pd
+
+    from pramana.metrics import distribution_test, population_stability_index
+
+    rng = np.random.default_rng(0)
+    ref = pd.Series(rng.integers(1, 6, size=1000))
+    cur = pd.Series(rng.integers(1, 6, size=1000)).astype(float)
+    cur[3] = np.nan
+    assert population_stability_index(ref, cur) < 0.05
+    assert distribution_test(ref, cur)[1] > 0.01
+    shifted = pd.Series(rng.integers(4, 6, size=1000))
+    assert population_stability_index(ref, shifted) > 0.25  # a real shift is still caught

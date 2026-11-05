@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from sklearn.inspection import permutation_importance
 
-from pramana.context import AuditContext, MissingArtifact
+from pramana.context import AuditContext, CannotMeasure, MissingArtifact
 from pramana.registry import register
 from pramana.types import CheckResult, Severity, Status
 
@@ -25,6 +25,10 @@ def feature_importance(ctx: AuditContext) -> CheckResult:
     if len(df) > MAX_ROWS:
         df = df.sample(MAX_ROWS, random_state=ctx.spec.seed)
     X, y = ctx.X(df), ctx.y(df)
+    if len(set(y)) < 2:
+        raise CannotMeasure(
+            "the evaluation data has only one outcome class, so importance by AUC drop is undefined"
+        )
 
     result = permutation_importance(
         ctx.model, X, y, scoring="roc_auc", n_repeats=5, random_state=ctx.spec.seed
@@ -76,12 +80,17 @@ def feature_importance(ctx: AuditContext) -> CheckResult:
         severity=severity,
         summary=summary,
         plain_summary=(
-            f"The decision is driven mostly by {', '.join(top5[:3])}"
-            + (
-                "; some of these drivers are not described in the documentation."
-                if undocumented
-                else "."
+            (
+                f"The decision is driven mostly by {', '.join(top5[:3])}"
+                + (
+                    "; some of these drivers are not described in the documentation."
+                    if undocumented
+                    else "."
+                )
             )
+            if top5
+            else "No input measurably changes the model's ranking, which is unusual and worth "
+            "investigating (for example a constant or broken model)."
         ),
         recommendation=(
             "Declare expected key drivers in the model documentation, explain any surprising driver, "

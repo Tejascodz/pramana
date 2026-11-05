@@ -46,11 +46,20 @@ def population_stability(ctx: AuditContext) -> CheckResult:
     warn, fail = ctx.spec.threshold("psi_warn"), ctx.spec.threshold("psi_fail")
 
     rows = feature_drift(ctx.ref_df, current, ctx.feature_columns)
-    ref_scores = ctx.score(ctx.ref_df)
-    cur_scores = ctx.score(current)
-    score_psi = population_stability_index(pd.Series(ref_scores), pd.Series(cur_scores))
-    ref_rate = float(ctx.decide(ref_scores).mean())
-    cur_rate = float(ctx.decide(cur_scores).mean())
+    try:
+        ref_scores = ctx.score(ctx.ref_df)
+        cur_scores = ctx.score(current)
+    except MissingArtifact:
+        # Predictions-only audits often lack scores in the production extract: input drift
+        # can still be measured, so it is reported rather than skipping the whole check.
+        ref_scores = cur_scores = None
+    if ref_scores is not None:
+        score_psi = population_stability_index(pd.Series(ref_scores), pd.Series(cur_scores))
+        ref_rate = float(ctx.decide(ref_scores).mean())
+        cur_rate = float(ctx.decide(cur_scores).mean())
+    else:
+        score_psi = ref_rate = cur_rate = float("nan")
+    scores_measured = not np.isnan(score_psi)
 
     measured = [r for r in rows if not np.isnan(r["psi"])]
     unmeasured = [r["feature"] for r in rows if np.isnan(r["psi"])]
@@ -75,8 +84,13 @@ def population_stability(ctx: AuditContext) -> CheckResult:
         summary=(
             f"Compared reference data with {current_name} ({len(current)} rows). "
             f"{len(major)} features with major drift (PSI >= {fail}), {len(moderate)} moderate. "
-            f"Largest shifts: {top}. Score PSI {score_psi:.3f}; favourable-decision rate moved from "
-            f"{ref_rate:.1%} to {cur_rate:.1%}."
+            f"Largest shifts: {top}. "
+            + (
+                f"Score PSI {score_psi:.3f}; favourable-decision rate moved from "
+                f"{ref_rate:.1%} to {cur_rate:.1%}."
+                if scores_measured
+                else f"Score drift not measured: {current_name} has no scores."
+            )
             + (f" PSI could not be computed for {', '.join(unmeasured)}." if unmeasured else "")
         ),
         plain_summary=(
@@ -96,17 +110,21 @@ def population_stability(ctx: AuditContext) -> CheckResult:
             "largest shifts, and set PSI alerts in production monitoring."
         ),
         metrics={
-            "score_psi": round(float(score_psi), 4),
+            "score_psi": round(float(score_psi), 4) if scores_measured else None,
             "max_feature_psi": measured[0]["psi"] if measured else 0.0,
             "features_unmeasured": len(unmeasured),
             "features_major_drift": len(major),
             "features_moderate_drift": len(moderate),
-            "favourable_rate_reference": round(ref_rate, 4),
-            "favourable_rate_current": round(cur_rate, 4),
+            "favourable_rate_reference": round(ref_rate, 4) if scores_measured else None,
+            "favourable_rate_current": round(cur_rate, 4) if scores_measured else None,
         },
         details={
             "features": rows,
             "compared_with": current_name,
-            "score_shift": round(float(np.mean(cur_scores) - np.mean(ref_scores)), 4),
+            "score_shift": (
+                round(float(np.mean(cur_scores) - np.mean(ref_scores)), 4)
+                if scores_measured
+                else None
+            ),
         },
     )

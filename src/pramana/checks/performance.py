@@ -57,9 +57,14 @@ def discrimination(ctx: AuditContext) -> CheckResult:
     if auc < min_auc:
         status, severity = Status.FAIL, Severity.HIGH
         verdict = "below"
-    elif lo < min_auc:
+    elif np.isnan(lo) or lo < min_auc:
+        # An interval that cannot be computed (too little data) is uncertainty, not confidence.
         status, severity = Status.WARN, Severity.MEDIUM
-        verdict = "above, but its 95% confidence interval reaches below,"
+        verdict = (
+            "above, but its 95% confidence interval reaches below,"
+            if not np.isnan(lo)
+            else "above, but too little data to bound it, so it is not shown to meet"
+        )
     else:
         status, severity = Status.PASS, Severity.INFO
         verdict = "above"

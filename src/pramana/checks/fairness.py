@@ -12,7 +12,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from pramana.context import AuditContext, MissingArtifact
+from pramana.context import MISSING_GROUP, AuditContext, MissingArtifact
 from pramana.metrics import (
     false_positive_rate,
     proxy_strength,
@@ -32,11 +32,15 @@ def group_table(
     for g in sorted(set(groups)):
         mask = groups == g
         n = int(mask.sum())
+        missing = MISSING_GROUP in g.split(" × ")
         rows.append(
             {
                 "group": g,
                 "n": n,
-                "adequate_sample": n >= min_n,
+                # Rows with no recorded attribute are shown, but they are not a demographic
+                # group, so they never enter the fairness ratios.
+                "missing_attribute": missing,
+                "adequate_sample": n >= min_n and not missing,
                 "selection_rate": float(pred[mask].mean()),
                 "favourable": int(pred[mask].sum()),
                 "tpr": true_positive_rate(y[mask], pred[mask]),
@@ -53,8 +57,9 @@ def group_table(
 
 def parity_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     usable = [r for r in rows if r["adequate_sample"]]
+    missing_rows = sum(r["n"] for r in rows if r.get("missing_attribute"))
     if len(usable) < 2:
-        return {"comparable_groups": len(usable)}
+        return {"comparable_groups": len(usable), "missing_attribute_rows": missing_rows}
     best = max(usable, key=lambda r: r["selection_rate"])
     worst = min(usable, key=lambda r: r["selection_rate"])
     tprs = [r["tpr"] for r in usable if not np.isnan(r["tpr"])]
@@ -66,6 +71,7 @@ def parity_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
     )
     return {
         "comparable_groups": len(usable),
+        "missing_attribute_rows": sum(r["n"] for r in rows if r.get("missing_attribute")),
         "most_favoured": best["group"],
         "least_favoured": worst["group"],
         "disparate_impact_ratio": round(di, 4),
@@ -149,6 +155,12 @@ def group_parity(ctx: AuditContext) -> CheckResult:
             )
         else:
             spread = summary.get("base_rate_difference")
+            missing_note = (
+                f"; {summary['missing_attribute_rows']} record(s) with no {attr} recorded are shown "
+                "but not compared"
+                if summary.get("missing_attribute_rows")
+                else ""
+            )
             tension = (
                 spread is not None
                 and spread >= 0.05
@@ -158,6 +170,7 @@ def group_parity(ctx: AuditContext) -> CheckResult:
                 f"{attr}: DI {summary['disparate_impact_ratio']:.2f} "
                 f"({summary['least_favoured']} vs {summary['most_favoured']}, p={summary['p_value']:.3g}), "
                 f"EOdds diff {summary['equalized_odds_difference']:.2f}"
+                + missing_note
                 + (
                     f" (observed outcome rates differ by {spread:.2f} between groups, so equal "
                     "error rates and calibration cannot both be met; choosing which governs is a "
@@ -362,7 +375,9 @@ def proxy_features(ctx: AuditContext) -> CheckResult:
         for attr in attrs:
             if feature == attr:
                 continue
-            strength = proxy_strength(X[feature], ctx.eval_df[attr])
+            protected = ctx.eval_df[attr]
+            # Predicting whether an attribute was recorded is not predicting the attribute.
+            strength = proxy_strength(X[feature], protected.where(protected != MISSING_GROUP))
             matrix[feature][attr] = round(strength, 4)
             if strength > limit:
                 findings.append({"feature": feature, "attribute": attr, "auc": round(strength, 4)})

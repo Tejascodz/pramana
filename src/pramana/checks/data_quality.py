@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pandas as pd
+
 from pramana.context import AuditContext
 from pramana.metrics import single_feature_auc
 from pramana.registry import register
@@ -31,7 +33,12 @@ def integrity(ctx: AuditContext) -> CheckResult:
         missing = df[cols].isna().mean()
         high_missing = {c: round(float(v), 4) for c, v in missing.items() if v > miss_max}
         dup_rate = float(df[cols].duplicated().mean())
-        target_balance = float(ctx.y(df).mean()) if ctx.spec.target in df.columns else None
+        # Balance from labelled rows: this check reports missing labels (above), it must
+        # not fail on them the way the metric checks do.
+        labelled = df[df[ctx.spec.target].notna()] if ctx.spec.target in df.columns else None
+        target_balance = (
+            float(ctx.y(labelled).mean()) if labelled is not None and len(labelled) else None
+        )
         per_dataset[name] = {
             "rows": int(len(df)),
             "high_missing": high_missing,
@@ -50,7 +57,8 @@ def integrity(ctx: AuditContext) -> CheckResult:
     leakage = []
     source = ctx.ref_df if ctx.ref_df is not None else ctx.eval_df
     if ctx.spec.target in source.columns:
-        y = ctx.y(source)
+        source = source[source[ctx.spec.target].notna()]
+        y = pd.Series(ctx.y(source), index=source.index)
         for feature in ctx.feature_columns:
             if feature in source.columns:
                 auc = single_feature_auc(source[feature], y)

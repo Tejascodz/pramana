@@ -193,8 +193,11 @@ def test_missing_labels_are_not_counted_as_negative_outcomes(tmp_path):
     spec = _tabular(
         tmp_path, lambda d, rng: d.assign(y=np.where(rng.random(len(d)) < 0.1, np.nan, d.y))
     )
-    check = run_audit(load_spec(spec), tmp_path / "p").result("performance.discrimination")
+    result = run_audit(load_spec(spec), tmp_path / "p")
+    check = result.result("performance.discrimination")
     assert check.status == Status.ERROR and "missing label" in check.summary
+    quality = result.result("data_quality.integrity")  # the check that reports the gap
+    assert quality.status != Status.ERROR and "missing values" in quality.summary
 
 
 def test_a_missing_protected_attribute_is_its_own_group(tmp_path):
@@ -290,3 +293,58 @@ def test_an_endpoint_that_returns_empty_answers_cannot_pass(tmp_path):
     health = result.result("llm.service_health")
     assert health.status == Status.FAIL and "empty answer" in health.summary
     assert result.gate["decision"] == "BLOCK"
+
+
+def test_rows_missing_a_protected_attribute_are_shown_but_never_compared(tmp_path):
+    """Missing gender is not a demographic: it must not drive a four-fifths verdict."""
+    import numpy as np
+
+    def mutate(d, rng):
+        # 30% of rows lack the attribute and, among them, nobody gets a favourable score.
+        gone = rng.random(len(d)) < 0.3
+        return d.assign(group=np.where(gone, None, d.group), s=np.where(gone, 0.01, d.s))
+
+    spec = _tabular(tmp_path, mutate)
+    check = run_audit(load_spec(spec), tmp_path / "p").result("fairness.group_parity")
+    summary = check.details["attributes"]["group"]["summary"]
+    assert "(missing)" not in (summary["least_favoured"], summary["most_favoured"])
+    assert summary["missing_attribute_rows"] > 0
+    assert "no group recorded are shown but not compared" in check.summary
+    rows = {r["group"]: r for r in check.details["attributes"]["group"]["groups"]}
+    assert rows["(missing)"]["missing_attribute"] and not rows["(missing)"]["adequate_sample"]
+
+
+def test_drift_is_measured_on_inputs_when_production_has_no_scores(tmp_path):
+    import numpy as np
+    import pandas as pd
+
+    rng = np.random.default_rng(2)
+    ref = pd.DataFrame({"x1": rng.normal(size=500), "y": rng.integers(0, 2, 500)})
+    ref["s"] = rng.random(500)
+    prod = pd.DataFrame({"x1": rng.normal(loc=1.5, size=500)})  # shifted, and no scores
+    ref.to_csv(tmp_path / "ref.csv", index=False)
+    ref.to_csv(tmp_path / "eval.csv", index=False)
+    prod.to_csv(tmp_path / "prod.csv", index=False)
+    spec = tmp_path / "audit.yaml"
+    spec.write_text(
+        "system: {name: M, version: '1', type: tabular_classifier, owner: O}\n"
+        "use_case: {domain: credit_scoring}\n"
+        "artifacts: {reference_data: ref.csv, evaluation_data: eval.csv, production_data: prod.csv}\n"
+        "target: y\nscore_column: s\nfeatures: [x1]\n",
+        encoding="utf-8",
+    )
+    check = run_audit(load_spec(spec), tmp_path / "p").result("drift.population_stability")
+    assert check.status != Status.SKIPPED, check.summary
+    assert check.metrics["features_major_drift"] == 1
+    assert "Score drift not measured" in check.summary
+
+
+def test_a_misspelt_monotonicity_rule_is_reported_not_silently_dropped(tmp_path, credit_example):
+    spec = load_spec(_credit_copy(tmp_path, with_data=credit_example))
+    spec.checks = {
+        "include": ["robustness.perturbation"],
+        "options": {"robustness.perturbation": {"monotone_increasing": ["monthly_incom"]}},
+    }
+    check = run_audit(spec, tmp_path / "p").result("robustness.perturbation")
+    assert check.status != Status.PASS
+    assert "monthly_incom (increasing)" in check.summary

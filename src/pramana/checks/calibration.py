@@ -5,7 +5,7 @@ from __future__ import annotations
 import numpy as np
 from sklearn.metrics import brier_score_loss
 
-from pramana.context import AuditContext
+from pramana.context import MISSING_GROUP, AuditContext
 from pramana.metrics import (
     adaptive_calibration_error,
     expected_calibration_error,
@@ -43,7 +43,8 @@ def reliability(ctx: AuditContext) -> CheckResult:
             if (values == g).sum() >= min_n
         }
     worst_group = max(
-        ((a, g, v) for a, d in group_ece.items() for g, v in d.items()),
+        # Rows with no recorded attribute are shown but not graded as a group.
+        ((a, g, v) for a, d in group_ece.items() for g, v in d.items() if g != MISSING_GROUP),
         key=lambda t: t[2],
         default=None,
     )
