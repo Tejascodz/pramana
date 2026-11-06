@@ -111,6 +111,12 @@ JOB_PERMISSIONS = {
         "attestations": "write",
     },
     ("codeql.yml", "analyze"): {"security-events": "write"},
+    # Signs the audit pack's ledger (build-provenance attestation); no write to the repository.
+    ("release-gate.yml", "audit"): {
+        "contents": "read",
+        "id-token": "write",
+        "attestations": "write",
+    },
 }
 
 

@@ -4,6 +4,11 @@ name: AI release gate
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "examples/support_chatbot/**"
+      - "src/**"
   pull_request:
     paths:
       - "examples/support_chatbot/**"
@@ -14,6 +19,12 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
+    # Attesting the pack signs its ledger with a short-lived Sigstore certificate naming this
+    # repository, commit and workflow: nothing else in this job can write anywhere.
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -25,6 +36,8 @@ jobs:
           spec: examples/support_chatbot/audit.yaml
           out: pramana-audit
           enforce: "false"   # set to "true" to fail the job on BLOCK
+          # Pull requests from forks get no signing token, so only trusted runs attest.
+          attest: ${{ (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && 'true' || 'false' }}
       - name: Show decision
         env:
           DECISION: ${{ steps.pramana.outputs.decision }}
