@@ -316,9 +316,22 @@ def _scan_text(text: str) -> str:
 
 
 def _incomplete_note(totals: dict[str, Any]) -> str:
+    note = ""
     if totals["errored_samples"]:
-        return f" {totals['errored_samples']} call(s) failed and were not scored."
-    return ""
+        note += f" {totals['errored_samples']} call(s) failed and were not scored."
+    if _too_little_evidence(totals):
+        note += (
+            f" Only {totals['evaluated_samples']} sample(s) were judged (minimum "
+            f"{totals['min_samples']}): with so few, the true failure rate could be as high as "
+            f"{totals['ci_high']:.0%}, so this is not a pass. Add probes or use --samples."
+        )
+    return note
+
+
+def _too_little_evidence(totals: dict[str, Any]) -> bool:
+    """No failure seen, but too few judged samples for that to mean anything."""
+    evaluated = totals["evaluated_samples"]
+    return bool(totals.get("min_samples")) and 0 < evaluated < totals["min_samples"]
 
 
 def _rate_text(totals: dict[str, Any], label: str) -> str:
@@ -335,7 +348,7 @@ def _status_with_errors(
 ) -> tuple[Status, Severity]:
     if failed:
         return Status.FAIL, severity
-    if totals["errored_samples"]:
+    if totals["errored_samples"] or _too_little_evidence(totals):
         return Status.WARN, Severity.MEDIUM
     return Status.PASS, Severity.INFO
 
@@ -530,6 +543,7 @@ def prompt_injection(ctx: AuditContext) -> CheckResult:
         return injection_verdict(c.text, probe, canary)
 
     rows, totals = _evaluate(probes, runs, judge)
+    totals["min_samples"] = int(ctx.spec.threshold("llm_min_samples"))
     for r in rows:
         r["succeeded"] = r["failed"]
     ctx.shared["injection_failed"] = {r["probe_id"]: r["failed"] for r in rows}
@@ -647,6 +661,7 @@ def obfuscation(ctx: AuditContext) -> CheckResult:
         return injection_verdict(c.text, probe, canary)
 
     rows, totals = _evaluate(variants, runs, judge)
+    totals["min_samples"] = int(ctx.spec.threshold("llm_min_samples"))
     plain = ctx.shared.get("injection_failed", {})
     by_mutation: dict[str, list[int]] = {}
     for row, variant in zip(rows, variants, strict=True):
@@ -775,6 +790,7 @@ def multi_turn(ctx: AuditContext) -> CheckResult:
         return failed, info
 
     rows, totals = _evaluate(probes, runs, judge)
+    totals["min_samples"] = int(ctx.spec.threshold("llm_min_samples"))
     for row, probe in zip(rows, probes, strict=True):
         row["turns"] = len(probe["turns"])
         if row["failed"] and row.get("broken_at_turn"):
@@ -877,6 +893,7 @@ def sensitive_disclosure(ctx: AuditContext) -> CheckResult:
         }
 
     rows, totals = _evaluate(probes, runs, judge)
+    totals["min_samples"] = int(ctx.spec.threshold("llm_min_samples"))
     for r in rows:
         r["disclosed"] = r["failed"]
 
@@ -990,6 +1007,7 @@ def access_control(ctx: AuditContext) -> CheckResult:
         return bool(exposed), {"exposed": exposed}
 
     rows_out, totals = _evaluate(probes, runs, judge)
+    totals["min_samples"] = int(ctx.spec.threshold("llm_min_samples"))
     for row, probe in zip(rows_out, probes, strict=True):
         row["claimed_identity"] = probe.get("forbidden_record") or ""
         row["technique"] = probe.get("technique", "identity claim")

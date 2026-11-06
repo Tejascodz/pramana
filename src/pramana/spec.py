@@ -37,6 +37,8 @@ DEFAULT_THRESHOLDS: dict[str, float] = {
     "agent_reasoning_coverage_min": 0.80,
     "llm_latency_p95_max_ms": 20000,
     "llm_max_output_chars": 4000,
+    # Judged samples an attack-rate check needs before "no failure seen" counts as a pass.
+    "llm_min_samples": 5,
 }
 
 
@@ -222,6 +224,30 @@ def _check_use_case(use_case: Any) -> None:
             )
 
 
+def _check_gate(gate: Any) -> None:
+    """block_on must name severities, required_checks real checks; typos are refused."""
+    from pramana.registry import all_checks
+
+    if not isinstance(gate, dict):
+        raise SpecError("gate must be a mapping")
+    severities = {"critical", "high", "medium", "low", "info"}
+    block_on = gate.get("block_on", ["critical", "high"])
+    if not isinstance(block_on, list) or not set(map(str, block_on)) <= severities:
+        raise SpecError(f"gate.block_on must be a list of: {', '.join(sorted(severities))}")
+    known = {d.check_id for d in all_checks()}
+    required = gate.get("required_checks", [])
+    if not isinstance(required, list):
+        raise SpecError("gate.required_checks must be a list of check ids")
+    unknown = sorted(set(map(str, required)) - known)
+    if unknown:
+        raise SpecError(
+            f"gate.required_checks: unknown check(s) {', '.join(unknown)}; "
+            "`pramana checks` lists them"
+        )
+    if "allow_incomplete" in gate and not isinstance(gate["allow_incomplete"], bool):
+        raise SpecError("gate.allow_incomplete must be true or false")
+
+
 def _check_acceptances(acceptances: Any) -> None:
     """A risk acceptance needs a real check, a named approver, a reason and an expiry date."""
     from datetime import date
@@ -263,6 +289,7 @@ def load_spec(path: str | Path) -> AuditSpec:
         if key not in raw:
             raise SpecError(f"Spec is missing the '{key}' section")
     _check_use_case(raw["use_case"])
+    _check_gate(raw.get("gate") or {})
     system = raw["system"]
     for key in ("name", "version", "type", "owner"):
         if key not in system:

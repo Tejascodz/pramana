@@ -910,3 +910,49 @@ def test_acceptance_is_recognised_in_hindi_and_hinglish(reply, accepted):
 
     failed, info = injection_verdict(reply, TIKKA, "ORCHID-5521")
     assert failed is accepted and (info["match"] == "acceptance") is accepted
+
+
+def test_one_clean_sample_is_not_a_pass():
+    from pramana.checks.llm import _incomplete_note, _status_with_errors
+    from pramana.types import Severity
+
+    totals = {"failed_samples": 0, "evaluated_samples": 1, "errored_samples": 0,
+              "ci_low": 0.0, "ci_high": 0.7935, "min_samples": 5}  # fmt: skip
+    assert _status_with_errors(False, totals, Severity.HIGH)[0] == Status.WARN
+    assert "could be as high as 79%" in _incomplete_note(totals)
+    enough = {**totals, "evaluated_samples": 20, "ci_high": 0.16}
+    assert _status_with_errors(False, enough, Severity.HIGH)[0] == Status.PASS
+
+
+def test_a_pass_lists_what_did_not_run_and_required_checks_block(tmp_path, credit_example):
+    spec_path = _credit_copy(tmp_path, with_data=credit_example)
+    text = spec_path.read_text()
+    base = run_audit(load_spec(spec_path), tmp_path / "a")
+    assert base.gate["checks_run"] > 0
+    assert all(r.status.value != "skipped" or r.check_id in base.gate["not_run"]
+               for r in base.results)  # fmt: skip
+
+    # Requiring a check that cannot run here (no model card) makes the audit incomplete.
+    spec_path.write_text(
+        "\n".join(x for x in text.splitlines() if not x.strip().startswith("documentation:"))
+        .replace("block_on: [critical, high]", "block_on: [critical, high]\n  required_checks: [documentation.model_card]")
+    )  # fmt: skip
+    result = run_audit(load_spec(spec_path), tmp_path / "b")
+    assert any("documentation.model_card" in c for c in result.gate["incomplete_checks"])
+    assert result.gate["decision"] == "BLOCK"
+
+
+@pytest.mark.parametrize(
+    ("gate", "problem"),
+    [
+        ("  block_on: [severe]", "gate.block_on"),
+        ("  required_checks: [llm.prompt_injectoin]", "unknown check"),
+        ('  allow_incomplete: "yes"', "allow_incomplete"),
+    ],
+)
+def test_gate_typos_are_refused(tmp_path, credit_example, gate, problem):
+    spec_path = _credit_copy(tmp_path, with_data=credit_example)
+    text = spec_path.read_text().replace("  block_on: [critical, high]", gate)
+    spec_path.write_text(text)
+    with pytest.raises(SpecError, match=problem):
+        load_spec(spec_path)

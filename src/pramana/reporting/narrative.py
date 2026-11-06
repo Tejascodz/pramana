@@ -24,6 +24,7 @@ def executive_summary(result) -> dict[str, Any]:
     evidenced = sum(1 for c in result.coverage["controls"] if c["state"] == "evidenced")
 
     incomplete = result.gate.get("incomplete_checks", [])
+    not_run = result.gate.get("not_run", [])
     # The gate's own list, so a gate set to block on medium findings is described correctly.
     blocking = result.gate.get("blocking_risks", [])
     rated = " or ".join(
@@ -55,6 +56,12 @@ def executive_summary(result) -> dict[str, Any]:
                 f" {len(incomplete)} test{'s' if len(incomplete) != 1 else ''} could not be completed "
                 "and were allowed by the gate setting allow_incomplete."
                 if incomplete
+                else ""
+            )
+            + (
+                f" This covers the {result.gate.get('checks_run')} checks that ran; "
+                f"{len(not_run)} did not run ({', '.join(not_run)})."
+                if not_run
                 else ""
             )
         )

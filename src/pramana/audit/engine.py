@@ -417,7 +417,18 @@ def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) ->
     )
     if not technical_ran:
         incomplete.append("no technical test ran")
-    gate = gate_decision(risks, spec.gate, incomplete)
+    by_id = {r.check_id: r for r in results}
+    for check_id in spec.gate.get("required_checks", []) or []:
+        if check_id not in by_id or by_id[check_id].status == Status.SKIPPED:
+            incomplete.append(f"{check_id} (required by gate.required_checks, did not run)")
+    not_run = [r.check_id for r in results if r.status == Status.SKIPPED]
+    gate = gate_decision(
+        risks,
+        spec.gate,
+        incomplete,
+        not_run=not_run,
+        checks_run=sum(1 for r in results if r.status != Status.SKIPPED),
+    )
     opinion = audit_opinion(risks, incomplete)
     process = CheckResult(
         check_id="audit.process",

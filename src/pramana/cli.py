@@ -87,6 +87,11 @@ def _cmd_run(args: argparse.Namespace) -> int:
         print(f"Blocking risks: {', '.join(result.gate['blocking_risks'])}")
     if result.gate.get("incomplete_checks"):
         print(f"Incomplete checks: {', '.join(result.gate['incomplete_checks'])}")
+    if result.gate.get("not_run"):
+        print(
+            f"Not run ({len(result.gate['not_run'])}): {', '.join(result.gate['not_run'])}. "
+            "The gate decision covers only the checks that ran."
+        )
     if result.llm_run.get("calls"):
         run = result.llm_run
         p50 = run.get("latency_p50_ms")

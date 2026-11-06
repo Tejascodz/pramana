@@ -219,7 +219,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <div>
       <h3>What is working</h3>
       <ul class="clean">
-        {% for w in s.working %}<li><span class="chip pass">pass</span><span>{{ w }}</span></li>{% else %}<li>No checks passed outright.</li>{% endfor %}
+        {% for w in s.working %}<li><span class="chip pass">pass</span><span>{{ w }}</span></li>{% else %}<li>No technical test passed{% if counts.get('pass', 0) %}; the passes counted above are governance and process checks{% endif %}.</li>{% endfor %}
       </ul>
       <h3>Decisions and actions required</h3>
       <ul class="clean">
@@ -233,6 +233,13 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 <section class="card" style="border-color: var(--critical)">
   <p class="eyebrow">Audit incomplete</p>
   <p>These tests could not be completed, so the release gate blocks until they are re-run: {% for c in r.gate.incomplete_checks %}<span class="tag">{{ c }}</span>{% endfor %}</p>
+</section>
+{% endif %}
+
+{% if r.gate.get('not_run') %}
+<section class="card">
+  <p class="eyebrow">Not tested in this audit</p>
+  <p>The gate decision covers only the checks that ran. These did not run, because their inputs were not supplied or do not apply: {% for c in r.gate.not_run %}<span class="tag">{{ c }}</span>{% endfor %} To make one mandatory, list it under <code>gate.required_checks</code>.</p>
 </section>
 {% endif %}
 

@@ -95,7 +95,11 @@ def build_register(
 
 
 def gate_decision(
-    risks: list[Risk], gate: dict[str, Any], incomplete: list[str] | None = None
+    risks: list[Risk],
+    gate: dict[str, Any],
+    incomplete: list[str] | None = None,
+    not_run: list[str] | None = None,
+    checks_run: int | None = None,
 ) -> dict[str, Any]:
     """BLOCK if any open risk is in ``block_on``, or if a check could not complete.
 
@@ -113,6 +117,9 @@ def gate_decision(
         "blocking_risks": [r.risk_id for r in blocking],
         "accepted_risks": [r.risk_id for r in accepted],
         "incomplete_checks": incomplete,
+        # A PASS covers only the checks that ran; these were not applicable or not supplied.
+        "not_run": list(not_run or []),
+        "checks_run": checks_run,
     }
 
 
