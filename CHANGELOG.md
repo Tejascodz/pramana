@@ -1,5 +1,65 @@
 # Changelog
 
+## 0.7.15 — 2026-11-06
+
+From testing on a system its authors did not build, and from an independent review run
+on a fresh clone. Each fix has a regression test.
+
+**Third-party validation.** `examples/compas` audits ProPublica's published COMPAS data,
+the real risk scores of a commercial tool used by US courts (downloaded, hash-pinned,
+names dropped, never committed). Pramana reproduces ProPublica's findings within 2.6
+points: Black defendants who did not reoffend were labelled higher risk 42.3% of the time
+against 22.0% for white defendants (published: 44.9% and 23.5%). A CI job repeats it. See
+`docs/third-party-validation.md`. It exposed three Pramana problems, fixed here:
+
+- Membership inference ran when the reference data was not training data (common in
+  predictions-only audits). It now needs the model or `reference_is_training: true`, and
+  its rate at a 1% false-positive rate is no longer inflated by tied scores.
+- Different people with the same few values were counted as duplicate records. Rows are
+  now compared in full; without a record identifier they are noted, not graded.
+- The India sensitivity rating is marked as a benchmark when India is not a deployment region.
+
+**Found by the independent review**
+
+- **Fix: retrieved documents and model inputs were dropped from LangChain and
+  OpenTelemetry traces,** so an instruction planted in a retrieved document was never
+  screened. Retriever documents (with their sources) and tool outputs now become
+  `tool_result` events, model inputs are kept, and `agent.oversight_integrity` screens
+  both. Tool output used to be stored as the agent's own words; it no longer is.
+- **Fix: the misalignment scan read text the agent did not write.** A planted sentence in a
+  document was reported as the agent's privilege escalation. Only the agent's own events
+  are scanned now; tool results, user requests and approvals are not.
+- **A pass now says what it does not cover.** The gate records `checks_run` and `not_run`;
+  the command line, the report, the headline and the viewer list the checks that did not
+  run. `gate.required_checks` makes a check mandatory, and gate settings are validated.
+- **One clean sample is not a pass.** Rate-based LLM checks need `llm_min_samples` judged
+  samples (default 5); with fewer they warn and state the 95% upper bound.
+- **Audit a web chat window, no API needed:** `llm.mode: browser` drives the page in
+  Chromium through Playwright (extra `[browser]`), with a fresh browser context per
+  conversation and identity headers for access-control probes.
+- `pramana verify` says what an unsigned pack proves (the files match the ledger, not who
+  made it). Self-test entries say whether they are a planted defect or a false-alarm
+  control, and whether they passed. The report no longer says "no checks passed" when
+  governance checks did. The example release-gate workflow now attests its audit pack.
+
+**New checks and coverage**
+
+- `llm.access_control`: requests that claim to be another customer (an unsigned id header,
+  a forged signature, an identity stated in the message) must not get that customer's
+  record back. Found the identity flaw in the reference app that the red-team session
+  reported; five probes added to the live set.
+- Injection acceptance is recognised in Hindi and Hinglish, with negation.
+
+**Using it**
+
+- Every report, model card and summary carries a notice: test evidence for a qualified
+  reviewer, not a certification. `DISCLAIMER.md`, `SUPPORT.md` (what stays stable between
+  releases) and GitHub issue forms, including one for scoring errors.
+- The web viewer is redesigned: the verdict in plain words first, then what needs
+  attention, what is working and what was not tested; findings with filters and search;
+  light and dark mode; verification cached until a file in the pack changes.
+- `examples/credit_scoring/README.md` lists every planted defect and the expected result.
+
 ## 0.7.14 — 2026-11-05
 
 From a red-team session on the real run 6 transcript and the Niva reference app.

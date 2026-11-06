@@ -1,5 +1,5 @@
 {
-  "audit_id": "PRM-20261021-F1B3DE",
+  "audit_id": "PRM-20261021-962CE0",
   "classification": {
     "eu_applicable": false,
     "eu_basis": [
@@ -42,6 +42,7 @@
     "llm.groundedness",
     "llm.policy_adherence",
     "llm.obfuscation",
+    "llm.access_control",
     "llm.sensitive_disclosure",
     "llm.service_health",
     "documentation.model_card"
@@ -66,6 +67,7 @@
     "llm_groundedness_min": 0.9,
     "llm_latency_p95_max_ms": 20000,
     "llm_max_output_chars": 4000,
+    "llm_min_samples": 5,
     "mia_auc_max": 0.6,
     "min_auc": 0.7,
     "min_group_size": 30,

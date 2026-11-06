@@ -18,6 +18,9 @@
           "bureau_score": 0.0661
         },
         "positive_rate": 0.7514,
+        "record_identifier": [
+          "applicant_id"
+        ],
         "rows": 3660
       },
       "reference_data": {
@@ -26,6 +29,9 @@
           "bureau_score": 0.0702
         },
         "positive_rate": 0.7501,
+        "record_identifier": [
+          "applicant_id"
+        ],
         "rows": 8400
       }
     },

@@ -178,7 +178,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <header class="top">
   <div>
-    <p class="eyebrow">AI system audit report · PRM-20261021-FAD25D</p>
+    <p class="eyebrow">AI system audit report · PRM-20261021-A2FEC2</p>
     <h1>Nilgiri Finance Personal Loan Pre-Approval Model</h1>
     <div class="meta">
       Version 2.3.0 · Owner Credit Risk Analytics
@@ -225,11 +225,12 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 </section>
 
 
+
 <section class="kpis" style="margin-bottom:18px">
   <div class="kpi"><div class="v">4/16</div><div class="l">checks passed</div></div>
   <div class="kpi"><div class="v">7</div><div class="l">open high or critical risks</div></div>
   <div class="kpi"><div class="v">75/151</div><div class="l">applicable controls tested by automation</div></div>
-  <div class="kpi"><div class="v mono" style="font-size:18px">5d8a13ca5438</div><div class="l">evidence root hash</div></div>
+  <div class="kpi"><div class="v mono" style="font-size:18px">dcdc444f7eca</div><div class="l">evidence root hash</div></div>
 </section>
 
 <section class="card" id="risks">
@@ -286,7 +287,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <div class="finding-body">
       <p>Issues: evaluation_data: missing values above 5% in bureau_score; evaluation_data: 1.6% duplicate rows; reference_data: missing values above 5% in bureau_score.</p>
 <p><strong>Recommendation.</strong> Document how missing values are handled, de-duplicate records, and confirm no input is recorded after the outcome it predicts.</p><p><span class="tag">NIST:MAP-2.3</span><span class="tag">NIST:MEASURE-2.1</span><span class="tag">ISO42001:A.7.4</span><span class="tag">ISO42001:A.7.6</span><span class="tag">ISO42001:A.4.3</span><span class="tag">EUAIA:Art-10</span><span class="tag">ISO42005:6.4</span></p>      <p class="note">issues = <span class="mono">3</span> · leakage_suspects = <span class="mono">0</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">a8c7490eb70e9152e31d411b83adea084aa448deb8a3af1b0becb64894e2b852</span></p>    </div>
+<p class="note">Evidence SHA-256 <span class="mono hash">14b626782b5f078489edfac3f53508f84e67abe5ffaa80b3c991fc7262e44b69</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Predictive performance <span class="note mono">performance.discrimination</span></summary>
@@ -354,9 +355,9 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <details >
     <summary><span class="chip pass">pass</span>Membership-inference risk <span class="note mono">privacy.membership_inference</span></summary>
     <div class="finding-body">
-      <p>Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.6% of training rows (5% FPR: 6.5%).</p>
-<p><span class="tag">NIST:MEASURE-2.10</span><span class="tag">NIST:MEASURE-2.7</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:DPDP-2023</span></p>      <p class="note">attack_auc = <span class="mono">0.5672</span> · membership_advantage = <span class="mono">0.1345</span> · tpr_at_1pct_fpr = <span class="mono">0.0156</span> · tpr_at_5pct_fpr = <span class="mono">0.0648</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">b85bc0a0e46a774097ddec29967c45dc26bcbc734dfc6f1acd615aa886c08f8e</span></p>    </div>
+      <p>Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.5% of training rows (5% FPR: 6.5%).</p>
+<p><span class="tag">NIST:MEASURE-2.10</span><span class="tag">NIST:MEASURE-2.7</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:DPDP-2023</span></p>      <p class="note">attack_auc = <span class="mono">0.5672</span> · membership_advantage = <span class="mono">0.1345</span> · tpr_at_1pct_fpr = <span class="mono">0.0153</span> · tpr_at_5pct_fpr = <span class="mono">0.0645</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">298e7abd5ca77d043d8d3bc6b66c088cc22037c888d92b295a4f1b7f28de6cdb</span></p>    </div>
   </details>
   <details open>
     <summary><span class="chip fail">fail</span>Documentation and claims <span class="note mono">documentation.model_card</span></summary>
@@ -368,9 +369,9 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <details >
     <summary><span class="chip pass">pass</span>Audit self-test (canaries) <span class="note mono">audit.detector_sensitivity</span></summary>
     <div class="finding-body">
-      <p>6/6 self-tests passed (3 planted defects, 3 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.</p>
+      <p>6/6 self-tests passed (6 planted defects, 0 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.</p>
 <p><span class="tag">NIST:MEASURE-2.13</span><span class="tag">NIST:MEASURE-1.2</span><span class="tag">ISO42001:A.6.2.4</span></p>      <p class="note">canaries = <span class="mono">6</span> · missed = <span class="mono">0</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">000a09774e63ccc9247b56bdee095fe67595249a5cb25cf3ca9a4a7edcb3f7fe</span></p>    </div>
+<p class="note">Evidence SHA-256 <span class="mono hash">8be872401d3313db0e2f406ea5906ba9cded195be84a16da1306b63a70a2214c</span></p>    </div>
   </details>
   <details >
     <summary><span class="chip warn">warn</span>Governance evidence on file <span class="note mono">governance.manual_evidence</span></summary>
@@ -850,13 +851,14 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     </table></div>
   </details>
   <h3>Verifying this pack</h3>
-  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">5d8a13ca5438cf9e3e17ff2506e4e8813b098e20bddaa9fa4c2314d15bfbe9c1</span>.</p>
+  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">dcdc444f7ecac5bd3280453e6e5e6f98638669eee6382c9f49f0d12b8383bfdc</span>.</p>
   <h3>Limitations</h3>
   <p class="note">Automated tests evidence technical controls only. Controls marked "not tested" need organisational evidence. Statistical tests depend on the representativeness of the data supplied. LLM probes are a sample of behaviour, not proof of safety. The classification is an assessment to support legal review, not legal advice. See docs/limitations.md in the Pramana repository.</p>
 </section>
 
 <footer>
-  Generated by Pramana 0.7.14 · Python 3.13.18 · audit PRM-20261021-FAD25D · started 2026-11-05T18:15:09+00:00
+  <p><strong>Notice.</strong> Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md</p>
+  Generated by Pramana 0.7.15 · Python 3.13.18 · audit PRM-20261021-A2FEC2 · started 2026-11-06T21:39:40+00:00
 </footer>
 </div>
 </body>

@@ -93,6 +93,22 @@
     "failure_mode": "Attacks disguised with invisible or look-alike characters pass input filters"
   },
   {
+    "check_id": "llm.access_control",
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST:MEASURE-2.10",
+      "NIST-GAI:DATA-PRIVACY",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM02",
+      "ISO42001:A.7.2",
+      "EUAIA:Art-15",
+      "INDIA:DPDP-2023"
+    ],
+    "detection": "Access control across identities",
+    "effect": "Account takeover by assertion; personal-data breach",
+    "failure_mode": "A caller who claims another customer's identity (a header, a stated account) gets that customer's data"
+  },
+  {
     "check_id": "llm.sensitive_disclosure",
     "controls": [
       "NIST:MEASURE-2.10",

@@ -11,35 +11,44 @@
       {
         "canary": "balanced copy, then halve favourable decisions for gender=male",
         "detected": true,
-        "observed": "DI 0.50 after 608 decisions flipped"
+        "kind": "planted defect",
+        "observed": "DI 0.50 after 608 decisions flipped",
+        "passed": true
       },
       {
         "canary": "balanced copy of gender is not flagged (false-alarm control)",
-        "control": true,
-        "detected": true,
-        "observed": "DI 1.00"
+        "false_alarm": false,
+        "kind": "false-alarm control",
+        "observed": "DI 1.00",
+        "passed": true
       },
       {
         "canary": "shift monthly_income by 1.5 standard deviations",
         "detected": true,
-        "observed": "PSI 7.26"
+        "kind": "planted defect",
+        "observed": "PSI 7.26",
+        "passed": true
       },
       {
         "canary": "two random halves of the data on monthly_income (false-alarm control)",
-        "control": true,
-        "detected": true,
-        "observed": "PSI 0.01"
+        "false_alarm": false,
+        "kind": "false-alarm control",
+        "observed": "PSI 0.01",
+        "passed": true
       },
       {
         "canary": "plant 5 e-mail addresses in 100 values of an unnamed column",
         "detected": true,
-        "observed": "scanner run on planted column"
+        "kind": "planted defect",
+        "observed": "scanner run on planted column",
+        "passed": true
       },
       {
         "canary": "a column of customer references is not flagged (false-alarm control)",
-        "control": true,
-        "detected": true,
-        "observed": "not flagged"
+        "false_alarm": false,
+        "kind": "false-alarm control",
+        "observed": "not flagged",
+        "passed": true
       }
     ]
   },
@@ -52,6 +61,6 @@
   "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
   "severity": "info",
   "status": "pass",
-  "summary": "6/6 self-tests passed (3 planted defects, 3 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.",
+  "summary": "6/6 self-tests passed (6 planted defects, 0 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.",
   "title": "Audit self-test (canaries)"
 }

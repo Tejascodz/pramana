@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-FAD25D",
+  "audit_id": "PRM-20261021-A2FEC2",
   "tool": {
     "name": "pramana",
-    "version": "0.7.14"
+    "version": "0.7.15"
   },
   "system": {
     "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
@@ -31,8 +31,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-11-05T18:15:09+00:00",
-  "finished": "2026-11-05T18:15:12+00:00",
+  "started": "2026-11-06T21:39:40+00:00",
+  "finished": "2026-11-06T21:39:43+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -55,7 +55,9 @@
     "accepted_risks": [
       "R-12"
     ],
-    "incomplete_checks": []
+    "incomplete_checks": [],
+    "not_run": [],
+    "checks_run": 15
   },
   "counts": {
     "fail": 6,
@@ -269,7 +271,10 @@
               "bureau_score": 0.0661
             },
             "duplicate_rate": 0.0164,
-            "positive_rate": 0.7514
+            "positive_rate": 0.7514,
+            "record_identifier": [
+              "applicant_id"
+            ]
           },
           "reference_data": {
             "rows": 8400,
@@ -277,7 +282,10 @@
               "bureau_score": 0.0702
             },
             "duplicate_rate": 0.0,
-            "positive_rate": 0.7501
+            "positive_rate": 0.7501,
+            "record_identifier": [
+              "applicant_id"
+            ]
           }
         },
         "leakage": []
@@ -291,7 +299,7 @@
         "EUAIA:Art-10",
         "ISO42005:6.4"
       ],
-      "evidence_hash": "a8c7490eb70e9152e31d411b83adea084aa448deb8a3af1b0becb64894e2b852"
+      "evidence_hash": "14b626782b5f078489edfac3f53508f84e67abe5ffaa80b3c991fc7262e44b69"
     },
     {
       "check_id": "performance.discrimination",
@@ -1478,14 +1486,14 @@
       "category": "Privacy",
       "status": "pass",
       "severity": "info",
-      "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.6% of training rows (5% FPR: 6.5%).",
+      "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.5% of training rows (5% FPR: 6.5%).",
       "plain_summary": "The model does not reveal who was in its training data beyond chance level.",
       "recommendation": "Reduce overfitting (regularisation, fewer trees, early stopping) or train with differential privacy, then re-run this test.",
       "metrics": {
         "attack_auc": 0.5672,
         "membership_advantage": 0.1345,
-        "tpr_at_1pct_fpr": 0.0156,
-        "tpr_at_5pct_fpr": 0.0648
+        "tpr_at_1pct_fpr": 0.0153,
+        "tpr_at_5pct_fpr": 0.0645
       },
       "details": {},
       "controls": [
@@ -1495,7 +1503,7 @@
         "EUAIA:Art-15",
         "INDIA:DPDP-2023"
       ],
-      "evidence_hash": "b85bc0a0e46a774097ddec29967c45dc26bcbc734dfc6f1acd615aa886c08f8e"
+      "evidence_hash": "298e7abd5ca77d043d8d3bc6b66c088cc22037c888d92b295a4f1b7f28de6cdb"
     },
     {
       "check_id": "documentation.model_card",
@@ -1545,7 +1553,7 @@
       "category": "Assurance",
       "status": "pass",
       "severity": "info",
-      "summary": "6/6 self-tests passed (3 planted defects, 3 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.",
+      "summary": "6/6 self-tests passed (6 planted defects, 0 false-alarm controls). balanced copy, then halve favourable decisions for gender=male: DI 0.50 after 608 decisions flipped; balanced copy of gender is not flagged (false-alarm control): DI 1.00; shift monthly_income by 1.5 standard deviations: PSI 7.26; two random halves of the data on monthly_income (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.",
       "plain_summary": "The audit tests caught every defect deliberately planted to check them, and raised no alarm on clean copies.",
       "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
       "metrics": {
@@ -1556,36 +1564,45 @@
         "canaries": [
           {
             "canary": "balanced copy, then halve favourable decisions for gender=male",
+            "observed": "DI 0.50 after 608 decisions flipped",
+            "kind": "planted defect",
             "detected": true,
-            "observed": "DI 0.50 after 608 decisions flipped"
+            "passed": true
           },
           {
             "canary": "balanced copy of gender is not flagged (false-alarm control)",
-            "detected": true,
             "observed": "DI 1.00",
-            "control": true
+            "kind": "false-alarm control",
+            "false_alarm": false,
+            "passed": true
           },
           {
             "canary": "shift monthly_income by 1.5 standard deviations",
+            "observed": "PSI 7.26",
+            "kind": "planted defect",
             "detected": true,
-            "observed": "PSI 7.26"
+            "passed": true
           },
           {
             "canary": "two random halves of the data on monthly_income (false-alarm control)",
-            "detected": true,
             "observed": "PSI 0.01",
-            "control": true
+            "kind": "false-alarm control",
+            "false_alarm": false,
+            "passed": true
           },
           {
             "canary": "plant 5 e-mail addresses in 100 values of an unnamed column",
+            "observed": "scanner run on planted column",
+            "kind": "planted defect",
             "detected": true,
-            "observed": "scanner run on planted column"
+            "passed": true
           },
           {
             "canary": "a column of customer references is not flagged (false-alarm control)",
-            "detected": true,
             "observed": "not flagged",
-            "control": true
+            "kind": "false-alarm control",
+            "false_alarm": false,
+            "passed": true
           }
         ]
       },
@@ -1594,7 +1611,7 @@
         "NIST:MEASURE-1.2",
         "ISO42001:A.6.2.4"
       ],
-      "evidence_hash": "000a09774e63ccc9247b56bdee095fe67595249a5cb25cf3ca9a4a7edcb3f7fe"
+      "evidence_hash": "8be872401d3313db0e2f406ea5906ba9cded195be84a16da1306b63a70a2214c"
     },
     {
       "check_id": "governance.manual_evidence",
@@ -4948,9 +4965,9 @@
     }
   ],
   "llm_run": {},
-  "ledger_root": "5d8a13ca5438cf9e3e17ff2506e4e8813b098e20bddaa9fa4c2314d15bfbe9c1",
+  "ledger_root": "dcdc444f7ecac5bd3280453e6e5e6f98638669eee6382c9f49f0d12b8383bfdc",
   "environment": {
     "python": "3.13.18",
-    "pramana": "0.7.14"
+    "pramana": "0.7.15"
   }
 }

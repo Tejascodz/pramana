@@ -9,8 +9,14 @@
       "R-01",
       "R-02"
     ],
+    "checks_run": 5,
     "decision": "BLOCK",
-    "incomplete_checks": []
+    "incomplete_checks": [],
+    "not_run": [
+      "agent.honeypot",
+      "agent.approval_paths",
+      "documentation.model_card"
+    ]
   },
   "opinion": {
     "rating": "Ineffective",

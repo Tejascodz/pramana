@@ -16,8 +16,10 @@
       "R-06",
       "R-07"
     ],
+    "checks_run": 15,
     "decision": "BLOCK",
-    "incomplete_checks": []
+    "incomplete_checks": [],
+    "not_run": []
   },
   "opinion": {
     "rating": "Ineffective",
