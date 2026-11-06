@@ -10,3 +10,7 @@ toolbarMode = "viewer"
 [browser]
 serverAddress = "localhost"
 gatherUsageStats = false
+
+# A calm accent: red is kept for real problems (failed checks, a blocked release).
+[theme]
+primaryColor = "#2f6fdb"

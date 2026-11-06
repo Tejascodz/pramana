@@ -285,7 +285,9 @@ pip install -e ".[dashboard]"
 streamlit run dashboard/app.py --server.address 127.0.0.1 -- --pack packs/credit
 ```
 
-The viewer re-verifies the pack every time it opens it and warns if anything was changed. It shows the gate, the risk register, every finding with its per-test table (which attack succeeded, in how many samples, at which turn a conversation broke, each honeypot outcome, and the system's reply), framework coverage and the remediation plan. Text from the pack is shown as text: no formatting, images or clickable links from a model's answers.
+![The audit viewer: verdict, evidence check and what needs attention](https://raw.githubusercontent.com/Tejascodz/pramana/main/docs/img/viewer.png)
+
+The viewer opens on the answer: whether the release can go ahead and why, in plain words, with the evidence check beneath it. It re-verifies the pack whenever any file in it changes and warns if anything was altered. The **Overview** lists what needs attention (most serious first), what is working, and what was not tested, so a pass is never read as covering more than it did. **Findings** can be filtered by status, area and text; each opens to its plain-language meaning, the technical evidence, the per-test table (which attack succeeded, in how many samples, at which turn a conversation broke, each honeypot outcome, and the system's reply) and the recommendation. The risk register, framework coverage and remediation plan have their own tabs. It follows the system's light or dark mode. Text from the pack is shown as text: no formatting, images or clickable links from a model's answers.
 
 ## Write your own audit
 

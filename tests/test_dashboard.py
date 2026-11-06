@@ -27,7 +27,7 @@ def test_the_viewer_opens_published_packs(pack, monkeypatch):
     at = _app(ROOT / "docs" / "sample-audits" / pack, monkeypatch)
     assert at.title[0].value
     assert any("Evidence verified" in s.value for s in at.success)
-    assert len(at.tabs) == 4
+    assert len(at.tabs) == 5
 
 
 def test_findings_show_the_per_test_table_for_a_real_run(monkeypatch):
