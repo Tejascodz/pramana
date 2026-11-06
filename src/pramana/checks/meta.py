@@ -134,7 +134,15 @@ def detector_sensitivity(ctx: AuditContext) -> CheckResult:
 
     if not canaries:
         raise MissingArtifact("No canaries could be planted for this dataset")
-    missed = [c for c in canaries if not c["detected"]]
+    # One vocabulary for both kinds: a planted defect passes when it is detected, a false-alarm
+    # control passes when nothing is flagged. "detected" stays only where it means detected.
+    for c in canaries:
+        ok = bool(c.pop("detected"))
+        if c.pop("control", False):
+            c.update(kind="false-alarm control", false_alarm=not ok, passed=ok)
+        else:
+            c.update(kind="planted defect", detected=ok, passed=ok)
+    missed = [c for c in canaries if not c["passed"]]
     status = Status.FAIL if missed else Status.PASS
     return CheckResult(
         check_id="audit.detector_sensitivity",

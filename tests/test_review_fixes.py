@@ -158,7 +158,7 @@ def test_self_test_detects_its_canary_when_the_majority_is_favoured(tmp_path):
     )
     control = next(c for c in r.details["canaries"] if "false-alarm" in c["canary"])
     assert planted["detected"], planted
-    assert control["detected"], control
+    assert control["passed"] and not control["false_alarm"], control
 
 
 # P1: drift must not crash or mis-sort on degenerate features ---------------------

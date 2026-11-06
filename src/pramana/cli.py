@@ -199,7 +199,11 @@ def _cmd_verify(args: argparse.Namespace) -> int:
             print(f"OK: {args.pack} verifies and is signed by the key you provided.")
         return EXIT_OK
 
-    print(f"OK: every evidence file and ledger entry in {args.pack} verifies.")
+    print(
+        f"OK: every evidence file and ledger entry in {args.pack} verifies. The pack is not "
+        "signed or attested, so this shows the files match the ledger, not who produced them: "
+        "anyone can rebuild an unsigned pack. Check its origin with --public-key or --attested-by."
+    )
     return EXIT_OK
 
 
