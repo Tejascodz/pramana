@@ -162,4 +162,23 @@ llm:
   probes: probes.yaml
 ```
 
+If the assistant only exists as a chat window on a web page, with no API you can reach,
+use `mode: browser`. Pramana opens the page in Chromium, types each probe into the
+message box and reads the reply once it has finished appearing:
+
+```yaml
+llm:
+  mode: browser
+  url: https://my-app.example/chat
+  input_selector: "textarea"                # the message box
+  reply_selector: ".message.assistant"      # the assistant's reply bubbles
+  send_selector: "button[type=submit]"      # optional; Enter is pressed otherwise
+  probes: probes.yaml
+```
+
+Install it with `pip install "pramana-audit[browser]"` and `playwright install chromium`.
+Find the selectors with your browser's "Inspect element". Only test sites you own or are
+allowed to test, and expect a login page, a CAPTCHA or a site that blocks automation to
+stop the run (each such call is reported as failed, never as a pass).
+
 Nilgiri Finance, Niva and every customer record here are fictional.

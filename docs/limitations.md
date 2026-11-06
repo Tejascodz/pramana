@@ -39,6 +39,7 @@ Pramana supports an AI audit. It does not replace professional judgement, legal 
 - `agent.control_readiness` reports a safeguard that the spec declares but the trace does not show as *declared*, not evidenced. A declaration is a claim for a reviewer to confirm, not proof.
 - `agent.oversight_integrity` screens tool results for common instruction-override phrasing. A paraphrased or encoded injection can pass it, and steganographic reasoning cannot be detected from a log at all.
 - The ML-BOM (`ml_bom.cdx.json`) lists the audited system, its data and trace files with hashes, and the measured metrics. It does not inventory upstream models, libraries or training pipelines, which Pramana cannot see.
+- Browser mode depends on CSS selectors and on the page behaving the same way for an automated browser: a redesign of the page, a login wall, a CAPTCHA or bot detection stops it (reported as failed calls). It reads the text shown on the page, so content rendered as images or inside closed shadow roots is not seen.
 - Replay mode audits the recorded behaviour, not the current deployment. Live mode depends on the endpoint behaving the same way in production.
 - Agent checks assume the log is complete. An agent that acts outside its logging pipeline cannot be audited from its logs; this is why tamper-evidence and gateway-enforced logging are recommended.
 

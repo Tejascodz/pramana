@@ -47,7 +47,8 @@ dependencies = [
 dashboard = ["streamlit>=1.46"]
 signing = ["cryptography>=42"]
 skops = ["skops>=0.10"]                                # load .skops models without pickle
-all = ["pramana-audit[dashboard,signing,skops]"]
+browser = ["playwright>=1.40"]                         # audit a web chat window (llm.mode: browser)
+all = ["pramana-audit[dashboard,signing,skops,browser]"]
 dev = [
     "pytest>=7.4",
     "ruff>=0.4",

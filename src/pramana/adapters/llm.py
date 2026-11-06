@@ -607,6 +607,23 @@ def build_client(config: dict[str, Any]) -> LLMClient:
             send_system_prompt=bool(config.get("send_system_prompt", True)),
             **common,
         )
+    if mode == "browser":
+        for key in ("url", "input_selector", "reply_selector"):
+            if not config.get(key):
+                raise ValueError(f"llm.{key} is required in browser mode")
+        if int(config.get("concurrency", 1)) > 1:
+            raise ValueError("browser mode drives one page at a time: remove llm.concurrency")
+        from pramana.adapters.browser import BrowserChatClient
+
+        return BrowserChatClient(
+            url=config["url"],
+            input_selector=config["input_selector"],
+            reply_selector=config["reply_selector"],
+            send_selector=config.get("send_selector"),
+            timeout=float(config.get("timeout", 60.0)),
+            settle_ms=int(config.get("settle_ms", 1200)),
+            headless=bool(config.get("headless", True)),
+        )
     if mode == "http":
         for key in ("url", "body", "response_path"):
             if not config.get(key):
@@ -623,4 +640,4 @@ def build_client(config: dict[str, Any]) -> LLMClient:
             model_path=config.get("model_path"),
             **common,
         )
-    raise ValueError(f"Unknown llm.mode '{mode}' (use replay, openai_compatible or http)")
+    raise ValueError(f"Unknown llm.mode '{mode}' (use replay, openai_compatible, http or browser)")

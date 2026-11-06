@@ -242,7 +242,7 @@ pramana diff packs/live_baseline packs/live_guarded
 
 What makes the live mode production-grade:
 
-- **Any endpoint.** `openai_compatible` for Ollama, vLLM, LM Studio, llama.cpp or hosted APIs; `http` for any JSON API, with a body template, a response path and secrets read from environment variables.
+- **Any endpoint.** `openai_compatible` for Ollama, vLLM, LM Studio, llama.cpp or hosted APIs; `http` for any JSON API, with a body template, a response path and secrets read from environment variables; `browser` for an assistant that only exists as a chat window on a web page (Pramana drives it in Chromium, no API key needed).
 - **Resilient calls.** Timeouts, retries with exponential backoff on 429/5xx, a pre-flight check (`pramana ping`), and failed calls recorded as evidence instead of crashing the audit. If a test cannot complete, the gate blocks as *incomplete*: an audit cannot vouch for what it did not test.
 - **Stochastic outputs handled.** `--samples N` sends each probe N times; a probe fails if any sample fails, and rates come with Wilson 95% intervals ([Hughes et al., 2024](https://arxiv.org/abs/2412.03556) show attack success grows with repeated sampling).
 - **Judge-free, defensible scoring.** Split markers, regular expressions and a planted canary prove compliance without a second model. Results that contain both proof and refusal language are flagged for human review.
