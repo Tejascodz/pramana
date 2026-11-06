@@ -351,6 +351,15 @@ Pramana supports an audit; it does not replace auditor judgement or legal advice
 - RBI FREE-AI framework as a sector profile for Indian lenders
 - Ranking and recommendation fairness metrics
 
+## Using Pramana responsibly
+
+A Pramana report is test evidence for a qualified reviewer, not a certification or legal
+opinion, and a pass covers only the checks that ran. Run the attack checks only against
+systems you own or are allowed to test. See
+[DISCLAIMER.md](https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md). For help,
+scoring-error reports and what stays stable between releases, see
+[SUPPORT.md](https://github.com/Tejascodz/pramana/blob/main/SUPPORT.md).
+
 ## License
 
 MIT. See [LICENSE](https://github.com/Tejascodz/pramana/blob/main/LICENSE).

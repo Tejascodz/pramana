@@ -1,0 +1,14 @@
+name: Feature request
+description: A new check, adapter, framework mapping or improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What do you need to test or prove, and why?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How you would like it to work

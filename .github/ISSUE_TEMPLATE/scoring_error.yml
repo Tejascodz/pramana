@@ -1,0 +1,45 @@
+name: Scoring error
+description: A check passed when it should have failed, or failed when it should have passed
+labels: [scoring]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Every confirmed scoring error becomes a regression test. Remove secrets, keys and
+        personal data from the excerpt; a redacted excerpt that still shows the problem is enough.
+  - type: input
+    id: version
+    attributes:
+      label: Pramana version
+    validations:
+      required: true
+  - type: input
+    id: check
+    attributes:
+      label: Check id
+      placeholder: llm.prompt_injection
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of error
+      options:
+        - False pass (a real problem was scored as fine)
+        - False failure (a fine result was scored as a problem)
+        - Wrong evidence or wording in the report
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: The input and the reply or record that was mis-scored
+      description: For LLM checks, the probe id, the prompt and the reply. For data checks, a small synthetic example that reproduces it.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What the verdict should have been, and why
+    validations:
+      required: true

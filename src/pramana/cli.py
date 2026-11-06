@@ -24,7 +24,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from pramana import __version__
+from pramana import NOTICE, __version__
 
 EXIT_OK, EXIT_BLOCKED, EXIT_TAMPERED, EXIT_INPUT, EXIT_UNREACHABLE = 0, 1, 2, 3, 4
 
@@ -334,6 +334,8 @@ def _cmd_summary(args: argparse.Namespace) -> int:
             print("| " + " | ".join(_cell(x) for x in cells) + " |")
     else:
         print("No risks identified.")
+    print()
+    print(f"_{NOTICE}_")
     return EXIT_OK
 
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from pramana import NOTICE
 from pramana.types import Status
 
 GAP = "_Not documented. Flagged in the audit._"
@@ -104,7 +105,7 @@ def render_model_card(result) -> str:
         lines += [f"- **{r.risk_id} ({r.rating.value}):** {r.description}" for r in open_risks]
     else:
         lines.append("None.")
-    lines += ["", f"_Evidence root hash: `{result.ledger_root}`_", ""]
+    lines += ["", f"_Evidence root hash: `{result.ledger_root}`_", "", f"_{NOTICE}_", ""]
     return "\n".join(lines)
 
 

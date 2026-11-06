@@ -10,7 +10,7 @@ from typing import Any
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from pramana import __version__
+from pramana import NOTICE, __version__
 from pramana.audit.ledger import EvidenceLedger
 from pramana.checks.llm import fmt_ms
 from pramana.controls import load_library
@@ -104,6 +104,7 @@ def render_html(result) -> str:
         multi_sample=int(result.llm_run.get("samples_per_probe") or 1) > 1,
         calendar_reviewed=load_library().calendar.get("last_reviewed"),
         version=__version__,
+        notice=NOTICE,
     )
 
 
