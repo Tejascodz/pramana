@@ -87,6 +87,45 @@ def _otel_args(value: Any) -> dict[str, Any]:
     return value if isinstance(value, dict) else {"input": value}
 
 
+def _documents(value: Any) -> list[dict[str, Any]] | None:
+    """Retrieved documents as ``{"content", "source"}``: LangChain ``Document`` dicts or text."""
+    if not isinstance(value, list):
+        return None
+    docs = []
+    for item in value:
+        if isinstance(item, dict):
+            meta = item.get("metadata") if isinstance(item.get("metadata"), dict) else {}
+            text = _first(item, "page_content", "content", "text", default="")
+            docs.append(
+                {"content": _as_text(text), "source": meta.get("source") or meta.get("url")}
+            )
+        else:
+            docs.append({"content": _as_text(item), "source": None})
+    return docs
+
+
+def _result_text(result: Any) -> str:
+    docs = _documents(result)
+    if docs is not None:
+        return "\n".join((f"[{d['source']}] " if d["source"] else "") + d["content"] for d in docs)
+    return _as_text(result)
+
+
+def _tool_result(call: dict[str, Any], result: Any, ts: str) -> dict[str, Any]:
+    """What a tool or retriever returned, as data the agent read (screened for injection)."""
+    return {
+        "event_id": f"{call['event_id']}:result",
+        "ts": ts or call.get("ts", ""),
+        "session_id": call.get("session_id", ""),
+        "type": "tool_result",
+        "actor": f"tool:{call.get('tool', 'unknown')}",
+        "parent_id": call["event_id"],
+        "tool": call.get("tool"),
+        "result": docs if (docs := _documents(result)) is not None else result,
+        "content": _result_text(result),
+    }
+
+
 def from_otel_spans(spans: Iterable[dict[str, Any]]) -> Iterator[dict[str, Any]]:
     """Map OpenTelemetry GenAI spans to Pramana events.
 
@@ -124,6 +163,20 @@ def from_otel_spans(spans: Iterable[dict[str, Any]]) -> Iterator[dict[str, Any]]
         reasoning = _first(attr, "gen_ai.reasoning", "gen_ai.completion.reasoning")
         if reasoning:
             event["reasoning"] = _as_text(reasoning)
+        prompt = _first(attr, "gen_ai.input.messages", "gen_ai.prompt")
+        if prompt is not None:
+            event["input"] = _as_text(prompt)
+        if etype == "tool_call":
+            yield event
+            result = _first(attr, "gen_ai.tool.call.result", "gen_ai.tool.result")
+            if result is not None:
+                if isinstance(result, str):
+                    try:
+                        result = json.loads(result)
+                    except json.JSONDecodeError:
+                        pass
+                yield _tool_result(event, result, _first(span, "end_time", "endTime", default=""))
+            continue
         output = _first(
             attr, "gen_ai.output.messages", "gen_ai.completion", "gen_ai.response.content"
         )
@@ -174,10 +227,31 @@ def from_langchain_runs(runs: Iterable[dict[str, Any]]) -> Iterator[dict[str, An
         if etype == "tool_call":
             event["tool"] = run.get("name", rtype)
             event["args"] = inputs if isinstance(inputs, dict) else {"input": inputs}
+            yield event
+            # What the tool or retriever returned is data the agent read, not its own words:
+            # it becomes a tool_result (screened for planted instructions), never the call's
+            # content (which the misalignment scan would read as the agent's reasoning).
+            result = (
+                _first(outputs, "documents", "output", "result", "text", "content")
+                if isinstance(outputs, dict)
+                else outputs
+            )
+            if result is not None and result != {}:
+                yield _tool_result(event, result, _first(run, "end_time", "end", default=""))
+            continue
+        # The prompt, messages or retrieved context the model was given: kept as evidence and
+        # screened for planted instructions, but never read as the model's own reasoning.
+        prompt = (
+            _first(inputs, "prompt", "prompts", "messages", "input")
+            if isinstance(inputs, dict)
+            else inputs
+        )
+        if prompt and rtype in ("llm", "chat_model"):  # a chain's input is the user's own message
+            event["input"] = _as_text(prompt)
         reasoning = _first(outputs, "reasoning", "intermediate_steps", "log")
         if reasoning:
             event["reasoning"] = _as_text(reasoning)
-        content = _first(outputs, "output", "text", "content", "messages")
+        content = _first(outputs, "output", "text", "content", "messages", "generations")
         if content is not None:
             event["content"] = _as_text(content)
         yield event

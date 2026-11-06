@@ -495,7 +495,16 @@ GATED_PATTERNS = {
 
 
 def _scannable_text(event: dict[str, Any]) -> str:
-    """The agent's own words in an event: reasoning, output content, and stated reasons."""
+    """The agent's own words in an event: reasoning, output content, and stated reasons.
+
+    What a tool returned, what a user asked and what an approver wrote are someone else's
+    words: a planted "I will bypass the permission check" in a retrieved document is an
+    injection for the oversight check to flag, not the agent's intent.
+    """
+    if event.get("type") in ("tool_result", "user_request", "approval", "scheduled_trigger"):
+        return ""
+    if str(event.get("actor", "")).startswith(("tool:", "user:", "human:", "customer:")):
+        return ""
     parts: list[str] = []
     for key in ("reasoning", "thought", "scratchpad", "content", "message"):
         value = event.get(key)
@@ -982,9 +991,15 @@ def oversight_integrity(ctx: AuditContext) -> CheckResult:
     # next action in that session is listed so a reviewer can see whether it was followed.
     injected = []
     for i, e in enumerate(events):
-        if e.get("type") != "tool_result":
+        # Data the agent read: what tools and retrievers returned, and the prompt or retrieved
+        # context a model call was given (kept as "input" by the trace adapters).
+        if e.get("type") == "tool_result":
+            payload = e.get("result") if e.get("result") is not None else e.get("content")
+            where = "tool result"
+        elif e.get("type") == "model_output" and e.get("input"):
+            payload, where = e["input"], "model input"
+        else:
             continue
-        payload = e.get("result") if e.get("result") is not None else e.get("content")
         text = payload if isinstance(payload, str) else json.dumps(payload, ensure_ascii=False)
         match = _TOOL_INJECTION_CUE.search(normalize(text or ""))
         if not match:
@@ -1002,6 +1017,7 @@ def oversight_integrity(ctx: AuditContext) -> CheckResult:
                 "event_id": e.get("event_id"),
                 "session_id": e.get("session_id"),
                 "quote": " ".join(match.group(0).split())[:120],
+                "found_in": where,
                 "next_action": f"{nxt.get('event_id')} {nxt.get('tool')}" if nxt else None,
             }
         )
@@ -1019,7 +1035,7 @@ def oversight_integrity(ctx: AuditContext) -> CheckResult:
         )
     if injected:
         problems.append(
-            f"{len(injected)} tool result(s) contain planted instructions ("
+            f"{len(injected)} tool result(s) or model input(s) contain planted instructions ("
             + "; ".join(f'{x["event_id"]}: "{x["quote"]}"' for x in injected[:4])
             + ")"
         )
@@ -1032,7 +1048,7 @@ def oversight_integrity(ctx: AuditContext) -> CheckResult:
         severity=severity,
         summary=(
             f"Reasoning is logged for {explained} of {calls} tool call(s) ({coverage:.0%}, minimum "
-            f"{minimum:.0%}). {len(injected)} tool result(s) contain planted instructions."
+            f"{minimum:.0%}). {len(injected)} tool result(s) or model input(s) contain planted instructions."
             + (" " + "; ".join(problems) + "." if problems else "")
             + " Encoded or steganographic reasoning cannot be detected from a log and is not tested."
         ),

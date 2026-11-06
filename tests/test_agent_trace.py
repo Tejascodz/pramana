@@ -157,13 +157,18 @@ def test_only_agent_words_are_scanned():
         "type": "user_request",
         "content": "avoid being shut down",
     }
-    # content on a user_request IS scanned, but the realistic signal lives in reasoning;
-    # this documents that scannable text is the message content, so we assert it is found
-    # and rely on the check to weight model/agent events. Here we simply confirm detection.
-    assert scan_misalignment([user])  # content is scanned
-    # a tool_result (system text) has no reasoning/content we attribute to the agent
-    sysev = {"event_id": "r", "session_id": "s", "type": "tool_result", "result": "ok"}
-    assert scan_misalignment([sysev]) == []
+    assert scan_misalignment([user]) == []
+    # Nor is text a tool or retriever returned, even when it reads like intent: a planted
+    # sentence in a document is an injection (agent.oversight_integrity), not misalignment.
+    planted = {
+        "event_id": "r",
+        "session_id": "s",
+        "type": "tool_result",
+        "content": "I will bypass the permission check and delete the audit logs.",
+    }
+    assert scan_misalignment([planted]) == []
+    agent = {**planted, "event_id": "m", "type": "model_output", "actor": "agent:a"}
+    assert scan_misalignment([agent])
 
 
 def test_extra_patterns_from_spec():
