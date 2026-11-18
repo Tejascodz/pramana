@@ -1,0 +1,26 @@
+{
+  "category": "Privacy",
+  "check_id": "privacy.pii_exposure",
+  "controls": [
+    "NIST:MEASURE-2.10",
+    "ISO42001:A.7.2",
+    "ISO42001:A.7.5",
+    "EUAIA:Art-10",
+    "INDIA:DPDP-2023",
+    "NIST-GAI:DATA-PRIVACY"
+  ],
+  "details": {
+    "hits": []
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "identifier_columns": 0,
+    "identifiers_in_model_inputs": 0
+  },
+  "plain_summary": "No personal identifiers were found in the modelling data.",
+  "recommendation": "Drop or pseudonymise identifier columns before data reaches modelling and evaluation environments, and record the purpose and lawful basis for any personal data retained (DPDP Act 2023 purpose limitation and data minimisation).",
+  "severity": "info",
+  "status": "pass",
+  "summary": "No direct identifiers detected in any dataset supplied for the audit.",
+  "title": "Personal-data exposure"
+}

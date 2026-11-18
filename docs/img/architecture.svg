@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="690" viewBox="0 0 1040 690" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" role="img">
+<title>How pramana run turns an audit spec into a sealed evidence pack</title>
+<desc>Inputs (the audit spec and a tabular model, an LLM application or an AI agent) pass through the spec loader and six stages: scoping, mapping, artifacts, testing, reflection and reporting. Every stage appends its evidence to a hash-chained ledger, which pramana verify, sign and attest check later.</desc>
+<defs>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+  </marker>
+</defs>
+<rect width="1040" height="690" fill="#ffffff"/>
+
+<!-- Column headings -->
+<text x="20" y="44" font-size="13" font-weight="650" fill="#6b7280" letter-spacing="0.06em">INPUTS</text>
+<text x="320" y="44" font-size="13" font-weight="650" fill="#6b7280" letter-spacing="0.06em">AUDIT PIPELINE (pramana run)</text>
+<text x="750" y="44" font-size="13" font-weight="650" fill="#6b7280" letter-spacing="0.06em">EVIDENCE</text>
+
+<!-- Inputs -->
+<g font-size="12" fill="#4b5563">
+  <rect x="20" y="70" width="250" height="58" rx="8" fill="#f7f7f8" stroke="#d1d5db"/>
+  <text x="34" y="94" font-size="14" font-weight="650" fill="#111827">Audit spec (audit.yaml)</text>
+  <text x="34" y="113">system, use case, thresholds, gate</text>
+
+  <rect x="20" y="214" width="250" height="58" rx="8" fill="#f7f7f8" stroke="#d1d5db"/>
+  <text x="34" y="238" font-size="14" font-weight="650" fill="#111827">Tabular model</text>
+  <text x="34" y="257">model or score column; data CSVs</text>
+
+  <rect x="20" y="286" width="250" height="58" rx="8" fill="#f7f7f8" stroke="#d1d5db"/>
+  <text x="34" y="310" font-size="14" font-weight="650" fill="#111827">LLM application</text>
+  <text x="34" y="329">API, browser or replay; probe files</text>
+
+  <rect x="20" y="358" width="250" height="58" rx="8" fill="#f7f7f8" stroke="#d1d5db"/>
+  <text x="34" y="382" font-size="14" font-weight="650" fill="#111827">AI agent</text>
+  <text x="34" y="401">trace, sandbox runs, workflow graph</text>
+</g>
+
+<!-- Input connectors -->
+<g stroke="#9ca3af" stroke-width="1.5" fill="none">
+  <line x1="270" y1="99" x2="316" y2="99" marker-end="url(#arrow)"/>
+  <line x1="270" y1="243" x2="295" y2="243"/>
+  <line x1="270" y1="315" x2="295" y2="315"/>
+  <line x1="270" y1="387" x2="295" y2="387"/>
+  <line x1="295" y1="243" x2="295" y2="387"/>
+  <line x1="295" y1="315" x2="316" y2="315" marker-end="url(#arrow)"/>
+  <line x1="295" y1="387" x2="316" y2="387" marker-end="url(#arrow)"/>
+</g>
+
+<!-- Pipeline -->
+<g font-size="12" fill="#4b5563">
+  <rect x="320" y="70" width="380" height="58" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-dasharray="4 3"/>
+  <text x="334" y="94" font-size="14" font-weight="650" fill="#111827">Spec loader</text>
+  <text x="334" y="113">validates the spec; checks SHA-256 pins; refuses untrusted pickles</text>
+
+  <rect x="320" y="142" width="380" height="58" rx="8" fill="#f3f7ff" stroke="#b9cdf3"/>
+  <text x="334" y="166" font-size="14" font-weight="650" fill="#111827">1  Scoping</text>
+  <text x="334" y="185">EU AI Act tier and India sensitivity from the use case</text>
+
+  <rect x="320" y="214" width="380" height="58" rx="8" fill="#f3f7ff" stroke="#b9cdf3"/>
+  <text x="334" y="238" font-size="14" font-weight="650" fill="#111827">2  Mapping</text>
+  <text x="334" y="257">failure mode, effect and owner for every planned check</text>
+
+  <rect x="320" y="286" width="380" height="58" rx="8" fill="#f3f7ff" stroke="#b9cdf3"/>
+  <text x="334" y="310" font-size="14" font-weight="650" fill="#111827">3  Artifacts</text>
+  <text x="334" y="329">SHA-256 of every input file and governance document</text>
+
+  <rect x="320" y="358" width="380" height="58" rx="8" fill="#f3f7ff" stroke="#b9cdf3"/>
+  <text x="334" y="382" font-size="14" font-weight="650" fill="#111827">4  Testing</text>
+  <text x="334" y="401">28 checks: 14 tabular, 10 LLM application, 8 agent</text>
+
+  <rect x="320" y="430" width="380" height="72" rx="8" fill="#f3f7ff" stroke="#b9cdf3"/>
+  <text x="334" y="454" font-size="14" font-weight="650" fill="#111827">5  Reflection</text>
+  <text x="334" y="473">risk = likelihood x impact; gate BLOCK or PASS;</text>
+  <text x="334" y="490">coverage of 184 controls in 8 frameworks; remediation plan</text>
+
+  <rect x="320" y="516" width="380" height="58" rx="8" fill="#f3f7ff" stroke="#b9cdf3"/>
+  <text x="334" y="540" font-size="14" font-weight="650" fill="#111827">6  Reporting</text>
+  <text x="334" y="559">report.html, results.json, model card, ML-BOM, CSVs</text>
+</g>
+
+<!-- Pipeline flow -->
+<g stroke="#9ca3af" stroke-width="1.5" fill="none">
+  <line x1="510" y1="128" x2="510" y2="140" marker-end="url(#arrow)"/>
+  <line x1="510" y1="200" x2="510" y2="212" marker-end="url(#arrow)"/>
+  <line x1="510" y1="272" x2="510" y2="284" marker-end="url(#arrow)"/>
+  <line x1="510" y1="344" x2="510" y2="356" marker-end="url(#arrow)"/>
+  <line x1="510" y1="416" x2="510" y2="428" marker-end="url(#arrow)"/>
+  <line x1="510" y1="502" x2="510" y2="514" marker-end="url(#arrow)"/>
+</g>
+
+<!-- Every stage writes to the ledger -->
+<g stroke="#6aa884" stroke-width="1.5" fill="none">
+  <line x1="700" y1="171" x2="746" y2="171" marker-end="url(#arrow)"/>
+  <line x1="700" y1="243" x2="746" y2="243" marker-end="url(#arrow)"/>
+  <line x1="700" y1="315" x2="746" y2="315" marker-end="url(#arrow)"/>
+  <line x1="700" y1="387" x2="746" y2="387" marker-end="url(#arrow)"/>
+  <line x1="700" y1="466" x2="746" y2="466" marker-end="url(#arrow)"/>
+  <line x1="700" y1="545" x2="746" y2="545" marker-end="url(#arrow)"/>
+</g>
+
+<!-- Ledger -->
+<g font-size="12" fill="#4b5563">
+  <rect x="750" y="142" width="270" height="432" rx="8" fill="#f2faf5" stroke="#a7d7b8"/>
+  <text x="764" y="166" font-size="14" font-weight="650" fill="#111827">Evidence ledger</text>
+  <text x="764" y="185" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">ledger.jsonl</text>
+  <text x="764" y="214">Each stage writes its evidence as a file</text>
+  <text x="764" y="231">in the pack and appends an entry with</text>
+  <text x="764" y="248">the file's SHA-256 and the hash of the</text>
+  <text x="764" y="265">previous entry.</text>
+  <text x="764" y="294">Every file in the pack must be recorded,</text>
+  <text x="764" y="311">so an edited, added, removed or</text>
+  <text x="764" y="328">reordered file breaks verification.</text>
+  <text x="764" y="357">The gate decision, risk register and</text>
+  <text x="764" y="374">report are sealed with the test evidence.</text>
+</g>
+
+<!-- Verify -->
+<line x1="885" y1="574" x2="885" y2="598" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+<g font-size="12" fill="#4b5563">
+  <rect x="750" y="602" width="270" height="72" rx="8" fill="#ffffff" stroke="#9ca3af" stroke-dasharray="4 3"/>
+  <text x="764" y="626" font-size="14" font-weight="650" fill="#111827">Afterwards</text>
+  <text x="764" y="645">pramana verify; sign (Ed25519);</text>
+  <text x="764" y="662">attest in CI (Sigstore); viewer</text>
+</g>
+
+<!-- Gate note under the pipeline -->
+<g font-size="12" fill="#4b5563">
+  <text x="320" y="604" font-weight="650" fill="#111827">The gate blocks when</text>
+  <text x="320" y="622">an open risk is rated in gate.block_on (default critical, high),</text>
+  <text x="320" y="639">a check ends in ERROR (for example, a declared input is missing),</text>
+  <text x="320" y="656">a check in gate.required_checks did not run,</text>
+  <text x="320" y="673">or no technical test ran. pramana run then exits with code 1.</text>
+</g>
+</svg>

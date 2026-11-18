@@ -1,0 +1,4431 @@
+{
+  "audit_id": "PRM-20261021-42DAFC",
+  "tool": {
+    "name": "pramana",
+    "version": "0.7.16"
+  },
+  "system": {
+    "name": "COMPAS recidivism risk scores (Broward County, Florida)",
+    "version": "2013-2014",
+    "type": "tabular_classifier",
+    "owner": "Northpointe (now equivant); scores as published by ProPublica",
+    "accountable_executive": "Not applicable (third-party data audit)",
+    "description": "Commercial risk assessment that gives each defendant a decile score from 1 (lowest risk) to 10. ProPublica obtained the scores given in Broward County in 2013 and 2014 and matched them with criminal records over the next two years. This audit treats a decile of 1 to 4 as a low-risk (favourable) decision, as ProPublica did.\n"
+  },
+  "use_case": {
+    "domain": "law_enforcement",
+    "purpose": "Assess the risk that a defendant will reoffend, to inform pre-trial decisions.",
+    "decision_role": "decision_support",
+    "affected_persons": "Defendants awaiting trial",
+    "deployment_regions": [
+      "US"
+    ],
+    "processes_personal_data": true,
+    "interacts_with_people": false,
+    "generates_synthetic_content": false,
+    "annual_decisions": 10000,
+    "vulnerable_groups": true,
+    "contestability": "low",
+    "prohibited_practice_flags": []
+  },
+  "audit_date": "2026-10-21",
+  "started": "2026-11-18T13:58:58+00:00",
+  "finished": "2026-11-18T13:59:00+00:00",
+  "opinion": {
+    "rating": "Ineffective",
+    "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
+  },
+  "gate": {
+    "decision": "BLOCK",
+    "block_on": [
+      "critical",
+      "high"
+    ],
+    "blocking_risks": [
+      "R-01",
+      "R-02",
+      "R-03",
+      "R-04"
+    ],
+    "accepted_risks": [],
+    "incomplete_checks": [],
+    "not_run": [
+      "robustness.perturbation",
+      "explainability.feature_importance",
+      "privacy.membership_inference",
+      "documentation.model_card"
+    ],
+    "checks_run": 10
+  },
+  "counts": {
+    "warn": 2,
+    "pass": 5,
+    "fail": 4,
+    "skipped": 4
+  },
+  "classification": {
+    "eu_tier": "high",
+    "eu_applicable": false,
+    "eu_basis": [
+      "Art. 6(2) and Annex III point 6: Law enforcement"
+    ],
+    "india_sensitivity": "high",
+    "india_score": 7,
+    "india_factors": [
+      "affects access to essential services, livelihood or rights (+3)",
+      "processes personal data under the DPDP Act (+1)",
+      "affects vulnerable groups (+2)",
+      "outcomes are hard to contest or reverse (+1)"
+    ],
+    "sector_notes": [],
+    "obligations": []
+  },
+  "results": [
+    {
+      "check_id": "governance.risk_classification",
+      "title": "Risk classification",
+      "category": "Governance",
+      "status": "warn",
+      "severity": "low",
+      "summary": "EU AI Act tier: high (Art. 6(2) and Annex III point 6: Law enforcement); the Act is used as a benchmark (no EU deployment declared). India context sensitivity: high (score 7/10), shown as a benchmark (India is not a declared deployment region). No risk tier was declared by the system owner. 0 upcoming regulatory milestone(s) apply.",
+      "plain_summary": "This is a high-risk AI use under the EU AI Act, with strict duties on testing, documentation and human oversight.",
+      "recommendation": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation.",
+      "metrics": {
+        "eu_tier": "high",
+        "declared_eu_tier": null,
+        "india_sensitivity": "high",
+        "upcoming_obligations": 0
+      },
+      "details": {
+        "eu_tier": "high",
+        "eu_applicable": false,
+        "eu_basis": [
+          "Art. 6(2) and Annex III point 6: Law enforcement"
+        ],
+        "india_sensitivity": "high",
+        "india_score": 7,
+        "india_factors": [
+          "affects access to essential services, livelihood or rights (+3)",
+          "processes personal data under the DPDP Act (+1)",
+          "affects vulnerable groups (+2)",
+          "outcomes are hard to contest or reverse (+1)"
+        ],
+        "sector_notes": [],
+        "obligations": []
+      },
+      "controls": [
+        "NIST:MAP-1.1",
+        "NIST:MAP-3.3",
+        "NIST:MAP-1.5",
+        "NIST:GOVERN-1.1",
+        "ISO42001:A.9.4",
+        "ISO42001:A.5.2",
+        "EUAIA:Art-5",
+        "EUAIA:Art-6",
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
+      ],
+      "evidence_hash": "d840d25c137475d5165b056f38c75e18fc72df97efcfbac549a3063a9ea228db"
+    },
+    {
+      "check_id": "data_quality.integrity",
+      "title": "Data quality",
+      "category": "Data",
+      "status": "pass",
+      "severity": "info",
+      "summary": "No data-quality issues above thresholds. Note: evaluation_data: 15.6% of rows are identical to another, but the data has no record identifier, so they may be different people with the same values; reference_data: 13.5% of rows are identical to another, but the data has no record identifier, so they may be different people with the same values.",
+      "plain_summary": "The data supplied for the audit is complete and consistent.",
+      "recommendation": "Document how missing values are handled, de-duplicate records, and confirm no input is recorded after the outcome it predicts.",
+      "metrics": {
+        "issues": 0,
+        "leakage_suspects": 0
+      },
+      "details": {
+        "datasets": {
+          "evaluation_data": {
+            "rows": 6172,
+            "high_missing": {},
+            "duplicate_rate": 0.156,
+            "positive_rate": 0.5449,
+            "record_identifier": null
+          },
+          "reference_data": {
+            "rows": 4345,
+            "high_missing": {},
+            "duplicate_rate": 0.1353,
+            "positive_rate": 0.6334,
+            "record_identifier": null
+          }
+        },
+        "leakage": []
+      },
+      "controls": [
+        "NIST:MAP-2.3",
+        "NIST:MEASURE-2.1",
+        "ISO42001:A.7.4",
+        "ISO42001:A.7.6",
+        "ISO42001:A.4.3",
+        "EUAIA:Art-10",
+        "ISO42005:6.4"
+      ],
+      "evidence_hash": "10c42a75db6594d10087ef231671b0d4693545edd2d35d81600180395204d006"
+    },
+    {
+      "check_id": "performance.discrimination",
+      "title": "Predictive performance",
+      "category": "Performance",
+      "status": "warn",
+      "severity": "medium",
+      "summary": "AUC 0.710 (95% CI 0.699-0.722) on 6172 held-out rows is above, but its 95% confidence interval reaches below, the declared minimum of 0.70. Accuracy 0.661, F1 0.691 at threshold 0.65.",
+      "plain_summary": "The model tells good and bad outcomes apart correctly about 71% of the time, which meets the bar set for this use.",
+      "recommendation": "Track AUC in production monitoring with an alert at the declared minimum.",
+      "metrics": {
+        "auc": 0.7098,
+        "auc_ci_low": 0.6986,
+        "auc_ci_high": 0.7223,
+        "accuracy": 0.6607,
+        "precision": 0.6855,
+        "recall": 0.6973,
+        "f1": 0.6913,
+        "positive_rate_observed": 0.5449,
+        "positive_rate_predicted": 0.5543,
+        "n_eval": 6172,
+        "min_auc": 0.7,
+        "train_auc": 0.717,
+        "generalization_gap": 0.0072
+      },
+      "details": {},
+      "controls": [
+        "NIST:MEASURE-2.3",
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.1",
+        "NIST:MANAGE-1.1",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-SAFETY"
+      ],
+      "evidence_hash": "86b4c9e9db40723b3e227ec29dbb3d80e70961252af9fdff6e03f5c6c0e42983"
+    },
+    {
+      "check_id": "calibration.reliability",
+      "title": "Calibration",
+      "category": "Performance",
+      "status": "fail",
+      "severity": "medium",
+      "summary": "Expected calibration error 0.134 (limit 0.05; equal-mass bins 0.132), Brier score 0.238. Worst group: race=Other with ECE 0.194.",
+      "plain_summary": "Risk scores do not match observed outcome rates closely enough to be read as probabilities.",
+      "recommendation": "Apply isotonic or Platt calibration on a held-out set and re-check per group.",
+      "metrics": {
+        "ece": 0.1342,
+        "adaptive_ece": 0.132,
+        "brier": 0.2381
+      },
+      "details": {
+        "reliability": [
+          {
+            "bin": "0.0-0.1",
+            "count": 304,
+            "mean_predicted": 0.09999999999999999,
+            "observed_rate": 0.19407894736842105
+          },
+          {
+            "bin": "0.1-0.2",
+            "count": 420,
+            "mean_predicted": 0.2,
+            "observed_rate": 0.2857142857142857
+          },
+          {
+            "bin": "0.2-0.3",
+            "count": 420,
+            "mean_predicted": 0.29999999999999993,
+            "observed_rate": 0.28095238095238095
+          },
+          {
+            "bin": "0.3-0.4",
+            "count": 496,
+            "mean_predicted": 0.4000000000000001,
+            "observed_rate": 0.39919354838709675
+          },
+          {
+            "bin": "0.4-0.5",
+            "count": 529,
+            "mean_predicted": 0.5,
+            "observed_rate": 0.41776937618147447
+          },
+          {
+            "bin": "0.5-0.6",
+            "count": 582,
+            "mean_predicted": 0.5999999999999999,
+            "observed_rate": 0.5189003436426117
+          },
+          {
+            "bin": "0.6-0.7",
+            "count": 666,
+            "mean_predicted": 0.7000000000000001,
+            "observed_rate": 0.5630630630630631
+          },
+          {
+            "bin": "0.7-0.8",
+            "count": 647,
+            "mean_predicted": 0.7999999999999998,
+            "observed_rate": 0.6228748068006182
+          },
+          {
+            "bin": "0.8-0.9",
+            "count": 822,
+            "mean_predicted": 0.9000000000000002,
+            "observed_rate": 0.6788321167883211
+          },
+          {
+            "bin": "0.9-1.0",
+            "count": 1286,
+            "mean_predicted": 1.0,
+            "observed_rate": 0.7846034214618973
+          }
+        ],
+        "group_ece": {
+          "race": {
+            "African-American": 0.12,
+            "Asian": 0.1258,
+            "Caucasian": 0.1431,
+            "Hispanic": 0.1864,
+            "Other": 0.1936
+          },
+          "sex": {
+            "Female": 0.0992,
+            "Male": 0.1495
+          },
+          "age_cat": {
+            "25 - 45": 0.1368,
+            "Greater than 45": 0.1533,
+            "Less than 25": 0.1249
+          }
+        }
+      },
+      "controls": [
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.9",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-UNDERSTANDABLE"
+      ],
+      "evidence_hash": "a9423c3b5df3eb3a5d20ab1447c94ff362276130d96877bb90ee5b6b21aa684c"
+    },
+    {
+      "check_id": "fairness.group_parity",
+      "title": "Group fairness",
+      "category": "Fairness",
+      "status": "fail",
+      "severity": "critical",
+      "summary": "race: DI 0.53 (African-American vs Other, p=2.18e-39), EOdds diff 0.38 (observed outcome rates differ by 0.27 between groups, so equal error rates and calibration cannot both be met; choosing which governs is a policy decision); sex: DI 0.92 (Male vs Female, p=0.00185), EOdds diff 0.03; age_cat: DI 0.46 (Less than 25 vs Greater than 45, p=3.72e-106), EOdds diff 0.40 (observed outcome rates differ by 0.24 between groups, so equal error rates and calibration cannot both be met; choosing which governs is a policy decision). Thresholds: DI >= 0.8, equalized-odds difference <= 0.1.",
+      "plain_summary": "Applicants in the 'Less than 25' group (age_cat) receive a favourable outcome 36% of the time versus 78% for 'Greater than 45', below the four-fifths benchmark.",
+      "recommendation": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: race, age_cat.",
+      "metrics": {
+        "di_race": 0.5326,
+        "di_sex": 0.9157,
+        "di_age_cat": 0.4581,
+        "eodds_race": 0.3765,
+        "eodds_sex": 0.025,
+        "eodds_age_cat": 0.4037,
+        "unassessed_attributes": []
+      },
+      "details": {
+        "attributes": {
+          "race": {
+            "groups": [
+              {
+                "group": "African-American",
+                "n": 3175,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.4239370078740157,
+                "favourable": 1346,
+                "tpr": 0.5766182298546896,
+                "fpr": 0.2847682119205298,
+                "auc": 0.7042527817830293,
+                "mean_score": 0.5723149606299213,
+                "base_rate": 0.4768503937007874
+              },
+              {
+                "group": "Asian",
+                "n": 31,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.7741935483870968,
+                "favourable": 24,
+                "tpr": 0.9130434782608695,
+                "fpr": 0.375,
+                "auc": 0.8478260869565217,
+                "mean_score": 0.8161290322580645,
+                "base_rate": 0.7419354838709677
+              },
+              {
+                "group": "Caucasian",
+                "n": 2103,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.6690442225392297,
+                "favourable": 1407,
+                "tpr": 0.7798594847775175,
+                "fpr": 0.49635036496350365,
+                "auc": 0.6927625543456583,
+                "mean_score": 0.7364717070851166,
+                "base_rate": 0.609129814550642
+              },
+              {
+                "group": "Hispanic",
+                "n": 509,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.7229862475442044,
+                "favourable": 368,
+                "tpr": 0.80625,
+                "fpr": 0.582010582010582,
+                "auc": 0.6371693121693122,
+                "mean_score": 0.7616895874263262,
+                "base_rate": 0.6286836935166994
+              },
+              {
+                "group": "Native American",
+                "n": 11,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.2727272727272727,
+                "favourable": 3,
+                "tpr": 0.5,
+                "fpr": 0.0,
+                "auc": 0.85,
+                "mean_score": 0.45454545454545464,
+                "base_rate": 0.5454545454545454
+              },
+              {
+                "group": "Other",
+                "n": 343,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.7959183673469388,
+                "favourable": 273,
+                "tpr": 0.8721461187214612,
+                "fpr": 0.6612903225806451,
+                "auc": 0.7066946531153336,
+                "mean_score": 0.8110787172011663,
+                "base_rate": 0.6384839650145773
+              }
+            ],
+            "summary": {
+              "comparable_groups": 5,
+              "missing_attribute_rows": 0,
+              "most_favoured": "Other",
+              "least_favoured": "African-American",
+              "disparate_impact_ratio": 0.5326,
+              "demographic_parity_difference": 0.372,
+              "equal_opportunity_difference": 0.3364,
+              "equalized_odds_difference": 0.3765,
+              "p_value": 2.1837233863790307e-39,
+              "base_rate_difference": 0.2651
+            },
+            "status": "fail"
+          },
+          "sex": {
+            "groups": [
+              {
+                "group": "Female",
+                "n": 1175,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.5948936170212766,
+                "favourable": 699,
+                "tpr": 0.6981627296587927,
+                "fpr": 0.4043583535108959,
+                "auc": 0.6976829167540497,
+                "mean_score": 0.6936170212765957,
+                "base_rate": 0.6485106382978724
+              },
+              {
+                "group": "Male",
+                "n": 4997,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.544726836101661,
+                "favourable": 2722,
+                "tpr": 0.697039600153787,
+                "fpr": 0.37938230383973287,
+                "auc": 0.710987378682528,
+                "mean_score": 0.649809885931559,
+                "base_rate": 0.5205123073844307
+              }
+            ],
+            "summary": {
+              "comparable_groups": 2,
+              "missing_attribute_rows": 0,
+              "most_favoured": "Female",
+              "least_favoured": "Male",
+              "disparate_impact_ratio": 0.9157,
+              "demographic_parity_difference": 0.0502,
+              "equal_opportunity_difference": 0.0011,
+              "equalized_odds_difference": 0.025,
+              "p_value": 0.0018518770552517288,
+              "base_rate_difference": 0.128
+            },
+            "status": "pass"
+          },
+          "age_cat": {
+            "groups": [
+              {
+                "group": "25 - 45",
+                "n": 3532,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.5469988674971688,
+                "favourable": 1932,
+                "tpr": 0.6901110523532522,
+                "fpr": 0.3820840950639854,
+                "auc": 0.702085732120236,
+                "mean_score": 0.6501132502831256,
+                "base_rate": 0.5353907134767837
+              },
+              {
+                "group": "Greater than 45",
+                "n": 1293,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.7795823665893271,
+                "favourable": 1008,
+                "tpr": 0.8691695108077361,
+                "fpr": 0.5893719806763285,
+                "auc": 0.6996325974290064,
+                "mean_score": 0.8279969064191803,
+                "base_rate": 0.679814385150812
+              },
+              {
+                "group": "Less than 25",
+                "n": 1347,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.3570898292501856,
+                "favourable": 481,
+                "tpr": 0.4654300168634064,
+                "fpr": 0.2718832891246684,
+                "auc": 0.641346209759305,
+                "mean_score": 0.5161841128433555,
+                "base_rate": 0.44023756495916855
+              }
+            ],
+            "summary": {
+              "comparable_groups": 3,
+              "missing_attribute_rows": 0,
+              "most_favoured": "Greater than 45",
+              "least_favoured": "Less than 25",
+              "disparate_impact_ratio": 0.4581,
+              "demographic_parity_difference": 0.4225,
+              "equal_opportunity_difference": 0.4037,
+              "equalized_odds_difference": 0.4037,
+              "p_value": 3.7214807263137245e-106,
+              "base_rate_difference": 0.2396
+            },
+            "status": "fail"
+          }
+        }
+      },
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "NIST:MAP-5.1",
+        "ISO42001:A.5.4",
+        "ISO42001:A.7.4",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS",
+        "NIST-GAI:HARMFUL-BIAS",
+        "ISO42005:6.8.2"
+      ],
+      "evidence_hash": "9ce02e1567930d3ab6dccacbe4339826a0494c42586c5f76bdfe26e2ca4af736"
+    },
+    {
+      "check_id": "fairness.intersectional",
+      "title": "Intersectional fairness",
+      "category": "Fairness",
+      "status": "fail",
+      "severity": "critical",
+      "summary": "Worst pair race \u00d7 age_cat: DI 0.33 between 'African-American \u00d7 Less than 25' and 'Other \u00d7 Greater than 45' (p=4.51e-28); lowest single-attribute DI for the same attributes is 0.46. The intersectional gap is larger than either attribute shows on its own.",
+      "plain_summary": "The combined group 'African-American \u00d7 Less than 25' is treated less favourably than any single attribute reveals.",
+      "recommendation": "Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance. Collect more data for subgroups below the minimum sample size.",
+      "metrics": {
+        "worst_pair": "race \u00d7 age_cat",
+        "worst_intersectional_di": 0.3264
+      },
+      "details": {
+        "pairs": {
+          "race \u00d7 sex": {
+            "groups": [
+              {
+                "group": "African-American \u00d7 Female",
+                "n": 549,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.5045537340619308,
+                "favourable": 277,
+                "tpr": 0.6213872832369942,
+                "fpr": 0.3054187192118227,
+                "auc": 0.7201514849511661,
+                "mean_score": 0.6360655737704919,
+                "base_rate": 0.6302367941712204
+              },
+              {
+                "group": "African-American \u00d7 Male",
+                "n": 2626,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.40708301599390706,
+                "favourable": 1069,
+                "tpr": 0.5633561643835616,
+                "fpr": 0.28189300411522633,
+                "auc": 0.6968332487738881,
+                "mean_score": 0.558987052551409,
+                "base_rate": 0.44478293983244477
+              },
+              {
+                "group": "Asian \u00d7 Female",
+                "n": 2,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 1.0,
+                "favourable": 2,
+                "tpr": 1.0,
+                "fpr": 1.0,
+                "auc": 1.0,
+                "mean_score": 0.9,
+                "base_rate": 0.5
+              },
+              {
+                "group": "Asian \u00d7 Male",
+                "n": 29,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.7586206896551724,
+                "favourable": 22,
+                "tpr": 0.9090909090909091,
+                "fpr": 0.2857142857142857,
+                "auc": 0.8441558441558441,
+                "mean_score": 0.8103448275862067,
+                "base_rate": 0.7586206896551724
+              },
+              {
+                "group": "Caucasian \u00d7 Female",
+                "n": 482,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.6182572614107884,
+                "favourable": 298,
+                "tpr": 0.7115384615384616,
+                "fpr": 0.4470588235294118,
+                "auc": 0.6698340874811464,
+                "mean_score": 0.720746887966805,
+                "base_rate": 0.6473029045643154
+              },
+              {
+                "group": "Caucasian \u00d7 Male",
+                "n": 1621,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.6841455891425047,
+                "favourable": 1109,
+                "tpr": 0.8018575851393189,
+                "fpr": 0.50920245398773,
+                "auc": 0.7006044749188018,
+                "mean_score": 0.7411474398519433,
+                "base_rate": 0.5977791486736582
+              },
+              {
+                "group": "Hispanic \u00d7 Female",
+                "n": 82,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.9146341463414634,
+                "favourable": 75,
+                "tpr": 0.9464285714285714,
+                "fpr": 0.8461538461538461,
+                "auc": 0.6098901098901099,
+                "mean_score": 0.8317073170731708,
+                "base_rate": 0.6829268292682927
+              },
+              {
+                "group": "Hispanic \u00d7 Male",
+                "n": 427,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.6861826697892272,
+                "favourable": 293,
+                "tpr": 0.7765151515151515,
+                "fpr": 0.5398773006134969,
+                "auc": 0.6393962632459564,
+                "mean_score": 0.7482435597189696,
+                "base_rate": 0.6182669789227166
+              },
+              {
+                "group": "Native American \u00d7 Female",
+                "n": 2,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.0,
+                "favourable": 0,
+                "tpr": null,
+                "fpr": 0.0,
+                "auc": null,
+                "mean_score": 0.25,
+                "base_rate": 0.0
+              },
+              {
+                "group": "Native American \u00d7 Male",
+                "n": 9,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.3333333333333333,
+                "favourable": 3,
+                "tpr": 0.5,
+                "fpr": 0.0,
+                "auc": 0.8333333333333334,
+                "mean_score": 0.5,
+                "base_rate": 0.6666666666666666
+              },
+              {
+                "group": "Other \u00d7 Female",
+                "n": 58,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.8103448275862069,
+                "favourable": 47,
+                "tpr": 0.8723404255319149,
+                "fpr": 0.5454545454545454,
+                "auc": 0.7427466150870407,
+                "mean_score": 0.8258620689655174,
+                "base_rate": 0.8103448275862069
+              },
+              {
+                "group": "Other \u00d7 Male",
+                "n": 285,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.7929824561403509,
+                "favourable": 226,
+                "tpr": 0.872093023255814,
+                "fpr": 0.672566371681416,
+                "auc": 0.7075015435274747,
+                "mean_score": 0.8080701754385965,
+                "base_rate": 0.6035087719298246
+              }
+            ],
+            "summary": {
+              "comparable_groups": 8,
+              "missing_attribute_rows": 0,
+              "most_favoured": "Hispanic \u00d7 Female",
+              "least_favoured": "African-American \u00d7 Male",
+              "disparate_impact_ratio": 0.4451,
+              "demographic_parity_difference": 0.5076,
+              "equal_opportunity_difference": 0.3831,
+              "equalized_odds_difference": 0.5643,
+              "p_value": 5.057951674058756e-20,
+              "base_rate_difference": 0.3656,
+              "marginal_min_di": 0.5326
+            },
+            "small_subgroups": [
+              "Asian \u00d7 Female",
+              "Asian \u00d7 Male",
+              "Native American \u00d7 Female",
+              "Native American \u00d7 Male"
+            ]
+          },
+          "race \u00d7 age_cat": {
+            "groups": [
+              {
+                "group": "African-American \u00d7 25 - 45",
+                "n": 1898,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.4262381454162276,
+                "favourable": 809,
+                "tpr": 0.5847826086956521,
+                "fpr": 0.2770961145194274,
+                "auc": 0.7125833555614831,
+                "mean_score": 0.5740779768177028,
+                "base_rate": 0.48472075869336145
+              },
+              {
+                "group": "African-American \u00d7 Greater than 45",
+                "n": 468,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.6132478632478633,
+                "favourable": 287,
+                "tpr": 0.7463768115942029,
+                "fpr": 0.421875,
+                "auc": 0.7057386020531401,
+                "mean_score": 0.7162393162393164,
+                "base_rate": 0.5897435897435898
+              },
+              {
+                "group": "African-American \u00d7 Less than 25",
+                "n": 809,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.30902348578491967,
+                "favourable": 250,
+                "tpr": 0.4056603773584906,
+                "fpr": 0.24643584521384929,
+                "auc": 0.6369045331693758,
+                "mean_score": 0.48491965389369585,
+                "base_rate": 0.3930778739184178
+              },
+              {
+                "group": "Asian \u00d7 25 - 45",
+                "n": 14,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.7857142857142857,
+                "favourable": 11,
+                "tpr": 0.8333333333333334,
+                "fpr": 0.5,
+                "auc": 0.875,
+                "mean_score": 0.8285714285714285,
+                "base_rate": 0.8571428571428571
+              },
+              {
+                "group": "Asian \u00d7 Greater than 45",
+                "n": 11,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.8181818181818182,
+                "favourable": 9,
+                "tpr": 1.0,
+                "fpr": 0.5,
+                "auc": 0.8571428571428571,
+                "mean_score": 0.8818181818181817,
+                "base_rate": 0.6363636363636364
+              },
+              {
+                "group": "Asian \u00d7 Less than 25",
+                "n": 6,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.6666666666666666,
+                "favourable": 4,
+                "tpr": 1.0,
+                "fpr": 0.0,
+                "auc": 1.0,
+                "mean_score": 0.6666666666666666,
+                "base_rate": 0.6666666666666666
+              },
+              {
+                "group": "Caucasian \u00d7 25 - 45",
+                "n": 1128,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.6445035460992907,
+                "favourable": 727,
+                "tpr": 0.7565891472868217,
+                "fpr": 0.494824016563147,
+                "auc": 0.6709904184120564,
+                "mean_score": 0.7118794326241135,
+                "base_rate": 0.5718085106382979
+              },
+              {
+                "group": "Caucasian \u00d7 Greater than 45",
+                "n": 628,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.8630573248407644,
+                "favourable": 542,
+                "tpr": 0.9148471615720524,
+                "fpr": 0.7235294117647059,
+                "auc": 0.6624711019779091,
+                "mean_score": 0.8821656050955414,
+                "base_rate": 0.7292993630573248
+              },
+              {
+                "group": "Caucasian \u00d7 Less than 25",
+                "n": 347,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.3976945244956772,
+                "favourable": 138,
+                "tpr": 0.5168539325842697,
+                "fpr": 0.27218934911242604,
+                "auc": 0.6584668572568314,
+                "mean_score": 0.5527377521613832,
+                "base_rate": 0.5129682997118156
+              },
+              {
+                "group": "Hispanic \u00d7 25 - 45",
+                "n": 291,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.7525773195876289,
+                "favourable": 219,
+                "tpr": 0.8360655737704918,
+                "fpr": 0.6111111111111112,
+                "auc": 0.6092643189637724,
+                "mean_score": 0.772852233676976,
+                "base_rate": 0.6288659793814433
+              },
+              {
+                "group": "Hispanic \u00d7 Greater than 45",
+                "n": 109,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.908256880733945,
+                "favourable": 99,
+                "tpr": 0.9382716049382716,
+                "fpr": 0.8214285714285714,
+                "auc": 0.650352733686067,
+                "mean_score": 0.9174311926605503,
+                "base_rate": 0.7431192660550459
+              },
+              {
+                "group": "Hispanic \u00d7 Less than 25",
+                "n": 109,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.45871559633027525,
+                "favourable": 50,
+                "tpr": 0.5178571428571429,
+                "fpr": 0.39622641509433965,
+                "auc": 0.5507075471698113,
+                "mean_score": 0.5761467889908256,
+                "base_rate": 0.5137614678899083
+              },
+              {
+                "group": "Native American \u00d7 25 - 45",
+                "n": 7,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.42857142857142855,
+                "favourable": 3,
+                "tpr": 0.5,
+                "fpr": 0.0,
+                "auc": 0.75,
+                "mean_score": 0.5857142857142856,
+                "base_rate": 0.8571428571428571
+              },
+              {
+                "group": "Native American \u00d7 Greater than 45",
+                "n": 2,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.0,
+                "favourable": 0,
+                "tpr": null,
+                "fpr": 0.0,
+                "auc": null,
+                "mean_score": 0.1,
+                "base_rate": 0.0
+              },
+              {
+                "group": "Native American \u00d7 Less than 25",
+                "n": 2,
+                "missing_attribute": false,
+                "adequate_sample": false,
+                "selection_rate": 0.0,
+                "favourable": 0,
+                "tpr": null,
+                "fpr": 0.0,
+                "auc": null,
+                "mean_score": 0.35,
+                "base_rate": 0.0
+              },
+              {
+                "group": "Other \u00d7 25 - 45",
+                "n": 194,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.8402061855670103,
+                "favourable": 163,
+                "tpr": 0.904,
+                "fpr": 0.7246376811594203,
+                "auc": 0.7046956521739131,
+                "mean_score": 0.8402061855670104,
+                "base_rate": 0.6443298969072165
+              },
+              {
+                "group": "Other \u00d7 Greater than 45",
+                "n": 75,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.9466666666666667,
+                "favourable": 71,
+                "tpr": 0.9824561403508771,
+                "fpr": 0.8333333333333334,
+                "auc": 0.678849902534113,
+                "mean_score": 0.9533333333333331,
+                "base_rate": 0.76
+              },
+              {
+                "group": "Other \u00d7 Less than 25",
+                "n": 74,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.527027027027027,
+                "favourable": 39,
+                "tpr": 0.5945945945945946,
+                "fpr": 0.4594594594594595,
+                "auc": 0.5653761869978087,
+                "mean_score": 0.5905405405405406,
+                "base_rate": 0.5
+              }
+            ],
+            "summary": {
+              "comparable_groups": 12,
+              "missing_attribute_rows": 0,
+              "most_favoured": "Other \u00d7 Greater than 45",
+              "least_favoured": "African-American \u00d7 Less than 25",
+              "disparate_impact_ratio": 0.3264,
+              "demographic_parity_difference": 0.6376,
+              "equal_opportunity_difference": 0.5768,
+              "equalized_odds_difference": 0.5869,
+              "p_value": 4.509896907840071e-28,
+              "base_rate_difference": 0.3669,
+              "marginal_min_di": 0.4581
+            },
+            "small_subgroups": [
+              "Asian \u00d7 25 - 45",
+              "Asian \u00d7 Greater than 45",
+              "Asian \u00d7 Less than 25",
+              "Native American \u00d7 25 - 45",
+              "Native American \u00d7 Greater than 45",
+              "Native American \u00d7 Less than 25"
+            ]
+          },
+          "sex \u00d7 age_cat": {
+            "groups": [
+              {
+                "group": "Female \u00d7 25 - 45",
+                "n": 689,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.6037735849056604,
+                "favourable": 416,
+                "tpr": 0.7219626168224299,
+                "fpr": 0.4099616858237548,
+                "auc": 0.7019819529487593,
+                "mean_score": 0.6923076923076923,
+                "base_rate": 0.6211901306240929
+              },
+              {
+                "group": "Female \u00d7 Greater than 45",
+                "n": 240,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.85,
+                "favourable": 204,
+                "tpr": 0.9005524861878453,
+                "fpr": 0.6949152542372882,
+                "auc": 0.6924337484783218,
+                "mean_score": 0.8712500000000001,
+                "base_rate": 0.7541666666666667
+              },
+              {
+                "group": "Female \u00d7 Less than 25",
+                "n": 246,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.32113821138211385,
+                "favourable": 79,
+                "tpr": 0.39215686274509803,
+                "fpr": 0.20430107526881722,
+                "auc": 0.653911026776302,
+                "mean_score": 0.5239837398373985,
+                "base_rate": 0.6219512195121951
+              },
+              {
+                "group": "Male \u00d7 25 - 45",
+                "n": 2843,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.5332395357017236,
+                "favourable": 1516,
+                "tpr": 0.6807928913192071,
+                "fpr": 0.37681159420289856,
+                "auc": 0.7006280523442996,
+                "mean_score": 0.6398874428420682,
+                "base_rate": 0.5145972564192755
+              },
+              {
+                "group": "Male \u00d7 Greater than 45",
+                "n": 1053,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.7635327635327636,
+                "favourable": 804,
+                "tpr": 0.8610315186246418,
+                "fpr": 0.571830985915493,
+                "auc": 0.6986278703741071,
+                "mean_score": 0.8181386514719848,
+                "base_rate": 0.6628679962013295
+              },
+              {
+                "group": "Male \u00d7 Less than 25",
+                "n": 1101,
+                "missing_attribute": false,
+                "adequate_sample": true,
+                "selection_rate": 0.3651226158038147,
+                "favourable": 402,
+                "tpr": 0.4909090909090909,
+                "fpr": 0.2813918305597579,
+                "auc": 0.643018498143309,
+                "mean_score": 0.5144414168937329,
+                "base_rate": 0.3996366939146231
+              }
+            ],
+            "summary": {
+              "comparable_groups": 6,
+              "missing_attribute_rows": 0,
+              "most_favoured": "Female \u00d7 Greater than 45",
+              "least_favoured": "Female \u00d7 Less than 25",
+              "disparate_impact_ratio": 0.3778,
+              "demographic_parity_difference": 0.5289,
+              "equal_opportunity_difference": 0.5084,
+              "equalized_odds_difference": 0.5084,
+              "p_value": 3.102081041831597e-32,
+              "base_rate_difference": 0.3545,
+              "marginal_min_di": 0.4581
+            },
+            "small_subgroups": []
+          }
+        }
+      },
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "ISO42001:A.5.4",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS",
+        "ISO42005:6.8.2"
+      ],
+      "evidence_hash": "f3a168f8356f5db210ea525e3a069bf856dd93bae4781a67d96270bb26b3631e"
+    },
+    {
+      "check_id": "fairness.proxy_features",
+      "title": "Proxy-feature screening",
+      "category": "Fairness",
+      "status": "fail",
+      "severity": "high",
+      "summary": "2 feature/attribute pairs exceed proxy AUC 0.7: age\u2192age_cat (AUC 1.00), c_charge_degree\u2192race (AUC 0.72).",
+      "plain_summary": "Some inputs (e.g. 'age') closely track 'age_cat', so the model can discriminate indirectly even though that attribute is excluded.",
+      "recommendation": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them.",
+      "metrics": {
+        "flagged_pairs": 2,
+        "direct_sensitive_inputs": 0
+      },
+      "details": {
+        "flagged": [
+          {
+            "feature": "age",
+            "attribute": "age_cat",
+            "auc": 1.0
+          },
+          {
+            "feature": "c_charge_degree",
+            "attribute": "race",
+            "auc": 0.7246
+          }
+        ],
+        "matrix": {
+          "age": {
+            "race": 0.6031,
+            "sex": 0.5122,
+            "age_cat": 1.0
+          },
+          "priors_count": {
+            "race": 0.6361,
+            "sex": 0.5972,
+            "age_cat": 0.6471
+          },
+          "juv_fel_count": {
+            "race": 0.53,
+            "sex": 0.5161,
+            "age_cat": 0.5145
+          },
+          "juv_misd_count": {
+            "race": 0.5266,
+            "sex": 0.5174,
+            "age_cat": 0.5351
+          },
+          "juv_other_count": {
+            "race": 0.5273,
+            "sex": 0.5245,
+            "age_cat": 0.5656
+          },
+          "c_charge_degree": {
+            "race": 0.7246,
+            "sex": 0.5268,
+            "age_cat": 0.5376
+          }
+        }
+      },
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "NIST:MAP-2.3",
+        "ISO42001:A.7.4",
+        "ISO42001:A.7.6",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS"
+      ],
+      "evidence_hash": "42eaef6369a67f6fbfbeacb62b9326817aa6b0bed0a4e56657fdf25a6fac2b0a"
+    },
+    {
+      "check_id": "robustness.perturbation",
+      "title": "Robustness to perturbation",
+      "category": "Robustness",
+      "status": "skipped",
+      "severity": "info",
+      "summary": "Skipped: Perturbation testing needs the model, not just scores",
+      "plain_summary": "Not tested because the required input was not supplied.",
+      "recommendation": "",
+      "metrics": {},
+      "details": {},
+      "controls": [
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.7",
+        "NIST:MEASURE-2.6",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
+      ],
+      "evidence_hash": "8554f0c309adbe053a2d4cd33075f8f5dc75e1e9b43dcb76028fd3a994ccc2a4"
+    },
+    {
+      "check_id": "drift.population_stability",
+      "title": "Data and prediction drift",
+      "category": "Monitoring",
+      "status": "pass",
+      "severity": "info",
+      "summary": "Compared reference data with production_data (1827 rows). 0 features with major drift (PSI >= 0.25), 0 moderate. Largest shifts: age (PSI 0.05), priors_count (PSI 0.02), juv_misd_count (PSI 0.02). Score PSI 0.016; favourable-decision rate moved from 56.5% to 52.8%.",
+      "plain_summary": "Incoming data still resembles the data the model was validated on.",
+      "recommendation": "Re-validate performance and fairness on recent labelled data, review the drivers of the largest shifts, and set PSI alerts in production monitoring.",
+      "metrics": {
+        "score_psi": 0.0156,
+        "max_feature_psi": 0.0452,
+        "features_unmeasured": 0,
+        "features_major_drift": 0,
+        "features_moderate_drift": 0,
+        "favourable_rate_reference": 0.5655,
+        "favourable_rate_current": 0.5276
+      },
+      "details": {
+        "features": [
+          {
+            "feature": "age",
+            "psi": 0.0452,
+            "test": "ks",
+            "p_value": 0.00013269454814695313
+          },
+          {
+            "feature": "priors_count",
+            "psi": 0.0182,
+            "test": "ks",
+            "p_value": 0.02827362098752719
+          },
+          {
+            "feature": "juv_misd_count",
+            "psi": 0.0175,
+            "test": "chi2",
+            "p_value": 0.09155982351951202
+          },
+          {
+            "feature": "juv_fel_count",
+            "psi": 0.017,
+            "test": "chi2",
+            "p_value": 0.2914041771961979
+          },
+          {
+            "feature": "juv_other_count",
+            "psi": 0.0114,
+            "test": "chi2",
+            "p_value": 0.1407584211162777
+          },
+          {
+            "feature": "c_charge_degree",
+            "psi": 0.0018,
+            "test": "chi2",
+            "p_value": 0.1404859191571751
+          }
+        ],
+        "compared_with": "production_data",
+        "score_shift": -0.0285
+      },
+      "controls": [
+        "NIST:MEASURE-2.4",
+        "NIST:MEASURE-4.3",
+        "NIST:MANAGE-4.1",
+        "NIST:MANAGE-2.2",
+        "ISO42001:A.6.2.6",
+        "EUAIA:Art-72",
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:5.12"
+      ],
+      "evidence_hash": "32f5bcb143196d61921b890e6984b73cde018603b97b7176087be7a1f88a1797"
+    },
+    {
+      "check_id": "explainability.feature_importance",
+      "title": "Decision drivers",
+      "category": "Transparency",
+      "status": "skipped",
+      "severity": "info",
+      "summary": "Skipped: Feature importance needs the model",
+      "plain_summary": "Not tested because the required input was not supplied.",
+      "recommendation": "",
+      "metrics": {},
+      "details": {},
+      "controls": [
+        "NIST:MEASURE-2.9",
+        "NIST:MAP-2.2",
+        "ISO42001:A.6.2.7",
+        "ISO42001:A.8.2",
+        "EUAIA:Art-13",
+        "INDIA:SUTRA-UNDERSTANDABLE"
+      ],
+      "evidence_hash": "b8d2e1e50d8fdbf797c58b8c3a4fb6923a7a862ea92d328dd3c4c24575029ec0"
+    },
+    {
+      "check_id": "privacy.pii_exposure",
+      "title": "Personal-data exposure",
+      "category": "Privacy",
+      "status": "pass",
+      "severity": "info",
+      "summary": "No direct identifiers detected in any dataset supplied for the audit.",
+      "plain_summary": "No personal identifiers were found in the modelling data.",
+      "recommendation": "Drop or pseudonymise identifier columns before data reaches modelling and evaluation environments, and record the purpose and lawful basis for any personal data retained (DPDP Act 2023 purpose limitation and data minimisation).",
+      "metrics": {
+        "identifier_columns": 0,
+        "identifiers_in_model_inputs": 0
+      },
+      "details": {
+        "hits": []
+      },
+      "controls": [
+        "NIST:MEASURE-2.10",
+        "ISO42001:A.7.2",
+        "ISO42001:A.7.5",
+        "EUAIA:Art-10",
+        "INDIA:DPDP-2023",
+        "NIST-GAI:DATA-PRIVACY"
+      ],
+      "evidence_hash": "dcba218102fd3a1daea2ddbc8a84f351dfc8c0d82e3a151b9223a4f2f9140d53"
+    },
+    {
+      "check_id": "privacy.membership_inference",
+      "title": "Membership-inference risk",
+      "category": "Privacy",
+      "status": "skipped",
+      "severity": "info",
+      "summary": "Skipped: membership inference needs the model's training data as reference_data; this is a predictions-only audit, so set reference_is_training: true if that is what it is",
+      "plain_summary": "Not tested because the required input was not supplied.",
+      "recommendation": "",
+      "metrics": {},
+      "details": {},
+      "controls": [
+        "NIST:MEASURE-2.10",
+        "NIST:MEASURE-2.7",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:DPDP-2023"
+      ],
+      "evidence_hash": "f5ddc0b38a1b6c6ef7bc91c15b91d27b2ea96c490c243c699bf84a377d5eb99b"
+    },
+    {
+      "check_id": "documentation.model_card",
+      "title": "Documentation and claims",
+      "category": "Transparency",
+      "status": "skipped",
+      "severity": "info",
+      "summary": "Skipped: artifacts.documentation (model card YAML) was not supplied",
+      "plain_summary": "Not tested because the required input was not supplied.",
+      "recommendation": "",
+      "metrics": {},
+      "details": {},
+      "controls": [
+        "NIST:MAP-2.2",
+        "NIST:MAP-3.5",
+        "NIST:GOVERN-4.2",
+        "NIST:MEASURE-2.8",
+        "ISO42001:A.6.2.3",
+        "ISO42001:A.6.2.7",
+        "ISO42001:A.8.2",
+        "EUAIA:Art-11",
+        "EUAIA:Art-13",
+        "EUAIA:Art-14",
+        "INDIA:SUTRA-UNDERSTANDABLE",
+        "INDIA:SUTRA-ACCOUNTABILITY",
+        "ISO42005:6.3.4",
+        "ISO42005:6.3.5",
+        "ISO42005:6.5"
+      ],
+      "evidence_hash": "66aee72015556e0c066bce8e590292381a33867c749c21a9c10e966ec04d3344"
+    },
+    {
+      "check_id": "audit.detector_sensitivity",
+      "title": "Audit self-test (canaries)",
+      "category": "Assurance",
+      "status": "pass",
+      "severity": "info",
+      "summary": "6/6 self-tests passed (6 planted defects, 0 false-alarm controls). balanced copy, then halve favourable decisions for race=African-American: DI 0.49 after 952 decisions flipped; balanced copy of race is not flagged (false-alarm control): DI 0.98; shift age by 1.5 standard deviations: PSI 7.61; two random halves of the data on age (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.",
+      "plain_summary": "The audit tests caught every defect deliberately planted to check them, and raised no alarm on clean copies.",
+      "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
+      "metrics": {
+        "canaries": 6,
+        "missed": 0
+      },
+      "details": {
+        "canaries": [
+          {
+            "canary": "balanced copy, then halve favourable decisions for race=African-American",
+            "observed": "DI 0.49 after 952 decisions flipped",
+            "kind": "planted defect",
+            "detected": true,
+            "passed": true
+          },
+          {
+            "canary": "balanced copy of race is not flagged (false-alarm control)",
+            "observed": "DI 0.98",
+            "kind": "false-alarm control",
+            "false_alarm": false,
+            "passed": true
+          },
+          {
+            "canary": "shift age by 1.5 standard deviations",
+            "observed": "PSI 7.61",
+            "kind": "planted defect",
+            "detected": true,
+            "passed": true
+          },
+          {
+            "canary": "two random halves of the data on age (false-alarm control)",
+            "observed": "PSI 0.01",
+            "kind": "false-alarm control",
+            "false_alarm": false,
+            "passed": true
+          },
+          {
+            "canary": "plant 5 e-mail addresses in 100 values of an unnamed column",
+            "observed": "scanner run on planted column",
+            "kind": "planted defect",
+            "detected": true,
+            "passed": true
+          },
+          {
+            "canary": "a column of customer references is not flagged (false-alarm control)",
+            "observed": "not flagged",
+            "kind": "false-alarm control",
+            "false_alarm": false,
+            "passed": true
+          }
+        ]
+      },
+      "controls": [
+        "NIST:MEASURE-2.13",
+        "NIST:MEASURE-1.2",
+        "ISO42001:A.6.2.4"
+      ],
+      "evidence_hash": "f5f90b5713578cbcb3d844ec7be1adc6b746143a4f52513d1f28a291d551b2b5"
+    },
+    {
+      "check_id": "audit.process",
+      "title": "Documented go/no-go decision",
+      "category": "Governance",
+      "status": "pass",
+      "severity": "info",
+      "summary": "Test plan (FMEA, 14 failure modes), scored risk register (6 risks), treatment plan and release-gate decision (BLOCK) recorded in this audit pack.",
+      "plain_summary": "A documented, risk-based release decision exists for this version.",
+      "recommendation": "",
+      "metrics": {},
+      "details": {},
+      "controls": [
+        "NIST:MEASURE-1.1",
+        "NIST:MEASURE-2.1",
+        "NIST:MAP-5.1",
+        "NIST:MANAGE-1.1",
+        "NIST:MANAGE-1.2",
+        "NIST:MANAGE-1.3",
+        "NIST:MANAGE-1.4",
+        "ISO42001:A.5.3",
+        "EUAIA:Art-9",
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.8",
+        "ISO42005:5.9",
+        "ISO42005:5.10",
+        "ISO42005:5.11"
+      ],
+      "evidence_hash": "a844e9cb90b76028d1c8cad1f85b20844967690c4fc76cd55260f58652ba4f4a"
+    }
+  ],
+  "risks": [
+    {
+      "risk_id": "R-01",
+      "title": "Group fairness",
+      "description": "Applicants in the 'Less than 25' group (age_cat) receive a favourable outcome 36% of the time versus 78% for 'Greater than 45', below the four-fifths benchmark.",
+      "source_check": "fairness.group_parity",
+      "likelihood": 4,
+      "impact": 5,
+      "owner": "Unassigned",
+      "treatment": "Mitigate",
+      "recommendation": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: race, age_cat.",
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "NIST:MAP-5.1",
+        "ISO42001:A.5.4",
+        "ISO42001:A.7.4",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS",
+        "NIST-GAI:HARMFUL-BIAS",
+        "ISO42005:6.8.2"
+      ],
+      "accepted": false,
+      "acceptance": null,
+      "score": 20,
+      "rating": "critical"
+    },
+    {
+      "risk_id": "R-02",
+      "title": "Intersectional fairness",
+      "description": "The combined group 'African-American \u00d7 Less than 25' is treated less favourably than any single attribute reveals.",
+      "source_check": "fairness.intersectional",
+      "likelihood": 4,
+      "impact": 5,
+      "owner": "Unassigned",
+      "treatment": "Mitigate",
+      "recommendation": "Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance. Collect more data for subgroups below the minimum sample size.",
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "ISO42001:A.5.4",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS",
+        "ISO42005:6.8.2"
+      ],
+      "accepted": false,
+      "acceptance": null,
+      "score": 20,
+      "rating": "critical"
+    },
+    {
+      "risk_id": "R-03",
+      "title": "Proxy-feature screening",
+      "description": "Some inputs (e.g. 'age') closely track 'age_cat', so the model can discriminate indirectly even though that attribute is excluded.",
+      "source_check": "fairness.proxy_features",
+      "likelihood": 4,
+      "impact": 4,
+      "owner": "Unassigned",
+      "treatment": "Mitigate",
+      "recommendation": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them.",
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "NIST:MAP-2.3",
+        "ISO42001:A.7.4",
+        "ISO42001:A.7.6",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS"
+      ],
+      "accepted": false,
+      "acceptance": null,
+      "score": 16,
+      "rating": "high"
+    },
+    {
+      "risk_id": "R-04",
+      "title": "Calibration",
+      "description": "Risk scores do not match observed outcome rates closely enough to be read as probabilities.",
+      "source_check": "calibration.reliability",
+      "likelihood": 4,
+      "impact": 3,
+      "owner": "Unassigned",
+      "treatment": "Mitigate",
+      "recommendation": "Apply isotonic or Platt calibration on a held-out set and re-check per group.",
+      "controls": [
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.9",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-UNDERSTANDABLE"
+      ],
+      "accepted": false,
+      "acceptance": null,
+      "score": 12,
+      "rating": "high"
+    },
+    {
+      "risk_id": "R-05",
+      "title": "Predictive performance",
+      "description": "The model tells good and bad outcomes apart correctly about 71% of the time, which meets the bar set for this use.",
+      "source_check": "performance.discrimination",
+      "likelihood": 3,
+      "impact": 3,
+      "owner": "Unassigned",
+      "treatment": "Mitigate",
+      "recommendation": "Track AUC in production monitoring with an alert at the declared minimum.",
+      "controls": [
+        "NIST:MEASURE-2.3",
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.1",
+        "NIST:MANAGE-1.1",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-SAFETY"
+      ],
+      "accepted": false,
+      "acceptance": null,
+      "score": 9,
+      "rating": "medium"
+    },
+    {
+      "risk_id": "R-06",
+      "title": "Risk classification",
+      "description": "This is a high-risk AI use under the EU AI Act, with strict duties on testing, documentation and human oversight.",
+      "source_check": "governance.risk_classification",
+      "likelihood": 3,
+      "impact": 2,
+      "owner": "Unassigned",
+      "treatment": "Mitigate",
+      "recommendation": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation.",
+      "controls": [
+        "NIST:MAP-1.1",
+        "NIST:MAP-3.3",
+        "NIST:MAP-1.5",
+        "NIST:GOVERN-1.1",
+        "ISO42001:A.9.4",
+        "ISO42001:A.5.2",
+        "EUAIA:Art-5",
+        "EUAIA:Art-6",
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
+      ],
+      "accepted": false,
+      "acceptance": null,
+      "score": 6,
+      "rating": "medium"
+    }
+  ],
+  "fmea": [
+    {
+      "check_id": "governance.risk_classification",
+      "failure_mode": "System deployed without a documented risk classification",
+      "effect": "Wrong obligations applied; high-risk duties missed",
+      "detection": "Risk classification",
+      "controls": [
+        "NIST:MAP-1.1",
+        "NIST:MAP-3.3",
+        "NIST:MAP-1.5",
+        "NIST:GOVERN-1.1",
+        "ISO42001:A.9.4",
+        "ISO42001:A.5.2",
+        "EUAIA:Art-5",
+        "EUAIA:Art-6",
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
+      ]
+    },
+    {
+      "check_id": "data_quality.integrity",
+      "failure_mode": "Missing values, duplicates, imbalance or target leakage in data",
+      "effect": "Biased or over-optimistic validation results",
+      "detection": "Data quality",
+      "controls": [
+        "NIST:MAP-2.3",
+        "NIST:MEASURE-2.1",
+        "ISO42001:A.7.4",
+        "ISO42001:A.7.6",
+        "ISO42001:A.4.3",
+        "EUAIA:Art-10",
+        "ISO42005:6.4"
+      ]
+    },
+    {
+      "check_id": "performance.discrimination",
+      "failure_mode": "Model does not separate good and bad outcomes well enough for its intended use",
+      "effect": "Wrong decisions at scale; financial and customer harm",
+      "detection": "Predictive performance",
+      "controls": [
+        "NIST:MEASURE-2.3",
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.1",
+        "NIST:MANAGE-1.1",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-SAFETY"
+      ]
+    },
+    {
+      "check_id": "calibration.reliability",
+      "failure_mode": "Predicted probabilities do not match observed rates",
+      "effect": "Mispriced risk; misleading scores shown to reviewers",
+      "detection": "Calibration",
+      "controls": [
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.9",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-UNDERSTANDABLE"
+      ]
+    },
+    {
+      "check_id": "fairness.group_parity",
+      "failure_mode": "Outcomes or error rates differ materially across protected groups",
+      "effect": "Discrimination against applicants; legal and reputational exposure",
+      "detection": "Group fairness",
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "NIST:MAP-5.1",
+        "ISO42001:A.5.4",
+        "ISO42001:A.7.4",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS",
+        "NIST-GAI:HARMFUL-BIAS",
+        "ISO42005:6.8.2"
+      ]
+    },
+    {
+      "check_id": "fairness.intersectional",
+      "failure_mode": "Disparity hidden inside combinations of attributes (e.g. rural women)",
+      "effect": "Sub-group harm that single-attribute tests miss",
+      "detection": "Intersectional fairness",
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "ISO42001:A.5.4",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS",
+        "ISO42005:6.8.2"
+      ]
+    },
+    {
+      "check_id": "fairness.proxy_features",
+      "failure_mode": "Model inputs act as proxies for protected attributes",
+      "effect": "Indirect discrimination even when protected attributes are excluded",
+      "detection": "Proxy-feature screening",
+      "controls": [
+        "NIST:MEASURE-2.11",
+        "NIST:MAP-2.3",
+        "ISO42001:A.7.4",
+        "ISO42001:A.7.6",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS"
+      ]
+    },
+    {
+      "check_id": "robustness.perturbation",
+      "failure_mode": "Small input noise or missing values flip decisions",
+      "effect": "Unstable, unrepeatable outcomes; exploitable behaviour",
+      "detection": "Robustness to perturbation",
+      "controls": [
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.7",
+        "NIST:MEASURE-2.6",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:6.8.3"
+      ]
+    },
+    {
+      "check_id": "drift.population_stability",
+      "failure_mode": "Production data no longer resembles the data the model was validated on",
+      "effect": "Silent performance and fairness decay after deployment",
+      "detection": "Data and prediction drift",
+      "controls": [
+        "NIST:MEASURE-2.4",
+        "NIST:MEASURE-4.3",
+        "NIST:MANAGE-4.1",
+        "NIST:MANAGE-2.2",
+        "ISO42001:A.6.2.6",
+        "EUAIA:Art-72",
+        "INDIA:SUTRA-SAFETY",
+        "ISO42005:5.12"
+      ]
+    },
+    {
+      "check_id": "explainability.feature_importance",
+      "failure_mode": "Decision drivers are unknown, undocumented or include prohibited inputs",
+      "effect": "Decisions cannot be explained to customers, reviewers or regulators",
+      "detection": "Decision drivers",
+      "controls": [
+        "NIST:MEASURE-2.9",
+        "NIST:MAP-2.2",
+        "ISO42001:A.6.2.7",
+        "ISO42001:A.8.2",
+        "EUAIA:Art-13",
+        "INDIA:SUTRA-UNDERSTANDABLE"
+      ]
+    },
+    {
+      "check_id": "privacy.pii_exposure",
+      "failure_mode": "Direct identifiers present in modelling or evaluation datasets",
+      "effect": "Unnecessary personal-data processing; breach impact",
+      "detection": "Personal-data exposure",
+      "controls": [
+        "NIST:MEASURE-2.10",
+        "ISO42001:A.7.2",
+        "ISO42001:A.7.5",
+        "EUAIA:Art-10",
+        "INDIA:DPDP-2023",
+        "NIST-GAI:DATA-PRIVACY"
+      ]
+    },
+    {
+      "check_id": "privacy.membership_inference",
+      "failure_mode": "Model memorizes training records so membership can be inferred",
+      "effect": "Re-identification of individuals in the training set",
+      "detection": "Membership-inference risk",
+      "controls": [
+        "NIST:MEASURE-2.10",
+        "NIST:MEASURE-2.7",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:DPDP-2023"
+      ]
+    },
+    {
+      "check_id": "documentation.model_card",
+      "failure_mode": "Intended use, limitations and oversight measures are not documented",
+      "effect": "Misuse outside scope; failed technical-documentation review",
+      "detection": "Documentation and claims",
+      "controls": [
+        "NIST:MAP-2.2",
+        "NIST:MAP-3.5",
+        "NIST:GOVERN-4.2",
+        "NIST:MEASURE-2.8",
+        "ISO42001:A.6.2.3",
+        "ISO42001:A.6.2.7",
+        "ISO42001:A.8.2",
+        "EUAIA:Art-11",
+        "EUAIA:Art-13",
+        "EUAIA:Art-14",
+        "INDIA:SUTRA-UNDERSTANDABLE",
+        "INDIA:SUTRA-ACCOUNTABILITY",
+        "ISO42005:6.3.4",
+        "ISO42005:6.3.5",
+        "ISO42005:6.5"
+      ]
+    },
+    {
+      "check_id": "audit.detector_sensitivity",
+      "failure_mode": "Audit tests fail to detect a defect that is known to exist",
+      "effect": "False assurance from the audit itself",
+      "detection": "Audit self-test (canaries)",
+      "controls": [
+        "NIST:MEASURE-2.13",
+        "NIST:MEASURE-1.2",
+        "ISO42001:A.6.2.4"
+      ]
+    }
+  ],
+  "coverage": {
+    "controls": [
+      {
+        "ref": "NIST:GOVERN-1.1",
+        "framework": "NIST",
+        "id": "GOVERN-1.1",
+        "group": "GOVERN",
+        "title": "Legal and regulatory requirements for AI are understood, managed and documented",
+        "evidence_type": "organizational",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-1.2",
+        "framework": "NIST",
+        "id": "GOVERN-1.2",
+        "group": "GOVERN",
+        "title": "Trustworthy-AI characteristics are built into policies, processes and practices",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-1.3",
+        "framework": "NIST",
+        "id": "GOVERN-1.3",
+        "group": "GOVERN",
+        "title": "Level of risk-management activity is set according to organizational risk tolerance",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-1.4",
+        "framework": "NIST",
+        "id": "GOVERN-1.4",
+        "group": "GOVERN",
+        "title": "Risk-management process and outcomes are established through transparent policies and controls",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-1.5",
+        "framework": "NIST",
+        "id": "GOVERN-1.5",
+        "group": "GOVERN",
+        "title": "Ongoing monitoring and periodic review of the risk process are planned, with clear roles",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-1.6",
+        "framework": "NIST",
+        "id": "GOVERN-1.6",
+        "group": "GOVERN",
+        "title": "Mechanisms exist to inventory AI systems",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-1.7",
+        "framework": "NIST",
+        "id": "GOVERN-1.7",
+        "group": "GOVERN",
+        "title": "Processes exist to decommission and phase out AI systems safely",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-2.1",
+        "framework": "NIST",
+        "id": "GOVERN-2.1",
+        "group": "GOVERN",
+        "title": "Roles, responsibilities and lines of communication for AI risk are documented",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-2.2",
+        "framework": "NIST",
+        "id": "GOVERN-2.2",
+        "group": "GOVERN",
+        "title": "Personnel and partners receive AI risk-management training",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-2.3",
+        "framework": "NIST",
+        "id": "GOVERN-2.3",
+        "group": "GOVERN",
+        "title": "Executive leadership takes responsibility for decisions about AI risk",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-3.1",
+        "framework": "NIST",
+        "id": "GOVERN-3.1",
+        "group": "GOVERN",
+        "title": "AI risk decisions are informed by a diverse team",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-3.2",
+        "framework": "NIST",
+        "id": "GOVERN-3.2",
+        "group": "GOVERN",
+        "title": "Roles for human-AI configurations and oversight are defined",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-4.1",
+        "framework": "NIST",
+        "id": "GOVERN-4.1",
+        "group": "GOVERN",
+        "title": "Practices foster critical thinking and a safety-first mindset",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-4.2",
+        "framework": "NIST",
+        "id": "GOVERN-4.2",
+        "group": "GOVERN",
+        "title": "Teams document risks and impacts of the AI they build and use, and communicate them",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-4.3",
+        "framework": "NIST",
+        "id": "GOVERN-4.3",
+        "group": "GOVERN",
+        "title": "Practices enable AI testing, incident identification and information sharing",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-5.1",
+        "framework": "NIST",
+        "id": "GOVERN-5.1",
+        "group": "GOVERN",
+        "title": "Feedback from external stakeholders is collected and integrated",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-5.2",
+        "framework": "NIST",
+        "id": "GOVERN-5.2",
+        "group": "GOVERN",
+        "title": "Adjudicated feedback from AI actors is regularly incorporated into design",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-6.1",
+        "framework": "NIST",
+        "id": "GOVERN-6.1",
+        "group": "GOVERN",
+        "title": "Policies address risks from third-party entities, including IP",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:GOVERN-6.2",
+        "framework": "NIST",
+        "id": "GOVERN-6.2",
+        "group": "GOVERN",
+        "title": "Contingency processes handle failures in high-risk third-party data or AI",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-1.1",
+        "framework": "NIST",
+        "id": "MAP-1.1",
+        "group": "MAP",
+        "title": "Intended purpose, context, applicable laws and deployment setting are documented",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-1.2",
+        "framework": "NIST",
+        "id": "MAP-1.2",
+        "group": "MAP",
+        "title": "Interdisciplinary and diverse actors establish context",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-1.3",
+        "framework": "NIST",
+        "id": "MAP-1.3",
+        "group": "MAP",
+        "title": "Organizational mission and goals for the AI are documented",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-1.4",
+        "framework": "NIST",
+        "id": "MAP-1.4",
+        "group": "MAP",
+        "title": "Business value or context of use is clearly defined",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-1.5",
+        "framework": "NIST",
+        "id": "MAP-1.5",
+        "group": "MAP",
+        "title": "Organizational risk tolerances are determined and documented",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-1.6",
+        "framework": "NIST",
+        "id": "MAP-1.6",
+        "group": "MAP",
+        "title": "System requirements are elicited and understood by relevant actors",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-2.1",
+        "framework": "NIST",
+        "id": "MAP-2.1",
+        "group": "MAP",
+        "title": "Tasks and methods the AI system supports are defined",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-2.2",
+        "framework": "NIST",
+        "id": "MAP-2.2",
+        "group": "MAP",
+        "title": "Knowledge limits and how outputs are used and overseen by humans are documented",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-2.3",
+        "framework": "NIST",
+        "id": "MAP-2.3",
+        "group": "MAP",
+        "title": "Scientific integrity and TEVV considerations are identified and documented",
+        "evidence_type": "both",
+        "state": "deficient",
+        "checks": [
+          "fairness.proxy_features",
+          "data_quality.integrity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-3.1",
+        "framework": "NIST",
+        "id": "MAP-3.1",
+        "group": "MAP",
+        "title": "Potential benefits of the system are examined and documented",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-3.2",
+        "framework": "NIST",
+        "id": "MAP-3.2",
+        "group": "MAP",
+        "title": "Potential costs of AI errors, including non-monetary costs, are documented",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-3.3",
+        "framework": "NIST",
+        "id": "MAP-3.3",
+        "group": "MAP",
+        "title": "Targeted application scope is specified based on capability and categorization",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-3.4",
+        "framework": "NIST",
+        "id": "MAP-3.4",
+        "group": "MAP",
+        "title": "Operator and practitioner proficiency processes are defined and assessed",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-3.5",
+        "framework": "NIST",
+        "id": "MAP-3.5",
+        "group": "MAP",
+        "title": "Human oversight processes are defined, assessed and documented",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-4.1",
+        "framework": "NIST",
+        "id": "MAP-4.1",
+        "group": "MAP",
+        "title": "Technology and legal risks of components, incl. third-party data/software, are mapped",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-4.2",
+        "framework": "NIST",
+        "id": "MAP-4.2",
+        "group": "MAP",
+        "title": "Internal risk controls for system components are identified and documented",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-5.1",
+        "framework": "NIST",
+        "id": "MAP-5.1",
+        "group": "MAP",
+        "title": "Likelihood and magnitude of each identified impact are documented",
+        "evidence_type": "both",
+        "state": "deficient",
+        "checks": [
+          "fairness.group_parity",
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MAP-5.2",
+        "framework": "NIST",
+        "id": "MAP-5.2",
+        "group": "MAP",
+        "title": "Engagement with AI actors about positive and negative impacts is in place",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-1.1",
+        "framework": "NIST",
+        "id": "MEASURE-1.1",
+        "group": "MEASURE",
+        "title": "Metrics for the most significant mapped risks are selected and implemented",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-1.2",
+        "framework": "NIST",
+        "id": "MEASURE-1.2",
+        "group": "MEASURE",
+        "title": "Appropriateness of metrics and effectiveness of controls are regularly reassessed",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.detector_sensitivity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-1.3",
+        "framework": "NIST",
+        "id": "MEASURE-1.3",
+        "group": "MEASURE",
+        "title": "Independent assessors or non-developer experts are involved in assessments",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.1",
+        "framework": "NIST",
+        "id": "MEASURE-2.1",
+        "group": "MEASURE",
+        "title": "Test sets, metrics and TEVV tool details are documented",
+        "evidence_type": "technical",
+        "state": "partial",
+        "checks": [
+          "performance.discrimination",
+          "data_quality.integrity",
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.2",
+        "framework": "NIST",
+        "id": "MEASURE-2.2",
+        "group": "MEASURE",
+        "title": "Human-subject evaluations meet requirements and represent the population",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.3",
+        "framework": "NIST",
+        "id": "MEASURE-2.3",
+        "group": "MEASURE",
+        "title": "Performance is measured and demonstrated for deployment-like conditions",
+        "evidence_type": "technical",
+        "state": "partial",
+        "checks": [
+          "performance.discrimination"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.4",
+        "framework": "NIST",
+        "id": "MEASURE-2.4",
+        "group": "MEASURE",
+        "title": "System functionality and behaviour are monitored in production",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.5",
+        "framework": "NIST",
+        "id": "MEASURE-2.5",
+        "group": "MEASURE",
+        "title": "System is shown to be valid and reliable; generalization limits documented",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "performance.discrimination",
+          "calibration.reliability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.6",
+        "framework": "NIST",
+        "id": "MEASURE-2.6",
+        "group": "MEASURE",
+        "title": "System is regularly evaluated for safety risks",
+        "evidence_type": "technical",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.7",
+        "framework": "NIST",
+        "id": "MEASURE-2.7",
+        "group": "MEASURE",
+        "title": "Security and resilience are evaluated and documented",
+        "evidence_type": "technical",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.8",
+        "framework": "NIST",
+        "id": "MEASURE-2.8",
+        "group": "MEASURE",
+        "title": "Transparency and accountability risks are examined and documented",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.9",
+        "framework": "NIST",
+        "id": "MEASURE-2.9",
+        "group": "MEASURE",
+        "title": "Model is explained, validated and documented; outputs interpreted in context",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "calibration.reliability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.10",
+        "framework": "NIST",
+        "id": "MEASURE-2.10",
+        "group": "MEASURE",
+        "title": "Privacy risk is examined and documented",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "privacy.pii_exposure"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.11",
+        "framework": "NIST",
+        "id": "MEASURE-2.11",
+        "group": "MEASURE",
+        "title": "Fairness and bias are evaluated and results documented",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "fairness.group_parity",
+          "fairness.intersectional",
+          "fairness.proxy_features"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.12",
+        "framework": "NIST",
+        "id": "MEASURE-2.12",
+        "group": "MEASURE",
+        "title": "Environmental impact and sustainability are assessed",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-2.13",
+        "framework": "NIST",
+        "id": "MEASURE-2.13",
+        "group": "MEASURE",
+        "title": "Effectiveness of TEVV metrics and processes is evaluated",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "audit.detector_sensitivity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-3.1",
+        "framework": "NIST",
+        "id": "MEASURE-3.1",
+        "group": "MEASURE",
+        "title": "Existing, unanticipated and emergent risks are regularly tracked",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-3.2",
+        "framework": "NIST",
+        "id": "MEASURE-3.2",
+        "group": "MEASURE",
+        "title": "Risk tracking is considered where risks are hard to measure",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-3.3",
+        "framework": "NIST",
+        "id": "MEASURE-3.3",
+        "group": "MEASURE",
+        "title": "Feedback and appeal processes for users and affected communities exist",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-4.1",
+        "framework": "NIST",
+        "id": "MEASURE-4.1",
+        "group": "MEASURE",
+        "title": "Measurement approaches are connected to deployment context with domain input",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-4.2",
+        "framework": "NIST",
+        "id": "MEASURE-4.2",
+        "group": "MEASURE",
+        "title": "Trustworthiness results in deployment are validated with domain experts",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MEASURE-4.3",
+        "framework": "NIST",
+        "id": "MEASURE-4.3",
+        "group": "MEASURE",
+        "title": "Measurable performance improvements or declines are identified and documented",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-1.1",
+        "framework": "NIST",
+        "id": "MANAGE-1.1",
+        "group": "MANAGE",
+        "title": "A go/no-go determination is made on whether deployment should proceed",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "performance.discrimination",
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-1.2",
+        "framework": "NIST",
+        "id": "MANAGE-1.2",
+        "group": "MANAGE",
+        "title": "Risk treatment is prioritized by impact, likelihood and resources",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-1.3",
+        "framework": "NIST",
+        "id": "MANAGE-1.3",
+        "group": "MANAGE",
+        "title": "Responses to high-priority risks are planned and documented",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-1.4",
+        "framework": "NIST",
+        "id": "MANAGE-1.4",
+        "group": "MANAGE",
+        "title": "Negative residual risks are documented",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-2.1",
+        "framework": "NIST",
+        "id": "MANAGE-2.1",
+        "group": "MANAGE",
+        "title": "Resources to manage risk and non-AI alternatives are considered",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-2.2",
+        "framework": "NIST",
+        "id": "MANAGE-2.2",
+        "group": "MANAGE",
+        "title": "Mechanisms sustain the value of deployed AI systems",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-2.3",
+        "framework": "NIST",
+        "id": "MANAGE-2.3",
+        "group": "MANAGE",
+        "title": "Procedures exist to respond to previously unknown risks",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-2.4",
+        "framework": "NIST",
+        "id": "MANAGE-2.4",
+        "group": "MANAGE",
+        "title": "Mechanisms exist to supersede, disengage or deactivate misbehaving systems",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-3.1",
+        "framework": "NIST",
+        "id": "MANAGE-3.1",
+        "group": "MANAGE",
+        "title": "Third-party AI risks are monitored and controls documented",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-3.2",
+        "framework": "NIST",
+        "id": "MANAGE-3.2",
+        "group": "MANAGE",
+        "title": "Pre-trained models used in development are monitored",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-4.1",
+        "framework": "NIST",
+        "id": "MANAGE-4.1",
+        "group": "MANAGE",
+        "title": "Post-deployment monitoring plans are implemented",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-4.2",
+        "framework": "NIST",
+        "id": "MANAGE-4.2",
+        "group": "MANAGE",
+        "title": "Continual-improvement activities are integrated into updates",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST:MANAGE-4.3",
+        "framework": "NIST",
+        "id": "MANAGE-4.3",
+        "group": "MANAGE",
+        "title": "Incidents and errors are tracked, communicated and recovered from",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:CBRN",
+        "framework": "NIST-GAI",
+        "id": "CBRN",
+        "group": "GenAI risk",
+        "title": "CBRN information or capabilities",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:CONFABULATION",
+        "framework": "NIST-GAI",
+        "id": "CONFABULATION",
+        "group": "GenAI risk",
+        "title": "Confabulation (confidently stated false content)",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:DANGEROUS-CONTENT",
+        "framework": "NIST-GAI",
+        "id": "DANGEROUS-CONTENT",
+        "group": "GenAI risk",
+        "title": "Dangerous, violent or hateful content",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:DATA-PRIVACY",
+        "framework": "NIST-GAI",
+        "id": "DATA-PRIVACY",
+        "group": "GenAI risk",
+        "title": "Data privacy (leakage or inference of personal data)",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:ENVIRONMENTAL",
+        "framework": "NIST-GAI",
+        "id": "ENVIRONMENTAL",
+        "group": "GenAI risk",
+        "title": "Environmental impacts",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:HARMFUL-BIAS",
+        "framework": "NIST-GAI",
+        "id": "HARMFUL-BIAS",
+        "group": "GenAI risk",
+        "title": "Harmful bias and homogenization",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:HUMAN-AI-CONFIG",
+        "framework": "NIST-GAI",
+        "id": "HUMAN-AI-CONFIG",
+        "group": "GenAI risk",
+        "title": "Human-AI configuration (over-reliance, anthropomorphism)",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:INFO-INTEGRITY",
+        "framework": "NIST-GAI",
+        "id": "INFO-INTEGRITY",
+        "group": "GenAI risk",
+        "title": "Information integrity",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:INFO-SECURITY",
+        "framework": "NIST-GAI",
+        "id": "INFO-SECURITY",
+        "group": "GenAI risk",
+        "title": "Information security (e.g. prompt injection)",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:IP",
+        "framework": "NIST-GAI",
+        "id": "IP",
+        "group": "GenAI risk",
+        "title": "Intellectual property",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:OBSCENE-CONTENT",
+        "framework": "NIST-GAI",
+        "id": "OBSCENE-CONTENT",
+        "group": "GenAI risk",
+        "title": "Obscene, degrading or abusive content",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "NIST-GAI:VALUE-CHAIN",
+        "framework": "NIST-GAI",
+        "id": "VALUE-CHAIN",
+        "group": "GenAI risk",
+        "title": "Value chain and component integration",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.2.2",
+        "framework": "ISO42001",
+        "id": "A.2.2",
+        "group": "A.2 AI policy",
+        "title": "AI policy",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.2.3",
+        "framework": "ISO42001",
+        "id": "A.2.3",
+        "group": "A.2 AI policy",
+        "title": "Alignment with other organizational policies",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.2.4",
+        "framework": "ISO42001",
+        "id": "A.2.4",
+        "group": "A.2 AI policy",
+        "title": "Review of the AI policy",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.3.2",
+        "framework": "ISO42001",
+        "id": "A.3.2",
+        "group": "A.3 Internal organization",
+        "title": "AI roles and responsibilities",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.3.3",
+        "framework": "ISO42001",
+        "id": "A.3.3",
+        "group": "A.3 Internal organization",
+        "title": "Reporting of concerns",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.4.2",
+        "framework": "ISO42001",
+        "id": "A.4.2",
+        "group": "A.4 Resources",
+        "title": "Resource documentation",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.4.3",
+        "framework": "ISO42001",
+        "id": "A.4.3",
+        "group": "A.4 Resources",
+        "title": "Data resources",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "data_quality.integrity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.4.4",
+        "framework": "ISO42001",
+        "id": "A.4.4",
+        "group": "A.4 Resources",
+        "title": "Tooling resources",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.4.5",
+        "framework": "ISO42001",
+        "id": "A.4.5",
+        "group": "A.4 Resources",
+        "title": "System and computing resources",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.4.6",
+        "framework": "ISO42001",
+        "id": "A.4.6",
+        "group": "A.4 Resources",
+        "title": "Human resources",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.5.2",
+        "framework": "ISO42001",
+        "id": "A.5.2",
+        "group": "A.5 Impact assessment",
+        "title": "AI system impact assessment process",
+        "evidence_type": "organizational",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.5.3",
+        "framework": "ISO42001",
+        "id": "A.5.3",
+        "group": "A.5 Impact assessment",
+        "title": "Documentation of impact assessments",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.5.4",
+        "framework": "ISO42001",
+        "id": "A.5.4",
+        "group": "A.5 Impact assessment",
+        "title": "Impact on individuals or groups of individuals",
+        "evidence_type": "both",
+        "state": "deficient",
+        "checks": [
+          "fairness.group_parity",
+          "fairness.intersectional"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.5.5",
+        "framework": "ISO42001",
+        "id": "A.5.5",
+        "group": "A.5 Impact assessment",
+        "title": "Societal impacts of AI systems",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.1.2",
+        "framework": "ISO42001",
+        "id": "A.6.1.2",
+        "group": "A.6 Life cycle",
+        "title": "Objectives for responsible development",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.1.3",
+        "framework": "ISO42001",
+        "id": "A.6.1.3",
+        "group": "A.6 Life cycle",
+        "title": "Processes for responsible design and development",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.2.2",
+        "framework": "ISO42001",
+        "id": "A.6.2.2",
+        "group": "A.6 Life cycle",
+        "title": "System requirements and specification",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.2.3",
+        "framework": "ISO42001",
+        "id": "A.6.2.3",
+        "group": "A.6 Life cycle",
+        "title": "Documentation of design and development",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.2.4",
+        "framework": "ISO42001",
+        "id": "A.6.2.4",
+        "group": "A.6 Life cycle",
+        "title": "Verification and validation",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "performance.discrimination",
+          "calibration.reliability",
+          "audit.detector_sensitivity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.2.5",
+        "framework": "ISO42001",
+        "id": "A.6.2.5",
+        "group": "A.6 Life cycle",
+        "title": "Deployment",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.2.6",
+        "framework": "ISO42001",
+        "id": "A.6.2.6",
+        "group": "A.6 Life cycle",
+        "title": "Operation and monitoring",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.2.7",
+        "framework": "ISO42001",
+        "id": "A.6.2.7",
+        "group": "A.6 Life cycle",
+        "title": "Technical documentation",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.6.2.8",
+        "framework": "ISO42001",
+        "id": "A.6.2.8",
+        "group": "A.6 Life cycle",
+        "title": "Recording of event logs",
+        "evidence_type": "technical",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.7.2",
+        "framework": "ISO42001",
+        "id": "A.7.2",
+        "group": "A.7 Data",
+        "title": "Data for development and enhancement",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "privacy.pii_exposure"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.7.3",
+        "framework": "ISO42001",
+        "id": "A.7.3",
+        "group": "A.7 Data",
+        "title": "Acquisition of data",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.7.4",
+        "framework": "ISO42001",
+        "id": "A.7.4",
+        "group": "A.7 Data",
+        "title": "Quality of data",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "fairness.group_parity",
+          "fairness.proxy_features",
+          "data_quality.integrity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.7.5",
+        "framework": "ISO42001",
+        "id": "A.7.5",
+        "group": "A.7 Data",
+        "title": "Data provenance",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "privacy.pii_exposure"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.7.6",
+        "framework": "ISO42001",
+        "id": "A.7.6",
+        "group": "A.7 Data",
+        "title": "Data preparation",
+        "evidence_type": "both",
+        "state": "deficient",
+        "checks": [
+          "fairness.proxy_features",
+          "data_quality.integrity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.8.2",
+        "framework": "ISO42001",
+        "id": "A.8.2",
+        "group": "A.8 Information for interested parties",
+        "title": "System documentation and information for users",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.8.3",
+        "framework": "ISO42001",
+        "id": "A.8.3",
+        "group": "A.8 Information for interested parties",
+        "title": "External reporting",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.8.4",
+        "framework": "ISO42001",
+        "id": "A.8.4",
+        "group": "A.8 Information for interested parties",
+        "title": "Communication of incidents",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.8.5",
+        "framework": "ISO42001",
+        "id": "A.8.5",
+        "group": "A.8 Information for interested parties",
+        "title": "Information for interested parties",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.9.2",
+        "framework": "ISO42001",
+        "id": "A.9.2",
+        "group": "A.9 Use of AI systems",
+        "title": "Processes for responsible use",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.9.3",
+        "framework": "ISO42001",
+        "id": "A.9.3",
+        "group": "A.9 Use of AI systems",
+        "title": "Objectives for responsible use",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.9.4",
+        "framework": "ISO42001",
+        "id": "A.9.4",
+        "group": "A.9 Use of AI systems",
+        "title": "Intended use of the AI system",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.10.2",
+        "framework": "ISO42001",
+        "id": "A.10.2",
+        "group": "A.10 Third parties",
+        "title": "Allocating responsibilities",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.10.3",
+        "framework": "ISO42001",
+        "id": "A.10.3",
+        "group": "A.10 Third parties",
+        "title": "Suppliers",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42001:A.10.4",
+        "framework": "ISO42001",
+        "id": "A.10.4",
+        "group": "A.10 Third parties",
+        "title": "Customers",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-4",
+        "framework": "EUAIA",
+        "id": "Art-4",
+        "group": "General provisions",
+        "title": "AI literacy of staff and operators",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-5",
+        "framework": "EUAIA",
+        "id": "Art-5",
+        "group": "Prohibited practices",
+        "title": "Prohibited AI practices",
+        "evidence_type": "organizational",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-6",
+        "framework": "EUAIA",
+        "id": "Art-6",
+        "group": "High-risk systems",
+        "title": "Classification rules for high-risk AI systems",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-9",
+        "framework": "EUAIA",
+        "id": "Art-9",
+        "group": "High-risk systems",
+        "title": "Risk management system",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-10",
+        "framework": "EUAIA",
+        "id": "Art-10",
+        "group": "High-risk systems",
+        "title": "Data and data governance (quality, relevance, bias examination)",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "fairness.group_parity",
+          "fairness.intersectional",
+          "fairness.proxy_features",
+          "privacy.pii_exposure",
+          "data_quality.integrity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-11",
+        "framework": "EUAIA",
+        "id": "Art-11",
+        "group": "High-risk systems",
+        "title": "Technical documentation (Annex IV)",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-12",
+        "framework": "EUAIA",
+        "id": "Art-12",
+        "group": "High-risk systems",
+        "title": "Record-keeping and automatic event logging",
+        "evidence_type": "technical",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-13",
+        "framework": "EUAIA",
+        "id": "Art-13",
+        "group": "High-risk systems",
+        "title": "Transparency and information to deployers",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-14",
+        "framework": "EUAIA",
+        "id": "Art-14",
+        "group": "High-risk systems",
+        "title": "Human oversight",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-15",
+        "framework": "EUAIA",
+        "id": "Art-15",
+        "group": "High-risk systems",
+        "title": "Accuracy, robustness and cybersecurity",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "performance.discrimination",
+          "calibration.reliability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-17",
+        "framework": "EUAIA",
+        "id": "Art-17",
+        "group": "Provider obligations",
+        "title": "Quality management system",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-26",
+        "framework": "EUAIA",
+        "id": "Art-26",
+        "group": "Deployer obligations",
+        "title": "Obligations of deployers of high-risk systems",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-27",
+        "framework": "EUAIA",
+        "id": "Art-27",
+        "group": "Deployer obligations",
+        "title": "Fundamental rights impact assessment",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-50",
+        "framework": "EUAIA",
+        "id": "Art-50",
+        "group": "Transparency",
+        "title": "Transparency for systems that interact with people or generate content",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-53",
+        "framework": "EUAIA",
+        "id": "Art-53",
+        "group": "General-purpose AI",
+        "title": "Obligations for providers of general-purpose AI models",
+        "evidence_type": "organizational",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-72",
+        "framework": "EUAIA",
+        "id": "Art-72",
+        "group": "Post-market",
+        "title": "Post-market monitoring",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "EUAIA:Art-73",
+        "framework": "EUAIA",
+        "id": "Art-73",
+        "group": "Post-market",
+        "title": "Reporting of serious incidents",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:SUTRA-TRUST",
+        "framework": "INDIA",
+        "id": "SUTRA-TRUST",
+        "group": "Sutras",
+        "title": "Trust is the foundation",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:SUTRA-PEOPLE-FIRST",
+        "framework": "INDIA",
+        "id": "SUTRA-PEOPLE-FIRST",
+        "group": "Sutras",
+        "title": "People first (human-centric design and oversight)",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:SUTRA-INNOVATION",
+        "framework": "INDIA",
+        "id": "SUTRA-INNOVATION",
+        "group": "Sutras",
+        "title": "Innovation over restraint",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:SUTRA-FAIRNESS",
+        "framework": "INDIA",
+        "id": "SUTRA-FAIRNESS",
+        "group": "Sutras",
+        "title": "Fairness and equity",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "fairness.group_parity",
+          "fairness.intersectional",
+          "fairness.proxy_features"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:SUTRA-ACCOUNTABILITY",
+        "framework": "INDIA",
+        "id": "SUTRA-ACCOUNTABILITY",
+        "group": "Sutras",
+        "title": "Accountability",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:SUTRA-UNDERSTANDABLE",
+        "framework": "INDIA",
+        "id": "SUTRA-UNDERSTANDABLE",
+        "group": "Sutras",
+        "title": "Understandable by design",
+        "evidence_type": "both",
+        "state": "deficient",
+        "checks": [
+          "calibration.reliability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:SUTRA-SAFETY",
+        "framework": "INDIA",
+        "id": "SUTRA-SAFETY",
+        "group": "Sutras",
+        "title": "Safety, resilience and sustainability",
+        "evidence_type": "technical",
+        "state": "partial",
+        "checks": [
+          "performance.discrimination",
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:PILLAR-RISK-MITIGATION",
+        "framework": "INDIA",
+        "id": "PILLAR-RISK-MITIGATION",
+        "group": "Pillars",
+        "title": "Risk mitigation (evidence-based risk assessment, techno-legal measures)",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification",
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:PILLAR-ACCOUNTABILITY",
+        "framework": "INDIA",
+        "id": "PILLAR-ACCOUNTABILITY",
+        "group": "Pillars",
+        "title": "Accountability (graded liability tied to function and risk)",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "INDIA:DPDP-2023",
+        "framework": "INDIA",
+        "id": "DPDP-2023",
+        "group": "Related law",
+        "title": "Digital Personal Data Protection Act 2023 and DPDP Rules 2025",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "privacy.pii_exposure"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM01",
+        "framework": "OWASP-LLM",
+        "id": "LLM01",
+        "group": "Top 10",
+        "title": "Prompt injection",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM02",
+        "framework": "OWASP-LLM",
+        "id": "LLM02",
+        "group": "Top 10",
+        "title": "Sensitive information disclosure",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM03",
+        "framework": "OWASP-LLM",
+        "id": "LLM03",
+        "group": "Top 10",
+        "title": "Supply chain",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM04",
+        "framework": "OWASP-LLM",
+        "id": "LLM04",
+        "group": "Top 10",
+        "title": "Data and model poisoning",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM05",
+        "framework": "OWASP-LLM",
+        "id": "LLM05",
+        "group": "Top 10",
+        "title": "Improper output handling",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM06",
+        "framework": "OWASP-LLM",
+        "id": "LLM06",
+        "group": "Top 10",
+        "title": "Excessive agency",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM07",
+        "framework": "OWASP-LLM",
+        "id": "LLM07",
+        "group": "Top 10",
+        "title": "System prompt leakage",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM08",
+        "framework": "OWASP-LLM",
+        "id": "LLM08",
+        "group": "Top 10",
+        "title": "Vector and embedding weaknesses",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM09",
+        "framework": "OWASP-LLM",
+        "id": "LLM09",
+        "group": "Top 10",
+        "title": "Misinformation",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-LLM:LLM10",
+        "framework": "OWASP-LLM",
+        "id": "LLM10",
+        "group": "Top 10",
+        "title": "Unbounded consumption",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI01",
+        "framework": "OWASP-ASI",
+        "id": "ASI01",
+        "group": "Top 10",
+        "title": "Agent goal hijack",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI02",
+        "framework": "OWASP-ASI",
+        "id": "ASI02",
+        "group": "Top 10",
+        "title": "Tool misuse and exploitation",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI03",
+        "framework": "OWASP-ASI",
+        "id": "ASI03",
+        "group": "Top 10",
+        "title": "Identity and privilege abuse",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI04",
+        "framework": "OWASP-ASI",
+        "id": "ASI04",
+        "group": "Top 10",
+        "title": "Agentic supply chain vulnerabilities",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI05",
+        "framework": "OWASP-ASI",
+        "id": "ASI05",
+        "group": "Top 10",
+        "title": "Unexpected code execution (RCE)",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI06",
+        "framework": "OWASP-ASI",
+        "id": "ASI06",
+        "group": "Top 10",
+        "title": "Memory and context poisoning",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI07",
+        "framework": "OWASP-ASI",
+        "id": "ASI07",
+        "group": "Top 10",
+        "title": "Insecure inter-agent communication",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI08",
+        "framework": "OWASP-ASI",
+        "id": "ASI08",
+        "group": "Top 10",
+        "title": "Cascading failures",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI09",
+        "framework": "OWASP-ASI",
+        "id": "ASI09",
+        "group": "Top 10",
+        "title": "Human-agent trust exploitation",
+        "evidence_type": "both",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "OWASP-ASI:ASI10",
+        "framework": "OWASP-ASI",
+        "id": "ASI10",
+        "group": "Top 10",
+        "title": "Rogue agents",
+        "evidence_type": "technical",
+        "state": "not applicable",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.4",
+        "framework": "ISO42005",
+        "id": "5.4",
+        "group": "5 Assessment process",
+        "title": "Timing of AI system impact assessment",
+        "evidence_type": "organizational",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.5",
+        "framework": "ISO42005",
+        "id": "5.5",
+        "group": "5 Assessment process",
+        "title": "Scope of the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.6",
+        "framework": "ISO42005",
+        "id": "5.6",
+        "group": "5 Assessment process",
+        "title": "Allocating responsibilities",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.8",
+        "framework": "ISO42005",
+        "id": "5.8",
+        "group": "5 Assessment process",
+        "title": "Performing the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.9",
+        "framework": "ISO42005",
+        "id": "5.9",
+        "group": "5 Assessment process",
+        "title": "Analysing the results of the AI system impact assessment",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.10",
+        "framework": "ISO42005",
+        "id": "5.10",
+        "group": "5 Assessment process",
+        "title": "Recording and reporting",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.11",
+        "framework": "ISO42005",
+        "id": "5.11",
+        "group": "5 Assessment process",
+        "title": "Approval process",
+        "evidence_type": "organizational",
+        "state": "evidenced",
+        "checks": [
+          "audit.process"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:5.12",
+        "framework": "ISO42005",
+        "id": "5.12",
+        "group": "5 Assessment process",
+        "title": "Monitoring and review",
+        "evidence_type": "both",
+        "state": "evidenced",
+        "checks": [
+          "drift.population_stability"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.3.4",
+        "framework": "ISO42005",
+        "id": "6.3.4",
+        "group": "6 Assessment content",
+        "title": "Intended use",
+        "evidence_type": "both",
+        "state": "partial",
+        "checks": [
+          "governance.risk_classification"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.3.5",
+        "framework": "ISO42005",
+        "id": "6.3.5",
+        "group": "6 Assessment content",
+        "title": "Unintended uses",
+        "evidence_type": "both",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.4",
+        "framework": "ISO42005",
+        "id": "6.4",
+        "group": "6 Assessment content",
+        "title": "Data information and quality",
+        "evidence_type": "technical",
+        "state": "evidenced",
+        "checks": [
+          "data_quality.integrity"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.5",
+        "framework": "ISO42005",
+        "id": "6.5",
+        "group": "6 Assessment content",
+        "title": "Algorithm and model information",
+        "evidence_type": "technical",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.7",
+        "framework": "ISO42005",
+        "id": "6.7",
+        "group": "6 Assessment content",
+        "title": "Relevant interested parties",
+        "evidence_type": "organizational",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.8.2",
+        "framework": "ISO42005",
+        "id": "6.8.2",
+        "group": "6 Assessment content",
+        "title": "Benefits and harms",
+        "evidence_type": "technical",
+        "state": "deficient",
+        "checks": [
+          "fairness.group_parity",
+          "fairness.intersectional"
+        ],
+        "manual_evidence": []
+      },
+      {
+        "ref": "ISO42005:6.8.3",
+        "framework": "ISO42005",
+        "id": "6.8.3",
+        "group": "6 Assessment content",
+        "title": "AI system failures and reasonably foreseeable misuse",
+        "evidence_type": "technical",
+        "state": "not tested",
+        "checks": [],
+        "manual_evidence": []
+      }
+    ],
+    "frameworks": {
+      "NIST": {
+        "name": "NIST AI Risk Management Framework",
+        "version": "AI 100-1 (1.0)",
+        "source": "https://www.nist.gov/itl/ai-risk-management-framework",
+        "group_label": "Function",
+        "totals": {
+          "evidenced": 11,
+          "partial": 7,
+          "deficient": 5,
+          "not tested": 49,
+          "not applicable": 0
+        },
+        "groups": {
+          "GOVERN": {
+            "evidenced": 0,
+            "partial": 1,
+            "deficient": 0,
+            "not tested": 18,
+            "not applicable": 0
+          },
+          "MAP": {
+            "evidenced": 0,
+            "partial": 3,
+            "deficient": 2,
+            "not tested": 13,
+            "not applicable": 0
+          },
+          "MEASURE": {
+            "evidenced": 6,
+            "partial": 2,
+            "deficient": 3,
+            "not tested": 11,
+            "not applicable": 0
+          },
+          "MANAGE": {
+            "evidenced": 5,
+            "partial": 1,
+            "deficient": 0,
+            "not tested": 7,
+            "not applicable": 0
+          }
+        }
+      },
+      "NIST-GAI": {
+        "name": "NIST Generative AI Profile",
+        "version": "AI 600-1",
+        "source": "https://doi.org/10.6028/NIST.AI.600-1",
+        "group_label": "Risk",
+        "totals": {
+          "evidenced": 0,
+          "partial": 0,
+          "deficient": 0,
+          "not tested": 0,
+          "not applicable": 12
+        },
+        "groups": {
+          "GenAI risk": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 0,
+            "not applicable": 12
+          }
+        }
+      },
+      "ISO42001": {
+        "name": "ISO/IEC 42001 Annex A",
+        "version": "2023",
+        "source": "https://www.iso.org/standard/81230.html",
+        "group_label": "Objective",
+        "totals": {
+          "evidenced": 5,
+          "partial": 2,
+          "deficient": 4,
+          "not tested": 27,
+          "not applicable": 0
+        },
+        "groups": {
+          "A.2 AI policy": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 3,
+            "not applicable": 0
+          },
+          "A.3 Internal organization": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 2,
+            "not applicable": 0
+          },
+          "A.4 Resources": {
+            "evidenced": 1,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 4,
+            "not applicable": 0
+          },
+          "A.5 Impact assessment": {
+            "evidenced": 1,
+            "partial": 1,
+            "deficient": 1,
+            "not tested": 1,
+            "not applicable": 0
+          },
+          "A.6 Life cycle": {
+            "evidenced": 1,
+            "partial": 0,
+            "deficient": 1,
+            "not tested": 7,
+            "not applicable": 0
+          },
+          "A.7 Data": {
+            "evidenced": 2,
+            "partial": 0,
+            "deficient": 2,
+            "not tested": 1,
+            "not applicable": 0
+          },
+          "A.8 Information for interested parties": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 4,
+            "not applicable": 0
+          },
+          "A.9 Use of AI systems": {
+            "evidenced": 0,
+            "partial": 1,
+            "deficient": 0,
+            "not tested": 2,
+            "not applicable": 0
+          },
+          "A.10 Third parties": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 3,
+            "not applicable": 0
+          }
+        }
+      },
+      "EUAIA": {
+        "name": "EU AI Act",
+        "version": "2024/1689 as amended by 2026/1744",
+        "source": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+        "group_label": "Chapter",
+        "totals": {
+          "evidenced": 2,
+          "partial": 2,
+          "deficient": 2,
+          "not tested": 10,
+          "not applicable": 1
+        },
+        "groups": {
+          "General provisions": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 1,
+            "not applicable": 0
+          },
+          "Prohibited practices": {
+            "evidenced": 0,
+            "partial": 1,
+            "deficient": 0,
+            "not tested": 0,
+            "not applicable": 0
+          },
+          "High-risk systems": {
+            "evidenced": 1,
+            "partial": 1,
+            "deficient": 2,
+            "not tested": 4,
+            "not applicable": 0
+          },
+          "Provider obligations": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 1,
+            "not applicable": 0
+          },
+          "Deployer obligations": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 2,
+            "not applicable": 0
+          },
+          "Transparency": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 1,
+            "not applicable": 0
+          },
+          "General-purpose AI": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 0,
+            "not applicable": 1
+          },
+          "Post-market": {
+            "evidenced": 1,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 1,
+            "not applicable": 0
+          }
+        }
+      },
+      "INDIA": {
+        "name": "India AI Governance Guidelines",
+        "version": "MeitY, Nov 2025",
+        "source": "https://indiaai.gov.in/",
+        "group_label": "Element",
+        "totals": {
+          "evidenced": 1,
+          "partial": 2,
+          "deficient": 2,
+          "not tested": 5,
+          "not applicable": 0
+        },
+        "groups": {
+          "Sutras": {
+            "evidenced": 0,
+            "partial": 1,
+            "deficient": 2,
+            "not tested": 4,
+            "not applicable": 0
+          },
+          "Pillars": {
+            "evidenced": 0,
+            "partial": 1,
+            "deficient": 0,
+            "not tested": 1,
+            "not applicable": 0
+          },
+          "Related law": {
+            "evidenced": 1,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 0,
+            "not applicable": 0
+          }
+        }
+      },
+      "OWASP-LLM": {
+        "name": "OWASP Top 10 for LLM Applications",
+        "version": "2025",
+        "source": "https://genai.owasp.org/llm-top-10/",
+        "group_label": "Category",
+        "totals": {
+          "evidenced": 0,
+          "partial": 0,
+          "deficient": 0,
+          "not tested": 0,
+          "not applicable": 10
+        },
+        "groups": {
+          "Top 10": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 0,
+            "not applicable": 10
+          }
+        }
+      },
+      "OWASP-ASI": {
+        "name": "OWASP Top 10 for Agentic Applications",
+        "version": "2026",
+        "source": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+        "group_label": "Category",
+        "totals": {
+          "evidenced": 0,
+          "partial": 0,
+          "deficient": 0,
+          "not tested": 0,
+          "not applicable": 10
+        },
+        "groups": {
+          "Top 10": {
+            "evidenced": 0,
+            "partial": 0,
+            "deficient": 0,
+            "not tested": 0,
+            "not applicable": 10
+          }
+        }
+      },
+      "ISO42005": {
+        "name": "ISO/IEC 42005 AI system impact assessment",
+        "version": "2025",
+        "source": "https://www.iso.org/standard/42005",
+        "group_label": "Clause",
+        "totals": {
+          "evidenced": 6,
+          "partial": 3,
+          "deficient": 1,
+          "not tested": 5,
+          "not applicable": 0
+        },
+        "groups": {
+          "5 Assessment process": {
+            "evidenced": 5,
+            "partial": 2,
+            "deficient": 0,
+            "not tested": 1,
+            "not applicable": 0
+          },
+          "6 Assessment content": {
+            "evidenced": 1,
+            "partial": 1,
+            "deficient": 1,
+            "not tested": 4,
+            "not applicable": 0
+          }
+        }
+      }
+    }
+  },
+  "remediation": [
+    {
+      "risk_id": "R-01",
+      "priority": "P1",
+      "action": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: race, age_cat.",
+      "owner": "Unassigned",
+      "due": "2026-11-04",
+      "closes_controls": [
+        "NIST:MEASURE-2.11",
+        "NIST:MAP-5.1",
+        "ISO42001:A.5.4",
+        "ISO42001:A.7.4",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS",
+        "NIST-GAI:HARMFUL-BIAS",
+        "ISO42005:6.8.2"
+      ]
+    },
+    {
+      "risk_id": "R-02",
+      "priority": "P1",
+      "action": "Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance. Collect more data for subgroups below the minimum sample size.",
+      "owner": "Unassigned",
+      "due": "2026-11-04",
+      "closes_controls": [
+        "NIST:MEASURE-2.11",
+        "ISO42001:A.5.4",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS",
+        "ISO42005:6.8.2"
+      ]
+    },
+    {
+      "risk_id": "R-03",
+      "priority": "P1",
+      "action": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them.",
+      "owner": "Unassigned",
+      "due": "2026-11-20",
+      "closes_controls": [
+        "NIST:MEASURE-2.11",
+        "NIST:MAP-2.3",
+        "ISO42001:A.7.4",
+        "ISO42001:A.7.6",
+        "EUAIA:Art-10",
+        "INDIA:SUTRA-FAIRNESS"
+      ]
+    },
+    {
+      "risk_id": "R-04",
+      "priority": "P1",
+      "action": "Apply isotonic or Platt calibration on a held-out set and re-check per group.",
+      "owner": "Unassigned",
+      "due": "2026-11-20",
+      "closes_controls": [
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.9",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-UNDERSTANDABLE"
+      ]
+    },
+    {
+      "risk_id": "R-05",
+      "priority": "P2",
+      "action": "Track AUC in production monitoring with an alert at the declared minimum.",
+      "owner": "Unassigned",
+      "due": "2027-01-19",
+      "closes_controls": [
+        "NIST:MEASURE-2.3",
+        "NIST:MEASURE-2.5",
+        "NIST:MEASURE-2.1",
+        "NIST:MANAGE-1.1",
+        "ISO42001:A.6.2.4",
+        "EUAIA:Art-15",
+        "INDIA:SUTRA-SAFETY"
+      ]
+    },
+    {
+      "risk_id": "R-06",
+      "priority": "P2",
+      "action": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation.",
+      "owner": "Unassigned",
+      "due": "2027-01-19",
+      "closes_controls": [
+        "NIST:MAP-1.1",
+        "NIST:MAP-3.3",
+        "NIST:MAP-1.5",
+        "NIST:GOVERN-1.1",
+        "ISO42001:A.9.4",
+        "ISO42001:A.5.2",
+        "EUAIA:Art-5",
+        "EUAIA:Art-6",
+        "INDIA:PILLAR-RISK-MITIGATION",
+        "ISO42005:5.4",
+        "ISO42005:5.5",
+        "ISO42005:6.3.4"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact": "evaluation_data",
+      "file": "compas_all.csv",
+      "sha256": "fb233457a289a80829bf5262e50300da795acccd0f1d16d6cb47e4bd6e47b19d"
+    },
+    {
+      "artifact": "reference_data",
+      "file": "compas_2013.csv",
+      "sha256": "1805de66b1db1eeb06434775aa6c608fb2ca78ca48a01121bc478b087ac410a8"
+    },
+    {
+      "artifact": "production_data",
+      "file": "compas_2014.csv",
+      "sha256": "fadad944b3f2a789cae5480dd383cd79e50b1a5eb0d9de14e4b6598eae069b00"
+    }
+  ],
+  "manual_evidence": [],
+  "llm_run": {},
+  "ledger_root": "be28dede3b7a5659a8836d13cd528745e73b7de3b4d52dac589c18f7143f8ebf",
+  "environment": {
+    "python": "3.13.18",
+    "pramana": "0.7.16"
+  }
+}

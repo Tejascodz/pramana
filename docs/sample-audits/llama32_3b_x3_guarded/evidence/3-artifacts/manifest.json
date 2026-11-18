@@ -8,7 +8,7 @@
     {
       "artifact": "llm_probes",
       "file": "probes.yaml",
-      "sha256": "88803ce2e6fb8d92a6599dec5fed1b165b24284bb4a0d591db580cfb0148048f"
+      "sha256": "b1290e747cf159d42f7ad4e00e2dfdc273c15a8529427586c4821d8bb72a51b9"
     },
     {
       "artifact": "llm_replay",

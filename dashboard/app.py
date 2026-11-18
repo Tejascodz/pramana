@@ -33,12 +33,12 @@ WORD_JOINER = "⁠"
 LINKABLE = re.compile(r"(://|www\.|@)", re.IGNORECASE)
 
 SEVERITY_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
-STATUS_RANK = {"fail": 0, "error": 1, "warn": 2, "pass": 3, "skipped": 4}
+STATUS_RANK = {"fail": 0, "error": 1, "warn": 2, "pass": 3, "skipped": 4}  # nosec B105 - check statuses
 STATUS_LABEL = {
     "fail": "Fail",
     "error": "Not completed",
     "warn": "Warning",
-    "pass": "Pass",
+    "pass": "Pass",  # nosec B105 - a check status label
     "skipped": "Not run",
 }
 PROCESS_CHECKS = {"governance.risk_classification", "governance.manual_evidence", "audit.process"}
@@ -96,12 +96,18 @@ def safe_html(value: object) -> str:
     return html.escape(defang(str(value)))
 
 
+CHIP_KINDS = {"ok", "fail", "warn", "error", "skipped", "critical", "high", "medium", "low", "info"}
+
+
 def chip(text: str, kind: str) -> str:
+    # The kind becomes part of a class attribute, so only known values are allowed: a hostile
+    # pack's "severity" must not be able to close the attribute and inject markup.
+    kind = kind if kind in CHIP_KINDS else "info"
     return f'<span class="pv-chip pv-{kind}">{safe_html(text)}</span>'
 
 
 def status_chip(status: str) -> str:
-    kind = {"pass": "ok"}.get(status, status)
+    kind = {"pass": "ok"}.get(status, status)  # nosec B105 - a check status
     return chip(STATUS_LABEL.get(status, status), kind)
 
 

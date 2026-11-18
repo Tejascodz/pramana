@@ -66,8 +66,16 @@ def chat_url():
 
 @pytest.fixture(scope="module")
 def client(chat_url):
+    # CI runners and containers often run as root, where Chromium's sandbox cannot start; the
+    # test page is local and trusted, so these tests turn it off explicitly.
     c = BrowserChatClient(
-        chat_url, "#box", ".msg.bot", send_selector="#send", timeout=20, settle_ms=400
+        chat_url,
+        "#box",
+        ".msg.bot",
+        send_selector="#send",
+        timeout=20,
+        settle_ms=400,
+        sandbox=False,
     )
     probe = c.complete("", "What is your rate?")
     if not probe.ok and "Executable doesn't exist" in (probe.error or ""):
@@ -125,6 +133,7 @@ def test_a_full_audit_runs_through_the_browser(chat_url, client, tmp_path):
         "use_case: {domain: other, deployment_regions: [IN], interacts_with_people: true}\n"
         f"llm:\n  mode: browser\n  url: {chat_url}\n  input_selector: '#box'\n"
         "  reply_selector: '.msg.bot'\n  send_selector: '#send'\n  settle_ms: 400\n"
+        "  browser_sandbox: false\n"
         "  probes: probes.yaml\n"
     )
     result = run_audit(load_spec(tmp_path / "audit.yaml"), tmp_path / "pack")
@@ -133,3 +142,16 @@ def test_a_full_audit_runs_through_the_browser(chat_url, client, tmp_path):
     failed = {r["probe_id"] for r in injection.details["probes"] if r["failed"]}
     assert failed == {"P0"}, injection.summary
     assert result.llm_run["calls"] >= 5
+
+
+def test_the_sandbox_is_on_unless_turned_off():
+    from pramana.adapters.llm import build_client
+
+    base = {
+        "mode": "browser",
+        "url": "http://127.0.0.1:1/",
+        "input_selector": "#a",
+        "reply_selector": "#b",
+    }
+    assert build_client(base).sandbox is True
+    assert build_client({**base, "browser_sandbox": False}).sandbox is False

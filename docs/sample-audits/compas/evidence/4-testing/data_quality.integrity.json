@@ -1,0 +1,43 @@
+{
+  "category": "Data",
+  "check_id": "data_quality.integrity",
+  "controls": [
+    "NIST:MAP-2.3",
+    "NIST:MEASURE-2.1",
+    "ISO42001:A.7.4",
+    "ISO42001:A.7.6",
+    "ISO42001:A.4.3",
+    "EUAIA:Art-10",
+    "ISO42005:6.4"
+  ],
+  "details": {
+    "datasets": {
+      "evaluation_data": {
+        "duplicate_rate": 0.156,
+        "high_missing": {},
+        "positive_rate": 0.5449,
+        "record_identifier": null,
+        "rows": 6172
+      },
+      "reference_data": {
+        "duplicate_rate": 0.1353,
+        "high_missing": {},
+        "positive_rate": 0.6334,
+        "record_identifier": null,
+        "rows": 4345
+      }
+    },
+    "leakage": []
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "issues": 0,
+    "leakage_suspects": 0
+  },
+  "plain_summary": "The data supplied for the audit is complete and consistent.",
+  "recommendation": "Document how missing values are handled, de-duplicate records, and confirm no input is recorded after the outcome it predicts.",
+  "severity": "info",
+  "status": "pass",
+  "summary": "No data-quality issues above thresholds. Note: evaluation_data: 15.6% of rows are identical to another, but the data has no record identifier, so they may be different people with the same values; reference_data: 13.5% of rows are identical to another, but the data has no record identifier, so they may be different people with the same values.",
+  "title": "Data quality"
+}

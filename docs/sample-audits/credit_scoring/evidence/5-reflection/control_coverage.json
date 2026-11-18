@@ -1079,7 +1079,7 @@
       "id": "A.4.3",
       "manual_evidence": [],
       "ref": "ISO42001:A.4.3",
-      "state": "evidenced",
+      "state": "partial",
       "title": "Data resources"
     },
     {
@@ -2161,7 +2161,7 @@
       "id": "6.4",
       "manual_evidence": [],
       "ref": "ISO42005:6.4",
-      "state": "evidenced",
+      "state": "partial",
       "title": "Data information and quality"
     },
     {
@@ -2350,10 +2350,10 @@
         },
         "A.4 Resources": {
           "deficient": 0,
-          "evidenced": 1,
+          "evidenced": 0,
           "not applicable": 0,
           "not tested": 4,
-          "partial": 0
+          "partial": 1
         },
         "A.5 Impact assessment": {
           "deficient": 2,
@@ -2395,10 +2395,10 @@
       "source": "https://www.iso.org/standard/81230.html",
       "totals": {
         "deficient": 10,
-        "evidenced": 3,
+        "evidenced": 2,
         "not applicable": 0,
         "not tested": 23,
-        "partial": 2
+        "partial": 3
       },
       "version": "2023"
     },
@@ -2414,20 +2414,20 @@
         },
         "6 Assessment content": {
           "deficient": 4,
-          "evidenced": 1,
+          "evidenced": 0,
           "not applicable": 0,
           "not tested": 1,
-          "partial": 1
+          "partial": 2
         }
       },
       "name": "ISO/IEC 42005 AI system impact assessment",
       "source": "https://www.iso.org/standard/42005",
       "totals": {
         "deficient": 6,
-        "evidenced": 5,
+        "evidenced": 4,
         "not applicable": 0,
         "not tested": 2,
-        "partial": 2
+        "partial": 3
       },
       "version": "2025"
     },

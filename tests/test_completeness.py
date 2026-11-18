@@ -956,3 +956,19 @@ def test_gate_typos_are_refused(tmp_path, credit_example, gate, problem):
     spec_path.write_text(text)
     with pytest.raises(SpecError, match=problem):
         load_spec(spec_path)
+
+
+def test_an_accepted_risk_is_not_evidence_that_its_control_works():
+    from pramana.audit.engine import compute_coverage
+    from pramana.controls import load_library
+    from pramana.types import CheckResult, Severity
+
+    lib = load_library()
+    failing = CheckResult(check_id="privacy.pii_exposure", title="t", category="Privacy",
+                          status=Status.FAIL, severity=Severity.HIGH, summary="s")  # fmt: skip
+    ref = lib.controls_for_check("privacy.pii_exposure")[0]
+    accepted = compute_coverage(
+        lib, [failing], [], "high", {"privacy.pii_exposure"}, {"tabular_classifier"}
+    )
+    state = next(c["state"] for c in accepted["controls"] if c["ref"] == ref)
+    assert state == "partial"

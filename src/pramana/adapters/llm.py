@@ -623,6 +623,7 @@ def build_client(config: dict[str, Any]) -> LLMClient:
             timeout=float(config.get("timeout", 60.0)),
             settle_ms=int(config.get("settle_ms", 1200)),
             headless=bool(config.get("headless", True)),
+            sandbox=config.get("browser_sandbox", True) is not False,
         )
     if mode == "http":
         for key in ("url", "body", "response_path"):

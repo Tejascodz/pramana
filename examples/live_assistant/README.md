@@ -179,6 +179,8 @@ llm:
 Install it with `pip install "pramana-audit[browser]"` and `playwright install chromium`.
 Find the selectors with your browser's "Inspect element". Only test sites you own or are
 allowed to test, and expect a login page, a CAPTCHA or a site that blocks automation to
-stop the run (each such call is reported as failed, never as a pass).
+stop the run (each such call is reported as failed, never as a pass). Chromium runs with
+its sandbox on, since the pages under audit may be hostile; where it cannot start (for
+example as root in a container), set `browser_sandbox: false` only for sites you trust.
 
 Nilgiri Finance, Niva and every customer record here are fictional.

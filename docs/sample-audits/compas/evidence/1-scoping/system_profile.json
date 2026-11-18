@@ -1,0 +1,83 @@
+{
+  "audit_id": "PRM-20261021-42DAFC",
+  "classification": {
+    "eu_applicable": false,
+    "eu_basis": [
+      "Art. 6(2) and Annex III point 6: Law enforcement"
+    ],
+    "eu_tier": "high",
+    "india_factors": [
+      "affects access to essential services, livelihood or rights (+3)",
+      "processes personal data under the DPDP Act (+1)",
+      "affects vulnerable groups (+2)",
+      "outcomes are hard to contest or reverse (+1)"
+    ],
+    "india_score": 7,
+    "india_sensitivity": "high",
+    "obligations": [],
+    "sector_notes": []
+  },
+  "planned_checks": [
+    "governance.risk_classification",
+    "data_quality.integrity",
+    "performance.discrimination",
+    "calibration.reliability",
+    "fairness.group_parity",
+    "fairness.intersectional",
+    "fairness.proxy_features",
+    "robustness.perturbation",
+    "drift.population_stability",
+    "explainability.feature_importance",
+    "privacy.pii_exposure",
+    "privacy.membership_inference",
+    "documentation.model_card",
+    "audit.detector_sensitivity"
+  ],
+  "system": {
+    "accountable_executive": "Not applicable (third-party data audit)",
+    "description": "Commercial risk assessment that gives each defendant a decile score from 1 (lowest risk) to 10. ProPublica obtained the scores given in Broward County in 2013 and 2014 and matched them with criminal records over the next two years. This audit treats a decile of 1 to 4 as a low-risk (favourable) decision, as ProPublica did.\n",
+    "name": "COMPAS recidivism risk scores (Broward County, Florida)",
+    "owner": "Northpointe (now equivant); scores as published by ProPublica",
+    "type": "tabular_classifier",
+    "version": "2013-2014"
+  },
+  "thresholds": {
+    "agent_auditability_min": 0.9,
+    "agent_reasoning_coverage_min": 0.8,
+    "disparate_impact_min": 0.8,
+    "duplicate_rate_max": 0.01,
+    "ece_max": 0.05,
+    "equalized_odds_max": 0.1,
+    "leakage_auc_max": 0.95,
+    "llm_attack_success_max": 0.0,
+    "llm_groundedness_min": 0.9,
+    "llm_latency_p95_max_ms": 20000,
+    "llm_max_output_chars": 4000,
+    "llm_min_samples": 5,
+    "mia_auc_max": 0.6,
+    "min_auc": 0.7,
+    "min_group_size": 30,
+    "missing_rate_max": 0.05,
+    "model_card_min_completeness": 0.85,
+    "noise_flip_rate_max": 0.05,
+    "proxy_auc_max": 0.7,
+    "psi_fail": 0.25,
+    "psi_warn": 0.1
+  },
+  "use_case": {
+    "affected_persons": "Defendants awaiting trial",
+    "annual_decisions": 10000,
+    "contestability": "low",
+    "decision_role": "decision_support",
+    "deployment_regions": [
+      "US"
+    ],
+    "domain": "law_enforcement",
+    "generates_synthetic_content": false,
+    "interacts_with_people": false,
+    "processes_personal_data": true,
+    "prohibited_practice_flags": [],
+    "purpose": "Assess the risk that a defendant will reoffend, to inform pre-trial decisions.",
+    "vulnerable_groups": true
+  }
+}

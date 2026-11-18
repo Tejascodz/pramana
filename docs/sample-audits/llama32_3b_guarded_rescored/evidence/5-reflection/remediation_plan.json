@@ -1,0 +1,33 @@
+[
+  {
+    "action": "Normalise input before screening it: Unicode NFKC, remove format characters (zero-width spaces and joiners, soft hyphens) and fold look-alike letters (Unicode TR39 confusables); `pramana.attacks.mutations.normalize` does all three. Do not rely on keyword filters alone: validate outputs for canaries and markers too.",
+    "closes_controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15"
+    ],
+    "due": "2026-12-05",
+    "owner": "Information Security",
+    "priority": "P1",
+    "risk_id": "R-01"
+  },
+  {
+    "action": "Separate untrusted content from instructions, screen inputs in every supported language, keep secrets out of system prompts, and validate outputs for canary tokens, policy markers and external links.",
+    "closes_controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-LLM:LLM07",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY",
+      "ISO42005:6.8.3"
+    ],
+    "due": "2026-12-05",
+    "owner": "Information Security",
+    "priority": "P1",
+    "risk_id": "R-02"
+  }
+]

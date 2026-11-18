@@ -1,0 +1,20 @@
+{
+  "calls": 462,
+  "errors": 0,
+  "latency_p50_ms": 1.1,
+  "latency_p95_ms": 6434.6,
+  "mode": "replay",
+  "models_reported": [
+    "niva-guarded/llama3.2:3b"
+  ],
+  "probe_packs": [
+    "builtin:injection_core",
+    "builtin:injection_indic",
+    "builtin:disclosure_core",
+    "builtin:multiturn_core"
+  ],
+  "prompts": 154,
+  "recorded_latency": true,
+  "samples_per_probe": 3,
+  "source": "llm_replay.jsonl"
+}

@@ -1,0 +1,20 @@
+{
+  "category": "Privacy",
+  "check_id": "privacy.membership_inference",
+  "controls": [
+    "NIST:MEASURE-2.10",
+    "NIST:MEASURE-2.7",
+    "ISO42001:A.6.2.4",
+    "EUAIA:Art-15",
+    "INDIA:DPDP-2023"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "Not tested because the required input was not supplied.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "skipped",
+  "summary": "Skipped: membership inference needs the model's training data as reference_data; this is a predictions-only audit, so set reference_is_training: true if that is what it is",
+  "title": "Membership-inference risk"
+}

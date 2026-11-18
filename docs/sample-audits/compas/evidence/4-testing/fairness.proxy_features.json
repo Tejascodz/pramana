@@ -1,0 +1,69 @@
+{
+  "category": "Fairness",
+  "check_id": "fairness.proxy_features",
+  "controls": [
+    "NIST:MEASURE-2.11",
+    "NIST:MAP-2.3",
+    "ISO42001:A.7.4",
+    "ISO42001:A.7.6",
+    "EUAIA:Art-10",
+    "INDIA:SUTRA-FAIRNESS"
+  ],
+  "details": {
+    "flagged": [
+      {
+        "attribute": "age_cat",
+        "auc": 1.0,
+        "feature": "age"
+      },
+      {
+        "attribute": "race",
+        "auc": 0.7246,
+        "feature": "c_charge_degree"
+      }
+    ],
+    "matrix": {
+      "age": {
+        "age_cat": 1.0,
+        "race": 0.6031,
+        "sex": 0.5122
+      },
+      "c_charge_degree": {
+        "age_cat": 0.5376,
+        "race": 0.7246,
+        "sex": 0.5268
+      },
+      "juv_fel_count": {
+        "age_cat": 0.5145,
+        "race": 0.53,
+        "sex": 0.5161
+      },
+      "juv_misd_count": {
+        "age_cat": 0.5351,
+        "race": 0.5266,
+        "sex": 0.5174
+      },
+      "juv_other_count": {
+        "age_cat": 0.5656,
+        "race": 0.5273,
+        "sex": 0.5245
+      },
+      "priors_count": {
+        "age_cat": 0.6471,
+        "race": 0.6361,
+        "sex": 0.5972
+      }
+    }
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "direct_sensitive_inputs": 0,
+    "flagged_pairs": 2
+  },
+  "plain_summary": "Some inputs (e.g. 'age') closely track 'age_cat', so the model can discriminate indirectly even though that attribute is excluded.",
+  "recommendation": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them.",
+  "severity": "high",
+  "status": "fail",
+  "summary": "2 feature/attribute pairs exceed proxy AUC 0.7: age→age_cat (AUC 1.00), c_charge_degree→race (AUC 0.72).",
+  "title": "Proxy-feature screening"
+}

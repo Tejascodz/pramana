@@ -1,0 +1,21 @@
+{
+  "category": "Transparency",
+  "check_id": "explainability.feature_importance",
+  "controls": [
+    "NIST:MEASURE-2.9",
+    "NIST:MAP-2.2",
+    "ISO42001:A.6.2.7",
+    "ISO42001:A.8.2",
+    "EUAIA:Art-13",
+    "INDIA:SUTRA-UNDERSTANDABLE"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "Not tested because the required input was not supplied.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "skipped",
+  "summary": "Skipped: Feature importance needs the model",
+  "title": "Decision drivers"
+}
