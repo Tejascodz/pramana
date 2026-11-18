@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use Pramana, please cite it as below."
+title: "Pramana: an audit engine for machine-learning models, LLM applications and AI agents"
+type: software
+authors:
+  - given-names: Tejas
+    family-names: S
+version: 0.7.16
+license: MIT
+repository-code: "https://github.com/Tejascodz/pramana"
+keywords:
+  - AI audit
+  - AI assurance
+  - responsible AI
+  - fairness
+  - LLM security
+  - EU AI Act
+  - NIST AI RMF
+  - ISO/IEC 42001

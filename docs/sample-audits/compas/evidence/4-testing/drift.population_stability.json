@@ -1,0 +1,72 @@
+{
+  "category": "Monitoring",
+  "check_id": "drift.population_stability",
+  "controls": [
+    "NIST:MEASURE-2.4",
+    "NIST:MEASURE-4.3",
+    "NIST:MANAGE-4.1",
+    "NIST:MANAGE-2.2",
+    "ISO42001:A.6.2.6",
+    "EUAIA:Art-72",
+    "INDIA:SUTRA-SAFETY",
+    "ISO42005:5.12"
+  ],
+  "details": {
+    "compared_with": "production_data",
+    "features": [
+      {
+        "feature": "age",
+        "p_value": 0.00013269454814695313,
+        "psi": 0.0452,
+        "test": "ks"
+      },
+      {
+        "feature": "priors_count",
+        "p_value": 0.02827362098752719,
+        "psi": 0.0182,
+        "test": "ks"
+      },
+      {
+        "feature": "juv_misd_count",
+        "p_value": 0.09155982351951202,
+        "psi": 0.0175,
+        "test": "chi2"
+      },
+      {
+        "feature": "juv_fel_count",
+        "p_value": 0.2914041771961979,
+        "psi": 0.017,
+        "test": "chi2"
+      },
+      {
+        "feature": "juv_other_count",
+        "p_value": 0.1407584211162777,
+        "psi": 0.0114,
+        "test": "chi2"
+      },
+      {
+        "feature": "c_charge_degree",
+        "p_value": 0.1404859191571751,
+        "psi": 0.0018,
+        "test": "chi2"
+      }
+    ],
+    "score_shift": -0.0285
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "favourable_rate_current": 0.5276,
+    "favourable_rate_reference": 0.5655,
+    "features_major_drift": 0,
+    "features_moderate_drift": 0,
+    "features_unmeasured": 0,
+    "max_feature_psi": 0.0452,
+    "score_psi": 0.0156
+  },
+  "plain_summary": "Incoming data still resembles the data the model was validated on.",
+  "recommendation": "Re-validate performance and fairness on recent labelled data, review the drivers of the largest shifts, and set PSI alerts in production monitoring.",
+  "severity": "info",
+  "status": "pass",
+  "summary": "Compared reference data with production_data (1827 rows). 0 features with major drift (PSI >= 0.25), 0 moderate. Largest shifts: age (PSI 0.05), priors_count (PSI 0.02), juv_misd_count (PSI 0.02). Score PSI 0.016; favourable-decision rate moved from 56.5% to 52.8%.",
+  "title": "Data and prediction drift"
+}

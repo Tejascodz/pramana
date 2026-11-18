@@ -1,0 +1,228 @@
+{
+  "category": "Fairness",
+  "check_id": "fairness.group_parity",
+  "controls": [
+    "NIST:MEASURE-2.11",
+    "NIST:MAP-5.1",
+    "ISO42001:A.5.4",
+    "ISO42001:A.7.4",
+    "EUAIA:Art-10",
+    "INDIA:SUTRA-FAIRNESS",
+    "NIST-GAI:HARMFUL-BIAS",
+    "ISO42005:6.8.2"
+  ],
+  "details": {
+    "attributes": {
+      "age_cat": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.702085732120236,
+            "base_rate": 0.5353907134767837,
+            "favourable": 1932,
+            "fpr": 0.3820840950639854,
+            "group": "25 - 45",
+            "mean_score": 0.6501132502831256,
+            "missing_attribute": false,
+            "n": 3532,
+            "selection_rate": 0.5469988674971688,
+            "tpr": 0.6901110523532522
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.6996325974290064,
+            "base_rate": 0.679814385150812,
+            "favourable": 1008,
+            "fpr": 0.5893719806763285,
+            "group": "Greater than 45",
+            "mean_score": 0.8279969064191803,
+            "missing_attribute": false,
+            "n": 1293,
+            "selection_rate": 0.7795823665893271,
+            "tpr": 0.8691695108077361
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.641346209759305,
+            "base_rate": 0.44023756495916855,
+            "favourable": 481,
+            "fpr": 0.2718832891246684,
+            "group": "Less than 25",
+            "mean_score": 0.5161841128433555,
+            "missing_attribute": false,
+            "n": 1347,
+            "selection_rate": 0.3570898292501856,
+            "tpr": 0.4654300168634064
+          }
+        ],
+        "status": "fail",
+        "summary": {
+          "base_rate_difference": 0.2396,
+          "comparable_groups": 3,
+          "demographic_parity_difference": 0.4225,
+          "disparate_impact_ratio": 0.4581,
+          "equal_opportunity_difference": 0.4037,
+          "equalized_odds_difference": 0.4037,
+          "least_favoured": "Less than 25",
+          "missing_attribute_rows": 0,
+          "most_favoured": "Greater than 45",
+          "p_value": 3.7214807263137245e-106
+        }
+      },
+      "race": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.7042527817830293,
+            "base_rate": 0.4768503937007874,
+            "favourable": 1346,
+            "fpr": 0.2847682119205298,
+            "group": "African-American",
+            "mean_score": 0.5723149606299213,
+            "missing_attribute": false,
+            "n": 3175,
+            "selection_rate": 0.4239370078740157,
+            "tpr": 0.5766182298546896
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.8478260869565217,
+            "base_rate": 0.7419354838709677,
+            "favourable": 24,
+            "fpr": 0.375,
+            "group": "Asian",
+            "mean_score": 0.8161290322580645,
+            "missing_attribute": false,
+            "n": 31,
+            "selection_rate": 0.7741935483870968,
+            "tpr": 0.9130434782608695
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.6927625543456583,
+            "base_rate": 0.609129814550642,
+            "favourable": 1407,
+            "fpr": 0.49635036496350365,
+            "group": "Caucasian",
+            "mean_score": 0.7364717070851166,
+            "missing_attribute": false,
+            "n": 2103,
+            "selection_rate": 0.6690442225392297,
+            "tpr": 0.7798594847775175
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.6371693121693122,
+            "base_rate": 0.6286836935166994,
+            "favourable": 368,
+            "fpr": 0.582010582010582,
+            "group": "Hispanic",
+            "mean_score": 0.7616895874263262,
+            "missing_attribute": false,
+            "n": 509,
+            "selection_rate": 0.7229862475442044,
+            "tpr": 0.80625
+          },
+          {
+            "adequate_sample": false,
+            "auc": 0.85,
+            "base_rate": 0.5454545454545454,
+            "favourable": 3,
+            "fpr": 0.0,
+            "group": "Native American",
+            "mean_score": 0.45454545454545464,
+            "missing_attribute": false,
+            "n": 11,
+            "selection_rate": 0.2727272727272727,
+            "tpr": 0.5
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.7066946531153336,
+            "base_rate": 0.6384839650145773,
+            "favourable": 273,
+            "fpr": 0.6612903225806451,
+            "group": "Other",
+            "mean_score": 0.8110787172011663,
+            "missing_attribute": false,
+            "n": 343,
+            "selection_rate": 0.7959183673469388,
+            "tpr": 0.8721461187214612
+          }
+        ],
+        "status": "fail",
+        "summary": {
+          "base_rate_difference": 0.2651,
+          "comparable_groups": 5,
+          "demographic_parity_difference": 0.372,
+          "disparate_impact_ratio": 0.5326,
+          "equal_opportunity_difference": 0.3364,
+          "equalized_odds_difference": 0.3765,
+          "least_favoured": "African-American",
+          "missing_attribute_rows": 0,
+          "most_favoured": "Other",
+          "p_value": 2.1837233863790307e-39
+        }
+      },
+      "sex": {
+        "groups": [
+          {
+            "adequate_sample": true,
+            "auc": 0.6976829167540497,
+            "base_rate": 0.6485106382978724,
+            "favourable": 699,
+            "fpr": 0.4043583535108959,
+            "group": "Female",
+            "mean_score": 0.6936170212765957,
+            "missing_attribute": false,
+            "n": 1175,
+            "selection_rate": 0.5948936170212766,
+            "tpr": 0.6981627296587927
+          },
+          {
+            "adequate_sample": true,
+            "auc": 0.710987378682528,
+            "base_rate": 0.5205123073844307,
+            "favourable": 2722,
+            "fpr": 0.37938230383973287,
+            "group": "Male",
+            "mean_score": 0.649809885931559,
+            "missing_attribute": false,
+            "n": 4997,
+            "selection_rate": 0.544726836101661,
+            "tpr": 0.697039600153787
+          }
+        ],
+        "status": "pass",
+        "summary": {
+          "base_rate_difference": 0.128,
+          "comparable_groups": 2,
+          "demographic_parity_difference": 0.0502,
+          "disparate_impact_ratio": 0.9157,
+          "equal_opportunity_difference": 0.0011,
+          "equalized_odds_difference": 0.025,
+          "least_favoured": "Male",
+          "missing_attribute_rows": 0,
+          "most_favoured": "Female",
+          "p_value": 0.0018518770552517288
+        }
+      }
+    }
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "di_age_cat": 0.4581,
+    "di_race": 0.5326,
+    "di_sex": 0.9157,
+    "eodds_age_cat": 0.4037,
+    "eodds_race": 0.3765,
+    "eodds_sex": 0.025,
+    "unassessed_attributes": []
+  },
+  "plain_summary": "Applicants in the 'Less than 25' group (age_cat) receive a favourable outcome 36% of the time versus 78% for 'Greater than 45', below the four-fifths benchmark.",
+  "recommendation": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: race, age_cat.",
+  "severity": "critical",
+  "status": "fail",
+  "summary": "race: DI 0.53 (African-American vs Other, p=2.18e-39), EOdds diff 0.38 (observed outcome rates differ by 0.27 between groups, so equal error rates and calibration cannot both be met; choosing which governs is a policy decision); sex: DI 0.92 (Male vs Female, p=0.00185), EOdds diff 0.03; age_cat: DI 0.46 (Less than 25 vs Greater than 45, p=3.72e-106), EOdds diff 0.40 (observed outcome rates differ by 0.24 between groups, so equal error rates and calibration cannot both be met; choosing which governs is a policy decision). Thresholds: DI >= 0.8, equalized-odds difference <= 0.1.",
+  "title": "Group fairness"
+}

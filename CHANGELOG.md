@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.7.16 — 2026-11-18
+
+From a security and accuracy review done while rewriting the README.
+
+- **Fix: an accepted risk counted as evidence that its control works.** A control whose
+  only mapped check had failed, with that risk formally accepted, was reported as
+  *evidenced*. It is now *partial*: accepting a known gap is a decision, not evidence.
+- **Security: browser mode keeps Chromium's sandbox on.** Playwright starts Chromium with
+  its sandbox off by default; the pages Pramana opens may be hostile, so the sandbox is
+  now on, with a clear error where it cannot start. `llm.browser_sandbox: false` turns it
+  off for trusted sites (needed when running as root).
+- **Security: the viewer escaped all pack text but used a pack's severity value inside an
+  HTML class attribute.** Only known values are accepted now, so a hostile pack cannot
+  inject markup there.
+- New sample packs: `compas` (ProPublica's COMPAS data; aggregate results only) and
+  `llama32_3b_guarded_rescored` (the recorded live run, re-scored with the current rules
+  by `scripts/rescore_live_run.py`).
+- `scripts/make_figures.py` draws the README charts from the committed packs, and
+  `scripts/screenshot_viewer.py` regenerates the viewer screenshot.
+- The README is rewritten to describe the current version only, with every number taken
+  from a committed audit pack.
+
 ## 0.7.15 — 2026-11-06
 
 From testing on a system its authors did not build, and from an independent review run

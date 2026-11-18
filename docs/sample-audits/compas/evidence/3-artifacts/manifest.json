@@ -1,0 +1,20 @@
+{
+  "artifacts": [
+    {
+      "artifact": "evaluation_data",
+      "file": "compas_all.csv",
+      "sha256": "fb233457a289a80829bf5262e50300da795acccd0f1d16d6cb47e4bd6e47b19d"
+    },
+    {
+      "artifact": "reference_data",
+      "file": "compas_2013.csv",
+      "sha256": "1805de66b1db1eeb06434775aa6c608fb2ca78ca48a01121bc478b087ac410a8"
+    },
+    {
+      "artifact": "production_data",
+      "file": "compas_2014.csv",
+      "sha256": "fadad944b3f2a789cae5480dd383cd79e50b1a5eb0d9de14e4b6598eae069b00"
+    }
+  ],
+  "manual_evidence": []
+}

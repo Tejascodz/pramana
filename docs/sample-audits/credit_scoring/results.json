@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-A2FEC2",
+  "audit_id": "PRM-20261021-F1F2BA",
   "tool": {
     "name": "pramana",
-    "version": "0.7.15"
+    "version": "0.7.16"
   },
   "system": {
     "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
@@ -31,8 +31,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-11-06T21:39:40+00:00",
-  "finished": "2026-11-06T21:39:43+00:00",
+  "started": "2026-11-18T13:50:27+00:00",
+  "finished": "2026-11-18T13:50:31+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -3249,7 +3249,7 @@
         "group": "A.4 Resources",
         "title": "Data resources",
         "evidence_type": "both",
-        "state": "evidenced",
+        "state": "partial",
         "checks": [
           "data_quality.integrity"
         ],
@@ -4331,7 +4331,7 @@
         "group": "6 Assessment content",
         "title": "Data information and quality",
         "evidence_type": "technical",
-        "state": "evidenced",
+        "state": "partial",
         "checks": [
           "data_quality.integrity"
         ],
@@ -4461,8 +4461,8 @@
         "source": "https://www.iso.org/standard/81230.html",
         "group_label": "Objective",
         "totals": {
-          "evidenced": 3,
-          "partial": 2,
+          "evidenced": 2,
+          "partial": 3,
           "deficient": 10,
           "not tested": 23,
           "not applicable": 0
@@ -4483,8 +4483,8 @@
             "not applicable": 0
           },
           "A.4 Resources": {
-            "evidenced": 1,
-            "partial": 0,
+            "evidenced": 0,
+            "partial": 1,
             "deficient": 0,
             "not tested": 4,
             "not applicable": 0
@@ -4690,8 +4690,8 @@
         "source": "https://www.iso.org/standard/42005",
         "group_label": "Clause",
         "totals": {
-          "evidenced": 5,
-          "partial": 2,
+          "evidenced": 4,
+          "partial": 3,
           "deficient": 6,
           "not tested": 2,
           "not applicable": 0
@@ -4705,8 +4705,8 @@
             "not applicable": 0
           },
           "6 Assessment content": {
-            "evidenced": 1,
-            "partial": 1,
+            "evidenced": 0,
+            "partial": 2,
             "deficient": 4,
             "not tested": 1,
             "not applicable": 0
@@ -4965,9 +4965,9 @@
     }
   ],
   "llm_run": {},
-  "ledger_root": "dcdc444f7ecac5bd3280453e6e5e6f98638669eee6382c9f49f0d12b8383bfdc",
+  "ledger_root": "17aa54a746ca5a90f437cedfb56a1373bb5050b424353f4eb4aefa393e7dc2d9",
   "environment": {
     "python": "3.13.18",
-    "pramana": "0.7.15"
+    "pramana": "0.7.16"
   }
 }

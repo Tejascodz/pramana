@@ -27,8 +27,8 @@ jobs:
         run: pip install -e ".[dev]"
       - name: Lint and format
         run: |
-          ruff check src tests dashboard examples
-          ruff format --check src tests dashboard examples
+          ruff check src tests dashboard examples scripts
+          ruff format --check src tests dashboard examples scripts
       - name: Unit and end-to-end tests
         run: pytest
 

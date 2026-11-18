@@ -192,9 +192,15 @@ def compute_coverage(
         else:
             checks = [c for c in library.checks_for_control(ref) if c in by_check]
             statuses = {by_check[c].status for c in checks if c not in accepted_checks}
+            # An accepted risk is a decision to live with a known gap, not evidence that the
+            # control works: a control whose only problem is accepted is partial, never evidenced.
+            accepted_gap = any(
+                c in accepted_checks and by_check[c].status in (Status.FAIL, Status.WARN)
+                for c in checks
+            )
             if Status.FAIL in statuses:
                 state = "deficient"
-            elif Status.WARN in statuses:
+            elif Status.WARN in statuses or accepted_gap:
                 state = "partial"
             elif checks or manual_by_ref.get(ref):
                 state = "evidenced"

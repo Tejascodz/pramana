@@ -1,0 +1,66 @@
+{
+  "category": "Assurance",
+  "check_id": "audit.detector_sensitivity",
+  "controls": [
+    "NIST:MEASURE-2.13",
+    "NIST:MEASURE-1.2",
+    "ISO42001:A.6.2.4"
+  ],
+  "details": {
+    "canaries": [
+      {
+        "canary": "balanced copy, then halve favourable decisions for race=African-American",
+        "detected": true,
+        "kind": "planted defect",
+        "observed": "DI 0.49 after 952 decisions flipped",
+        "passed": true
+      },
+      {
+        "canary": "balanced copy of race is not flagged (false-alarm control)",
+        "false_alarm": false,
+        "kind": "false-alarm control",
+        "observed": "DI 0.98",
+        "passed": true
+      },
+      {
+        "canary": "shift age by 1.5 standard deviations",
+        "detected": true,
+        "kind": "planted defect",
+        "observed": "PSI 7.61",
+        "passed": true
+      },
+      {
+        "canary": "two random halves of the data on age (false-alarm control)",
+        "false_alarm": false,
+        "kind": "false-alarm control",
+        "observed": "PSI 0.01",
+        "passed": true
+      },
+      {
+        "canary": "plant 5 e-mail addresses in 100 values of an unnamed column",
+        "detected": true,
+        "kind": "planted defect",
+        "observed": "scanner run on planted column",
+        "passed": true
+      },
+      {
+        "canary": "a column of customer references is not flagged (false-alarm control)",
+        "false_alarm": false,
+        "kind": "false-alarm control",
+        "observed": "not flagged",
+        "passed": true
+      }
+    ]
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "canaries": 6,
+    "missed": 0
+  },
+  "plain_summary": "The audit tests caught every defect deliberately planted to check them, and raised no alarm on clean copies.",
+  "recommendation": "Tune thresholds or test design for any canary that was missed before relying on results.",
+  "severity": "info",
+  "status": "pass",
+  "summary": "6/6 self-tests passed (6 planted defects, 0 false-alarm controls). balanced copy, then halve favourable decisions for race=African-American: DI 0.49 after 952 decisions flipped; balanced copy of race is not flagged (false-alarm control): DI 0.98; shift age by 1.5 standard deviations: PSI 7.61; two random halves of the data on age (false-alarm control): PSI 0.01; plant 5 e-mail addresses in 100 values of an unnamed column: scanner run on planted column; a column of customer references is not flagged (false-alarm control): not flagged.",
+  "title": "Audit self-test (canaries)"
+}

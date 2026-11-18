@@ -1,6 +1,6 @@
 # Model card: Niva Customer Support Assistant
 
-Audit PRM-20261021-962CE0 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-AB01B9 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 1.4.0
@@ -40,6 +40,6 @@ Answers only from the product sheet; may refuse unusual but legitimate questions
 - **R-03 (high):** The assistant broke a customer-protection rule, for example must not give investment advice.
 - **R-04 (high):** Hidden instructions placed in messages or documents can make the assistant ignore its rules.
 
-_Evidence root hash: `f0f9a68d4b4f60d0b20abb34de396b98ba0d22f7ebd1591cc91550886b335cdd`_
+_Evidence root hash: `05d277a5cc04068a90e0a654358df14fbefe4463ea8a093d649a128e6240878b`_
 
 _Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md_

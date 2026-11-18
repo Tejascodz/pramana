@@ -450,3 +450,14 @@ def test_access_control_catches_an_app_that_trusts_a_caller_set_identity(tmp_pat
 def test_access_control_passes_when_identity_must_be_signed(tmp_path, monkeypatch):
     check = _audit_niva_access(tmp_path, monkeypatch, "guarded")
     assert check.status.value == "pass", check.summary
+
+
+def test_dashboard_chip_classes_cannot_be_injected_from_a_pack():
+    pytest.importorskip("streamlit")
+    sys.path.insert(0, str(ROOT / "dashboard"))
+    import app
+
+    hostile = app.chip("high", '"><img src=x onerror=alert(1)>')
+    assert "<img" not in hostile and "onerror" not in hostile
+    assert 'class="pv-chip pv-info"' in hostile
+    assert "&lt;img" in app.chip("<img src=x>", "high")

@@ -41,11 +41,18 @@ _RUNTIME: dict[str, Any] = {}
 _RUNTIME_LOCK = threading.Lock()
 
 
-def _shared_browser(headless: bool) -> Any:
+SANDBOX_HINT = (
+    "Chromium could not start with its sandbox, which isolates the pages it opens from this "
+    "computer. This happens when running as root or in some containers. Run as a normal user, "
+    "or set llm.browser_sandbox: false only for sites you trust"
+)
+
+
+def _shared_browser(headless: bool, sandbox: bool = True) -> Any:
     """One Playwright and one Chromium per process: Playwright allows a single sync instance
     per thread, so every client shares them and keeps its own isolated context."""
     with _RUNTIME_LOCK:
-        key = "headless" if headless else "headed"
+        key = f"{'headless' if headless else 'headed'}-{'sandbox' if sandbox else 'nosandbox'}"
         if key not in _RUNTIME:
             try:
                 from playwright.sync_api import sync_playwright
@@ -55,23 +62,31 @@ def _shared_browser(headless: bool) -> Any:
                 _RUNTIME["playwright"] = sync_playwright().start()
                 atexit.register(_shutdown)
             executable = os.environ.get("PRAMANA_CHROMIUM")  # a Chromium already installed
-            _RUNTIME[key] = _RUNTIME["playwright"].chromium.launch(
-                headless=headless, **({"executable_path": executable} if executable else {})
-            )
+            # The pages under audit may be hostile, so Chromium's own sandbox stays on unless the
+            # user turns it off explicitly (Playwright disables it by default).
+            try:
+                _RUNTIME[key] = _RUNTIME["playwright"].chromium.launch(
+                    headless=headless,
+                    chromium_sandbox=sandbox,
+                    **({"executable_path": executable} if executable else {}),
+                )
+            except Exception as exc:
+                if sandbox and "sandbox" in str(exc).lower():
+                    raise RuntimeError(SANDBOX_HINT) from exc
+                raise
         return _RUNTIME[key]
 
 
 def _shutdown() -> None:
-    for key in ("headless", "headed"):
+    for key in [k for k in _RUNTIME if k != "playwright"]:
         try:
-            if key in _RUNTIME:
-                _RUNTIME.pop(key).close()
-        except Exception:  # noqa: BLE001,S110 - best effort at exit
+            _RUNTIME.pop(key).close()
+        except Exception:  # noqa: BLE001,S110  # nosec B110 - best effort at exit
             pass
     if "playwright" in _RUNTIME:
         try:
             _RUNTIME.pop("playwright").stop()
-        except Exception:  # noqa: BLE001,S110
+        except Exception:  # noqa: BLE001,S110  # nosec B110 - best effort at exit
             pass
 
 
@@ -89,6 +104,7 @@ class BrowserChatClient:
         timeout: float = 60.0,
         settle_ms: int = 1200,
         headless: bool = True,
+        sandbox: bool = True,
         **_: Any,
     ):
         check_endpoint(url, sends_credentials=False)
@@ -99,6 +115,7 @@ class BrowserChatClient:
         self.timeout = float(timeout)
         self.settle_ms = int(settle_ms)
         self.headless = bool(headless)
+        self.sandbox = bool(sandbox)
         self._lock = threading.Lock()
         self._browser = self._context = self._page = None
         self._history: list[dict[str, str]] | None = None
@@ -108,14 +125,14 @@ class BrowserChatClient:
 
     def _start(self) -> None:
         if self._browser is None:
-            self._browser = _shared_browser(self.headless)
+            self._browser = _shared_browser(self.headless, self.sandbox)
 
     def close(self) -> None:
         """Close this client's page; the shared browser closes when the process exits."""
         try:
             if self._context is not None:
                 self._context.close()
-        except Exception:  # noqa: BLE001,S110 - the browser may already be gone
+        except Exception:  # noqa: BLE001,S110  # nosec B110 - the browser may already be gone
             pass
         self._context = self._page = None
         self._history = None

@@ -10,7 +10,8 @@
   "probe_packs": [
     "builtin:injection_core",
     "builtin:injection_indic",
-    "builtin:disclosure_core"
+    "builtin:disclosure_core",
+    "builtin:multiturn_core"
   ],
   "prompts": 43,
   "recorded_latency": true,

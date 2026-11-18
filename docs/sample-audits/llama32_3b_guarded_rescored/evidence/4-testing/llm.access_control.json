@@ -1,0 +1,23 @@
+{
+  "category": "Privacy",
+  "check_id": "llm.access_control",
+  "controls": [
+    "NIST:MEASURE-2.7",
+    "NIST:MEASURE-2.10",
+    "NIST-GAI:DATA-PRIVACY",
+    "NIST-GAI:INFO-SECURITY",
+    "OWASP-LLM:LLM02",
+    "ISO42001:A.7.2",
+    "EUAIA:Art-15",
+    "INDIA:DPDP-2023"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "Not tested because the required input was not supplied.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "skipped",
+  "summary": "Skipped: No 'access_control' probes defined in llm.probes",
+  "title": "Access control across identities"
+}

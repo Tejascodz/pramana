@@ -56,6 +56,12 @@ Ollama applies its own origin and host checks; keep them by leaving
   misbehaving server cannot exhaust memory.
 - **Evidence names the endpoint by scheme, host and port only.** No paths, query
   strings or tokens.
+- **Browser mode keeps Chromium's sandbox on.** The pages it opens may be hostile, so
+  they stay isolated from your computer; `llm.browser_sandbox: false` turns the sandbox
+  off and is meant only for sites you trust (it is needed when running as root). Each
+  conversation runs in a fresh browser context, and downloads are refused.
+- **Access-control probe headers are sent as written.** They are never expanded from the
+  environment, so a probe file cannot copy your secrets into a request.
 
 ## What it stores
 

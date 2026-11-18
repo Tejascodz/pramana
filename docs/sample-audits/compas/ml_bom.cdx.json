@@ -1,0 +1,223 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.7",
+  "serialNumber": "urn:uuid:3c38d0a3-2349-5773-b3d0-e3731b050ff9",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-11-18T13:59:00+00:00",
+    "tools": {
+      "components": [
+        {
+          "type": "application",
+          "name": "pramana",
+          "version": "0.7.16"
+        }
+      ]
+    },
+    "component": {
+      "type": "machine-learning-model",
+      "bom-ref": "audited-system",
+      "name": "COMPAS recidivism risk scores (Broward County, Florida)",
+      "version": "2013-2014",
+      "description": "Commercial risk assessment that gives each defendant a decile score from 1 (lowest risk) to 10. ProPublica obtained the scores given in Broward County in 2013 and 2014 and matched them with criminal records over the next two years. This audit treats a decile of 1 to 4 as a low-risk (favourable) decision, as ProPublica did.",
+      "modelCard": {
+        "modelParameters": {
+          "approach": {
+            "type": "supervised"
+          },
+          "task": "binary classification"
+        },
+        "quantitativeAnalysis": {
+          "performanceMetrics": [
+            {
+              "type": "AUC",
+              "value": "0.7098",
+              "confidenceInterval": {
+                "lowerBound": "0.6986",
+                "upperBound": "0.7223"
+              }
+            },
+            {
+              "type": "accuracy",
+              "value": "0.6607"
+            },
+            {
+              "type": "precision",
+              "value": "0.6855"
+            },
+            {
+              "type": "recall",
+              "value": "0.6973"
+            },
+            {
+              "type": "F1",
+              "value": "0.6913"
+            },
+            {
+              "type": "expected calibration error",
+              "value": "0.1342"
+            },
+            {
+              "type": "expected calibration error (equal-mass bins)",
+              "value": "0.132"
+            },
+            {
+              "type": "Brier score",
+              "value": "0.2381"
+            },
+            {
+              "type": "disparate impact ratio",
+              "value": "0.5326",
+              "slice": "race"
+            },
+            {
+              "type": "disparate impact ratio",
+              "value": "0.9157",
+              "slice": "sex"
+            },
+            {
+              "type": "disparate impact ratio",
+              "value": "0.4581",
+              "slice": "age_cat"
+            }
+          ]
+        },
+        "considerations": {
+          "useCases": [
+            "Assess the risk that a defendant will reoffend, to inform pre-trial decisions."
+          ],
+          "users": [
+            "Defendants awaiting trial"
+          ],
+          "ethicalConsiderations": [
+            {
+              "name": "R-01: Group fairness",
+              "mitigationStrategy": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: race, age_cat."
+            },
+            {
+              "name": "R-02: Intersectional fairness",
+              "mitigationStrategy": "Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup tolerance. Collect more data for subgroups below the minimum sample size."
+            },
+            {
+              "name": "R-03: Proxy-feature screening",
+              "mitigationStrategy": "For each flagged feature, document a business justification, test model variants without it, and compare fairness and performance. Remove protected attributes from inputs unless a documented legal basis allows them."
+            },
+            {
+              "name": "R-04: Calibration",
+              "mitigationStrategy": "Apply isotonic or Platt calibration on a held-out set and re-check per group."
+            },
+            {
+              "name": "R-05: Predictive performance",
+              "mitigationStrategy": "Track AUC in production monitoring with an alert at the declared minimum."
+            },
+            {
+              "name": "R-06: Risk classification",
+              "mitigationStrategy": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation."
+            }
+          ],
+          "fairnessAssessments": [
+            {
+              "groupAtRisk": "race=African-American",
+              "harms": "Favourable-outcome rate 0.53 times that of race=Other",
+              "mitigationStrategy": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: race, age_cat."
+            },
+            {
+              "groupAtRisk": "age_cat=Less than 25",
+              "harms": "Favourable-outcome rate 0.46 times that of age_cat=Greater than 45",
+              "mitigationStrategy": "Investigate the drivers of the gap (see proxy-feature results), consider reweighing or threshold adjustment, and document a fairness rationale approved by the risk owner. Attributes needing action: race, age_cat."
+            }
+          ]
+        }
+      },
+      "properties": [
+        {
+          "name": "pramana:audit_id",
+          "value": "PRM-20261021-42DAFC"
+        },
+        {
+          "name": "pramana:audit_date",
+          "value": "2026-10-21"
+        },
+        {
+          "name": "pramana:owner",
+          "value": "Northpointe (now equivant); scores as published by ProPublica"
+        },
+        {
+          "name": "pramana:gate_decision",
+          "value": "BLOCK"
+        },
+        {
+          "name": "pramana:opinion",
+          "value": "Ineffective"
+        },
+        {
+          "name": "pramana:eu_ai_act_tier",
+          "value": "high"
+        }
+      ]
+    }
+  },
+  "components": [
+    {
+      "bom-ref": "artifact-evaluation_data",
+      "name": "compas_all.csv",
+      "type": "data",
+      "data": [
+        {
+          "type": "dataset",
+          "name": "evaluation_data"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fb233457a289a80829bf5262e50300da795acccd0f1d16d6cb47e4bd6e47b19d"
+        }
+      ]
+    },
+    {
+      "bom-ref": "artifact-reference_data",
+      "name": "compas_2013.csv",
+      "type": "data",
+      "data": [
+        {
+          "type": "dataset",
+          "name": "reference_data"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "1805de66b1db1eeb06434775aa6c608fb2ca78ca48a01121bc478b087ac410a8"
+        }
+      ]
+    },
+    {
+      "bom-ref": "artifact-production_data",
+      "name": "compas_2014.csv",
+      "type": "data",
+      "data": [
+        {
+          "type": "dataset",
+          "name": "production_data"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fadad944b3f2a789cae5480dd383cd79e50b1a5eb0d9de14e4b6598eae069b00"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "audited-system",
+      "dependsOn": [
+        "artifact-evaluation_data",
+        "artifact-reference_data",
+        "artifact-production_data"
+      ]
+    }
+  ]
+}

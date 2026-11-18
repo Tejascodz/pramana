@@ -11,8 +11,14 @@
       "R-03",
       "R-04"
     ],
+    "checks_run": 7,
     "decision": "BLOCK",
-    "incomplete_checks": []
+    "incomplete_checks": [],
+    "not_run": [
+      "llm.multi_turn",
+      "llm.obfuscation",
+      "llm.access_control"
+    ]
   },
   "opinion": {
     "rating": "Ineffective",

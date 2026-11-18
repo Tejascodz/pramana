@@ -1,0 +1,48 @@
+{
+  "category": "Governance",
+  "check_id": "governance.risk_classification",
+  "controls": [
+    "NIST:MAP-1.1",
+    "NIST:MAP-3.3",
+    "NIST:MAP-1.5",
+    "NIST:GOVERN-1.1",
+    "ISO42001:A.9.4",
+    "ISO42001:A.5.2",
+    "EUAIA:Art-5",
+    "EUAIA:Art-6",
+    "INDIA:PILLAR-RISK-MITIGATION",
+    "ISO42005:5.4",
+    "ISO42005:5.5",
+    "ISO42005:6.3.4"
+  ],
+  "details": {
+    "eu_applicable": false,
+    "eu_basis": [
+      "Art. 6(2) and Annex III point 6: Law enforcement"
+    ],
+    "eu_tier": "high",
+    "india_factors": [
+      "affects access to essential services, livelihood or rights (+3)",
+      "processes personal data under the DPDP Act (+1)",
+      "affects vulnerable groups (+2)",
+      "outcomes are hard to contest or reverse (+1)"
+    ],
+    "india_score": 7,
+    "india_sensitivity": "high",
+    "obligations": [],
+    "sector_notes": []
+  },
+  "evidence_hash": null,
+  "metrics": {
+    "declared_eu_tier": null,
+    "eu_tier": "high",
+    "india_sensitivity": "high",
+    "upcoming_obligations": 0
+  },
+  "plain_summary": "This is a high-risk AI use under the EU AI Act, with strict duties on testing, documentation and human oversight.",
+  "recommendation": "Record the classification and its basis in the AI inventory, have the accountable executive sign it off, and plan for each upcoming obligation.",
+  "severity": "low",
+  "status": "warn",
+  "summary": "EU AI Act tier: high (Art. 6(2) and Annex III point 6: Law enforcement); the Act is used as a benchmark (no EU deployment declared). India context sensitivity: high (score 7/10), shown as a benchmark (India is not a declared deployment region). No risk tier was declared by the system owner. 0 upcoming regulatory milestone(s) apply.",
+  "title": "Risk classification"
+}

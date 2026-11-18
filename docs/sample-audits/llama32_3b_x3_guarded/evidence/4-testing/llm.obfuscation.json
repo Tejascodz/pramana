@@ -1,0 +1,20 @@
+{
+  "category": "Security",
+  "check_id": "llm.obfuscation",
+  "controls": [
+    "NIST:MEASURE-2.7",
+    "NIST-GAI:INFO-SECURITY",
+    "OWASP-LLM:LLM01",
+    "ISO42001:A.6.2.4",
+    "EUAIA:Art-15"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "Not tested because the required input was not supplied.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "skipped",
+  "summary": "Skipped: set llm.mutations (for example 'all') to re-send each attack in obfuscated forms",
+  "title": "Obfuscated-attack resistance"
+}

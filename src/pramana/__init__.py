@@ -1,6 +1,6 @@
 """Pramana: AI Assurance & Evidence Engine."""
 
-__version__ = "0.7.15"
+__version__ = "0.7.16"
 
 __all__ = ["NOTICE", "__version__"]
 
