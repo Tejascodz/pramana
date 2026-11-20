@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import difflib
 import hashlib
+import math
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -10,7 +12,7 @@ from typing import Any
 
 import yaml
 
-from pramana.safeio import InputTooLarge, load_yaml
+from pramana.safeio import DuplicateKeyError, InputTooLarge, load_yaml
 
 _SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
 
@@ -40,6 +42,43 @@ DEFAULT_THRESHOLDS: dict[str, float] = {
     # Judged samples an attack-rate check needs before "no failure seen" counts as a pass.
     "llm_min_samples": 5,
 }
+
+
+#: (kind, lowest allowed, highest allowed) for every threshold. "rate" values are
+#: fractions between 0 and 1; "count" values are whole numbers of at least 1.
+_UNIT = ("number", 0.0, 1.0)
+THRESHOLD_RULES: dict[str, tuple[str, float, float]] = {
+    "min_auc": _UNIT,
+    "disparate_impact_min": _UNIT,
+    "equalized_odds_max": _UNIT,
+    "min_group_size": ("count", 1, math.inf),
+    "proxy_auc_max": _UNIT,
+    "noise_flip_rate_max": _UNIT,
+    "ece_max": _UNIT,
+    "psi_warn": ("number", 0.0, math.inf),
+    "psi_fail": ("number", 0.0, math.inf),
+    "mia_auc_max": _UNIT,
+    "missing_rate_max": _UNIT,
+    "duplicate_rate_max": _UNIT,
+    "leakage_auc_max": _UNIT,
+    "model_card_min_completeness": _UNIT,
+    "llm_attack_success_max": _UNIT,
+    "llm_groundedness_min": _UNIT,
+    "agent_auditability_min": _UNIT,
+    "agent_reasoning_coverage_min": _UNIT,
+    "llm_latency_p95_max_ms": ("number", 0.0, math.inf),
+    "llm_max_output_chars": ("count", 1, math.inf),
+    "llm_min_samples": ("count", 1, math.inf),
+}
+
+#: Options each check accepts under ``checks.options``, with the type each must have.
+CHECK_OPTIONS: dict[str, dict[str, type]] = {
+    "privacy.pii_exposure": {"allowed_columns": list},
+    "fairness.proxy_features": {"allow_sensitive_inputs": bool},
+    "robustness.perturbation": {"monotone_increasing": list, "monotone_decreasing": list},
+}
+GATE_KEYS = {"block_on", "required_checks", "allow_incomplete"}
+CHECKS_KEYS = {"include", "exclude", "options"}
 
 
 class SpecError(ValueError):
@@ -140,17 +179,19 @@ class AuditSpec:
         return self.artifacts.get(key)
 
     def threshold(self, key: str) -> float:
-        return float(self.thresholds.get(key, DEFAULT_THRESHOLDS[key]))
+        value = self.thresholds.get(key, DEFAULT_THRESHOLDS[key])
+        # load_spec validates every threshold; this also guards one set in code later.
+        return _valid_threshold(key, value)
 
     def check_enabled(self, check_id: str) -> bool:
         include = self.checks.get("include")
-        exclude = set(self.checks.get("exclude", []))
+        exclude = set(self.checks.get("exclude") or [])
         if check_id in exclude:
             return False
         return include is None or check_id in include
 
     def check_options(self, check_id: str) -> dict[str, Any]:
-        return dict(self.checks.get("options", {}).get(check_id, {}))
+        return dict((self.checks.get("options") or {}).get(check_id) or {})
 
 
 def _resolve(base: Path, value: str | None) -> Path | None:
@@ -160,6 +201,117 @@ def _resolve(base: Path, value: str | None) -> Path | None:
     return path if path.is_absolute() else (base / path)
 
 
+def _hint(value: str, options) -> str:
+    close = difflib.get_close_matches(value, sorted(options), n=1)
+    return f" Did you mean '{close[0]}'?" if close else ""
+
+
+def _valid_threshold(key: str, value: Any) -> float:
+    """``value`` as a float if it is allowed for threshold ``key``; else SpecError.
+
+    A threshold decides PASS or FAIL, so anything that could make a comparison
+    meaningless is refused: NaN (every comparison with it is false, so a check would
+    pass whatever it measured), infinities, values outside the threshold's range,
+    booleans, text, null, and fractions where a count is needed.
+    """
+    kind, low, high = THRESHOLD_RULES[key]
+    where = f"thresholds.{key}"
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        raise SpecError(f"{where} must be a number, not {value!r}")
+    if not math.isfinite(value):
+        raise SpecError(f"{where} must be a finite number, not {value!r}")
+    if kind == "count" and value != int(value):
+        raise SpecError(f"{where} must be a whole number, not {value!r}")
+    if not low <= value <= high:
+        upper = "" if math.isinf(high) else f" and at most {high:g}"
+        raise SpecError(f"{where} must be at least {low:g}{upper}, not {value!r}")
+    return float(value)
+
+
+def _check_thresholds(raw: Any) -> dict[str, float]:
+    if raw is None:
+        return dict(DEFAULT_THRESHOLDS)
+    if not isinstance(raw, dict):
+        raise SpecError("thresholds must be a mapping of threshold names to numbers")
+    unknown = sorted(set(map(str, raw)) - set(THRESHOLD_RULES))
+    if unknown:
+        raise SpecError(
+            f"thresholds.{unknown[0]} is not a Pramana threshold.{_hint(unknown[0], THRESHOLD_RULES)}"
+            f" Known: {', '.join(sorted(THRESHOLD_RULES))}"
+        )
+    thresholds = dict(DEFAULT_THRESHOLDS)
+    for key, value in raw.items():
+        _valid_threshold(key, value)
+        thresholds[key] = int(value) if THRESHOLD_RULES[key][0] == "count" else float(value)
+    if thresholds["psi_warn"] > thresholds["psi_fail"]:
+        raise SpecError("thresholds.psi_warn must not be above thresholds.psi_fail")
+    return thresholds
+
+
+def _check_ids(where: str, value: Any, known: set[str]) -> list[str]:
+    if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
+        raise SpecError(f"{where} must be a list of check ids, e.g. [fairness.group_parity]")
+    unknown = [v for v in value if v not in known]
+    if unknown:
+        raise SpecError(
+            f"{where}: '{unknown[0]}' is not a Pramana check.{_hint(unknown[0], known)} "
+            "`pramana checks` lists them"
+        )
+    return list(value)
+
+
+def _check_checks(raw: Any) -> dict[str, Any]:
+    """The ``checks`` section: which checks run and their options. A typo here would
+    silently drop a check from the audit, so every id and option is validated."""
+    from pramana.registry import all_checks
+
+    if raw is None:
+        return {}
+    if not isinstance(raw, dict):
+        raise SpecError("checks must be a mapping with include, exclude and options")
+    extra = sorted(set(map(str, raw)) - CHECKS_KEYS)
+    if extra:
+        raise SpecError(f"checks.{extra[0]} is not a setting; use include, exclude or options")
+    known = {d.check_id for d in all_checks()}
+    checks: dict[str, Any] = {}
+    if raw.get("include") is not None:
+        checks["include"] = _check_ids("checks.include", raw["include"], known)
+        if not checks["include"]:
+            raise SpecError("checks.include is empty, so no check would run; remove it to run all")
+    if raw.get("exclude") is not None:
+        checks["exclude"] = _check_ids("checks.exclude", raw["exclude"], known)
+    options = raw.get("options")
+    if options is not None:
+        if not isinstance(options, dict):
+            raise SpecError("checks.options must map check ids to their options")
+        checks["options"] = {}
+        for check_id, opts in options.items():
+            if check_id not in known:
+                raise SpecError(
+                    f"checks.options: '{check_id}' is not a Pramana check.{_hint(str(check_id), known)}"
+                )
+            allowed = CHECK_OPTIONS.get(check_id, {})
+            if not isinstance(opts, dict):
+                raise SpecError(f"checks.options.{check_id} must be a mapping of options")
+            for name, value in opts.items():
+                if name not in allowed:
+                    accepted = ", ".join(sorted(allowed)) or "no options"
+                    raise SpecError(
+                        f"checks.options.{check_id}.{name} is not an option of that check "
+                        f"(it accepts {accepted})"
+                    )
+                kind = allowed[name]
+                if kind is list:
+                    if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
+                        raise SpecError(
+                            f"checks.options.{check_id}.{name} must be a list of column names"
+                        )
+                elif not isinstance(value, kind):
+                    raise SpecError(f"checks.options.{check_id}.{name} must be true or false")
+            checks["options"][check_id] = dict(opts)
+    return checks
+
+
 def _check_use_case(use_case: Any) -> None:
     """Unknown domains and prohibited-practice flags are refused, not ignored.
 
@@ -167,16 +319,11 @@ def _check_use_case(use_case: Any) -> None:
     Annex III area, so a credit model would be classed as minimal risk, and an
     unknown Art. 5 flag would let a prohibited practice through.
     """
-    import difflib
-
     from pramana.risk.classification import KNOWN_DOMAINS, PROHIBITED
 
     if not isinstance(use_case, dict):
         raise SpecError("use_case must be a mapping")
-
-    def hint(value: str, options: set[str]) -> str:
-        close = difflib.get_close_matches(value, sorted(options), n=1)
-        return f" Did you mean '{close[0]}'?" if close else ""
+    hint = _hint
 
     domain = use_case.get("domain", "other")
     if domain not in KNOWN_DOMAINS:
@@ -230,15 +377,30 @@ def _check_gate(gate: Any) -> None:
 
     if not isinstance(gate, dict):
         raise SpecError("gate must be a mapping")
+    extra = sorted(set(map(str, gate)) - GATE_KEYS)
+    if extra:
+        raise SpecError(
+            f"gate.{extra[0]} is not a gate setting.{_hint(extra[0], GATE_KEYS)} "
+            f"Known: {', '.join(sorted(GATE_KEYS))}"
+        )
     severities = {"critical", "high", "medium", "low", "info"}
     block_on = gate.get("block_on", ["critical", "high"])
-    if not isinstance(block_on, list) or not set(map(str, block_on)) <= severities:
+    if not isinstance(block_on, list) or not all(
+        isinstance(s, str) and s in severities for s in block_on
+    ):
         raise SpecError(f"gate.block_on must be a list of: {', '.join(sorted(severities))}")
+    if not block_on:
+        raise SpecError(
+            "gate.block_on is empty, so no risk would ever block a release. List the ratings "
+            "that should block (the default is [critical, high])."
+        )
     known = {d.check_id for d in all_checks()}
     required = gate.get("required_checks", [])
     if not isinstance(required, list):
         raise SpecError("gate.required_checks must be a list of check ids")
-    unknown = sorted(set(map(str, required)) - known)
+    if not all(isinstance(c, str) for c in required):
+        raise SpecError("gate.required_checks must be a list of check ids")
+    unknown = sorted(set(required) - known)
     if unknown:
         raise SpecError(
             f"gate.required_checks: unknown check(s) {', '.join(unknown)}; "
@@ -280,6 +442,10 @@ def load_spec(path: str | Path) -> AuditSpec:
         raw = load_yaml(spec_path) or {}
     except InputTooLarge as exc:
         raise SpecError(str(exc)) from exc
+    except DuplicateKeyError as exc:
+        raise SpecError(
+            f"Spec repeats a key, so one value would silently replace the other: {exc}"
+        ) from exc
     except yaml.YAMLError as exc:
         raise SpecError(f"Spec is not valid YAML: {exc}") from exc
     if not isinstance(raw, dict):
@@ -289,8 +455,16 @@ def load_spec(path: str | Path) -> AuditSpec:
         if key not in raw:
             raise SpecError(f"Spec is missing the '{key}' section")
     _check_use_case(raw["use_case"])
-    _check_gate(raw.get("gate") or {})
+    # Only a missing or empty section means "defaults": "gate: []" or "gate: no" is an error.
+    for section in ("gate", "checks", "thresholds", "llm", "agent", "governance", "artifacts"):
+        if raw.get(section) is not None and not isinstance(raw[section], dict):
+            raise SpecError(f"{section} must be a mapping, not {type(raw[section]).__name__}")
+    gate = dict(raw.get("gate") or {})
+    _check_gate(gate)
+    checks = _check_checks(raw.get("checks"))
     system = raw["system"]
+    if not isinstance(system, dict):
+        raise SpecError("system must be a mapping")
     for key in ("name", "version", "type", "owner"):
         if key not in system:
             raise SpecError(f"system.{key} is required")
@@ -327,10 +501,25 @@ def load_spec(path: str | Path) -> AuditSpec:
             raise SpecError(f"artifacts_sha256.{key} must be a 64-character hex SHA-256")
         pins[key] = digest
 
-    thresholds = dict(DEFAULT_THRESHOLDS)
-    thresholds.update(raw.get("thresholds") or {})
+    thresholds = _check_thresholds(raw.get("thresholds"))
+    decision_threshold = raw.get("decision_threshold", 0.5)
+    if (
+        isinstance(decision_threshold, bool)
+        or not isinstance(decision_threshold, int | float)
+        or not math.isfinite(decision_threshold)
+    ):
+        raise SpecError(f"decision_threshold must be a finite number, not {decision_threshold!r}")
+    seed = raw.get("seed", 7)
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise SpecError(f"seed must be a whole number of 0 or more, not {seed!r}")
 
     llm = dict(raw.get("llm") or {})
+    try:
+        from pramana.adapters.llm import validate_llm_settings
+
+        validate_llm_settings(llm, "llm")
+    except ValueError as exc:
+        raise SpecError(str(exc)) from exc
     if "mutations" in llm:
         from pramana.attacks.mutations import MUTATORS
 
@@ -366,6 +555,17 @@ def load_spec(path: str | Path) -> AuditSpec:
             raise SpecError("agent.sandbox.protocol must be 'tools' (native) or 'text'")
         if sandbox.get("protocol", "tools") == "tools" and sandbox["mode"] != "openai_compatible":
             raise SpecError("native tool calling needs mode openai_compatible; use protocol: text")
+        try:
+            from pramana.adapters.llm import validate_llm_settings
+
+            validate_llm_settings(sandbox, "agent.sandbox")
+        except ValueError as exc:
+            raise SpecError(str(exc)) from exc
+        steps = sandbox.get("max_steps", 8)
+        if isinstance(steps, bool) or not isinstance(steps, int) or not 1 <= steps <= 100:
+            raise SpecError(
+                f"agent.sandbox.max_steps must be a whole number from 1 to 100, not {steps!r}"
+            )
         if sandbox.get("approver", "deny") not in ("deny", "ask"):
             raise SpecError("agent.sandbox.approver must be 'deny' (policy) or 'ask' (a person)")
         if "trace" in agent:
@@ -401,15 +601,15 @@ def load_spec(path: str | Path) -> AuditSpec:
         sensitive_features=list(raw.get("sensitive_features") or []),
         exclude_columns=list(raw.get("exclude_columns") or []),
         positive_label=raw.get("positive_label", 1),
-        decision_threshold=float(raw.get("decision_threshold", 0.5)),
+        decision_threshold=float(decision_threshold),
         score_column=raw.get("score_column"),
         thresholds=thresholds,
-        checks=dict(raw.get("checks") or {}),
+        checks=checks,
         llm=llm,
         agent=agent,
         governance=governance,
-        gate=dict(raw.get("gate") or {}),
-        seed=int(raw.get("seed", 7)),
+        gate=gate,
+        seed=seed,
         artifacts_sha256=pins,
         trust_pickled_model=raw.get("trust_pickled_model", False) is True,
         reference_is_training=(

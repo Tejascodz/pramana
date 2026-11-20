@@ -10,10 +10,13 @@ from __future__ import annotations
 
 import contextlib
 import io
+import os
 import runpy
 import shutil
 from importlib import resources
 from pathlib import Path
+
+from pramana import safefs
 
 DEMOS: dict[str, tuple[str, str]] = {
     "credit": (
@@ -25,25 +28,46 @@ DEMOS: dict[str, tuple[str, str]] = {
 }
 
 
-def _copy_tree(src, dst: Path) -> None:
-    dst.mkdir(parents=True, exist_ok=True)
+def _copy_tree(src, root: Path, rel: str = "") -> None:
+    """Copy a packaged folder into ``root/rel``. Writes go through :mod:`pramana.safefs`,
+    so a link planted in an existing demo folder is refused, never written through."""
+    with safefs.open_dir(root, rel or None):
+        pass
     for item in src.iterdir():
         if item.name == "__pycache__":
             continue
-        target = dst / item.name
+        child = f"{rel}/{item.name}" if rel else item.name
         if item.is_dir():
-            _copy_tree(item, target)
+            _copy_tree(item, root, child)
         else:
-            target.write_bytes(item.read_bytes())
+            safefs.write_bytes(root, child, item.read_bytes())
+
+
+def _refuse_links(workdir: Path) -> None:
+    """A demo folder from an earlier run is reused. The demo writes data, a model and a
+    pack into it (some with pandas and joblib, which follow links), so a link anywhere in
+    it could redirect a write outside it: refuse instead of following."""
+    if workdir.is_symlink():
+        raise safefs.UnsafePathError(f"{workdir} is a symbolic link; use an empty folder")
+    if not workdir.exists():
+        return
+    for top, dirs, files in os.walk(workdir, followlinks=False):
+        for name in dirs + files:
+            if os.path.islink(os.path.join(top, name)):
+                raise safefs.UnsafePathError(
+                    f"{os.path.join(top, name)} is a symbolic link; the demo will not write "
+                    "through it. Remove it or choose another folder (--out)."
+                )
 
 
 def prepare(name: str, out_dir: Path) -> Path:
     """Copy one demo into ``out_dir`` and build its inputs. Returns the spec path."""
     folder, _ = DEMOS[name]
     workdir = out_dir / folder
+    _refuse_links(workdir)
     if workdir.exists():
         shutil.rmtree(workdir / "pack", ignore_errors=True)
-    _copy_tree(resources.files("pramana.demos").joinpath(folder), workdir)
+    _copy_tree(resources.files("pramana.demos").joinpath(folder), out_dir, folder)
     builder = workdir / "build_model.py"
     if builder.exists():
         # The credit case study generates its synthetic data and model locally.

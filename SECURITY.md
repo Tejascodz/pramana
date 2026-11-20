@@ -74,10 +74,25 @@ Ollama applies its own origin and host checks; keep them by leaving
 - **Pramana never reads model files, chat history or any other data held by
   Ollama or another model server.** It sees only the answers to its own
   requests.
+- **Writes never leave the folder they are meant for.** A pack, key or demo folder
+  may have been prepared by someone else, so every file Pramana writes there goes
+  to a new temporary file that is then renamed into place: a symbolic link or hard
+  link at the destination is never written through. A destination that is a link,
+  a folder or another special file is refused, and so is a linked `evidence/` or
+  stage folder; clean-up deletes only Pramana's own regular files. All report files
+  are rendered and every destination is checked before the first one is written.
+  On POSIX systems sub-folders are opened without following links, so a link
+  swapped in during a run is refused too. The folder you name (`--out`,
+  `--out-dir`) is trusted as given. Every file is created readable by your user
+  only (mode 600), because a pack holds the system's answers; widen it
+  deliberately (`chmod`) before sharing a pack with other users on the machine.
 - **Signing keys live outside the repository.** `pramana keygen` writes the
   Ed25519 key pair to `~/.pramana/keys` (private key readable by the owner
-  only), refuses to write inside a git working tree unless told to, and never
-  overwrites an existing key without `--force`. In CI, keep the private key in
+  only), refuses to write inside a git working tree unless told to, never
+  replaces an existing private *or* public key without `--force`, refuses a key
+  folder that belongs to another user or that other users can write to, and
+  writes both keys before renaming either into place, so a failure leaves no
+  half pair. In CI, keep the private key in
   a secret store and pass it as `PRAMANA_SIGNING_KEY_PEM`. `.gitignore`
   excludes `*.key`, `*.pem` and `pramana_ed25519.*`. Only the public key
   should ever be shared.
@@ -90,8 +105,17 @@ Ollama applies its own origin and host checks; keep them by leaving
 
 - **Audit specs and probe files are configuration.** A spec chooses the endpoint
   and which environment variable is sent as a credential. Only run specs you
-  wrote or reviewed, as you would a CI workflow. Specs are parsed with
-  `yaml.safe_load`, which does not create Python objects.
+  wrote or reviewed, as you would a CI workflow. Specs are parsed with a YAML
+  `SafeLoader`, which does not create Python objects, and a mapping that repeats
+  a key is refused (otherwise a second `gate:` section would silently replace
+  the first).
+- **A spec cannot weaken a result without saying so.** Every threshold must be a
+  finite number in its range (NaN would make every comparison false, so a check
+  would pass whatever it measured); counts must be whole numbers; unknown
+  thresholds, gate settings, check ids and check options are refused with a
+  suggestion; `gate.block_on` cannot be empty; and endpoint settings (`timeout`,
+  `max_retries`, `backoff`, `samples`, `concurrency`) are range-checked. All of
+  this happens when the spec loads, before any check runs.
 - **Pickled model files are code, so Pramana refuses them by default.** A
   `.joblib` or `.pkl` model can run code the moment it is loaded. Pramana loads
   one only when its SHA-256 is pinned under `artifacts_sha256.model` (then a
@@ -115,8 +139,10 @@ Ollama applies its own origin and host checks; keep them by leaving
   register in Excel, Numbers or Google Sheets (CWE-1236). Plain numbers are
   left as they are.
 - **Audit packs from someone else are untrusted data.** `pramana verify` only
-  reads files inside the pack, and the dashboard shows a pack's text as plain
-  text, so it cannot load images or links from it. Bare web and e-mail
+  reads regular files inside the pack and reports a malformed ledger, signature
+  or evidence entry (bad JSON, wrong types, a folder or socket where a file
+  should be) as a verification failure, never a crash. The dashboard shows a
+  pack's text as plain text, so it cannot load images or links from it. Bare web and e-mail
   addresses, which Streamlit would otherwise turn into links, are defanged with
   an invisible word joiner, and the one-click *Deploy* button is hidden so a
   pack is never published by accident.

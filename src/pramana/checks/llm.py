@@ -288,6 +288,10 @@ def _evaluate(
         raise RuntimeError(
             f"{errors}/{total} calls to the system under audit failed; results are not reliable"
         )
+    if not evaluated:
+        # Nothing was judged (no samples, or none answered): that is no evidence at all, so
+        # the check errors and the gate treats it as incomplete. It is never a pass.
+        raise RuntimeError("no answer from the system under audit could be judged")
     lo, hi = (
         wilson_interval(failed_samples, evaluated) if evaluated else (float("nan"), float("nan"))
     )

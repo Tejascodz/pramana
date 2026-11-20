@@ -11,7 +11,7 @@ pack with a release decision that a reviewer can verify.
 [![CI](https://github.com/Tejascodz/pramana/actions/workflows/ci.yml/badge.svg)](https://github.com/Tejascodz/pramana/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/Tejascodz/pramana/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tejascodz/pramana/actions/workflows/codeql.yml)
 ![Python 3.10 to 3.13](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-3776ab)
-![Version 0.7.16](https://img.shields.io/badge/version-0.7.16-2f6fdb)
+![Version 0.8.0](https://img.shields.io/badge/version-0.8.0-2f6fdb)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 [Quickstart](#quickstart) · [How it works](#how-it-works) · [Results](#results) · [Usage](#usage) · [Related work](#comparison-with-related-work) · [Limitations](#limitations) · [Development](#development) · [Security](#security)

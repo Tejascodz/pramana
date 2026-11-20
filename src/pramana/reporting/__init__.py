@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import io
 import json
 from collections import Counter
 from pathlib import Path
@@ -10,7 +11,7 @@ from typing import Any
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from pramana import NOTICE, __version__
+from pramana import NOTICE, __version__, safefs
 from pramana.audit.ledger import EvidenceLedger
 from pramana.checks.llm import fmt_ms
 from pramana.controls import load_library
@@ -108,72 +109,87 @@ def render_html(result) -> str:
     )
 
 
+def _csv_text(rows: list[dict[str, Any]], fields: list[str]) -> str:
+    buffer = io.StringIO(newline="")
+    writer = csv.DictWriter(buffer, fieldnames=fields, extrasaction="ignore")
+    writer.writeheader()
+    for row in rows:
+        writer.writerow(
+            {
+                k: csv_safe("; ".join(map(str, v)) if isinstance(v, list) else v)
+                for k, v in row.items()
+            }
+        )
+    return buffer.getvalue()
+
+
 def _write_csv(path: Path, rows: list[dict[str, Any]], fields: list[str]) -> None:
-    with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
-        writer.writeheader()
-        for row in rows:
-            writer.writerow(
-                {
-                    k: csv_safe("; ".join(map(str, v)) if isinstance(v, list) else v)
-                    for k, v in row.items()
-                }
-            )
+    safefs.write_user_file(path, _csv_text(rows, fields))
+
+
+def render_outputs(result) -> dict[str, str]:
+    """Every report file's content, keyed like ``REPORT_FILES``, built in memory."""
+    return {
+        "report": render_html(result),
+        "results": json.dumps(
+            strict_json(result.to_dict()), indent=2, default=str, allow_nan=False
+        ),
+        "risk_register": _csv_text(
+            [r.to_dict() for r in result.risks],
+            [
+                "risk_id",
+                "title",
+                "source_check",
+                "likelihood",
+                "impact",
+                "score",
+                "rating",
+                "owner",
+                "treatment",
+                "description",
+                "recommendation",
+                "controls",
+            ],
+        ),
+        "control_coverage": _csv_text(
+            result.coverage["controls"],
+            [
+                "framework",
+                "id",
+                "group",
+                "title",
+                "evidence_type",
+                "state",
+                "checks",
+                "manual_evidence",
+            ],
+        ),
+        "remediation_plan": _csv_text(
+            result.remediation,
+            ["risk_id", "priority", "action", "owner", "due", "closes_controls"],
+        ),
+        "model_card": render_model_card(result),
+        "ml_bom": json.dumps(render_ml_bom(result), indent=2, ensure_ascii=False) + "\n",
+    }
 
 
 def write_outputs(result, out_dir: Path, ledger: EvidenceLedger | None = None) -> dict[str, Path]:
-    """Write the report pack. If a ledger is given, report files are sealed into it."""
+    """Write the report pack. If a ledger is given, report files are sealed into it.
+
+    Every file is rendered in memory and every destination checked before anything is
+    written, so a rendering error or a prepared folder (a link, or a folder where a file
+    belongs) leaves the existing files untouched. Each file is then written to a
+    temporary file and renamed into place: a link at the destination is refused, and a
+    hard link is replaced, never written through.
+    """
     out = Path(out_dir)
-    out.mkdir(parents=True, exist_ok=True)
+    contents = render_outputs(result)
+    with safefs.open_dir(out) as folder:
+        for name in REPORT_FILES.values():
+            safefs.check_replaceable(folder, name)
+        for key, name in REPORT_FILES.items():
+            safefs.replace_file(folder, name, contents[key].encode("utf-8"))
     paths = {key: out / name for key, name in REPORT_FILES.items()}
-
-    paths["report"].write_text(render_html(result), encoding="utf-8")
-    paths["results"].write_text(
-        json.dumps(strict_json(result.to_dict()), indent=2, default=str, allow_nan=False),
-        encoding="utf-8",
-    )
-    _write_csv(
-        paths["risk_register"],
-        [r.to_dict() for r in result.risks],
-        [
-            "risk_id",
-            "title",
-            "source_check",
-            "likelihood",
-            "impact",
-            "score",
-            "rating",
-            "owner",
-            "treatment",
-            "description",
-            "recommendation",
-            "controls",
-        ],
-    )
-    _write_csv(
-        paths["control_coverage"],
-        result.coverage["controls"],
-        [
-            "framework",
-            "id",
-            "group",
-            "title",
-            "evidence_type",
-            "state",
-            "checks",
-            "manual_evidence",
-        ],
-    )
-    _write_csv(
-        paths["remediation_plan"],
-        result.remediation,
-        ["risk_id", "priority", "action", "owner", "due", "closes_controls"],
-    )
-    paths["model_card"].write_text(render_model_card(result), encoding="utf-8")
-    paths["ml_bom"].write_text(
-        json.dumps(render_ml_bom(result), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
-    )
-
     if ledger is not None:
         for key, path in paths.items():
             ledger.add_pack_file("6-reporting", key, path.name)

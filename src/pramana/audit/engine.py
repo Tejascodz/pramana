@@ -433,6 +433,8 @@ def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) ->
         spec.gate,
         incomplete,
         not_run=not_run,
+        # The checks the gate weighed. audit.process, the record of this decision, is
+        # added to the results after it and is not counted.
         checks_run=sum(1 for r in results if r.status != Status.SKIPPED),
     )
     opinion = audit_opinion(risks, incomplete)

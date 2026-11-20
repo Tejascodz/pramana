@@ -232,7 +232,11 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 {% if r.gate.get('incomplete_checks') %}
 <section class="card" style="border-color: var(--critical)">
   <p class="eyebrow">Audit incomplete</p>
+  {% if r.spec.gate.get('allow_incomplete') %}
+  <p>These tests could not be completed. The gate setting <span class="mono">allow_incomplete</span> lets the release decision ignore them, so this audit gives no assurance on the controls they cover: {% for c in r.gate.incomplete_checks %}<span class="tag">{{ c }}</span>{% endfor %}</p>
+  {% else %}
   <p>These tests could not be completed, so the release gate blocks until they are re-run: {% for c in r.gate.incomplete_checks %}<span class="tag">{{ c }}</span>{% endfor %}</p>
+  {% endif %}
 </section>
 {% endif %}
 

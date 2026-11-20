@@ -227,6 +227,10 @@ def unguarded_paths(
     start: str, succ: dict[str, set[str]], irreversible: set[str], approvals: set[str]
 ) -> list[list[str]]:
     """Shortest path from ``start`` to each irreversible node that avoids every approval node."""
+    if start in approvals:
+        # Every path begins at an approval, so none can avoid one. (Before 0.8.0 the entry
+        # node was never checked, and a workflow that starts with approval was flagged.)
+        return []
     parent: dict[str, str | None] = {start: None}
     queue = deque([start])
     while queue:

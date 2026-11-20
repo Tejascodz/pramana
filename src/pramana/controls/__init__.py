@@ -7,7 +7,7 @@ from functools import lru_cache
 from importlib import resources
 from typing import Any
 
-import yaml
+from pramana.safeio import parse_yaml
 
 FRAMEWORK_FILES = (
     "nist_ai_rmf.yaml",
@@ -80,7 +80,7 @@ class ControlLibrary:
 
 def _read_yaml(name: str) -> dict[str, Any]:
     text = resources.files("pramana.controls").joinpath("data", name).read_text(encoding="utf-8")
-    return yaml.safe_load(text)
+    return parse_yaml(text)
 
 
 @lru_cache(maxsize=1)

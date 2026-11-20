@@ -4,8 +4,8 @@ Pramana reads files written by other people (specs, probe packs, model cards,
 traces, CSVs) and writes files that other people open (CSV exports, HTML). The
 helpers here apply the same limits everywhere:
 
-* ``load_yaml`` refuses oversized files and parses with ``yaml.safe_load``, which
-  never constructs Python objects.
+* ``load_yaml`` refuses oversized files and parses with a ``yaml.SafeLoader``, which
+  never constructs Python objects, and refuses a mapping that repeats a key.
 * ``csv_safe`` neutralises spreadsheet formulas, so text taken from a model's answer
   or a trace cannot run as a formula when a reviewer opens a CSV in Excel, Numbers
   or Google Sheets (CWE-1236, "CSV injection").
@@ -44,9 +44,44 @@ def read_text_limited(path: str | Path, max_bytes: int) -> str:
     return data.decode("utf-8")
 
 
+class DuplicateKeyError(yaml.constructor.ConstructorError):
+    """A YAML mapping repeats a key. Plain YAML keeps the last value silently, so a second
+    ``gate:`` or ``thresholds:`` section would quietly replace the first."""
+
+
+class _StrictLoader(yaml.SafeLoader):
+    """``yaml.SafeLoader`` that refuses a mapping with the same key twice."""
+
+    def construct_mapping(self, node, deep=False):  # noqa: ANN001
+        if isinstance(node, yaml.MappingNode):
+            seen: dict[Any, Any] = {}
+            for key_node, _ in node.value:
+                if key_node.tag == "tag:yaml.org,2002:merge":
+                    continue  # "<<: *defaults" may be overridden by explicit keys
+                key = self.construct_object(key_node, deep=True)
+                try:
+                    hash(key)
+                except TypeError:
+                    continue  # the base class reports unhashable keys
+                if key in seen:
+                    raise DuplicateKeyError(
+                        "while constructing a mapping",
+                        node.start_mark,
+                        f"found duplicate key {key!r} (first at line {seen[key].line + 1})",
+                        key_node.start_mark,
+                    )
+                seen[key] = key_node.start_mark
+        return super().construct_mapping(node, deep=deep)
+
+
+def parse_yaml(text: str) -> Any:
+    """Parse YAML text: no Python objects (a ``SafeLoader``), no repeated keys."""
+    return yaml.load(text, Loader=_StrictLoader)  # noqa: S506  # nosec B506 - SafeLoader subclass
+
+
 def load_yaml(path: str | Path, max_bytes: int | None = None) -> Any:
-    """Parse a YAML file safely: size-capped, ``safe_load`` only."""
-    return yaml.safe_load(read_text_limited(path, max_bytes or MAX_YAML_BYTES))
+    """Parse a YAML file safely: size-capped, no Python objects, no repeated keys."""
+    return parse_yaml(read_text_limited(path, max_bytes or MAX_YAML_BYTES))
 
 
 _FORMULA_START = ("=", "+", "-", "@", "\t", "\r", "\n", "＝", "＋", "－", "＠")
