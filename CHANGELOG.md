@@ -25,6 +25,10 @@ Some specs that 0.7.16 accepted are now refused, hence the minor version.
   protected like the private one; a key folder owned by another user or writable by
   other users is refused; both keys are written before either is renamed into place, so
   a failure leaves no half pair.
+- **Files Pramana writes are now readable by their owner only** (mode 600, found by
+  CodeQL on this change; 0.7.16 left them world-readable under a default umask). A
+  pack holds the probes sent to a system and its answers, which may include personal
+  data. Run `chmod` deliberately before sharing a pack with other local users.
 - `pramana init`, `scan-trace --out`, `convert-trace --out`, `sandbox serve --out`,
   `sign` and `demo` write the same way; `init` can no longer be redirected by a dangling
   link, and `demo` refuses a reused folder that contains a link.

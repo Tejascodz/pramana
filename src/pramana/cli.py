@@ -248,7 +248,7 @@ def _write_keypair(out: Path, private_pem: bytes, public_pem: bytes, force: bool
             raise FileExistsError(f"{names} already exists (use --force to replace the key pair)")
         tmp_priv = safefs._write_temp(folder, priv_name, private_pem, 0o600, durable=True)
         try:
-            tmp_pub = safefs._write_temp(folder, pub_name, public_pem, 0o644, durable=True)
+            tmp_pub = safefs._write_temp(folder, pub_name, public_pem, 0o600, durable=True)
         except BaseException:
             safefs._unlink_quietly(folder, tmp_priv)
             raise

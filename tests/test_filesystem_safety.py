@@ -401,3 +401,19 @@ def test_safefs_rejects_paths_that_leave_the_folder(tmp_path):
     for bad in ("../x", "/etc/passwd", "a/../../x", ""):
         with pytest.raises(safefs.UnsafePathError):
             safefs.write_bytes(tmp_path, bad, b"x")
+
+
+@pytest.mark.skipif(os.name != "posix", reason="POSIX permissions")
+def test_pack_files_are_readable_by_their_owner_only(chatbot_audit, tmp_path):
+    """A pack holds a system's answers, which may include personal data."""
+    pack = tmp_path / "pack"
+    write_outputs(chatbot_audit, pack)
+    ledger = EvidenceLedger(tmp_path / "pack2")
+    ledger.add_json("1-scoping", "x", {})
+    written = [pack / n for n in REPORT_FILES.values()]
+    written += [
+        tmp_path / "pack2" / "ledger.jsonl",
+        tmp_path / "pack2" / "evidence" / "1-scoping" / "x.json",
+    ]
+    for path in written:
+        assert path.stat().st_mode & 0o077 == 0, f"{path.name} is readable by other users"

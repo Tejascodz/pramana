@@ -83,7 +83,9 @@ Ollama applies its own origin and host checks; keep them by leaving
   are rendered and every destination is checked before the first one is written.
   On POSIX systems sub-folders are opened without following links, so a link
   swapped in during a run is refused too. The folder you name (`--out`,
-  `--out-dir`) is trusted as given.
+  `--out-dir`) is trusted as given. Every file is created readable by your user
+  only (mode 600), because a pack holds the system's answers; widen it
+  deliberately (`chmod`) before sharing a pack with other users on the machine.
 - **Signing keys live outside the repository.** `pramana keygen` writes the
   Ed25519 key pair to `~/.pramana/keys` (private key readable by the owner
   only), refuses to write inside a git working tree unless told to, never

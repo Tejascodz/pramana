@@ -11,7 +11,9 @@ makes into such a folder goes through this module, which:
   rename replaces the directory entry itself, so a symbolic link or hard link at the
   destination is never written through: the file it points to is left untouched;
 * refuses to replace a destination that is a symbolic link, a folder or any other
-  special file, so a prepared folder fails loudly instead of being silently "fixed".
+  special file, so a prepared folder fails loudly instead of being silently "fixed";
+* creates every file readable and writable by its owner only (mode 600): an audit pack
+  holds the probes sent to a system and its answers, which may include personal data.
 
 The folder the user names (``--out``, ``--out-dir``) is trusted as given, including any
 links in the path leading to it: only what is inside it is checked. On POSIX systems
@@ -177,7 +179,7 @@ def _unlink_quietly(folder: _Dir, name: str) -> None:
         pass
 
 
-def replace_file(folder: _Dir, name: str, data: bytes, *, mode: int = 0o644, durable=False):
+def replace_file(folder: _Dir, name: str, data: bytes, *, mode: int = 0o600, durable=False):
     """Atomically put ``data`` at ``folder/name`` as a new file."""
     check_replaceable(folder, name)
     tmp = _write_temp(folder, name, data, mode, durable)
@@ -189,7 +191,7 @@ def replace_file(folder: _Dir, name: str, data: bytes, *, mode: int = 0o644, dur
         raise
 
 
-def write_bytes(root: str | Path, rel: str | Path, data: bytes, *, mode: int = 0o644) -> Path:
+def write_bytes(root: str | Path, rel: str | Path, data: bytes, *, mode: int = 0o600) -> Path:
     """Write ``root/rel`` safely (see the module docstring). Returns the path written."""
     parts = _parts(rel)
     with open_dir(root, "/".join(parts[:-1]) or None) as folder:
@@ -197,7 +199,7 @@ def write_bytes(root: str | Path, rel: str | Path, data: bytes, *, mode: int = 0
         return folder.path / parts[-1]
 
 
-def write_text(root: str | Path, rel: str | Path, text: str, *, mode: int = 0o644) -> Path:
+def write_text(root: str | Path, rel: str | Path, text: str, *, mode: int = 0o600) -> Path:
     return write_bytes(root, rel, text.encode("utf-8"), mode=mode)
 
 
