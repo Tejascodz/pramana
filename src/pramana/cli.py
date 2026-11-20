@@ -24,7 +24,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from pramana import NOTICE, __version__
+from pramana import NOTICE, __version__, safefs
 
 EXIT_OK, EXIT_BLOCKED, EXIT_TAMPERED, EXIT_INPUT, EXIT_UNREACHABLE = 0, 1, 2, 3, 4
 
@@ -50,7 +50,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
             "replay": Path(args.replay),
             **{k: spec.llm[k] for k in keep if k in spec.llm},
         }
-    if args.samples:
+    if args.samples is not None:
         spec.llm["samples"] = args.samples
     if args.trust_model:
         spec.trust_pickled_model = True
@@ -207,9 +207,64 @@ def _cmd_verify(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
-def _cmd_keygen(args: argparse.Namespace) -> int:
-    import os
+KEY_FILES = ("pramana_ed25519.key", "pramana_ed25519.pub")
 
+
+def _write_keypair(out: Path, private_pem: bytes, public_pem: bytes, force: bool):
+    """Write the key pair into ``out`` without ever writing through a link.
+
+    Both destinations are checked before either is written: a link, a folder or other
+    special file is always refused, and an existing key (private or public) is replaced
+    only with ``force``. On POSIX the folder must belong to this user and be closed to
+    other users, who could otherwise swap the files. Both keys are written to new
+    temporary files first and renamed into place only once both writes succeed.
+    """
+    import os
+    import stat as st
+
+    from pramana import safefs
+
+    priv_name, pub_name = KEY_FILES
+    with safefs.open_dir(out, mode=0o700) as folder:
+        if os.name == "posix":
+            info = os.fstat(folder.fd) if folder.fd is not None else os.stat(out)
+            if info.st_uid != os.getuid():
+                raise PermissionError(f"{out} belongs to another user; choose your own folder")
+            if info.st_mode & (st.S_IWGRP | st.S_IWOTH):
+                raise PermissionError(
+                    f"{out} can be written by other users (mode {st.S_IMODE(info.st_mode):o}), "
+                    f"who could replace the keys; run: chmod 700 {out}"
+                )
+        existing = []
+        for name in (priv_name, pub_name):
+            found = folder.lstat(name)
+            if found is None:
+                continue
+            if not st.S_ISREG(found.st_mode):
+                safefs.check_replaceable(folder, name)  # raises with the reason
+            existing.append(out / name)
+        if existing and not force:
+            names = " and ".join(str(p) for p in existing)
+            raise FileExistsError(f"{names} already exists (use --force to replace the key pair)")
+        tmp_priv = safefs._write_temp(folder, priv_name, private_pem, 0o600, durable=True)
+        try:
+            tmp_pub = safefs._write_temp(folder, pub_name, public_pem, 0o644, durable=True)
+        except BaseException:
+            safefs._unlink_quietly(folder, tmp_priv)
+            raise
+        try:
+            for name in (priv_name, pub_name):
+                safefs.check_replaceable(folder, name)
+            safefs._rename(folder, tmp_priv, priv_name)
+            safefs._rename(folder, tmp_pub, pub_name)
+        except BaseException:
+            safefs._unlink_quietly(folder, tmp_priv)
+            safefs._unlink_quietly(folder, tmp_pub)
+            raise
+    return out / priv_name, out / pub_name
+
+
+def _cmd_keygen(args: argparse.Namespace) -> int:
     from pramana.audit.signing import SigningError, generate_keypair
 
     try:
@@ -226,17 +281,11 @@ def _cmd_keygen(args: argparse.Namespace) -> int:
             file=sys.stderr,
         )
         return EXIT_INPUT
-    out.mkdir(mode=0o700, parents=True, exist_ok=True)
-    priv, pub = out / "pramana_ed25519.key", out / "pramana_ed25519.pub"
-    if priv.exists() and not args.force:
-        print(f"error: {priv} already exists (use --force to replace it)", file=sys.stderr)
+    try:
+        priv, pub = _write_keypair(out, private_pem, public_pem, force=args.force)
+    except (FileExistsError, PermissionError, OSError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
         return EXIT_INPUT
-    # Create the private key owner-only from the first byte, not chmod after writing.
-    fd = os.open(priv, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-    with os.fdopen(fd, "wb") as handle:
-        handle.write(private_pem)
-    os.chmod(priv, 0o600)  # also tightens a key replaced with --force
-    pub.write_bytes(public_pem)
     print(f"Wrote private key {priv} (keep secret, never commit it) and public key {pub}.")
     return EXIT_OK
 
@@ -504,10 +553,14 @@ def _cmd_init(args: argparse.Namespace) -> int:
     from pramana.spec import SPEC_TEMPLATE
 
     target = Path(args.path)
-    if target.exists():
+    try:
+        # "x" creates the file exclusively: it fails if anything, even a dangling link,
+        # is already at the path, so it can never write through a link.
+        with target.open("x", encoding="utf-8") as handle:
+            handle.write(SPEC_TEMPLATE)
+    except FileExistsError:
         print(f"error: {target} already exists", file=sys.stderr)
         return EXIT_INPUT
-    target.write_text(SPEC_TEMPLATE, encoding="utf-8")
     print(f"Wrote {target}. Edit it, then run: pramana run {target}")
     return EXIT_OK
 
@@ -556,7 +609,7 @@ def _cmd_scan_trace(args: argparse.Namespace) -> int:
         signal["permissive_environment"] = sid is not None and str(sid) in permissive
     if args.out:
         lines = [json.dumps(signal, ensure_ascii=False) for signal in signals]
-        Path(args.out).write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+        safefs.write_user_file(args.out, "\n".join(lines) + ("\n" if lines else ""))
     else:
         # Quotes come from the agent's own reasoning: escape everything non-ASCII on a
         # terminal, so control sequences and bidi overrides cannot alter what is shown.
@@ -601,7 +654,7 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
         return EXIT_INPUT
     lines = "\n".join(json.dumps(e, ensure_ascii=False) for e in events)
     if args.out:
-        Path(args.out).write_text(lines + "\n", encoding="utf-8")
+        safefs.write_user_file(args.out, lines + "\n")
         print(f"Wrote {len(events)} events to {args.out}. Point your spec's agent.trace at it.")
     else:
         print(lines)
@@ -654,7 +707,9 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument(
         "--no-gate", action="store_true", help="always exit 0, even if the gate blocks"
     )
-    run.add_argument("--samples", type=int, help="override llm.samples (times each probe is sent)")
+    run.add_argument(
+        "--samples", type=_positive_int, help="override llm.samples (times each probe is sent)"
+    )
     run.add_argument(
         "--replay", help="re-score a recorded llm_replay.jsonl instead of calling the endpoint"
     )
@@ -790,10 +845,27 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _positive_int(text: str) -> int:
+    try:
+        value = int(text)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"{text!r} is not a whole number") from None
+    if not 1 <= value <= 1000:
+        raise argparse.ArgumentTypeError(f"must be from 1 to 1000, not {value}")
+    return value
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    from pramana.audit.ledger import LedgerError
+
     try:
         return args.fn(args)
+    except (safefs.UnsafePathError, LedgerError) as exc:
+        # A prepared folder (a link, or a folder where a file belongs) or a failed ledger
+        # write: stop with the reason, before anything outside the folder is touched.
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
     except BrokenPipeError:
         # Output piped into `head` or similar was closed early; that is not an error.
         import os

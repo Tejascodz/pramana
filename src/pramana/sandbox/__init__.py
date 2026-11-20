@@ -36,7 +36,7 @@ from pathlib import Path
 from typing import Any
 
 from pramana.adapters.llm import LLMClient
-from pramana.safeio import load_yaml
+from pramana.safeio import load_yaml, parse_yaml
 
 APPROVAL_THRESHOLD = 10000
 TOOL_NAMES = (
@@ -107,9 +107,7 @@ def load_scenarios(source: str | Path) -> list[dict[str, Any]]:
             raise SandboxError(
                 f"Unknown built-in scenarios '{name}'. Available: {', '.join(names)}"
             )
-        import yaml
-
-        data = yaml.safe_load(root.joinpath(f"{name}.yaml").read_text(encoding="utf-8"))
+        data = parse_yaml(root.joinpath(f"{name}.yaml").read_text(encoding="utf-8"))
     else:
         data = load_yaml(source)
     scenarios = (data or {}).get("scenarios")

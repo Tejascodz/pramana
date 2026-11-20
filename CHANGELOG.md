@@ -1,5 +1,86 @@
 # Changelog
 
+## 0.8.0 — 2026-11-19
+
+From an independent 12-phase assessment of a fresh clone (local-only testing on a
+MacBook Neo). Every confirmed finding is fixed, and each has a regression test that
+fails on 0.7.16 and passes now (`tests/test_filesystem_safety.py`,
+`test_config_validation.py`, `test_adapter_validation.py`, `test_audit_correctness.py`).
+Some specs that 0.7.16 accepted are now refused, hence the minor version.
+
+**Filesystem safety (all writes now go through `pramana.safefs`).**
+- **Fix: report files could overwrite a file outside the pack.** A symbolic or hard link
+  at `results.json`, `report.html` or any other report path was written through, and the
+  path was only checked afterwards. Each file is now written to a new temporary file and
+  renamed into place, so a hard link is replaced (the other name keeps its content) and
+  a symbolic link, folder or special file is refused. Every report is rendered and every
+  destination checked before the first write, so a failure leaves no partial set.
+- **Fix: starting a ledger could delete or truncate files outside the pack** through a
+  linked `evidence/` folder, a linked stage folder or a linked `ledger.jsonl` (existing
+  or dangling). Linked folders and files are refused; clean-up removes only Pramana's own
+  regular files, and a folder named `*.json` is refused with a clear error.
+- **Fix: `pramana keygen` could write a key through a link.** A symbolic link at either
+  key path (existing or dangling) or a hard link with `--force` redirected the write.
+  Links and special files are refused even with `--force`; an existing public key is now
+  protected like the private one; a key folder owned by another user or writable by
+  other users is refused; both keys are written before either is renamed into place, so
+  a failure leaves no half pair.
+- `pramana init`, `scan-trace --out`, `convert-trace --out`, `sandbox serve --out`,
+  `sign` and `demo` write the same way; `init` can no longer be redirected by a dangling
+  link, and `demo` refuses a reused folder that contains a link.
+
+**A spec can no longer weaken a result.**
+- **Fix: a threshold of NaN produced a false PASS.** Every comparison with NaN is false,
+  so fairness, drift, data-quality and prompt-injection checks passed whatever they
+  measured. Thresholds must now be finite numbers in range; counts must be whole
+  numbers; booleans, text and null are refused; unknown threshold names are refused with
+  a suggestion; `psi_warn` cannot exceed `psi_fail`.
+- **Fix: a repeated YAML key silently replaced the first value** (for example a second,
+  lenient `gate:` section). Every YAML file Pramana reads now refuses repeated keys.
+- **Fix: `gate.block_on: []` disabled risk-based blocking without a word.** It is now
+  refused, and so are unknown gate settings, `gate: []` and other sections of the wrong
+  type.
+- **Fix: check selection was not validated.** An unknown or misspelt id in
+  `checks.include` / `exclude` silently dropped a check, a string was read character by
+  character, and malformed `options` crashed. Ids, list types and every check option are
+  now validated (`fairness.proxy_features.allow_sensitive_inputs` must be true or false:
+  the text "no" used to count as true).
+- `decision_threshold`, `seed` and the endpoint settings `timeout`, `max_retries`,
+  `backoff`, `samples`, `concurrency`, `temperature`, `max_tokens` and
+  `agent.sandbox.max_steps` are range-checked when the spec loads.
+
+**Evidence ledger and verification.**
+- **Fix: concurrent appends could give two entries the same sequence number,** making
+  the pack unverifiable. Each write and its ledger entry now happen under one lock.
+- **Fix: a failed ledger write poisoned the ledger.** The entry joined the in-memory chain
+  before it reached disk, so the next write left a gap. An entry is now added only after
+  it is written, and after a failed write the ledger refuses further entries.
+- **Fix: malformed packs crashed `pramana verify`** (invalid JSON or UTF-8, a JSON array
+  or null where an entry belongs, wrong-typed fields, a folder or socket where a file
+  belongs, a malformed public key in `signature.json`). Each is now reported as a
+  verification failure.
+
+**LLM recordings and endpoints.**
+- **Fix: a recording with fewer latencies than responses was loaded in part,** silently
+  dropping samples. Every replay line and transcript entry is now validated, and a
+  problem is reported with its line or entry number instead of an `AttributeError` or
+  `KeyError`.
+- **Fix: invalid endpoint settings were accepted** (negative timeout or retries,
+  fractional or boolean retry counts, negative backoff). They are refused when the
+  client is built.
+- An endpoint reply that is not valid UTF-8 is reported as such, not as a missing
+  `response_path`; transport, decoding and response-path errors are now separate.
+
+**Audit correctness.**
+- **Fix: a workflow that starts with an approval step was flagged as unguarded**
+  (`agent.approval_paths`, a false FAIL).
+- **Fix: an evaluation in which no answer was judged could pass.** It is now an error,
+  so the gate treats the audit as incomplete.
+- **Fix: the report said incomplete checks block the release even when
+  `gate.allow_incomplete` let it pass.** The wording now follows the setting.
+- `checks_run` is now defined in the methodology: the checks the gate weighed; the
+  `audit.process` row is the record of that decision and is not counted.
+
 ## 0.7.16 — 2026-11-18
 
 From a security and accuracy review done while rewriting the README.

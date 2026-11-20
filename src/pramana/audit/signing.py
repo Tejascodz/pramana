@@ -28,6 +28,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from pramana import safefs
 from pramana.audit.ledger import LEDGER_NAME, sha256_bytes, verify_pack
 
 SIGNATURE_NAME = "signature.json"
@@ -68,15 +69,21 @@ def generate_keypair() -> tuple[bytes, bytes]:
 
 def _ledger_root_and_digest(pack_dir: Path) -> tuple[str, str]:
     """The pack's root hash (last ledger entry) and the sha256 of the ledger file."""
-    ledger = Path(pack_dir) / LEDGER_NAME
-    if not ledger.exists():
-        raise SigningError(f"{LEDGER_NAME} not found in {pack_dir}")
-    raw = ledger.read_bytes()
-    lines = [line for line in raw.decode("utf-8").splitlines() if line.strip()]
-    if not lines:
+    try:
+        raw = safefs.read_bytes(pack_dir, LEDGER_NAME)
+    except FileNotFoundError:
+        raise SigningError(f"{LEDGER_NAME} not found in {pack_dir}") from None
+    except (OSError, ValueError) as exc:
+        raise SigningError(f"{LEDGER_NAME} cannot be read: {exc}") from exc
+    try:
+        lines = [line for line in raw.decode("utf-8").splitlines() if line.strip()]
+        last = json.loads(lines[-1]) if lines else None
+    except ValueError as exc:
+        raise SigningError(f"{LEDGER_NAME} is not valid JSON lines") from exc
+    if last is None:
         raise SigningError("ledger is empty; nothing to sign")
-    root = json.loads(lines[-1]).get("entry_hash")
-    if not root:
+    root = last.get("entry_hash") if isinstance(last, dict) else None
+    if not isinstance(root, str) or not root:
         raise SigningError("ledger's final entry has no entry_hash")
     return root, sha256_bytes(raw)
 
@@ -126,7 +133,7 @@ def sign_pack(pack_dir: str | Path, private_key_pem: bytes, signed_at: str | Non
         "payload": payload,
         "signature": signature.hex(),
     }
-    (pack_dir / SIGNATURE_NAME).write_text(json.dumps(record, indent=2), encoding="utf-8")
+    safefs.write_text(pack_dir, SIGNATURE_NAME, json.dumps(record, indent=2))
     return record
 
 
@@ -141,8 +148,7 @@ def verify_pack_signature(
     """
     ed25519, serialization = _require_crypto()
     pack_dir = Path(pack_dir)
-    sig_path = pack_dir / SIGNATURE_NAME
-    if not sig_path.exists():
+    if not (pack_dir / SIGNATURE_NAME).exists() and not (pack_dir / SIGNATURE_NAME).is_symlink():
         return False, [f"{SIGNATURE_NAME} not found; pack is not signed"]
 
     problems: list[str] = []
@@ -151,11 +157,17 @@ def verify_pack_signature(
         problems.extend(chain_problems)
 
     try:
-        record = json.loads(sig_path.read_text(encoding="utf-8"))
+        record = json.loads(safefs.read_bytes(pack_dir, SIGNATURE_NAME).decode("utf-8"))
         if not isinstance(record, dict) or not isinstance(record.get("payload"), dict):
             raise ValueError("not a signature record")
-        record["payload"]["signed_at"], record["public_key"], record["signature"]  # noqa: B018
-    except (ValueError, KeyError, TypeError) as exc:
+        for field, value in (
+            ("payload.signed_at", record["payload"]["signed_at"]),
+            ("public_key", record["public_key"]),
+            ("signature", record["signature"]),
+        ):
+            if not isinstance(value, str):
+                raise ValueError(f"{field} is not text")
+    except (OSError, ValueError, KeyError, TypeError) as exc:
         return False, [
             f"{SIGNATURE_NAME} is malformed ({exc}); the pack's signature cannot be trusted"
         ]
@@ -177,9 +189,12 @@ def verify_pack_signature(
     if expected_public_key_pem is not None:
         if _normalise(expected_public_key_pem) != _normalise(embedded_pem):
             problems.append("pack is signed by a different key than the one provided")
-    public = serialization.load_pem_public_key(embedded_pem)
+    try:
+        public = serialization.load_pem_public_key(embedded_pem)
+    except (ValueError, TypeError) as exc:
+        return False, [*problems, f"the public key in {SIGNATURE_NAME} cannot be read ({exc})"]
     if not isinstance(public, ed25519.Ed25519PublicKey):
-        return False, ["signature public key is not an Ed25519 key"]
+        return False, [*problems, "signature public key is not an Ed25519 key"]
     try:
         public.verify(bytes.fromhex(record["signature"]), _payload_bytes(record["payload"]))
     except Exception:  # noqa: BLE001 - any failure means the signature is invalid

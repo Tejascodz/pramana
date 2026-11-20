@@ -19,6 +19,7 @@ are retried with exponential backoff. A call that still fails is returned with
 from __future__ import annotations
 
 import json
+import math
 import os
 import random
 import re
@@ -174,6 +175,55 @@ def endpoint_label(url: str) -> str:
     return f"{parsed.scheme}://{parsed.hostname}{':' + str(parsed.port) if parsed.port else ''}"
 
 
+#: Numeric LLM settings: (kind, lowest, highest, may be null). "count" is a whole number.
+LLM_NUMBER_RULES: dict[str, tuple[str, float, float, bool]] = {
+    "timeout": ("number", 0.0, 3600.0, False),
+    "max_retries": ("count", 0, 20, False),
+    "backoff": ("number", 0.0, 600.0, False),
+    "samples": ("count", 1, 1000, False),
+    "concurrency": ("count", 1, 64, False),
+    "temperature": ("number", 0.0, 2.0, False),
+    "max_tokens": ("count", 1, 1_000_000, True),
+    "seed": ("count", 0, 2**63 - 1, True),
+    "settle_ms": ("count", 0, 600_000, False),
+}
+
+
+def validate_llm_settings(config: dict[str, Any], where: str = "llm") -> None:
+    """Refuse numeric settings that would silently change how many calls are made or how
+    long they may take: booleans, text, NaN, infinities, negatives and fractions where a
+    count is needed. ``timeout`` must also be above zero."""
+    for key, (kind, low, high, nullable) in LLM_NUMBER_RULES.items():
+        if key not in config:
+            continue
+        value = config[key]
+        name = f"{where}.{key}"
+        if value is None and nullable:
+            continue
+        if isinstance(value, bool) or not isinstance(value, int | float):
+            raise ValueError(f"{name} must be a number, not {value!r}")
+        if not math.isfinite(value):
+            raise ValueError(f"{name} must be a finite number, not {value!r}")
+        if kind == "count" and value != int(value):
+            raise ValueError(f"{name} must be a whole number, not {value!r}")
+        if not low <= value <= high or (key == "timeout" and value <= 0):
+            bound = "above 0" if key == "timeout" else f"at least {low:g}"
+            raise ValueError(f"{name} must be {bound} and at most {high:g}, not {value!r}")
+
+
+def _is_latency(value: Any) -> bool:
+    return value is None or (
+        isinstance(value, int | float)
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+        and value >= 0
+    )
+
+
+def _record_error(source: str, where: str, problem: str) -> ValueError:
+    return ValueError(f"{source}{where}: {problem}")
+
+
 class ReplayClient:
     """Returns recorded responses keyed by the exact user prompt.
 
@@ -196,9 +246,16 @@ class ReplayClient:
         self._responses: dict[str, list[str]] = {}
         self._latencies: dict[str, list[float | None]] = {}
         self._models: dict[str, str] = {}
-        text = self.path.read_text(encoding="utf-8")
+        try:
+            text = self.path.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError(f"{self.path.name} is not valid UTF-8 text") from exc
         if self.path.suffix == ".json":
-            self._load_transcript(json.loads(text))
+            try:
+                entries = json.loads(text)
+            except json.JSONDecodeError as exc:
+                raise ValueError(f"{self.path.name} is not valid JSON: {exc}") from exc
+            self._load_transcript(entries)
         else:
             self._load_jsonl(text)
 
@@ -210,32 +267,76 @@ class ReplayClient:
             self._models[key] = model
 
     def _load_jsonl(self, text: str) -> None:
+        """Every line is checked: a malformed or partial recording is refused, with the
+        line number, rather than loaded in part (which would silently drop samples)."""
         for line_no, line in enumerate(text.splitlines(), 1):
             if not line.strip():
                 continue
-            record = json.loads(line)
-            if not ({"prompt", "conversation"} & record.keys()) or not (
-                {"response", "responses"} & record.keys()
-            ):
-                raise ValueError(f"{self.path.name}:{line_no} needs 'prompt' and 'response(s)'")
+            err = lambda problem: _record_error(self.path.name, f":{line_no}", problem)  # noqa: E731,B023
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError as exc:
+                raise err(f"not valid JSON ({exc.msg})") from exc
+            if not isinstance(record, dict):
+                raise err(f"is a JSON {type(record).__name__}, expected an object")
             if "conversation" in record:
-                record["prompt"] = TURN_SEPARATOR.join(
-                    str(u).strip() for u in record["conversation"]
+                turns = record["conversation"]
+                if (
+                    not isinstance(turns, list)
+                    or not turns
+                    or not all(isinstance(u, str) for u in turns)
+                ):
+                    raise err("'conversation' must be a non-empty list of user messages")
+                prompt = TURN_SEPARATOR.join(u.strip() for u in turns)
+            elif isinstance(record.get("prompt"), str):
+                prompt = record["prompt"]
+            else:
+                raise err("needs a text 'prompt' (or a 'conversation')")
+            if "responses" in record:
+                responses = record["responses"]
+                if not isinstance(responses, list) or not responses:
+                    raise err("'responses' must be a non-empty list")
+            elif "response" in record:
+                responses = [record["response"]]
+            else:
+                raise err("needs 'response' or 'responses'")
+            if not all(isinstance(r, str) for r in responses):
+                raise err("every response must be text")
+            latencies = record.get("latencies_ms")
+            if latencies is None:
+                latencies = [None] * len(responses)
+            elif not isinstance(latencies, list) or len(latencies) != len(responses):
+                raise err(
+                    f"'latencies_ms' must list one value per response ({len(responses)} responses)"
                 )
-            responses = record.get("responses") or [record["response"]]
-            latencies = record.get("latencies_ms") or [None] * len(responses)
-            for response, latency in zip(responses, latencies, strict=False):
-                self._add(record["prompt"], response, latency, record.get("model"))
+            elif not all(_is_latency(v) for v in latencies):
+                raise err("every latency must be a non-negative number or null")
+            model = record.get("model")
+            if model is not None and not isinstance(model, str):
+                raise err("'model' must be text")
+            for response, latency in zip(responses, latencies, strict=True):
+                self._add(prompt, response, latency, model)
 
-    def _load_transcript(self, entries: list[dict[str, Any]]) -> None:
+    def _load_transcript(self, entries: Any) -> None:
         if not isinstance(entries, list):
             raise ValueError(f"{self.path.name} is not a transcript (expected a JSON list)")
-        for entry in sorted(entries, key=lambda e: (e.get("prompt", ""), e.get("sample", 0))):
-            if entry.get("error") or "prompt" not in entry:
-                continue
+        for i, entry in enumerate(entries, 1):
+            err = lambda problem: _record_error(self.path.name, f" entry {i}", problem)  # noqa: E731,B023
+            if not isinstance(entry, dict):
+                raise err(f"is a JSON {type(entry).__name__}, expected an object")
+            for key in ("prompt", "conversation_key", "response", "model"):
+                if entry.get(key) is not None and not isinstance(entry[key], str):
+                    raise err(f"'{key}' must be text")
+            sample = entry.get("sample", 0)
+            if isinstance(sample, bool) or not isinstance(sample, int):
+                raise err("'sample' must be a whole number")
+            if not _is_latency(entry.get("latency_ms")):
+                raise err("'latency_ms' must be a non-negative number or null")
+        usable = [e for e in entries if not e.get("error") and isinstance(e.get("prompt"), str)]
+        for entry in sorted(usable, key=lambda e: (e["prompt"], e.get("sample", 0))):
             self._add(
                 entry.get("conversation_key") or entry["prompt"],
-                entry.get("response", ""),
+                entry.get("response") or "",
                 entry.get("latency_ms"),
                 entry.get("model"),
             )
@@ -295,6 +396,7 @@ class _HTTPBase:
         backoff: float = 1.0,
         headers: dict[str, str] | None = None,
     ):
+        validate_llm_settings({"timeout": timeout, "max_retries": max_retries, "backoff": backoff})
         self.timeout = float(timeout)
         self.max_retries = int(max_retries)
         self.backoff = float(backoff)
@@ -334,7 +436,10 @@ class _HTTPBase:
                     data = response.read(MAX_RESPONSE_BYTES + 1)
                 if len(data) > MAX_RESPONSE_BYTES:
                     raise RuntimeError(f"response larger than {MAX_RESPONSE_BYTES} bytes")
-                raw = data.decode("utf-8")
+                try:
+                    raw = data.decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    raise RuntimeError("endpoint response is not valid UTF-8 text") from exc
                 latency = (time.perf_counter() - started) * 1000
                 return json.loads(raw), latency, attempt
             except urllib.error.HTTPError as exc:
@@ -555,25 +660,26 @@ class HTTPJSONClient(_HTTPBase):
             data, latency, attempts = self._post(
                 self.url, body, method=self.method, extra_headers=headers
             )
+        except Exception as exc:  # noqa: BLE001 - transport, HTTP or decoding: recorded as evidence
+            return Completion(text="", error=str(exc)[:300])
+        try:
             raw = str(json_path(data, self.response_path))
-            model = None
-            if self.model_path:
-                try:
-                    model = str(json_path(data, self.model_path))
-                except (KeyError, IndexError, ValueError):
-                    model = None
-            return Completion(
-                text=strip_reasoning(raw),
-                latency_ms=round(latency, 1),
-                model=model,
-                attempts=attempts,
-            )
-        except (KeyError, IndexError, ValueError) as exc:
+        except (KeyError, IndexError, ValueError, TypeError) as exc:
             return Completion(
                 text="", error=f"response_path '{self.response_path}' not found: {exc}"
             )
-        except Exception as exc:  # noqa: BLE001
-            return Completion(text="", error=str(exc)[:300])
+        model = None
+        if self.model_path:
+            try:
+                model = str(json_path(data, self.model_path))
+            except (KeyError, IndexError, ValueError, TypeError):
+                model = None
+        return Completion(
+            text=strip_reasoning(raw),
+            latency_ms=round(latency, 1),
+            model=model,
+            attempts=attempts,
+        )
 
     def describe(self) -> dict[str, Any]:
         return {
@@ -587,6 +693,7 @@ class HTTPJSONClient(_HTTPBase):
 
 
 def build_client(config: dict[str, Any]) -> LLMClient:
+    validate_llm_settings(config)
     mode = config.get("mode", "replay")
     common = {k: config[k] for k in ("timeout", "max_retries", "backoff", "headers") if k in config}
     if mode == "replay":

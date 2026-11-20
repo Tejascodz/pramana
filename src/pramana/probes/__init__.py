@@ -23,9 +23,7 @@ from importlib import resources
 from pathlib import Path
 from typing import Any
 
-import yaml
-
-from pramana.safeio import load_yaml
+from pramana.safeio import load_yaml, parse_yaml
 
 CATEGORIES = (
     "prompt_injection",
@@ -58,7 +56,7 @@ def _read_builtin(name: str) -> dict[str, Any]:
         raise ProbeFileError(
             f"Unknown built-in probe pack '{name}'. Available: {', '.join(builtin_packs())}"
         )
-    return yaml.safe_load(target.read_text(encoding="utf-8")) or {}
+    return parse_yaml(target.read_text(encoding="utf-8")) or {}
 
 
 def _merge(into: dict[str, list], data: dict[str, Any], source: str) -> None:

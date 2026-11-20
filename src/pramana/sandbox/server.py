@@ -28,6 +28,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
+from pramana import safefs
 from pramana.sandbox import APPROVERS, Session, load_scenarios, tool_schemas
 
 MAX_BODY = 1024 * 1024
@@ -62,7 +63,7 @@ class SandboxServer:
         self.events.extend(session.events[before:])
         self.prev_hash = session.prev_hash
         text = "".join(json.dumps(e, ensure_ascii=False) + "\n" for e in self.events)
-        self.out.write_text(text, encoding="utf-8")
+        safefs.write_user_file(self.out, text)
 
     def call(self, session_id: str, tool: str, args: dict[str, Any]) -> str:
         session = self.sessions[session_id]
