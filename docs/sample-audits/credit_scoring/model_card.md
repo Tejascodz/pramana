@@ -1,6 +1,6 @@
 # Model card: Nilgiri Finance Personal Loan Pre-Approval Model
 
-Audit PRM-20261021-F1F2BA · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-1CE6AC · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 2.3.0
@@ -54,6 +54,6 @@ Not validated for co-applicant or secured loans.
 - **R-10 (medium):** Decisions stay stable under small input changes; but some business-logic expectations are violated.
 - **R-11 (medium):** The model tells good and bad outcomes apart correctly about 75% of the time, which meets the bar set for this use.
 
-_Evidence root hash: `17aa54a746ca5a90f437cedfb56a1373bb5050b424353f4eb4aefa393e7dc2d9`_
+_Evidence root hash: `2d7915d847207faaa32d2f0c0473a3d063d28f4c5688979afd7ded43dc92cd4e`_
 
 _Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md_

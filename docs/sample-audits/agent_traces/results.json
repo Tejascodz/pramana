@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-C1CBD1",
+  "audit_id": "PRM-20261021-FE6846",
   "tool": {
     "name": "pramana",
-    "version": "0.7.16"
+    "version": "0.9.0"
   },
   "system": {
     "name": "Fee Refund Agent",
@@ -25,8 +25,8 @@
     "declared_eu_tier": "limited"
   },
   "audit_date": "2026-10-21",
-  "started": "2026-11-18T13:50:36+00:00",
-  "finished": "2026-11-18T13:50:36+00:00",
+  "started": "2026-11-21T23:36:35+00:00",
+  "finished": "2026-11-21T23:36:35+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -3336,9 +3336,9 @@
   ],
   "manual_evidence": [],
   "llm_run": {},
-  "ledger_root": "88b5353e336ad55f057764698f845d93dd3aa210f7df9d1b2d3e765315abe5e5",
+  "ledger_root": "e98332a3d35b9d94a281e4b654b4b363daf25d2e443c81dfac37c29d543632ff",
   "environment": {
     "python": "3.13.18",
-    "pramana": "0.7.16"
+    "pramana": "0.9.0"
   }
 }

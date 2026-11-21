@@ -41,7 +41,14 @@ Ollama applies its own origin and host checks; keep them by leaving
 ## What it sends
 
 - **No telemetry.** No analytics, crash reports or update checks. The only network
-  traffic is to the endpoint in your spec.
+  traffic is to the endpoints in your spec: the system under audit and, if you
+  configure one, a judge model.
+- **A judge model sees the attacks and the replies.** `llm.judge` sends each attack and
+  each reply it reviews to the judge endpoint, so use a local model (for example through
+  Ollama) when the replies may contain personal data. The judge gets the same
+  protections as any endpoint: https for keys, no redirects, capped responses. It reads
+  the attack and reply as data between boundary markers derived from their content and
+  must answer with a JSON verdict; anything else counts as "unclear", never as a verdict.
 - **Credentials come from the environment, in headers only.** `${VAR}` is expanded
   in header values and `api_key_env` names an environment variable; neither is
   ever written to an audit pack. URLs and request bodies are sent exactly as
@@ -103,6 +110,10 @@ Ollama applies its own origin and host checks; keep them by leaving
 
 ## What it trusts
 
+- **Imported attack datasets are recorded, not trusted.** `pramana import-attacks`
+  streams a dataset file you downloaded, records its SHA-256, licence and citation in
+  the scenarios it writes, and leaves out participants' identifiers. The attack text is
+  only ever shown to the agent under audit, inside the sandbox's stand-in tools.
 - **Audit specs and probe files are configuration.** A spec chooses the endpoint
   and which environment variable is sent as a credential. Only run specs you
   wrote or reviewed, as you would a CI workflow. Specs are parsed with a YAML

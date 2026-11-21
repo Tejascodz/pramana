@@ -1,0 +1,18 @@
+{
+  "category": "Security",
+  "check_id": "llm.judge_calibration",
+  "controls": [
+    "NIST:MEASURE-2.13",
+    "NIST:MEASURE-2.1",
+    "ISO42001:A.6.2.4"
+  ],
+  "details": {},
+  "evidence_hash": null,
+  "metrics": {},
+  "plain_summary": "Not tested because the required input was not supplied.",
+  "recommendation": "",
+  "severity": "info",
+  "status": "skipped",
+  "summary": "Skipped: no llm.judge configured; replies are scored by the rules alone",
+  "title": "Judge model accuracy (measured)"
+}

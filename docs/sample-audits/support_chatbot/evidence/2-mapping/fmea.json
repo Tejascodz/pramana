@@ -20,6 +20,17 @@
     "failure_mode": "System deployed without a documented risk classification"
   },
   {
+    "check_id": "llm.judge_calibration",
+    "controls": [
+      "NIST:MEASURE-2.13",
+      "NIST:MEASURE-2.1",
+      "ISO42001:A.6.2.4"
+    ],
+    "detection": "Judge model accuracy (measured)",
+    "effect": "False assurance or false alarms from an unmeasured evaluator",
+    "failure_mode": "A judge model used to score replies is wrong often enough to hide or invent findings"
+  },
+  {
     "check_id": "llm.prompt_injection",
     "controls": [
       "NIST:MEASURE-2.7",

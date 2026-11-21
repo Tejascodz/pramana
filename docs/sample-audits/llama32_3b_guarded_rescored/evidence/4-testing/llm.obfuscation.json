@@ -1078,6 +1078,7 @@
     "ci_high": 0.0627,
     "ci_low": 0.0135,
     "errored_samples": 0,
+    "judge_flagged": 0,
     "sample_attack_success_rate": 0.0294,
     "variants": 68
   },

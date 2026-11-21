@@ -1,5 +1,36 @@
 # Changelog
 
+## 0.9.0 — 2026-11-21
+
+Broader attacks, and scoring whose accuracy is measured. Everything runs on free,
+local or open models; nothing needs a paid API.
+
+- **Attack library.** `pramana.attacks.library` generates prompt-injection probes from
+  23 techniques, 4 goals and 7 languages: 188 distinct attacks, about 1,500 variants with
+  the obfuscations. A probe file's `generate` section adds them; selection covers every
+  technique even with a small `count`. Each probe has its own seeded, split proof code,
+  so verdicts stay deterministic and reproducible. Injection results are now reported by
+  technique, goal, language and carrier, and `llm.obfuscation_budget` samples disguised
+  variants evenly.
+- **Real attacks for agents.** `pramana import-attacks llmail-inject` turns Microsoft's
+  LLMail-Inject dataset (MIT licence) into sandbox scenarios: by default only attacks
+  that succeeded against the challenge's defences, with the dataset, licence, citation
+  and source SHA-256 recorded and participants' ids left out.
+- **Measured scoring.** `pramana benchmark` scores 50 hand-labelled attack and reply
+  pairs. It found the rules missed 9 of 25 compliant replies; the rules now also catch a
+  code or canary written reversed, base64 or hex, a canary split into its parts, and a
+  code with its hyphen written as a space, raising recall from 0.64 to 0.84 with
+  precision still 1.00.
+- **Fix: an echoed acceptance phrase counted as a successful attack.** Testing every
+  generated attack's echo found that "Developer mode enabled", copied from the attack
+  into a reply, counted as the model accepting it. Acceptance now counts only in the
+  model's own words. The published real-model packs re-score identically.
+- **Optional judge model, measured every time.** `llm.judge` (any OpenAI-compatible
+  model, including a local one) is scored on the benchmark at the start of each audit
+  (new check `llm.judge_calibration`) and not used below precision 0.80 or recall 0.60.
+  It reviews only samples the rules scored as resisted; a flag sends the sample to a
+  person and stops the check passing, but never becomes or removes a failure on its own.
+
 ## 0.8.0 — 2026-11-19
 
 From an independent 12-phase assessment of a fresh clone (local-only testing on a

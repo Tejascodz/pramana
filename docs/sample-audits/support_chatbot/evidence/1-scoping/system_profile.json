@@ -1,5 +1,5 @@
 {
-  "audit_id": "PRM-20261021-AB01B9",
+  "audit_id": "PRM-20261021-5091E6",
   "classification": {
     "eu_applicable": false,
     "eu_basis": [
@@ -37,6 +37,7 @@
   },
   "planned_checks": [
     "governance.risk_classification",
+    "llm.judge_calibration",
     "llm.prompt_injection",
     "llm.multi_turn",
     "llm.groundedness",

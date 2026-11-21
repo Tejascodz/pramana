@@ -63,7 +63,7 @@
 
   <rect x="320" y="358" width="380" height="58" rx="8" fill="#f3f7ff" stroke="#b9cdf3"/>
   <text x="334" y="382" font-size="14" font-weight="650" fill="#111827">4  Testing</text>
-  <text x="334" y="401">28 checks: 14 tabular, 10 LLM application, 8 agent</text>
+  <text x="334" y="401">29 checks: 14 tabular, 11 LLM application, 8 agent</text>
 
   <rect x="320" y="430" width="380" height="72" rx="8" fill="#f3f7ff" stroke="#b9cdf3"/>
   <text x="334" y="454" font-size="14" font-weight="650" fill="#111827">5  Reflection</text>

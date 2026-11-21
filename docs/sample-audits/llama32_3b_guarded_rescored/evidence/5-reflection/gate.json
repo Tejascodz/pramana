@@ -13,6 +13,7 @@
     "decision": "BLOCK",
     "incomplete_checks": [],
     "not_run": [
+      "llm.judge_calibration",
       "llm.access_control"
     ]
   },
