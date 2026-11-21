@@ -8,6 +8,10 @@ referenced as ``builtin:<name>``; anything else is a path relative to the file.
 ``{canary}`` anywhere in a probe is replaced with the canary value, so the
 same pack works for every deployment.
 
+``generate`` adds probes from Pramana's attack library (``pramana.attacks.library``):
+for example ``generate: {prompt_injection: {count: 300, languages: [en, hi]}}`` adds
+300 injection probes spread evenly over every technique, goal and listed language.
+
 ``sensitive_records`` (a CSV next to the probe file) and ``sensitive_values``
 list data canaries: values that must never appear in an answer unless the user
 supplied them, such as customer names and account numbers that no pattern
@@ -155,6 +159,64 @@ def _sensitive_values(path: Path, data: dict[str, Any]) -> list[dict[str, str]]:
     return unique
 
 
+_GENERATE_KEYS = {"count", "seed", "languages", "goals", "techniques"}
+
+
+def _generated(spec: Any, source: str, has_canary: bool) -> list[dict[str, Any]]:
+    """Probes from the attack library, as requested by a probe file's ``generate`` section."""
+    from pramana.attacks import library
+
+    if not isinstance(spec, dict):
+        raise ProbeFileError(f"{source}: 'generate' must map a category to its settings")
+    extra = sorted(set(map(str, spec)) - {"prompt_injection"})
+    if extra:
+        raise ProbeFileError(
+            f"{source}: generate.{extra[0]}: only prompt_injection can be generated"
+        )
+    settings = spec.get("prompt_injection") or {}
+    if not isinstance(settings, dict):
+        raise ProbeFileError(f"{source}: generate.prompt_injection must be a mapping")
+    unknown = sorted(set(map(str, settings)) - _GENERATE_KEYS)
+    if unknown:
+        raise ProbeFileError(
+            f"{source}: generate.prompt_injection.{unknown[0]} is not a setting; use "
+            + ", ".join(sorted(_GENERATE_KEYS))
+        )
+    count = settings.get("count", "all")
+    if count != "all" and (isinstance(count, bool) or not isinstance(count, int) or count < 1):
+        raise ProbeFileError(
+            f"{source}: generate count must be a whole number of 1 or more, or 'all'"
+        )
+    seed = settings.get("seed", 7)
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise ProbeFileError(f"{source}: generate seed must be a whole number of 0 or more")
+    chosen = {}
+    for key, allowed in (
+        ("languages", library.LANGUAGES),
+        ("goals", library.GOALS),
+        ("techniques", tuple(library.TECHNIQUES)),
+    ):
+        value = settings.get(key, list(allowed))
+        if not isinstance(value, list) or not value or not all(v in allowed for v in value):
+            raise ProbeFileError(
+                f"{source}: generate {key} must be a non-empty list drawn from: {', '.join(allowed)}"
+            )
+        chosen[key] = value
+    if chosen["goals"] == ["canary"] and not has_canary:
+        raise ProbeFileError(f"{source}: the canary goal needs a 'canary' value in this file")
+    probes = library.generate(
+        None if count == "all" else count,
+        seed=seed,
+        goals=chosen["goals"],
+        languages=chosen["languages"],
+        techniques=chosen["techniques"],
+        has_canary=has_canary,
+    )
+    for probe in probes:
+        probe["source"] = "attack library"
+    return probes
+
+
 def load_probe_file(path: str | Path) -> dict[str, Any]:
     path = Path(path)
     data = load_yaml(path) or {}
@@ -177,6 +239,11 @@ def load_probe_file(path: str | Path) -> dict[str, Any]:
             _merge(probes, included_data, included.name)
         sources.append(str(ref))
     _merge(probes, data, path.name)
+    if data.get("generate") is not None:
+        has_canary = bool(str(data.get("canary", "") or ""))
+        generated = _generated(data["generate"], path.name, has_canary)
+        _merge(probes, {"probes": {"prompt_injection": generated}}, "attack library")
+        sources.append(f"attack library ({len(generated)} generated)")
 
     seen: set[str] = set()
     for items in probes.values():
