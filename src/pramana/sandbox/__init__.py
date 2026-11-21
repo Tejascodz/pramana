@@ -97,6 +97,18 @@ class SandboxError(ValueError):
 # Scenarios --------------------------------------------------------------------------
 
 
+def scenario_provenance(source: str | Path) -> dict[str, Any] | None:
+    """Where a scenarios file's attacks came from (dataset, licence, source hash), if it says."""
+    if str(source).startswith("builtin:"):
+        return None
+    try:
+        data = load_yaml(source) or {}
+    except Exception:  # noqa: BLE001 - load_scenarios reports a bad file; this is only metadata
+        return None
+    prov = data.get("provenance") if isinstance(data, dict) else None
+    return prov if isinstance(prov, dict) else None
+
+
 def load_scenarios(source: str | Path) -> list[dict[str, Any]]:
     """Scenarios from ``builtin:<name>`` or a YAML file path."""
     if str(source).startswith("builtin:"):

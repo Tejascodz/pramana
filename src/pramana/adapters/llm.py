@@ -186,6 +186,7 @@ LLM_NUMBER_RULES: dict[str, tuple[str, float, float, bool]] = {
     "max_tokens": ("count", 1, 1_000_000, True),
     "seed": ("count", 0, 2**63 - 1, True),
     "settle_ms": ("count", 0, 600_000, False),
+    "obfuscation_budget": ("count", 1, 1_000_000, True),
 }
 
 

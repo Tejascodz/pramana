@@ -11,6 +11,8 @@
     pramana init [PATH]                                write a starter audit spec
     pramana demo [credit|chatbot|agent|all]            run a bundled case study end to end
     pramana sandbox serve [--port P] [--out TRACE]     honeypot tools for your own agent
+    pramana import-attacks llmail-inject FILE --out F  real attack e-mails as sandbox scenarios
+    pramana benchmark [--judge-url U --judge-model M]  measure the scoring (and a judge) on labelled data
 
 Exit codes: 0 success, 1 release gate blocked, 2 verification failed, 3 bad input,
 4 endpoint unreachable.
@@ -44,7 +46,15 @@ def _cmd_run(args: argparse.Namespace) -> int:
         if not spec.llm:
             print("error: --replay needs a spec with an 'llm' section", file=sys.stderr)
             return EXIT_INPUT
-        keep = ("probes", "knowledge_base", "include_knowledge_base", "samples", "mutations")
+        keep = (
+            "probes",
+            "knowledge_base",
+            "include_knowledge_base",
+            "samples",
+            "mutations",
+            "obfuscation_budget",
+            "judge",
+        )
         spec.llm = {
             "mode": "replay",
             "replay": Path(args.replay),
@@ -565,6 +575,91 @@ def _cmd_init(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_import_attacks(args: argparse.Namespace) -> int:
+    import yaml
+
+    from pramana.attacks.importers import DatasetFormatError, llmail_scenarios
+
+    source = Path(args.source)
+    if args.count < 0:
+        print("error: --count must be 0 (all) or more", file=sys.stderr)
+        return EXIT_INPUT
+    if not source.is_file():
+        print(f"error: {source} not found", file=sys.stderr)
+        return EXIT_INPUT
+    try:
+        data, stats = llmail_scenarios(
+            source,
+            count=args.count or None,
+            seed=args.seed,
+            only_successful=not args.include_failed,
+        )
+    except (DatasetFormatError, OSError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    header = (
+        "# Real attack e-mails from LLMail-Inject (MIT licence), as Pramana sandbox scenarios.\n"
+        f"# {data['provenance']['citation']}\n"
+        "# Point an audit spec at this file with agent.scenarios.\n"
+    )
+    safefs.write_user_file(
+        args.out, header + yaml.safe_dump(data, sort_keys=False, allow_unicode=True)
+    )
+    print(
+        f"Read {stats['lines']} submissions ({stats['malformed']} malformed, {stats['successful']} "
+        f"successful against the challenge's defences); {stats['kept']} unique candidates. Wrote "
+        f"{len(data['scenarios']) - 1} attack scenarios and 1 control to {args.out}."
+    )
+    return EXIT_OK
+
+
+def _cmd_benchmark(args: argparse.Namespace) -> int:
+    from pramana import benchmarks
+
+    judge = None
+    if args.judge_url or args.judge_model:
+        if not (args.judge_url and args.judge_model):
+            print("error: --judge-url and --judge-model go together", file=sys.stderr)
+            return EXIT_INPUT
+        from pramana.judge import build_judge
+
+        try:
+            judge = build_judge({"base_url": args.judge_url, "model": args.judge_model})
+        except ValueError as exc:
+            print(f"error: {exc}", file=sys.stderr)
+            return EXIT_INPUT
+    report = benchmarks.run(judge)
+    if args.json:
+        print(json.dumps(report, indent=2))
+        return EXIT_OK
+
+    def show(m: dict) -> str:
+        if m["value"] is None:
+            return "n/a"
+        return f"{m['value']:.2f} (95% CI {m['ci'][0]:.2f}-{m['ci'][1]:.2f}, n={m['of']})"
+
+    print(
+        f"{report['cases']} labelled cases ({report['complied_cases']} complied). "
+        "Positive class: the reply complied with the attack."
+    )
+    for name in ("rules", "judge", "hybrid"):
+        if name in report:
+            m = report[name]
+            label = {"rules": "Pramana rules", "judge": f"Judge {report.get('judge_model', '')}",
+                     "hybrid": "Rules or judge"}[name]  # fmt: skip
+            print(f"  {label:28} precision {show(m['precision'])}  recall {show(m['recall'])}")
+    if "judge" in report:
+        print(
+            f"  judge answers unclear: {report['judge_unclear']}, errors: {report['judge_errors']}"
+        )
+    missed = [r for r in report["rows"] if r["rules"] != (r["label"] == "complied")]
+    if missed:
+        print("Cases the rules score wrongly:")
+        for r in missed:
+            print(f"  {r['id']} {r['kind']} (labelled {r['label']})")
+    return EXIT_OK
+
+
 def _cmd_scan_trace(args: argparse.Namespace) -> int:
     from pramana.adapters.traces import stream_events
     from pramana.checks.agent_trace import scan_misalignment, session_conditions
@@ -815,6 +910,30 @@ def build_parser() -> argparse.ArgumentParser:
     )
     demo.add_argument("--out", default="pramana-demo", help="folder for the demo files and packs")
     demo.set_defaults(fn=_cmd_demo)
+
+    imp = sub.add_parser(
+        "import-attacks", help="turn a public attack dataset into agent sandbox scenarios"
+    )
+    imp.add_argument("dataset", choices=["llmail-inject"])
+    imp.add_argument("source", help="LLMail-Inject raw_submissions_phase1.jsonl or _phase2.jsonl")
+    imp.add_argument("-o", "--out", required=True, help="scenarios file to write (YAML)")
+    imp.add_argument("--count", type=int, default=50, help="attacks to keep (0 = all; default 50)")
+    imp.add_argument("--seed", type=int, default=7, help="sampling seed (default 7)")
+    imp.add_argument(
+        "--include-failed",
+        action="store_true",
+        help="also keep attacks that did not succeed in the challenge (default: successful only)",
+    )
+    imp.set_defaults(fn=_cmd_import_attacks)
+
+    bench = sub.add_parser(
+        "benchmark",
+        help="measure the scoring rules (and optionally a judge model) on labelled data",
+    )
+    bench.add_argument("--judge-url", help="OpenAI-compatible endpoint of a judge model")
+    bench.add_argument("--judge-model", help="model name at that endpoint")
+    bench.add_argument("--json", action="store_true", help="print the full report as JSON")
+    bench.set_defaults(fn=_cmd_benchmark)
 
     scan = sub.add_parser(
         "scan-trace",

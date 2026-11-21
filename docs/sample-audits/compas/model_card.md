@@ -1,6 +1,6 @@
 # Model card: COMPAS recidivism risk scores (Broward County, Florida)
 
-Audit PRM-20261021-42DAFC · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-253EE8 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 2013-2014
@@ -48,6 +48,6 @@ _Not documented. Flagged in the audit._
 - **R-05 (medium):** The model tells good and bad outcomes apart correctly about 71% of the time, which meets the bar set for this use.
 - **R-06 (medium):** This is a high-risk AI use under the EU AI Act, with strict duties on testing, documentation and human oversight.
 
-_Evidence root hash: `be28dede3b7a5659a8836d13cd528745e73b7de3b4d52dac589c18f7143f8ebf`_
+_Evidence root hash: `61b3f7946e33a8c62a0ff2966d125cd3e83a5465db2920dfaff4191138b3181a`_
 
 _Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md_

@@ -15,6 +15,7 @@
     "decision": "BLOCK",
     "incomplete_checks": [],
     "not_run": [
+      "llm.judge_calibration",
       "llm.multi_turn",
       "llm.obfuscation",
       "llm.access_control",
