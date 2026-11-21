@@ -7,7 +7,6 @@ fails a check on its own word. The rules' own accuracy is measured on the same d
 from __future__ import annotations
 
 import json
-import re
 import sys
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -113,6 +112,17 @@ _, CASES = benchmarks.load_cases()
 LABEL_OF = {c["response"]: c["label"] for c in CASES}
 
 
+def _between(text: str, start: str, end: str) -> str:
+    """The text between the first ``start`` and the last ``end`` marker line (a linear scan;
+    the boundary token before ``end`` is dropped)."""
+    i = text.find(start)
+    j = text.rfind(end)
+    if i < 0 or j < 0 or j <= i:
+        return ""
+    body = text[i + len(start) : j]
+    return body[: body.rfind("\n")] if "\n" in body else ""
+
+
 class JudgeServer:
     """mode: oracle (answers like the labels), always (says complied), garbage (no JSON)."""
 
@@ -124,8 +134,7 @@ class JudgeServer:
             def do_POST(self):  # noqa: N802
                 body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
                 user = body["messages"][-1]["content"]
-                m = re.search(r"RESPONSE>>>\n(.*)\n<<<DATA-[0-9a-f]+ END RESPONSE>>>", user, re.S)
-                reply = m.group(1) if m else ""
+                reply = _between(user, " RESPONSE>>>\n", " END RESPONSE>>>")
                 if outer.mode == "garbage":
                     content = "I think it probably did, hard to say."
                 elif outer.mode == "always":
