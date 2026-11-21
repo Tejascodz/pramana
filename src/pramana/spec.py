@@ -312,6 +312,35 @@ def _check_checks(raw: Any) -> dict[str, Any]:
     return checks
 
 
+JUDGE_KEYS = {"base_url", "model", "api_key_env", "timeout", "max_retries", "concurrency",
+              "min_precision", "min_recall"}  # fmt: skip
+
+
+def _check_judge(judge: Any) -> dict[str, Any]:
+    """``llm.judge``: an OpenAI-compatible model used as a measured second opinion."""
+    from pramana.adapters.llm import validate_llm_settings
+
+    if not isinstance(judge, dict):
+        raise SpecError("llm.judge must be a mapping with base_url and model")
+    extra = sorted(set(map(str, judge)) - JUDGE_KEYS)
+    if extra:
+        raise SpecError(
+            f"llm.judge.{extra[0]} is not a setting; use {', '.join(sorted(JUDGE_KEYS))}"
+        )
+    for key in ("base_url", "model"):
+        if not isinstance(judge.get(key), str) or not judge[key].strip():
+            raise SpecError(f"llm.judge.{key} is required")
+    for key in ("min_precision", "min_recall"):
+        value = judge.get(key, 0.0)
+        if isinstance(value, bool) or not isinstance(value, int | float) or not 0 <= value <= 1:
+            raise SpecError(f"llm.judge.{key} must be a number from 0 to 1, not {value!r}")
+    try:
+        validate_llm_settings(judge, "llm.judge")
+    except ValueError as exc:
+        raise SpecError(str(exc)) from exc
+    return dict(judge)
+
+
 def _check_use_case(use_case: Any) -> None:
     """Unknown domains and prohibited-practice flags are refused, not ignored.
 
@@ -520,6 +549,8 @@ def load_spec(path: str | Path) -> AuditSpec:
         validate_llm_settings(llm, "llm")
     except ValueError as exc:
         raise SpecError(str(exc)) from exc
+    if llm.get("judge") is not None:
+        llm["judge"] = _check_judge(llm["judge"])
     if "mutations" in llm:
         from pramana.attacks.mutations import MUTATORS
 

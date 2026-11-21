@@ -79,6 +79,7 @@ pramana = [
   "reporting/templates/*.j2",
   "probes/packs/*.yaml",
   "sandbox/scenarios/*.yaml",
+  "benchmarks/*.yaml",
   "demos/**/*",
 ]
 
