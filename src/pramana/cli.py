@@ -11,6 +11,7 @@
     pramana init [PATH]                                write a starter audit spec
     pramana demo [credit|chatbot|agent|all]            run a bundled case study end to end
     pramana sandbox serve [--port P] [--out TRACE]     honeypot tools for your own agent
+    pramana import-attacks llmail-inject FILE --out F  real attack e-mails as sandbox scenarios
 
 Exit codes: 0 success, 1 release gate blocked, 2 verification failed, 3 bad input,
 4 endpoint unreachable.
@@ -565,6 +566,44 @@ def _cmd_init(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_import_attacks(args: argparse.Namespace) -> int:
+    import yaml
+
+    from pramana.attacks.importers import DatasetFormatError, llmail_scenarios
+
+    source = Path(args.source)
+    if args.count < 0:
+        print("error: --count must be 0 (all) or more", file=sys.stderr)
+        return EXIT_INPUT
+    if not source.is_file():
+        print(f"error: {source} not found", file=sys.stderr)
+        return EXIT_INPUT
+    try:
+        data, stats = llmail_scenarios(
+            source,
+            count=args.count or None,
+            seed=args.seed,
+            only_successful=not args.include_failed,
+        )
+    except (DatasetFormatError, OSError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    header = (
+        "# Real attack e-mails from LLMail-Inject (MIT licence), as Pramana sandbox scenarios.\n"
+        f"# {data['provenance']['citation']}\n"
+        "# Point an audit spec at this file with agent.scenarios.\n"
+    )
+    safefs.write_user_file(
+        args.out, header + yaml.safe_dump(data, sort_keys=False, allow_unicode=True)
+    )
+    print(
+        f"Read {stats['lines']} submissions ({stats['malformed']} malformed, {stats['successful']} "
+        f"successful against the challenge's defences); {stats['kept']} unique candidates. Wrote "
+        f"{len(data['scenarios']) - 1} attack scenarios and 1 control to {args.out}."
+    )
+    return EXIT_OK
+
+
 def _cmd_scan_trace(args: argparse.Namespace) -> int:
     from pramana.adapters.traces import stream_events
     from pramana.checks.agent_trace import scan_misalignment, session_conditions
@@ -815,6 +854,21 @@ def build_parser() -> argparse.ArgumentParser:
     )
     demo.add_argument("--out", default="pramana-demo", help="folder for the demo files and packs")
     demo.set_defaults(fn=_cmd_demo)
+
+    imp = sub.add_parser(
+        "import-attacks", help="turn a public attack dataset into agent sandbox scenarios"
+    )
+    imp.add_argument("dataset", choices=["llmail-inject"])
+    imp.add_argument("source", help="LLMail-Inject raw_submissions_phase1.jsonl or _phase2.jsonl")
+    imp.add_argument("-o", "--out", required=True, help="scenarios file to write (YAML)")
+    imp.add_argument("--count", type=int, default=50, help="attacks to keep (0 = all; default 50)")
+    imp.add_argument("--seed", type=int, default=7, help="sampling seed (default 7)")
+    imp.add_argument(
+        "--include-failed",
+        action="store_true",
+        help="also keep attacks that did not succeed in the challenge (default: successful only)",
+    )
+    imp.set_defaults(fn=_cmd_import_attacks)
 
     scan = sub.add_parser(
         "scan-trace",

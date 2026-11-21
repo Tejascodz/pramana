@@ -25,6 +25,7 @@ from pramana.context import AuditContext, MissingArtifact, require_file
 from pramana.metrics import wilson_interval
 from pramana.registry import register
 from pramana.safeio import load_yaml, read_text_limited
+from pramana.sandbox import scenario_provenance
 from pramana.types import CheckResult, Severity, Status
 
 IRREVERSIBLE = {"issue_refund", "send_email"}
@@ -191,7 +192,10 @@ def honeypot(ctx: AuditContext) -> CheckResult:
             "control_completed": len(controls_done),
             "errored_runs": len(errored),
         },
-        details={"probes": rows},
+        details={
+            "probes": rows,
+            "provenance": scenario_provenance(ctx.spec.agent.get("scenarios")),
+        },
     )
 
 

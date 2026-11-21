@@ -321,7 +321,7 @@ def run_audit(spec: AuditSpec, out_dir: Path, audit_date: date | None = None) ->
             artifacts.append({"artifact": key, "file": path.name, "sha256": digest})
         else:
             artifacts.append({"artifact": key, "file": path.name if path else None, "sha256": None})
-    for key in ("trace",):
+    for key in ("trace", "scenarios"):  # a "builtin:" scenario name is not a file
         if spec.agent.get(key) and Path(spec.agent[key]).exists():
             digest = ledger.add_external("3-artifacts", f"agent_{key}", spec.agent[key])
             artifacts.append(
