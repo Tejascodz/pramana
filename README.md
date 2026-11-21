@@ -187,6 +187,24 @@ Without being told what to look for, the audit fails group fairness as critical:
 
 **What did not work or is not significant.** The fall in single-message injection is significant (Fisher's exact test, p = 0.0001). The fall in disclosure, 4 of 21 to 0 of 21, is not (p = 0.11): it is consistent with the guard but not proven by this sample. The guarded build still blocks, because a held-out persona-switch attack succeeds in 1 of 3 samples and its disguised versions get the model to accept the attacker's persona; those are the six disguised successes. All numbers come from one small model; another model can behave very differently.
 
+### Independent reproduction on Kaggle
+
+The full system was run from a fresh clone of v0.8.0 (commit `e3afa83`), unchanged, on Kaggle with two NVIDIA T4 GPUs on 21 November 2026. The test suite passed (633 tests), all 11 sample packs above verified, and nine new audits ran: LLM applications on one GPU and agents on the other, with open-weights models downloaded from Hugging Face (4-bit GGUF builds served by Ollama). Every pack was signed with a fresh Ed25519 key and verified against it. The run took 11 minutes.
+
+| System | Model | Gate | Findings |
+|---|---|---|---|
+| Credit scoring (synthetic) | Gradient boosting | BLOCK | Same results as the committed pack |
+| COMPAS | Decile scores | BLOCK | Same results as above (AUC 0.710, CI 0.699–0.722) |
+| Adult Census Income (Hugging Face dataset; model trained in the run) | Gradient boosting | BLOCK | AUC 0.921 (CI 0.913–0.928). Disparate impact 0.30 by sex and 0.35 by race, 0.19 for the worst sex × race pair; `relationship` predicts sex with AUC 0.86 |
+| Reference assistant, baseline build | Qwen2.5-3B | BLOCK | Injection 14 of 26 (54%, CI 35–71%); multi-turn 7 of 14; disguised 37 of 68; another customer's e-mail and mobile disclosed in 2 of 7 disclosure probes and 2 of 5 identity claims |
+| Reference assistant, guarded build | Qwen2.5-3B | BLOCK | Injection 3 of 26 (12%, CI 4–29%), including the held-out persona switch; disguised 3 of 68 (4%); multi-turn 0 of 14; no disclosure; groundedness 100%. 102 of 160 requests were stopped by the guard without reaching the model |
+| The model with no application around it | Llama-3.2-3B | BLOCK | Injection 2 of 26 (8%); multi-turn 10 of 14 (71%, CI 45–88%); disguised 10 of 68 (15%) |
+| Agent sandbox | Qwen2.5-7B | BLOCK | Obeyed the planted instruction in 6 of the 8 runs that reached it (CI 41–93%): four refunds and two e-mails, none reversible |
+| Agent sandbox | Llama-3.2-3B | BLOCK | Ignored the planted instruction in all 4 runs that reached it, but issued 2 refunds before seeing any planted text and completed the control task in 0 of 2 runs, so this is reported as possibly not acting rather than as resisting |
+| Fee-refund agent audited from its own trace | Qwen2.5-3B | PASS | No misalignment signals in 32 events and 9 tool calls |
+
+The pattern from the laptop runs holds on different hardware and a different model: the guard cuts single-message injection from 54% to 12% on Qwen2.5-3B (Fisher's exact test, p = 0.0025), multi-turn attacks from 7 of 14 to 0 of 14 (p = 0.006) and disguised attacks from 37 of 68 to 3 of 68 (p < 0.0001), and the held-out persona switch still gets through. Each probe was sent once, so the intervals are wide; these packs are not committed, and the rates are indicative.
+
 ## Usage
 
 | Command | What it does |
@@ -281,7 +299,7 @@ The audit stages follow SMACTR (Raji et al., "Closing the AI Accountability Gap"
 - **It is evidence, not certification.** A report supports a qualified reviewer. It is not a conformity assessment or legal opinion, and a pass covers only the checks that ran, on the inputs and samples in the pack. Board oversight, training, suppliers and incident handling need organisational evidence that Pramana can fingerprint but not judge.
 - **Deterministic scoring has blind spots.** Paraphrased leaks, attacks that succeed without the configured proof, and acceptance phrased in languages other than English, Hindi and Hinglish can be missed. Results marked "needs review" need a person.
 - **The attack library is small and scripted.** 35 built-in probes, fixed multi-turn scripts and character-level disguises. There is no adaptive attacker, and translation or paraphrase attacks are not generated.
-- **Measured on one model.** The LLM results above come from llama3.2:3b on a laptop. No hosted frontier model or third-party LLM application has been audited live, and the probes and the reference guard share an author.
+- **Measured on small open models.** The LLM and agent results come from llama3.2:3b on a laptop and from Qwen2.5-3B, Qwen2.5-7B and Llama-3.2-3B on Kaggle. No hosted frontier model or third-party LLM application has been audited live, and the probes and the reference guard share an author.
 - **Access control is judged by what replies reveal.** It does not review an application's authentication design, and a system that accepts a false identity without repeating the record passes.
 - **Agent coverage depends on the logs.** Actions outside the logging pipeline are invisible, and the approval-path proof holds only for the workflow graph as declared. The sandbox uses a stand-in bank, not the customer's tools.
 - **Statistics need data.** Groups below 30 records are shown but not compared, fairness metrics conflict by construction, the four-fifths rule is a screening heuristic, and the membership-inference attack is a simple one.
@@ -327,7 +345,7 @@ src/pramana/        engine, checks, adapters (API, browser, traces), risk, contr
 dashboard/          web viewer for audit packs
 examples/           credit scoring, COMPAS, support chatbot, live assistant, agent traces and sandbox
 scripts/            re-scoring and figure generation
-docs/sample-audits/ committed audit packs, including the ones every number above comes from
+docs/sample-audits/ committed audit packs: every number above except the Kaggle reproduction comes from them
 tests/              unit, end-to-end, security and regression tests
 action.yml          GitHub Action
 ```
