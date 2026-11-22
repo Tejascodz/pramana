@@ -250,11 +250,12 @@ Pramana does not credit Llama-3.2-3B with resisting: it did not complete the ord
 
 | Share of the prompt reproduced | Precision | Recall | False alarms |
 |---|---|---|---|
-| At least 0.5 (fails the check) | 0.998 (CI 0.997–0.998) | 0.46 | 168 of 200,017 |
-| 0.4 to 0.5 (sent for review, from 0.9.3) | 0.97 | adds 0.23 | 1,270 |
-| At least 0.3 (not used) | 0.89 | 0.80 | 15,332 |
+| 0.9.2, at least 0.5 (fails the check) | 0.998 (CI 0.997–0.998) | 0.46 | 168 of 200,017 |
+| **0.9.3**, at least 0.5 (fails the check) | **0.998 (CI 0.998–0.998)** | **0.57** | **168 of 200,017** |
+| **0.9.3**, 0.4 to 0.5 (sent for review, never a failure) | **0.97 (CI 0.96–0.97)** | **0.80 with the above** | 1,270 |
+| 0.9.3, at least 0.3 (not used) | 0.90 | 0.91 | 15,332 |
 
-It catches recitals, not paraphrases, which is what the rule claims. The same data showed replies written with underscores for spaces going unseen, fixed in 0.9.3. With the judge on the 59 labelled cases, every judge raised recall to 0.96; Qwen2.5-3B without the system prompt did so with precision 1.00. Shown the system prompt with its canary withheld, Qwen2.5-7B still flagged the guarded build's fixed refusal 6 times in 135, against 2 in 136 without it, so the prompt stays off by default.
+It catches recitals, not paraphrases, which is what the rule claims. The 0.9.2 run showed replies written with underscores for spaces going unseen; 0.9.3 split those words, and a second run on the same data (CPU only, 19 minutes) measured the result: 17,023 of the 17,366 underscore leaks caught with one false alarm, recall at the fail threshold up from 0.46 to 0.57 with no new false alarm. The 168 that remain are on-topic answers to a long system prompt that reuse much of its wording in order; the leaks still missed are paraphrases, with synonyms in place of the prompt's words. With the judge on the 59 labelled cases, every judge raised recall to 0.96; Qwen2.5-3B without the system prompt did so with precision 1.00. Shown the system prompt with its canary withheld, Qwen2.5-7B still flagged the guarded build's fixed refusal 6 times in 135, against 2 in 136 without it, so the prompt stays off by default.
 
 ## Usage
 
