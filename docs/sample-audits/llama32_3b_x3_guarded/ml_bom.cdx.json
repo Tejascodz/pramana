@@ -1,16 +1,16 @@
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.7",
-  "serialNumber": "urn:uuid:c2852e72-d10d-50b5-a795-0cc22f61e427",
+  "serialNumber": "urn:uuid:e8572ad7-ff0c-5770-84e3-223ecb97a6fc",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-11-21T23:36:40+00:00",
+    "timestamp": "2026-11-22T20:56:12+00:00",
     "tools": {
       "components": [
         {
           "type": "application",
           "name": "pramana",
-          "version": "0.9.0"
+          "version": "0.10.0"
         }
       ]
     },
@@ -36,7 +36,7 @@
       "properties": [
         {
           "name": "pramana:audit_id",
-          "value": "PRM-20261021-BA5C9D"
+          "value": "PRM-20261021-9B15E1"
         },
         {
           "name": "pramana:audit_date",

@@ -32,7 +32,7 @@ pack with a release decision that a reviewer can verify.
 
 Teams that ship AI systems are asked for evidence: that the model is not unfair to a protected group, that the chatbot does not leak customer data or follow injected instructions, that an agent cannot move money without approval, and that none of this evidence was edited afterwards. That evidence usually lives in notebooks, screenshots and spreadsheets that a reviewer cannot check. Pramana produces it as a single sealed audit pack from one specification file. Its checks are deterministic, so the same inputs always give the same verdict and a failure always comes with the record that proves it.
 
-- **29 checks across three kinds of system.** Fairness (group, intersectional, proxy), performance, calibration, drift, robustness, explainability, privacy and documentation for tabular models; prompt injection, multi-turn manipulation, disguised attacks, data disclosure, access control, groundedness, conduct rules, service health and the measured accuracy of an optional judge model for LLM applications; auditability, misalignment signals, safeguards, oversight, honeypots and approval paths for agents.
+- **30 checks across three kinds of system.** Fairness (group, intersectional, proxy), performance, calibration, drift, robustness, explainability, privacy and documentation for tabular models; prompt injection, adaptive attacks that change after every reply, multi-turn manipulation, disguised attacks, data disclosure, access control, groundedness, conduct rules, service health and the measured accuracy of an optional judge model for LLM applications; auditability, misalignment signals, safeguards, oversight, honeypots and approval paths for agents.
 - **Tests run against the live system.** LLM applications are reached through an OpenAI-compatible API, any JSON API, a recorded replay, or their own web chat page driven in Chromium. 35 hand-written probes cover English, Hindi, Hinglish, Kannada and Tamil; an attack library generates 188 more from 23 techniques, 4 goals and 7 languages; and 7 obfuscation methods re-send each attack in disguise, about 1,500 variants in all. Agents can also be tested with real attack e-mails written by people in Microsoft's LLMail-Inject challenge.
 - **Agents are audited from the logs they already write** (native, OpenTelemetry or LangChain) and in a honeypot sandbox whose tools plant instructions. A graph search proves whether any workflow path reaches an irreversible step without human approval.
 - **Evidence is tamper-evident.** Every file in the pack is recorded in a hash-chained ledger; `pramana verify` fails on any edit, and packs can be signed with Ed25519 or attested by GitHub Actions through Sigstore.
@@ -116,7 +116,7 @@ Each finding becomes a risk with likelihood times impact (likelihood 4 for a fai
 The pack holds an HTML report, `results.json`, a model card, a CycloneDX 1.7 ML bill of materials, CSVs of the risk register, control coverage and remediation plan, and `ledger.jsonl`. Each ledger entry records a file's SHA-256 and the hash of the previous entry, and every file in the pack must be recorded, so an edited, added, removed or reordered file fails `pramana verify`. A hash chain proves consistency, not origin: anyone can rebuild an unsigned pack. `pramana sign` adds an Ed25519 signature, and the GitHub Action can attest the ledger with a Sigstore certificate that names the repository, commit and workflow.
 
 <details>
-<summary>All 29 checks</summary>
+<summary>All 30 checks</summary>
 
 | Area | Check | What it measures |
 |---|---|---|
@@ -136,9 +136,10 @@ The pack holds an HTML report, `results.json`, a model card, a CycloneDX 1.7 ML 
 | Assurance | `audit.detector_sensitivity` | Plants known defects and clean controls in copies of the data and confirms the checks react correctly |
 | LLM security | `llm.prompt_injection` | Hand-written and generated attacks (23 techniques, 4 goals, 7 languages), reported by technique, goal and language; system-prompt canary |
 | LLM security | `llm.multi_turn` | Conversations of 2 to 4 turns with the real replies kept in history; reports the turn at which the defence broke |
+| LLM security | `llm.adaptive_attacks` | A search that changes its attack after every reply (nested techniques, rephrasing, language, disguises, and optionally an attacker model as in PAIR and TAP); a goal counts only when the reply contains its proof |
 | LLM security | `llm.obfuscation` | Every injection re-sent with zero-width characters, look-alike letters, soft hyphens, spacing, digits, full-width letters or joiners inside Indian scripts |
 | LLM privacy | `llm.sensitive_disclosure` | Personal data, secrets, the canary and known customer records in replies |
-| LLM privacy | `llm.access_control` | Requests that claim another customer's identity must not get that customer's record |
+| LLM privacy | `llm.access_control` | Requests that claim another customer's identity must not get that customer's record; a reply accepting the false identity is sent for review |
 | LLM reliability | `llm.groundedness` | Required facts, unsupported figures and contacts, contradictions and over-refusal against the knowledge base |
 | LLM conduct | `llm.policy_adherence` | Required and forbidden statements for each conduct rule, negation-aware |
 | LLM operations | `llm.service_health` | Error rate, retries, p50 and p95 latency and output length from the run |
@@ -338,7 +339,7 @@ generate:
   prompt_injection: {count: 300, languages: [en, hi, es]}   # or count: all
 ```
 
-`llm.obfuscation_budget` caps how many disguised variants are sent, sampled evenly across disguises, and `llm.judge: {base_url: ..., model: ...}` adds a measured judge model as a second opinion. `llm.judge.send_system_prompt: true` also shows it the probe file's `system_prompt`, with the canary replaced by `[WITHHELD]`.
+`llm.obfuscation_budget` caps how many disguised variants are sent, sampled evenly across disguises, `llm.adaptive: {budget: 40}` turns on the adaptive search (add `attacker: {base_url: ..., model: ...}` for an attacker model), and `llm.judge: {base_url: ..., model: ...}` adds a measured judge model as a second opinion. `llm.judge.send_system_prompt: true` also shows it the probe file's `system_prompt`, with the canary replaced by `[WITHHELD]`.
 
 </details>
 
@@ -359,10 +360,10 @@ The audit stages follow SMACTR (Raji et al., "Closing the AI Accountability Gap"
 ## Limitations
 
 - **It is evidence, not certification.** A report supports a qualified reviewer. It is not a conformity assessment or legal opinion, and a pass covers only the checks that ran, on the inputs and samples in the pack. Board oversight, training, suppliers and incident handling need organisational evidence that Pramana can fingerprint but not judge.
-- **Scoring has measured blind spots.** On the labelled benchmark the rules miss 4 of 27 compliant replies, all of them without a proof in the reply. A judge model can catch some of these, but it is measured first and only flags samples for review. The benchmark's 59 cases are labelled by the author, including the nine real replies. Acceptance phrased in languages other than English, Hindi and Hinglish can be missed, and results marked "needs review" need a person.
-- **The attack library is generated, not adaptive.** 188 generated and 35 hand-written attacks with 7 disguises, plus imported LLMail-Inject e-mails for agents. Nothing learns from the system's replies, the multi-turn scripts are fixed, and each non-English language has 4 techniques written by the author.
+- **Scoring has measured blind spots.** On the labelled benchmark the rules miss 4 of 27 compliant replies, all of them without a proof in the reply. A judge model can catch some of these, but it is measured first and only flags samples for review. The benchmark's 59 cases are labelled by the author, including the nine real replies. Acceptance is recognised in English, Hindi, Hinglish, Spanish, French, German and Chinese; in Kannada, Tamil and other languages it can be missed. Results marked "needs review" need a person.
+- **Adaptive attacks have a budget.** `llm.adaptive_attacks` changes its attack after every reply, but a pass means only that no goal was reached within the queries spent; a larger budget or a stronger attacker model may still succeed. The multi-turn scripts are still fixed, and each non-English language has 4 techniques written by the author.
 - **Measured on small open models.** The LLM and agent results come from llama3.2:3b on a laptop and from Qwen2.5-3B, Qwen2.5-7B and Llama-3.2-3B on Kaggle. No hosted frontier model or third-party LLM application has been audited live, and the probes and the reference guard share an author.
-- **Access control is judged by what replies reveal.** It does not review an application's authentication design, and a system that accepts a false identity without repeating the record passes.
+- **Access control is judged by what replies say.** It does not review an application's authentication design. A reply that accepts a false identity is sent for review, but a system that acts on one silently, saying nothing, still passes.
 - **Agent coverage depends on the logs.** Actions outside the logging pipeline are invisible, and the approval-path proof holds only for the workflow graph as declared. The sandbox uses a stand-in bank, not the customer's tools.
 - **Statistics need data.** Groups below 30 records are shown but not compared, fairness metrics conflict by construction, the four-fifths rule is a screening heuristic, and the membership-inference attack is a simple one.
 - **Scale.** The full audit loads an agent trace into memory; very large logs should be audited in session batches, though `scan-trace` streams any size. Browser mode depends on page selectors, and a login wall, CAPTCHA or bot detection stops it.

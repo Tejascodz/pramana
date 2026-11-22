@@ -15,6 +15,7 @@
       "llm.judge_calibration",
       "llm.multi_turn",
       "llm.obfuscation",
+      "llm.adaptive_attacks",
       "llm.access_control"
     ]
   },

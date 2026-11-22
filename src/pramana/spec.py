@@ -345,6 +345,54 @@ def _check_judge(judge: Any) -> dict[str, Any]:
     return dict(judge)
 
 
+ADAPTIVE_KEYS = {"goals", "languages", "budget", "width", "branch", "seed", "attacker"}
+ATTACKER_KEYS = {"base_url", "model", "api_key_env", "timeout", "max_retries", "temperature",
+                 "max_tokens"}  # fmt: skip
+
+
+def _check_adaptive(adaptive: Any) -> dict[str, Any]:
+    """``llm.adaptive``: the adaptive attack search and, optionally, its attacker model."""
+    from pramana.adapters.llm import validate_llm_settings
+    from pramana.attacks.library import GOALS, LANGUAGES
+
+    if not isinstance(adaptive, dict):
+        raise SpecError("llm.adaptive must be a mapping, for example {budget: 40}")
+    extra = sorted(set(map(str, adaptive)) - ADAPTIVE_KEYS)
+    if extra:
+        raise SpecError(
+            f"llm.adaptive.{extra[0]} is not a setting; use {', '.join(sorted(ADAPTIVE_KEYS))}"
+        )
+    for key, low, high in (("budget", 1, 2000), ("width", 1, 16), ("branch", 1, 8),
+                           ("seed", 0, 10**9)):  # fmt: skip
+        value = adaptive.get(key, low)
+        if isinstance(value, bool) or not isinstance(value, int) or not low <= value <= high:
+            raise SpecError(f"llm.adaptive.{key} must be a whole number from {low} to {high}")
+    for key, allowed in (("goals", GOALS), ("languages", LANGUAGES)):
+        value = adaptive.get(key)
+        if value is not None and (
+            not isinstance(value, list) or not value or any(v not in allowed for v in value)
+        ):
+            raise SpecError(f"llm.adaptive.{key} must be a list drawn from {', '.join(allowed)}")
+    attacker = adaptive.get("attacker")
+    if attacker is not None:
+        if not isinstance(attacker, dict):
+            raise SpecError("llm.adaptive.attacker must be a mapping with base_url and model")
+        extra = sorted(set(map(str, attacker)) - ATTACKER_KEYS)
+        if extra:
+            raise SpecError(
+                f"llm.adaptive.attacker.{extra[0]} is not a setting; use "
+                f"{', '.join(sorted(ATTACKER_KEYS))}"
+            )
+        for key in ("base_url", "model"):
+            if not isinstance(attacker.get(key), str) or not attacker[key].strip():
+                raise SpecError(f"llm.adaptive.attacker.{key} is required")
+        try:
+            validate_llm_settings(attacker, "llm.adaptive.attacker")
+        except ValueError as exc:
+            raise SpecError(str(exc)) from exc
+    return dict(adaptive)
+
+
 def _check_use_case(use_case: Any) -> None:
     """Unknown domains and prohibited-practice flags are refused, not ignored.
 
@@ -555,6 +603,8 @@ def load_spec(path: str | Path) -> AuditSpec:
         raise SpecError(str(exc)) from exc
     if llm.get("judge") is not None:
         llm["judge"] = _check_judge(llm["judge"])
+    if "adaptive" in llm:
+        llm["adaptive"] = _check_adaptive(llm["adaptive"])
     if "mutations" in llm:
         from pramana.attacks.mutations import MUTATORS
 

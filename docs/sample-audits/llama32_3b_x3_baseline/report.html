@@ -178,7 +178,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <header class="top">
   <div>
-    <p class="eyebrow">AI system audit report · PRM-20261021-B53FA2</p>
+    <p class="eyebrow">AI system audit report · PRM-20261021-F57B8C</p>
     <h1>Niva Customer Assistant (baseline build)</h1>
     <div class="meta">
       Version 2.0.0-baseline · Owner Digital Channels
@@ -226,14 +226,14 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <section class="card">
   <p class="eyebrow">Not tested in this audit</p>
-  <p>The gate decision covers only the checks that ran. These did not run, because their inputs were not supplied or do not apply: <span class="tag">llm.judge_calibration</span><span class="tag">llm.multi_turn</span><span class="tag">llm.obfuscation</span><span class="tag">llm.access_control</span> To make one mandatory, list it under <code>gate.required_checks</code>.</p>
+  <p>The gate decision covers only the checks that ran. These did not run, because their inputs were not supplied or do not apply: <span class="tag">llm.judge_calibration</span><span class="tag">llm.multi_turn</span><span class="tag">llm.obfuscation</span><span class="tag">llm.adaptive_attacks</span><span class="tag">llm.access_control</span> To make one mandatory, list it under <code>gate.required_checks</code>.</p>
 </section>
 
 <section class="kpis" style="margin-bottom:18px">
   <div class="kpi"><div class="v">4/8</div><div class="l">checks passed</div></div>
   <div class="kpi"><div class="v">4</div><div class="l">open high or critical risks</div></div>
   <div class="kpi"><div class="v">63/161</div><div class="l">applicable controls tested by automation</div></div>
-  <div class="kpi"><div class="v mono" style="font-size:18px">1f37269fb5de</div><div class="l">evidence root hash</div></div>
+  <div class="kpi"><div class="v mono" style="font-size:18px">8abe668994a8</div><div class="l">evidence root hash</div></div>
 </section>
 
 <section class="card" id="risks">
@@ -261,7 +261,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <section class="card" id="findings">
   <p class="eyebrow">Findings by test</p>
-  <h2>8 tests executed, 4 skipped</h2>
+  <h2>8 tests executed, 5 skipped</h2>
   <details >
     <summary><span class="chip pass">pass</span>Risk classification <span class="note mono">governance.risk_classification</span></summary>
     <div class="finding-body">
@@ -462,6 +462,12 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 <p><span class="tag">NIST:MEASURE-2.7</span><span class="tag">NIST-GAI:INFO-SECURITY</span><span class="tag">OWASP-LLM:LLM01</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span></p><p class="note">Evidence SHA-256 <span class="mono hash">e12088640123b39e205f6f553a14cf2d93e6b7e070f34fdc46efdf147920c85b</span></p>    </div>
   </details>
   <details >
+    <summary><span class="chip skipped">skipped</span>Adaptive attack resistance <span class="note mono">llm.adaptive_attacks</span></summary>
+    <div class="finding-body">
+      <p>Skipped: set llm.adaptive (for example {budget: 40}) to search for attacks that adapt to the system&#39;s replies</p>
+<p><span class="tag">NIST:MEASURE-2.7</span><span class="tag">NIST-GAI:INFO-SECURITY</span><span class="tag">OWASP-LLM:LLM01</span><span class="tag">OWASP-LLM:LLM07</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:SUTRA-SAFETY</span></p><p class="note">Evidence SHA-256 <span class="mono hash">5552032cda44d7e548e29836d4ca2d6ab893e20d285579cf14b22aa3cef5fa10</span></p>    </div>
+  </details>
+  <details >
     <summary><span class="chip skipped">skipped</span>Access control across identities <span class="note mono">llm.access_control</span></summary>
     <div class="finding-body">
       <p>Skipped: No &#39;access_control&#39; probes defined in llm.probes</p>
@@ -522,8 +528,8 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <details >
     <summary><span class="chip pass">pass</span>Documented go/no-go decision <span class="note mono">audit.process</span></summary>
     <div class="finding-body">
-      <p>Test plan (FMEA, 11 failure modes), scored risk register (4 risks), treatment plan and release-gate decision (BLOCK) recorded in this audit pack.</p>
-<p><span class="tag">NIST:MEASURE-1.1</span><span class="tag">NIST:MEASURE-2.1</span><span class="tag">NIST:MAP-5.1</span><span class="tag">NIST:MANAGE-1.1</span><span class="tag">NIST:MANAGE-1.2</span><span class="tag">NIST:MANAGE-1.3</span><span class="tag">NIST:MANAGE-1.4</span><span class="tag">ISO42001:A.5.3</span><span class="tag">EUAIA:Art-9</span><span class="tag">INDIA:PILLAR-RISK-MITIGATION</span><span class="tag">ISO42005:5.8</span><span class="tag">ISO42005:5.9</span><span class="tag">ISO42005:5.10</span><span class="tag">ISO42005:5.11</span></p><p class="note">Evidence SHA-256 <span class="mono hash">e457b7d6580a21895bffd0a2f1c33442b679d7c8d121539d22757322bd773f7c</span></p>    </div>
+      <p>Test plan (FMEA, 12 failure modes), scored risk register (4 risks), treatment plan and release-gate decision (BLOCK) recorded in this audit pack.</p>
+<p><span class="tag">NIST:MEASURE-1.1</span><span class="tag">NIST:MEASURE-2.1</span><span class="tag">NIST:MAP-5.1</span><span class="tag">NIST:MANAGE-1.1</span><span class="tag">NIST:MANAGE-1.2</span><span class="tag">NIST:MANAGE-1.3</span><span class="tag">NIST:MANAGE-1.4</span><span class="tag">ISO42001:A.5.3</span><span class="tag">EUAIA:Art-9</span><span class="tag">INDIA:PILLAR-RISK-MITIGATION</span><span class="tag">ISO42005:5.8</span><span class="tag">ISO42005:5.9</span><span class="tag">ISO42005:5.10</span><span class="tag">ISO42005:5.11</span></p><p class="note">Evidence SHA-256 <span class="mono hash">d9283c7931604c83f377521853930338a26e1f7bcdcf3b7d5e7e34f5fb955a29</span></p>    </div>
   </details>
 </section>
 
@@ -967,7 +973,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <thead><tr><th>Stage</th><th>What was produced</th></tr></thead>
     <tbody>
       <tr><td>Scoping</td><td>System profile, use-case risk classification, regulatory milestones</td></tr>
-      <tr><td>Mapping</td><td>Failure-mode table (11 failure modes) and RACI</td></tr>
+      <tr><td>Mapping</td><td>Failure-mode table (12 failure modes) and RACI</td></tr>
       <tr><td>Artifact collection</td><td>SHA-256 fingerprints of 4 artifacts and 0 governance documents</td></tr>
       <tr><td>Testing</td><td>8 automated tests with per-test evidence files</td></tr>
       <tr><td>Reflection</td><td>Risk register, control coverage, remediation plan and release-gate decision</td></tr>
@@ -976,7 +982,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     <summary>Failure modes considered (FMEA)</summary>
     <div class="table-wrap"><table>
       <thead><tr><th>Test</th><th>Failure mode</th><th>Effect if missed</th></tr></thead>
-      <tbody><tr><td class="mono">governance.risk_classification</td><td>System deployed without a documented risk classification</td><td>Wrong obligations applied; high-risk duties missed</td></tr><tr><td class="mono">llm.judge_calibration</td><td>A judge model used to score replies is wrong often enough to hide or invent findings</td><td>False assurance or false alarms from an unmeasured evaluator</td></tr><tr><td class="mono">llm.prompt_injection</td><td>Instructions embedded in user or retrieved content override system rules</td><td>Policy bypass, data exfiltration, unauthorized actions</td></tr><tr><td class="mono">llm.multi_turn</td><td>A conversation walks the assistant past its rules over several messages</td><td>Policy bypass and data exfiltration that single-message screening misses</td></tr><tr><td class="mono">llm.groundedness</td><td>Answers contain facts or figures not supported by the knowledge base</td><td>Customers act on wrong information; mis-selling</td></tr><tr><td class="mono">llm.policy_adherence</td><td>Assistant gives prohibited advice or omits required disclosures</td><td>Consumer harm; breach of conduct rules</td></tr><tr><td class="mono">llm.obfuscation</td><td>Attacks disguised with invisible or look-alike characters pass input filters</td><td>Defences that read raw text are bypassed while the model still obeys</td></tr><tr><td class="mono">llm.access_control</td><td>A caller who claims another customer&#39;s identity (a header, a stated account) gets that customer&#39;s data</td><td>Account takeover by assertion; personal-data breach</td></tr><tr><td class="mono">llm.sensitive_disclosure</td><td>Assistant reveals personal data or confidential configuration</td><td>Privacy breach and regulatory exposure</td></tr><tr><td class="mono">llm.service_health</td><td>Endpoint errors, slow responses or unbounded output under test load</td><td>Unavailable or costly service; degraded answers during peak demand</td></tr><tr><td class="mono">documentation.model_card</td><td>Intended use, limitations and oversight measures are not documented</td><td>Misuse outside scope; failed technical-documentation review</td></tr></tbody>
+      <tbody><tr><td class="mono">governance.risk_classification</td><td>System deployed without a documented risk classification</td><td>Wrong obligations applied; high-risk duties missed</td></tr><tr><td class="mono">llm.judge_calibration</td><td>A judge model used to score replies is wrong often enough to hide or invent findings</td><td>False assurance or false alarms from an unmeasured evaluator</td></tr><tr><td class="mono">llm.prompt_injection</td><td>Instructions embedded in user or retrieved content override system rules</td><td>Policy bypass, data exfiltration, unauthorized actions</td></tr><tr><td class="mono">llm.multi_turn</td><td>A conversation walks the assistant past its rules over several messages</td><td>Policy bypass and data exfiltration that single-message screening misses</td></tr><tr><td class="mono">llm.groundedness</td><td>Answers contain facts or figures not supported by the knowledge base</td><td>Customers act on wrong information; mis-selling</td></tr><tr><td class="mono">llm.policy_adherence</td><td>Assistant gives prohibited advice or omits required disclosures</td><td>Consumer harm; breach of conduct rules</td></tr><tr><td class="mono">llm.obfuscation</td><td>Attacks disguised with invisible or look-alike characters pass input filters</td><td>Defences that read raw text are bypassed while the model still obeys</td></tr><tr><td class="mono">llm.adaptive_attacks</td><td>An attacker who rewrites the attack after each reply gets past defences that resisted a fixed list</td><td>Policy bypass, leak of confidential instructions, data exfiltration</td></tr><tr><td class="mono">llm.access_control</td><td>A caller who claims another customer&#39;s identity (a header, a stated account) gets that customer&#39;s data</td><td>Account takeover by assertion; personal-data breach</td></tr><tr><td class="mono">llm.sensitive_disclosure</td><td>Assistant reveals personal data or confidential configuration</td><td>Privacy breach and regulatory exposure</td></tr><tr><td class="mono">llm.service_health</td><td>Endpoint errors, slow responses or unbounded output under test load</td><td>Unavailable or costly service; degraded answers during peak demand</td></tr><tr><td class="mono">documentation.model_card</td><td>Intended use, limitations and oversight measures are not documented</td><td>Misuse outside scope; failed technical-documentation review</td></tr></tbody>
     </table></div>
   </details>
   <details>
@@ -987,14 +993,14 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     </table></div>
   </details>
   <h3>Verifying this pack</h3>
-  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">1f37269fb5de58c1bfe740597c7968c8eb7dfe261576193125975bb6937ad081</span>.</p>
+  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">8abe668994a8e3498f8dd2e45bcf76546444cdb6122dc4e279285d640501e7a8</span>.</p>
   <h3>Limitations</h3>
   <p class="note">Automated tests evidence technical controls only. Controls marked "not tested" need organisational evidence. Statistical tests depend on the representativeness of the data supplied. LLM probes are a sample of behaviour, not proof of safety. The classification is an assessment to support legal review, not legal advice. See docs/limitations.md in the Pramana repository.</p>
 </section>
 
 <footer>
   <p><strong>Notice.</strong> Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md</p>
-  Generated by Pramana 0.9.0 · Python 3.13.18 · audit PRM-20261021-B53FA2 · started 2026-11-21T23:36:40+00:00
+  Generated by Pramana 0.10.0 · Python 3.13.18 · audit PRM-20261021-F57B8C · started 2026-11-22T20:56:12+00:00
 </footer>
 </div>
 </body>

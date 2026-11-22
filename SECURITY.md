@@ -42,7 +42,7 @@ Ollama applies its own origin and host checks; keep them by leaving
 
 - **No telemetry.** No analytics, crash reports or update checks. The only network
   traffic is to the endpoints in your spec: the system under audit and, if you
-  configure one, a judge model.
+  configure them, a judge model and an attacker model.
 - **A judge model sees the attacks and the replies.** `llm.judge` sends each attack and
   each reply it reviews to the judge endpoint, so use a local model (for example through
   Ollama) when the replies may contain personal data. It is sent the system prompt only
@@ -51,6 +51,12 @@ Ollama applies its own origin and host checks; keep them by leaving
   protections as any endpoint: https for keys, no redirects, capped responses. It reads
   the attack and reply as data between boundary markers derived from their content and
   must answer with a JSON verdict; anything else counts as "unclear", never as a verdict.
+- **An attacker model sees the goal, its last attempt and the reply.**
+  `llm.adaptive.attacker` is sent the attack goal (a harmless code or link), its previous
+  attempt and the system's reply to it; never the canary or the system prompt. The
+  replies may contain personal data, so use a local model when they might. Its proposals
+  are checked before they are sent: one that contains the proof or the canary, or drops
+  the goal's fragments, is refused, so an attacker model cannot fake a success.
 - **Credentials come from the environment, in headers only.** `${VAR}` is expanded
   in header values and `api_key_env` names an environment variable; neither is
   ever written to an audit pack. URLs and request bodies are sent exactly as

@@ -1,6 +1,6 @@
 # Model card: Niva Customer Assistant (baseline build)
 
-Audit PRM-20261021-B53FA2 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-F57B8C · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 2.0.0-baseline
@@ -40,6 +40,6 @@ Small local models follow instructions less reliably than large hosted models. A
 - **R-03 (high):** The assistant stated figures, contact details or terms that are not in the official product information.
 - **R-04 (high):** The assistant broke a customer-protection rule, for example must disclose it is an ai when asked.
 
-_Evidence root hash: `1f37269fb5de58c1bfe740597c7968c8eb7dfe261576193125975bb6937ad081`_
+_Evidence root hash: `8abe668994a8e3498f8dd2e45bcf76546444cdb6122dc4e279285d640501e7a8`_
 
 _Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md_
