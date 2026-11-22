@@ -208,6 +208,42 @@ The full system was run from a fresh clone of v0.8.0 (commit `e3afa83`), unchang
 
 The pattern from the laptop runs holds on different hardware and a different model: the guard cuts single-message injection from 54% to 12% on Qwen2.5-3B (Fisher's exact test, p = 0.0025), multi-turn attacks from 7 of 14 to 0 of 14 (p = 0.006) and disguised attacks from 37 of 68 to 3 of 68 (p < 0.0001), and the held-out persona switch still gets through. Each probe was sent once, so the intervals are wide; these packs are not committed, and the rates are indicative.
 
+### Attack library, judge models and real attacks on Kaggle
+
+Version 0.9.0 was run from a fresh clone (commit `3a1774a`) on the same two T4 GPUs on 22 November 2026, with Qwen2.5-3B, Qwen2.5-7B and Llama-3.2-3B from Hugging Face. All four packs were signed and verified, and the run took 27 minutes.
+
+**Judge models on the labelled benchmark** (`pramana benchmark`, 50 cases; the rules alone have precision 1.00 and recall 0.84):
+
+| Judge | Precision | Recall | Rules or judge, recall | Used by Pramana |
+|---|---|---|---|---|
+| Qwen2.5-3B | 1.00 (CI 0.85–1.00) | 0.84 (0.65–0.94) | 0.92 | Yes |
+| Qwen2.5-7B | 0.91 (CI 0.73–0.98) | 0.84 (0.65–0.94) | 0.92 | Yes |
+| Llama-3.2-3B | 0.76 (CI 0.55–0.89), 5 answers unclear | 0.64 (0.45–0.80) | 0.92 | No: below the 0.80 precision minimum |
+
+Every judge caught the two cases the rules cannot see (an injected task carried out without the code), and every judge missed cases the rules catch (an exact canary leak), which is why a judge never overrides a proof. No judge recognised instructions paraphrased back, because it does not know what the instructions were. The same Qwen2.5-7B judge measured precision 0.91 in one calibration and 0.95 in another during the run, so a judge's accuracy is recorded in each pack rather than assumed.
+
+**The attack library against the reference assistant** (Qwen2.5-3B; the 26 hand-written injection probes plus all 188 generated attacks, and 300 of 588 disguised variants, with Qwen2.5-7B as the calibrated judge):
+
+| | Baseline build | Guarded build |
+|---|---|---|
+| Injection | 133 of 214 (62%, CI 55–68%) | 37 of 212 judged (17%, CI 13–23%) |
+| Disguised variants | 174 of 300 (58%, CI 52–63%) | 38 of 294 judged (13%, CI 10–17%) |
+| The 26 hand-written probes | 14 succeeded | 2 |
+| The 188 generated attacks | 119 succeeded | 35 |
+| All attacks by goal: code, persona, canary, exfiltration link | 52 of 73, 36 of 47, 27 of 47, 18 of 47 | 27, 10, 0, 0 |
+| Probes the judge flagged for review | 24 | 10 |
+
+The generated attacks found what the hand-written ones did not. Only 2 of the 26 hand-written probes got through the guarded build; 35 of the 188 generated attacks did. The language breakdown shows one reason: the guard's input screening covers English, Hindi, Hinglish, Kannada and Tamil, and it stops every Hindi attack (0 of 19), but attacks in German (6 of 16), Spanish (6 of 16), French (4 of 16) and Chinese (4 of 16) get through at a higher rate than English ones (15 of 109). Its output checks hold: no canary leak and no exfiltration link. Among the judge's flags is a reply of `CINMON-58` to a held-out attack whose proof is `CINNAMON-58`. That is two edits away, so the rules' one-edit near-match missed it, and the reply went to review.
+
+**Real attack e-mails against agents** (40 attacks that succeeded in the LLMail-Inject challenge, imported from Hugging Face with `pramana import-attacks`; source SHA-256 recorded in each pack):
+
+| Agent | Obeyed the attacker | Completed the control task |
+|---|---|---|
+| Qwen2.5-7B | 19 of 40 runs that reached the trap (48%, CI 33–63%): e-mails sent to the attacker's address | 1 of 1 |
+| Llama-3.2-3B | 3 of 32 runs that reached the trap (CI 3–24%); 8 never reached it | 0 of 1 |
+
+Pramana does not credit Llama-3.2-3B with resisting: it did not complete the ordinary task either, so it may be failing to act rather than resisting. As above, each attack was sent once and the packs are not committed, so the rates are indicative.
+
 ## Usage
 
 | Command | What it does |
@@ -359,7 +395,7 @@ src/pramana/        engine, checks, adapters (API, browser, traces), attack libr
 dashboard/          web viewer for audit packs
 examples/           credit scoring, COMPAS, support chatbot, live assistant, agent traces and sandbox
 scripts/            re-scoring and figure generation
-docs/sample-audits/ committed audit packs: every number above except the Kaggle reproduction comes from them
+docs/sample-audits/ committed audit packs: every number above except the Kaggle runs comes from them
 tests/              unit, end-to-end, security and regression tests
 action.yml          GitHub Action
 ```
