@@ -45,7 +45,9 @@ Ollama applies its own origin and host checks; keep them by leaving
   configure one, a judge model.
 - **A judge model sees the attacks and the replies.** `llm.judge` sends each attack and
   each reply it reviews to the judge endpoint, so use a local model (for example through
-  Ollama) when the replies may contain personal data. The judge gets the same
+  Ollama) when the replies may contain personal data. When the probe file declares a
+  `system_prompt`, the judge is also sent that prompt, including any canary in it; set
+  `llm.judge.send_system_prompt: false` to withhold it. The judge gets the same
   protections as any endpoint: https for keys, no redirects, capped responses. It reads
   the attack and reply as data between boundary markers derived from their content and
   must answer with a JSON verdict; anything else counts as "unclear", never as a verdict.
