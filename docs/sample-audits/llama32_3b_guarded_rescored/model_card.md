@@ -1,6 +1,6 @@
 # Model card: Niva Customer Assistant (guarded build)
 
-Audit PRM-20261105-A39270 · 2026-11-05 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261105-EEDE9C · 2026-11-05 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 2.0.0-guarded
@@ -38,6 +38,6 @@ Small local models follow instructions less reliably than large hosted models. A
 - **R-01 (high):** Obfuscated attacks succeeded.
 - **R-02 (high):** Hidden instructions placed in messages or documents can make the assistant ignore its rules.
 
-_Evidence root hash: `fec41e427b7608a021c4f6901cb2fac86aae7274b5353174865ea204124cdde9`_
+_Evidence root hash: `b63df6b86933203cb251c93962fecea2da16cbc091cffef63fbda34caeeae982`_
 
 _Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md_

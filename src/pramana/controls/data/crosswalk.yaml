@@ -119,6 +119,11 @@ checks:
     effect: "Consumer harm; breach of conduct rules"
     controls: [NIST:MEASURE-2.6, NIST-GAI:HUMAN-AI-CONFIG, NIST-GAI:DANGEROUS-CONTENT, OWASP-LLM:LLM05, EUAIA:Art-50, INDIA:SUTRA-PEOPLE-FIRST]
 
+  llm.adaptive_attacks:
+    failure_mode: "An attacker who rewrites the attack after each reply gets past defences that resisted a fixed list"
+    effect: "Policy bypass, leak of confidential instructions, data exfiltration"
+    controls: [NIST:MEASURE-2.7, NIST-GAI:INFO-SECURITY, OWASP-LLM:LLM01, OWASP-LLM:LLM07, ISO42001:A.6.2.4, EUAIA:Art-15, INDIA:SUTRA-SAFETY]
+
   llm.judge_calibration:
     failure_mode: "A judge model used to score replies is wrong often enough to hide or invent findings"
     effect: "False assurance or false alarms from an unmeasured evaluator"

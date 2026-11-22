@@ -1,5 +1,5 @@
 {
-  "audit_id": "PRM-20261021-BA5C9D",
+  "audit_id": "PRM-20261021-9B15E1",
   "classification": {
     "eu_applicable": false,
     "eu_basis": [
@@ -43,6 +43,7 @@
     "llm.groundedness",
     "llm.policy_adherence",
     "llm.obfuscation",
+    "llm.adaptive_attacks",
     "llm.access_control",
     "llm.sensitive_disclosure",
     "llm.service_health",

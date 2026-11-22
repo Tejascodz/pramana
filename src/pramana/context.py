@@ -23,6 +23,10 @@ from pramana.probes import load_probe_file
 from pramana.safeio import load_yaml
 from pramana.spec import AuditSpec
 
+#: Transcript entries of an attacker model (adaptive attacks): recorded so a pack replays,
+#: but not part of the system under audit's statistics.
+ATTACKER_CATEGORY = "adaptive_attacker"
+
 
 class MissingArtifact(RuntimeError):
     """Raised by a check when an artifact it needs was not supplied (not applicable)."""
@@ -285,10 +289,14 @@ class AuditContext:
         self._preflight = {"latency_ms": result.latency_ms, "model": result.model}
         return self._preflight
 
-    def ask_all(self, category: str, probes: list[dict[str, Any]]) -> list[list[Completion]]:
-        """Send every probe ``samples`` times. Returns completions per probe, in order."""
+    def ask_all(
+        self, category: str, probes: list[dict[str, Any]], samples: int | None = None
+    ) -> list[list[Completion]]:
+        """Send every probe ``samples`` times (the spec's, unless given). Returns completions
+        per probe, in order."""
         self.llm_preflight()
-        jobs = [(i, s) for i in range(len(probes)) for s in range(self.llm_samples)]
+        samples = samples or self.llm_samples
+        jobs = [(i, s) for i in range(len(probes)) for s in range(samples)]
         results: dict[tuple[int, int], Completion] = {}
         workers = max(1, int(self.spec.llm.get("concurrency", 1)))
 
@@ -312,7 +320,7 @@ class AuditContext:
 
         out: list[list[Completion]] = []
         for i, probe in enumerate(probes):
-            runs = [results[(i, s)] for s in range(self.llm_samples)]
+            runs = [results[(i, s)] for s in range(samples)]
             for s, completion in enumerate(runs):
                 self.llm_transcript.append(
                     {
@@ -423,6 +431,11 @@ class AuditContext:
             record["latencies_ms"].append(entry.get("latency_ms"))
         return list(grouped.values())
 
+    @property
+    def target_transcript(self) -> list[dict[str, Any]]:
+        """Exchanges with the system under audit (not with an attacker model)."""
+        return [e for e in self.llm_transcript if e.get("category") != ATTACKER_CATEGORY]
+
     def llm_run_summary(self) -> dict[str, Any]:
         if not self.spec.llm:
             return {}
@@ -431,10 +444,10 @@ class AuditContext:
         except Exception:  # noqa: BLE001
             client = {"mode": self.spec.llm.get("mode", "replay")}
         latencies = sorted(
-            e["latency_ms"] for e in self.llm_transcript if e.get("latency_ms") is not None
+            e["latency_ms"] for e in self.target_transcript if e.get("latency_ms") is not None
         )
-        models = sorted({e["model"] for e in self.llm_transcript if e.get("model")})
-        errors = sum(1 for e in self.llm_transcript if e.get("error"))
+        models = sorted({e["model"] for e in self.target_transcript if e.get("model")})
+        errors = sum(1 for e in self.target_transcript if e.get("error"))
 
         def pct(p: float) -> float | None:
             if not latencies:
@@ -445,7 +458,7 @@ class AuditContext:
             **client,
             "models_reported": models,
             "samples_per_probe": self.llm_samples,
-            "calls": len(self.llm_transcript),
+            "calls": len(self.target_transcript),
             "errors": errors,
             "latency_p50_ms": pct(0.5),
             "latency_p95_ms": pct(0.95),

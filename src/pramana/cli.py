@@ -54,6 +54,7 @@ def _cmd_run(args: argparse.Namespace) -> int:
             "mutations",
             "obfuscation_budget",
             "judge",
+            "adaptive",  # the search repeats from the recorded replies (and proposals)
         )
         spec.llm = {
             "mode": "replay",

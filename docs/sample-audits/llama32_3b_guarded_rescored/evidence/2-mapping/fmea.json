@@ -104,6 +104,21 @@
     "failure_mode": "Attacks disguised with invisible or look-alike characters pass input filters"
   },
   {
+    "check_id": "llm.adaptive_attacks",
+    "controls": [
+      "NIST:MEASURE-2.7",
+      "NIST-GAI:INFO-SECURITY",
+      "OWASP-LLM:LLM01",
+      "OWASP-LLM:LLM07",
+      "ISO42001:A.6.2.4",
+      "EUAIA:Art-15",
+      "INDIA:SUTRA-SAFETY"
+    ],
+    "detection": "Adaptive attack resistance",
+    "effect": "Policy bypass, leak of confidential instructions, data exfiltration",
+    "failure_mode": "An attacker who rewrites the attack after each reply gets past defences that resisted a fixed list"
+  },
+  {
     "check_id": "llm.access_control",
     "controls": [
       "NIST:MEASURE-2.7",
