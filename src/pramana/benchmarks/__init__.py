@@ -22,6 +22,12 @@ from pramana.safeio import parse_yaml
 
 
 def load_cases() -> tuple[str, list[dict[str, Any]]]:
+    canary, cases, _ = load_benchmark()
+    return canary, cases
+
+
+def load_benchmark() -> tuple[str, list[dict[str, Any]], str]:
+    """(canary, cases, the assistant's system prompt) with the canary filled in."""
     text = (
         resources.files("pramana.benchmarks")
         .joinpath("injection_labelled.yaml")
@@ -36,7 +42,7 @@ def load_cases() -> tuple[str, list[dict[str, Any]]]:
             m.replace("{canary}", canary) for m in case.get("success_markers", [])
         ]
         cases.append(filled)
-    return canary, cases
+    return canary, cases, str(data.get("system_prompt", "")).replace("{canary}", canary)
 
 
 def rule_verdict(case: dict[str, Any], canary: str) -> bool:
@@ -72,9 +78,13 @@ def confusion(labels: list[bool], predicted: list[bool]) -> dict[str, Any]:
     }  # fmt: skip
 
 
-def run(judge: Any = None) -> dict[str, Any]:
-    """Score every case with the rules (and the judge and the hybrid, if a judge is given)."""
-    canary, cases = load_cases()
+def run(judge: Any = None, instructions: bool = True) -> dict[str, Any]:
+    """Score every case with the rules (and the judge and the hybrid, if a judge is given).
+
+    With ``instructions`` the judge is shown the assistant's system prompt, as it is in an
+    audit that knows it; without, it sees only the attack and the reply.
+    """
+    canary, cases, system_prompt = load_benchmark()
     labels = [c["label"] == "complied" for c in cases]
     rules = [rule_verdict(c, canary) for c in cases]
     rows = [
@@ -88,12 +98,14 @@ def run(judge: Any = None) -> dict[str, Any]:
         "rules": confusion(labels, rules),
     }
     if judge is not None:
-        verdicts = judge.verdicts([(c["attack"], c["response"]) for c in cases])
+        shown = system_prompt if instructions else ""
+        verdicts = judge.verdicts([(c["attack"], c["response"], shown) for c in cases])
         flagged = [v["verdict"] == "complied" for v in verdicts]
         hybrid = [r or f for r, f in zip(rules, flagged, strict=True)]
         for row, v in zip(rows, verdicts, strict=True):
             row["judge"] = v["verdict"]
         report["judge_model"] = judge.label
+        report["judge_saw_instructions"] = bool(shown)
         report["judge"] = confusion(labels, flagged)
         report["judge_unclear"] = sum(1 for v in verdicts if v["verdict"] == "unclear")
         report["judge_errors"] = sum(1 for v in verdicts if v.get("error"))

@@ -313,7 +313,7 @@ def _check_checks(raw: Any) -> dict[str, Any]:
 
 
 JUDGE_KEYS = {"base_url", "model", "api_key_env", "timeout", "max_retries", "concurrency",
-              "min_precision", "min_recall"}  # fmt: skip
+              "min_precision", "min_recall", "send_system_prompt"}  # fmt: skip
 
 
 def _check_judge(judge: Any) -> dict[str, Any]:
@@ -334,8 +334,12 @@ def _check_judge(judge: Any) -> dict[str, Any]:
         value = judge.get(key, 0.0)
         if isinstance(value, bool) or not isinstance(value, int | float) or not 0 <= value <= 1:
             raise SpecError(f"llm.judge.{key} must be a number from 0 to 1, not {value!r}")
+    if not isinstance(judge.get("send_system_prompt", True), bool):
+        raise SpecError("llm.judge.send_system_prompt must be true or false")
     try:
-        validate_llm_settings(judge, "llm.judge")
+        validate_llm_settings(
+            {k: v for k, v in judge.items() if k != "send_system_prompt"}, "llm.judge"
+        )
     except ValueError as exc:
         raise SpecError(str(exc)) from exc
     return dict(judge)

@@ -12,7 +12,7 @@
     pramana demo [credit|chatbot|agent|all]            run a bundled case study end to end
     pramana sandbox serve [--port P] [--out TRACE]     honeypot tools for your own agent
     pramana import-attacks llmail-inject FILE --out F  real attack e-mails as sandbox scenarios
-    pramana benchmark [--judge-url U --judge-model M]  measure the scoring (and a judge) on labelled data
+    pramana benchmark [--judge-url U --judge-model M [--without-instructions]]  measure the scoring (and a judge)
 
 Exit codes: 0 success, 1 release gate blocked, 2 verification failed, 3 bad input,
 4 endpoint unreachable.
@@ -628,7 +628,7 @@ def _cmd_benchmark(args: argparse.Namespace) -> int:
         except ValueError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return EXIT_INPUT
-    report = benchmarks.run(judge)
+    report = benchmarks.run(judge, instructions=not args.without_instructions)
     if args.json:
         print(json.dumps(report, indent=2))
         return EXIT_OK
@@ -650,7 +650,12 @@ def _cmd_benchmark(args: argparse.Namespace) -> int:
             print(f"  {label:28} precision {show(m['precision'])}  recall {show(m['recall'])}")
     if "judge" in report:
         print(
-            f"  judge answers unclear: {report['judge_unclear']}, errors: {report['judge_errors']}"
+            f"  judge answers unclear: {report['judge_unclear']}, errors: {report['judge_errors']}; "
+            + (
+                "the judge was shown the assistant's system prompt"
+                if report["judge_saw_instructions"]
+                else "the judge saw only the attack and the reply"
+            )
         )
     missed = [r for r in report["rows"] if r["rules"] != (r["label"] == "complied")]
     if missed:
@@ -932,6 +937,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     bench.add_argument("--judge-url", help="OpenAI-compatible endpoint of a judge model")
     bench.add_argument("--judge-model", help="model name at that endpoint")
+    bench.add_argument(
+        "--without-instructions",
+        action="store_true",
+        help="do not show the judge the assistant's system prompt (as in a black-box audit)",
+    )
     bench.add_argument("--json", action="store_true", help="print the full report as JSON")
     bench.set_defaults(fn=_cmd_benchmark)
 
