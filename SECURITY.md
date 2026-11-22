@@ -75,6 +75,11 @@ Ollama applies its own origin and host checks; keep them by leaving
   they stay isolated from your computer; `llm.browser_sandbox: false` turns the sandbox
   off and is meant only for sites you trust (it is needed when running as root). Each
   conversation runs in a fresh browser context, and downloads are refused.
+- **A saved browser sign-in is a credential.** `pramana browser-login` writes the session
+  (cookies and local storage) readable by its owner only; `llm.storage_state` sends it
+  only to an https page or one on this computer, and it is never copied into an audit
+  pack. Delete it after the audit. Signing in is done by a person: Pramana does not type
+  passwords or try to get past CAPTCHAs or bot detection.
 - **Access-control probe headers are sent as written.** They are never expanded from the
   environment, so a probe file cannot copy your secrets into a request.
 

@@ -13,6 +13,8 @@
     pramana sandbox serve [--port P] [--out TRACE]     honeypot tools for your own agent
     pramana import-attacks llmail-inject FILE --out F  real attack e-mails as sandbox scenarios
     pramana benchmark [--judge-url U --judge-model M [--with-instructions]]  measure the scoring (and a judge)
+    pramana split-trace TRACE --out DIR [--sessions-per-file N]  split a large agent log into whole-session files
+    pramana browser-login URL --out FILE               sign in once in a browser; browser audits reuse the session
 
 Exit codes: 0 success, 1 release gate blocked, 2 verification failed, 3 bad input,
 4 endpoint unreachable.
@@ -666,6 +668,47 @@ def _cmd_benchmark(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_split_trace(args: argparse.Namespace) -> int:
+    from pramana.adapters.traces import split_trace
+
+    try:
+        result = split_trace(args.trace, args.out, args.format, args.sessions_per_file)
+    except (OSError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    print(
+        f"{result['sessions']} sessions written to {len(result['files'])} file(s) in {args.out}, "
+        f"at most {result['sessions_per_file']} sessions each, no session split across files:"
+    )
+    for name, events in result["files"].items():
+        print(f"  {name}: {events} events")
+    print("Audit each file with agent.trace pointing at it (native format).")
+    return EXIT_OK
+
+
+def _cmd_browser_login(args: argparse.Namespace) -> int:
+    from pramana.adapters.browser import save_sign_in
+
+    def wait(page: object) -> None:
+        print(
+            "Sign in in the browser window that opened. When the chat is ready, come back "
+            "here and press Enter to save the session."
+        )
+        input()
+
+    try:
+        path = save_sign_in(args.url, args.out, wait=wait, headless=False)
+    except (OSError, ValueError, RuntimeError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return EXIT_INPUT
+    print(
+        f"Saved the signed-in session to {path} (readable by you only). Set "
+        "llm.storage_state to this file in a browser-mode spec. It is a credential: it is "
+        "never copied into an audit pack, and you should delete it after the audit."
+    )
+    return EXIT_OK
+
+
 def _cmd_scan_trace(args: argparse.Namespace) -> int:
     from pramana.adapters.traces import stream_events
     from pramana.checks.agent_trace import scan_misalignment, session_conditions
@@ -948,6 +991,24 @@ def build_parser() -> argparse.ArgumentParser:
     bench.add_argument("--without-instructions", action="store_true", help=argparse.SUPPRESS)
     bench.add_argument("--json", action="store_true", help="print the full report as JSON")
     bench.set_defaults(fn=_cmd_benchmark)
+
+    split = sub.add_parser(
+        "split-trace",
+        help="split a large agent log into files of whole sessions, streaming (constant memory)",
+    )
+    split.add_argument("trace", help="the agent log (JSON Lines or JSON array)")
+    split.add_argument("--out", required=True, help="an empty folder for the split files")
+    split.add_argument("--format", default="native", help="trace format (as in agent.trace_format)")
+    split.add_argument("--sessions-per-file", type=int, default=5000)
+    split.set_defaults(fn=_cmd_split_trace)
+
+    login = sub.add_parser(
+        "browser-login",
+        help="open a browser, sign in yourself, and save the session for browser-mode audits",
+    )
+    login.add_argument("url", help="the chat page (https, or on this computer)")
+    login.add_argument("--out", required=True, help="file to save the session to")
+    login.set_defaults(fn=_cmd_browser_login)
 
     scan = sub.add_parser(
         "scan-trace",

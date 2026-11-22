@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-6EBF1F",
+  "audit_id": "PRM-20261021-F24CBA",
   "tool": {
     "name": "pramana",
-    "version": "0.10.0"
+    "version": "0.11.0"
   },
   "system": {
     "name": "COMPAS recidivism risk scores (Broward County, Florida)",
@@ -29,8 +29,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-11-22T20:56:08+00:00",
-  "finished": "2026-11-22T20:56:10+00:00",
+  "started": "2026-11-22T21:13:41+00:00",
+  "finished": "2026-11-22T21:13:43+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -398,7 +398,16 @@
                 "fpr": 0.0,
                 "auc": 0.85,
                 "mean_score": 0.45454545454545464,
-                "base_rate": 0.5454545454545454
+                "base_rate": 0.5454545454545454,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.0975,
+                    0.5657
+                  ],
+                  "others_rate": 0.5548,
+                  "ratio_to_others": 0.4916,
+                  "p_value": 0.057366
+                }
               },
               {
                 "group": "Other",
@@ -539,7 +548,7 @@
         "NIST-GAI:HARMFUL-BIAS",
         "ISO42005:6.8.2"
       ],
-      "evidence_hash": "9ce02e1567930d3ab6dccacbe4339826a0494c42586c5f76bdfe26e2ca4af736"
+      "evidence_hash": "e68a1f729aac2cda285928305f90bfc9e4f7cdbfcd3b96fb42379e18be37829e"
     },
     {
       "check_id": "fairness.intersectional",
@@ -595,7 +604,16 @@
                 "fpr": 1.0,
                 "auc": 1.0,
                 "mean_score": 0.9,
-                "base_rate": 0.5
+                "base_rate": 0.5,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.3424,
+                    1.0
+                  ],
+                  "others_rate": 0.5541,
+                  "ratio_to_others": 1.8046,
+                  "p_value": 1.0
+                }
               },
               {
                 "group": "Asian \u00d7 Male",
@@ -608,7 +626,16 @@
                 "fpr": 0.2857142857142857,
                 "auc": 0.8441558441558441,
                 "mean_score": 0.8103448275862067,
-                "base_rate": 0.7586206896551724
+                "base_rate": 0.7586206896551724,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.5789,
+                    0.8778
+                  ],
+                  "others_rate": 0.5533,
+                  "ratio_to_others": 1.3711,
+                  "p_value": 0.993426
+                }
               },
               {
                 "group": "Caucasian \u00d7 Female",
@@ -673,7 +700,16 @@
                 "fpr": 0.0,
                 "auc": null,
                 "mean_score": 0.25,
-                "base_rate": 0.0
+                "base_rate": 0.0,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.0,
+                    0.6576
+                  ],
+                  "others_rate": 0.5545,
+                  "ratio_to_others": 0.0,
+                  "p_value": 0.198629
+                }
               },
               {
                 "group": "Native American \u00d7 Male",
@@ -686,7 +722,16 @@
                 "fpr": 0.0,
                 "auc": 0.8333333333333334,
                 "mean_score": 0.5,
-                "base_rate": 0.6666666666666666
+                "base_rate": 0.6666666666666666,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.1206,
+                    0.6458
+                  ],
+                  "others_rate": 0.5546,
+                  "ratio_to_others": 0.601,
+                  "p_value": 0.159108
+                }
               },
               {
                 "group": "Other \u00d7 Female",
@@ -787,7 +832,16 @@
                 "fpr": 0.5,
                 "auc": 0.875,
                 "mean_score": 0.8285714285714285,
-                "base_rate": 0.8571428571428571
+                "base_rate": 0.8571428571428571,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.5241,
+                    0.9243
+                  ],
+                  "others_rate": 0.5538,
+                  "ratio_to_others": 1.4189,
+                  "p_value": 0.981733
+                }
               },
               {
                 "group": "Asian \u00d7 Greater than 45",
@@ -800,7 +854,16 @@
                 "fpr": 0.5,
                 "auc": 0.8571428571428571,
                 "mean_score": 0.8818181818181817,
-                "base_rate": 0.6363636363636364
+                "base_rate": 0.6363636363636364,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.523,
+                    0.9486
+                  ],
+                  "others_rate": 0.5538,
+                  "ratio_to_others": 1.4774,
+                  "p_value": 0.985131
+                }
               },
               {
                 "group": "Asian \u00d7 Less than 25",
@@ -813,7 +876,16 @@
                 "fpr": 0.0,
                 "auc": 1.0,
                 "mean_score": 0.6666666666666666,
-                "base_rate": 0.6666666666666666
+                "base_rate": 0.6666666666666666,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.3,
+                    0.9032
+                  ],
+                  "others_rate": 0.5542,
+                  "ratio_to_others": 1.203,
+                  "p_value": 0.831217
+                }
               },
               {
                 "group": "Caucasian \u00d7 25 - 45",
@@ -904,7 +976,16 @@
                 "fpr": 0.0,
                 "auc": 0.75,
                 "mean_score": 0.5857142857142856,
-                "base_rate": 0.8571428571428571
+                "base_rate": 0.8571428571428571,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.1582,
+                    0.7495
+                  ],
+                  "others_rate": 0.5544,
+                  "ratio_to_others": 0.773,
+                  "p_value": 0.382602
+                }
               },
               {
                 "group": "Native American \u00d7 Greater than 45",
@@ -917,7 +998,16 @@
                 "fpr": 0.0,
                 "auc": null,
                 "mean_score": 0.1,
-                "base_rate": 0.0
+                "base_rate": 0.0,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.0,
+                    0.6576
+                  ],
+                  "others_rate": 0.5545,
+                  "ratio_to_others": 0.0,
+                  "p_value": 0.198629
+                }
               },
               {
                 "group": "Native American \u00d7 Less than 25",
@@ -930,7 +1020,16 @@
                 "fpr": 0.0,
                 "auc": null,
                 "mean_score": 0.35,
-                "base_rate": 0.0
+                "base_rate": 0.0,
+                "small_group_test": {
+                  "rate_ci": [
+                    0.0,
+                    0.6576
+                  ],
+                  "others_rate": 0.5545,
+                  "ratio_to_others": 0.0,
+                  "p_value": 0.198629
+                }
               },
               {
                 "group": "Other \u00d7 25 - 45",
@@ -1099,7 +1198,7 @@
         "INDIA:SUTRA-FAIRNESS",
         "ISO42005:6.8.2"
       ],
-      "evidence_hash": "f3a168f8356f5db210ea525e3a069bf856dd93bae4781a67d96270bb26b3631e"
+      "evidence_hash": "6a16465ea63330bd39efa3513aad541536008737c0d3418f0701153752de50aa"
     },
     {
       "check_id": "fairness.proxy_features",
@@ -4423,9 +4522,9 @@
   ],
   "manual_evidence": [],
   "llm_run": {},
-  "ledger_root": "b9bb87290818216efa8c5748d9fe2445df606c4ddbe286dee91f8da6f47473c9",
+  "ledger_root": "85db8370997027ad8c414f871441e7bb0179a8fb033ba916b3ef3971920e53a6",
   "environment": {
     "python": "3.13.18",
-    "pramana": "0.10.0"
+    "pramana": "0.11.0"
   }
 }

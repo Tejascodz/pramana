@@ -134,6 +134,15 @@
             "missing_attribute": false,
             "n": 11,
             "selection_rate": 0.2727272727272727,
+            "small_group_test": {
+              "others_rate": 0.5548,
+              "p_value": 0.057366,
+              "rate_ci": [
+                0.0975,
+                0.5657
+              ],
+              "ratio_to_others": 0.4916
+            },
             "tpr": 0.5
           },
           {

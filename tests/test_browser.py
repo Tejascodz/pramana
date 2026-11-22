@@ -155,3 +155,91 @@ def test_the_sandbox_is_on_unless_turned_off():
     }
     assert build_client(base).sandbox is True
     assert build_client({**base, "browser_sandbox": False}).sandbox is False
+
+
+# ---------------------------------------------------------------------------------------
+# A chat behind a sign-in: a saved session (Playwright storage state)
+# ---------------------------------------------------------------------------------------
+
+
+class _SignedIn(BaseHTTPRequestHandler):
+    """/login sets a session cookie; / shows the chat only with that cookie."""
+
+    def log_message(self, *args) -> None:
+        return
+
+    def do_GET(self) -> None:  # noqa: N802
+        if self.path.startswith("/login"):
+            body = b"<html><body>Signed in. <a href='/'>Go to chat</a></body></html>"
+            self.send_response(200)
+            self.send_header("Set-Cookie", "pramana_session=ok; Path=/; HttpOnly")
+        elif "pramana_session=ok" in (self.headers.get("Cookie") or ""):
+            body = PAGE.format(customer="").encode()
+            self.send_response(200)
+        else:
+            body = b"<html><body><form>Please sign in.</form></body></html>"
+            self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+
+@pytest.fixture(scope="module")
+def signed_in_url(client):  # depends on `client` so it is skipped without Chromium
+    server = ThreadingHTTPServer(("127.0.0.1", 0), _SignedIn)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    yield f"http://127.0.0.1:{server.server_address[1]}/"
+    server.shutdown()
+    server.server_close()
+
+
+def test_a_saved_sign_in_opens_a_chat_behind_a_login(signed_in_url, tmp_path):
+    import os
+    import stat
+
+    from pramana.adapters.browser import save_sign_in
+
+    state = save_sign_in(
+        signed_in_url + "login",
+        tmp_path / "session.json",
+        wait=lambda page: page.wait_for_load_state(),
+        headless=True,
+        sandbox=False,  # test machines run as root, where Chromium's sandbox cannot start
+    )
+    assert stat.S_IMODE(os.stat(state).st_mode) == 0o600  # a credential: owner only
+    assert "pramana_session" in state.read_text()
+
+    common = dict(timeout=10, settle_ms=400, sandbox=False, send_selector="#send")
+    signed = BrowserChatClient(
+        signed_in_url, "#box", ".msg.bot", storage_state=str(state), **common
+    )
+    reply = signed.complete("", "What is your rate?")
+    signed.close()
+    assert reply.ok and reply.text.startswith("Our personal loan rate")
+
+    anonymous = BrowserChatClient(signed_in_url, "#box", ".msg.bot", **common)
+    blocked = anonymous.complete("", "What is your rate?")
+    anonymous.close()
+    assert not blocked.ok  # the login wall: no chat box without the session
+
+
+def test_a_saved_session_is_refused_for_plain_http_elsewhere(tmp_path):
+    from pramana.adapters.llm import build_client
+
+    (tmp_path / "s.json").write_text('{"cookies": [], "origins": []}')
+    with pytest.raises(ValueError, match="https|credential"):
+        build_client({"mode": "browser", "url": "http://chat.example.com/", "input_selector": "#b",
+                      "reply_selector": ".r", "storage_state": str(tmp_path / "s.json")})  # fmt: skip
+
+
+@pytest.mark.parametrize("content", [None, "not json", "[1, 2]"])
+def test_a_missing_or_malformed_session_file_is_refused(tmp_path, content):
+    from pramana.adapters.llm import build_client
+
+    path = tmp_path / "s.json"
+    if content is not None:
+        path.write_text(content)
+    with pytest.raises(ValueError, match="storage_state"):
+        build_client({"mode": "browser", "url": "http://127.0.0.1:9/", "input_selector": "#b",
+                      "reply_selector": ".r", "storage_state": str(path)})  # fmt: skip
