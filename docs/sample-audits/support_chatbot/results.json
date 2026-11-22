@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-43C1F5",
+  "audit_id": "PRM-20261021-49A4C9",
   "tool": {
     "name": "pramana",
-    "version": "0.10.0"
+    "version": "0.11.0"
   },
   "system": {
     "name": "Niva Customer Support Assistant",
@@ -26,8 +26,8 @@
     "declared_eu_tier": "limited"
   },
   "audit_date": "2026-10-21",
-  "started": "2026-11-22T20:56:05+00:00",
-  "finished": "2026-11-22T20:56:05+00:00",
+  "started": "2026-11-22T21:13:37+00:00",
+  "finished": "2026-11-22T21:13:37+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -3641,9 +3641,9 @@
     "latency_p95_ms": null,
     "probe_packs": []
   },
-  "ledger_root": "490dea6c1b8e92c3bf5e0be5593287fb0aabd9e583e460669fa86ce126a312ef",
+  "ledger_root": "2cc8c98b6bd94265b92234ac16ba788d10025cff428414ba3a80d3f8d9a68fe8",
   "environment": {
     "python": "3.13.18",
-    "pramana": "0.10.0"
+    "pramana": "0.11.0"
   }
 }

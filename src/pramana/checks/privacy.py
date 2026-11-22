@@ -198,6 +198,69 @@ def _tpr_at_fpr(loss_in: np.ndarray, loss_out: np.ndarray, fpr: float) -> float 
     return round(float((loss_in <= allowed.max()).mean()), 4)
 
 
+#: Shadow models trained for the likelihood-ratio attack, and the rows it attacks at most
+#: (each shadow model is trained on half of twice this many rows).
+LIRA_SHADOWS = 8
+LIRA_MAX_ROWS = 2000
+
+
+def _true_label_logit(model: Any, X: pd.DataFrame, labels: np.ndarray) -> np.ndarray:
+    """log(p / (1 - p)) of the probability the model gives each row's true label."""
+    proba = model.predict_proba(X)
+    classes = list(model.classes_)
+    index = np.array([classes.index(v) if v in classes else -1 for v in labels])
+    p = np.where(index >= 0, proba[np.arange(len(labels)), np.clip(index, 0, None)], 0.0)
+    p = np.clip(p, 1e-6, 1 - 1e-6)
+    return np.log(p) - np.log1p(-p)
+
+
+def lira_offline(
+    model: Any, X: pd.DataFrame, labels: np.ndarray, shadows: int, seed: int
+) -> np.ndarray | None:
+    """Offline likelihood-ratio attack (Carlini et al., IEEE S&P 2022), one score per row.
+
+    Each shadow model is a fresh copy of the audited model trained on a random half of the
+    rows. For every row, the shadows that never saw it show how confident a model like this
+    is on that row without it; the attack scores how far the audited model's confidence
+    (as a logit of the true label's probability) sits above that, with one variance shared
+    by all rows, as Carlini et al. recommend for few shadow models. A row the model has
+    memorised scores high. None if the model cannot be copied and retrained.
+    """
+    from scipy.stats import norm
+    from sklearn.base import clone
+
+    try:
+        target = _true_label_logit(model, X, labels)
+    except Exception:  # noqa: BLE001 - a model without class probabilities
+        return None
+    rng = np.random.default_rng(seed)
+    out: list[list[float]] = [[] for _ in range(len(X))]
+    for _ in range(shadows):
+        trained_on = rng.random(len(X)) < 0.5
+        if len(set(labels[trained_on])) < 2 or trained_on.all():
+            continue
+        try:
+            shadow = clone(model).fit(X[trained_on], labels[trained_on])
+        except Exception:  # noqa: BLE001 - not a re-trainable estimator
+            return None
+        held_out = np.flatnonzero(~trained_on)
+        for i, value in zip(
+            held_out, _true_label_logit(shadow, X.iloc[held_out], labels[held_out]), strict=True
+        ):
+            out[i].append(float(value))
+    seen = [i for i, values in enumerate(out) if values]
+    if not seen:
+        return None
+    means = np.array([np.mean(v) if v else np.nan for v in out])
+    fallback = float(np.nanmean(means))
+    means = np.where(np.isnan(means), fallback, means)
+    residuals = np.concatenate(
+        [np.asarray(out[i]) - means[i] for i in seen if len(out[i]) > 1] or [np.zeros(1)]
+    )
+    spread = float(np.std(residuals)) or 1.0
+    return norm.cdf((target - means) / spread)
+
+
 @register(
     "privacy.membership_inference",
     title="Membership-inference risk",
@@ -243,9 +306,35 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
     for fpr in (0.01, 0.05):
         tail[fpr] = _tpr_at_fpr(loss_in, loss_out, fpr) if n * fpr >= 1 else None
 
-    if attack_auc > limit + 0.10:
+    # The stronger attack: per-row likelihood ratios against shadow models (offline LiRA).
+    shadows = ctx.spec.check_options("privacy.membership_inference").get(
+        "shadow_models", LIRA_SHADOWS
+    )
+    lira: dict[str, Any] = {"run": False}
+    if shadows and ctx.has_model:
+        k = min(n, LIRA_MAX_ROWS)
+        pool = pd.concat([members.iloc[:k], non_members.iloc[:k]])
+        raw_labels = pool[ctx.spec.target].to_numpy()
+        scores = lira_offline(ctx.model, ctx.X(pool), raw_labels, int(shadows), ctx.spec.seed)
+        if scores is not None:
+            lira_labels = np.r_[np.ones(k), np.zeros(k)]
+            lira = {
+                "run": True,
+                "rows": k,
+                "shadow_models": int(shadows),
+                "auc": round(safe_auc(lira_labels, scores), 4),
+                "tpr_at_1pct_fpr": _tpr_at_fpr(-scores[:k], -scores[k:], 0.01)
+                if k >= 100
+                else None,
+                "tpr_at_0_1pct_fpr": _tpr_at_fpr(-scores[:k], -scores[k:], 0.001)
+                if k >= 1000
+                else None,
+            }
+    strongest = max(attack_auc, lira["auc"]) if lira["run"] else attack_auc
+
+    if strongest > limit + 0.10:
         status, severity = Status.FAIL, Severity.HIGH
-    elif attack_auc > limit:
+    elif strongest > limit:
         status, severity = Status.WARN, Severity.MEDIUM
     else:
         status, severity = Status.PASS, Severity.INFO
@@ -267,6 +356,21 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
                 else " The true-positive rate at a low false-positive rate is not measurable: "
                 "too many rows share the same loss to hold the false-positive rate that low."
             )
+            + (
+                f" The likelihood-ratio attack (offline LiRA, Carlini et al., 2022) with "
+                f"{lira['shadow_models']} shadow models on {lira['rows']} rows of each kind: AUC "
+                f"{lira['auc']:.3f}"
+                + (
+                    f", identifying {lira['tpr_at_1pct_fpr']:.1%} of training rows at a 1% "
+                    "false-positive rate"
+                    if lira["tpr_at_1pct_fpr"] is not None
+                    else ""
+                )
+                + ". The status uses the stronger of the two attacks."
+                if lira["run"]
+                else " The likelihood-ratio attack did not run: it needs a model that can be "
+                "copied and retrained (scikit-learn), and shadow_models above 0."
+            )
         ),
         plain_summary=(
             "An attacker could tell whether a specific person was in the training data more often than chance."
@@ -282,5 +386,15 @@ def membership_inference(ctx: AuditContext) -> CheckResult:
             "membership_advantage": round(advantage, 4),
             "tpr_at_1pct_fpr": tail[0.01],
             "tpr_at_5pct_fpr": tail[0.05],
+            **(
+                {
+                    "lira_auc": lira["auc"],
+                    "lira_tpr_at_1pct_fpr": lira["tpr_at_1pct_fpr"],
+                    "lira_tpr_at_0_1pct_fpr": lira["tpr_at_0_1pct_fpr"],
+                    "lira_shadow_models": lira["shadow_models"],
+                }
+                if lira["run"]
+                else {}
+            ),
         },
     )

@@ -132,7 +132,7 @@ The pack holds an HTML report, `results.json`, a model card, a CycloneDX 1.7 ML 
 | Transparency | `explainability.feature_importance` | Permutation importance compared with the drivers the documentation declares |
 | Transparency | `documentation.model_card` | Completeness against model-card and regulatory fields; documented claims against measured results |
 | Privacy | `privacy.pii_exposure` | E-mail, Indian mobile, PAN, Aadhaar-format, card (Luhn) and IP values in every dataset |
-| Privacy | `privacy.membership_inference` | Loss-threshold attack on training against held-out rows, with true-positive rates at 1% and 5% false positives |
+| Privacy | `privacy.membership_inference` | Loss-threshold attack and the likelihood-ratio attack (offline LiRA, with shadow models) on training against held-out rows, with true-positive rates at low false-positive rates |
 | Assurance | `audit.detector_sensitivity` | Plants known defects and clean controls in copies of the data and confirms the checks react correctly |
 | LLM security | `llm.prompt_injection` | Hand-written and generated attacks (23 techniques, 4 goals, 7 languages), reported by technique, goal and language; system-prompt canary |
 | LLM security | `llm.multi_turn` | Conversations of 2 to 4 turns with the real replies kept in history; reports the turn at which the defence broke |
@@ -272,6 +272,8 @@ It catches recitals, not paraphrases, which is what the rule claims. The 0.9.2 r
 | `pramana ping SPEC` | Confirm an LLM endpoint answers |
 | `pramana ingest LOG --format otel` | Convert OpenTelemetry or LangChain logs to Pramana's trace format |
 | `pramana scan-trace LOG` | Stream a log of any size for misalignment signals |
+| `pramana split-trace LOG --out DIR` | Split a log of any size into files of whole sessions, for auditing in batches |
+| `pramana browser-login URL --out FILE` | Sign in to a chat once, yourself; browser-mode audits reuse the session (`llm.storage_state`) |
 | `pramana sandbox serve` | Honeypot tool server for your own agent |
 | `pramana benchmark` | Measure the scoring rules, and optionally a judge model (`--judge-url`, `--judge-model`; `--with-instructions` also shows it the system prompt, secrets withheld), on the labelled benchmark |
 | `pramana import-attacks llmail-inject FILE --out F` | Turn LLMail-Inject's real attack e-mails into sandbox scenarios for `agent.scenarios` |
@@ -365,8 +367,8 @@ The audit stages follow SMACTR (Raji et al., "Closing the AI Accountability Gap"
 - **Measured on small open models.** The LLM and agent results come from llama3.2:3b on a laptop and from Qwen2.5-3B, Qwen2.5-7B and Llama-3.2-3B on Kaggle. No hosted frontier model or third-party LLM application has been audited live, and the probes and the reference guard share an author.
 - **Access control is judged by what replies say.** It does not review an application's authentication design. A reply that accepts a false identity is sent for review, but a system that acts on one silently, saying nothing, still passes.
 - **Agent coverage depends on the logs.** Actions outside the logging pipeline are invisible, and the approval-path proof holds only for the workflow graph as declared. The sandbox uses a stand-in bank, not the customer's tools.
-- **Statistics need data.** Groups below 30 records are shown but not compared, fairness metrics conflict by construction, the four-fifths rule is a screening heuristic, and the membership-inference attack is a simple one.
-- **Scale.** The full audit loads an agent trace into memory; very large logs should be audited in session batches, though `scan-trace` streams any size. Browser mode depends on page selectors, and a login wall, CAPTCHA or bot detection stops it.
+- **Statistics need data.** Groups below 30 records are compared only by an exact test for review, not by the fairness ratios; fairness metrics conflict by construction, and the four-fifths rule is a screening heuristic. The likelihood-ratio privacy attack needs a model that can be retrained (scikit-learn) and uses 8 shadow models by default; attacks with more shadow models, or by an attacker with other data, can find more.
+- **Scale.** The full audit loads an agent trace into memory, so a very large log is split into whole-session files with `pramana split-trace` and audited in batches; `scan-trace` streams any size. Browser mode depends on page selectors; a login wall is handled by signing in once yourself (`pramana browser-login`), but a CAPTCHA or bot detection stops it, and Pramana does not try to get past them.
 
 ## Development
 

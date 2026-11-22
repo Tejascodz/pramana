@@ -24,9 +24,11 @@ or are allowed to test: the probes are real attacks.
 from __future__ import annotations
 
 import atexit
+import json
 import os
 import threading
 import time
+from pathlib import Path
 from typing import Any
 
 from pramana.adapters.llm import Completion, check_endpoint, endpoint_label, strip_reasoning
@@ -105,9 +107,12 @@ class BrowserChatClient:
         settle_ms: int = 1200,
         headless: bool = True,
         sandbox: bool = True,
+        storage_state: str | None = None,
         **_: Any,
     ):
-        check_endpoint(url, sends_credentials=False)
+        # A saved sign-in (cookies and local storage) is a credential: it is only sent to an
+        # https page or one on this computer, like any other credential.
+        check_endpoint(url, sends_credentials=bool(storage_state))
         self.url = url
         self.input_selector = input_selector
         self.reply_selector = reply_selector
@@ -116,6 +121,7 @@ class BrowserChatClient:
         self.settle_ms = int(settle_ms)
         self.headless = bool(headless)
         self.sandbox = bool(sandbox)
+        self.storage_state = str(storage_state) if storage_state else None
         self._lock = threading.Lock()
         self._browser = self._context = self._page = None
         self._history: list[dict[str, str]] | None = None
@@ -141,7 +147,9 @@ class BrowserChatClient:
         if self._context is not None:
             self._context.close()
         self._context = self._browser.new_context(
-            accept_downloads=False, extra_http_headers=headers or None
+            accept_downloads=False,
+            extra_http_headers=headers or None,
+            **({"storage_state": self.storage_state} if self.storage_state else {}),
         )
         self._page = self._context.new_page()
         self._page.goto(self.url, wait_until="domcontentloaded", timeout=self.timeout * 1000)
@@ -233,3 +241,36 @@ class BrowserChatClient:
             "send": self.send_selector or "Enter",
             "timeout_s": self.timeout,
         }
+
+
+def save_sign_in(
+    url: str,
+    out: str | Path,
+    wait: Any = None,
+    headless: bool = False,
+    timeout: float = 600.0,
+    sandbox: bool = True,
+) -> Path:
+    """Open ``url`` in a visible browser, let a person sign in, and save the session.
+
+    The saved file (cookies and local storage, Playwright's storage state) lets later audits
+    open the chat already signed in, through ``llm.storage_state``. It is a credential: it
+    is written readable by its owner only, never copied into an audit pack, and should be
+    deleted after the audit. Signing in is done by the person, in the browser; Pramana does
+    not type passwords or pass CAPTCHAs or bot checks.
+    """
+    from pramana.safefs import write_bytes
+
+    check_endpoint(url, sends_credentials=True)
+    browser = _shared_browser(headless, sandbox)
+    context = browser.new_context(accept_downloads=False)
+    try:
+        page = context.new_page()
+        page.goto(url, wait_until="domcontentloaded", timeout=timeout * 1000)
+        if wait is not None:
+            wait(page)
+        state = context.storage_state()
+    finally:
+        context.close()
+    path = Path(out)
+    return write_bytes(path.parent, path.name, json.dumps(state, indent=1).encode("utf-8"))

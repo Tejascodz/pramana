@@ -1,8 +1,8 @@
 {
-  "audit_id": "PRM-20261021-C5D7DA",
+  "audit_id": "PRM-20261021-7F7F46",
   "tool": {
     "name": "pramana",
-    "version": "0.10.0"
+    "version": "0.11.0"
   },
   "system": {
     "name": "Nilgiri Finance Personal Loan Pre-Approval Model",
@@ -31,8 +31,8 @@
     "prohibited_practice_flags": []
   },
   "audit_date": "2026-10-21",
-  "started": "2026-11-22T20:56:00+00:00",
-  "finished": "2026-11-22T20:56:03+00:00",
+  "started": "2026-11-22T21:13:29+00:00",
+  "finished": "2026-11-22T21:13:36+00:00",
   "opinion": {
     "rating": "Ineffective",
     "statement": "Controls over this AI system do not yet manage its key risks. Release should wait for remediation of high and critical findings."
@@ -1486,14 +1486,18 @@
       "category": "Privacy",
       "status": "pass",
       "severity": "info",
-      "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.5% of training rows (5% FPR: 6.5%).",
+      "summary": "Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.5% of training rows (5% FPR: 6.5%). The likelihood-ratio attack (offline LiRA, Carlini et al., 2022) with 8 shadow models on 2000 rows of each kind: AUC 0.594, identifying 5.2% of training rows at a 1% false-positive rate. The status uses the stronger of the two attacks.",
       "plain_summary": "The model does not reveal who was in its training data beyond chance level.",
       "recommendation": "Reduce overfitting (regularisation, fewer trees, early stopping) or train with differential privacy, then re-run this test.",
       "metrics": {
         "attack_auc": 0.5672,
         "membership_advantage": 0.1345,
         "tpr_at_1pct_fpr": 0.0153,
-        "tpr_at_5pct_fpr": 0.0645
+        "tpr_at_5pct_fpr": 0.0645,
+        "lira_auc": 0.5944,
+        "lira_tpr_at_1pct_fpr": 0.052,
+        "lira_tpr_at_0_1pct_fpr": 0.0175,
+        "lira_shadow_models": 8
       },
       "details": {},
       "controls": [
@@ -1503,7 +1507,7 @@
         "EUAIA:Art-15",
         "INDIA:DPDP-2023"
       ],
-      "evidence_hash": "298e7abd5ca77d043d8d3bc6b66c088cc22037c888d92b295a4f1b7f28de6cdb"
+      "evidence_hash": "65279477efe7a2eca3b4c427bb6906137c6a348e403094eb86f705068992d4cd"
     },
     {
       "check_id": "documentation.model_card",
@@ -4965,9 +4969,9 @@
     }
   ],
   "llm_run": {},
-  "ledger_root": "825e2ffbc025701d082d34a4631405a38dcb697a481af88e3808ab586100fb84",
+  "ledger_root": "cf5e8ffc7796e4a171bc914cfa98dd033a4fbf5390fc82df400bec9c686c5ef1",
   "environment": {
     "python": "3.13.18",
-    "pramana": "0.10.0"
+    "pramana": "0.11.0"
   }
 }

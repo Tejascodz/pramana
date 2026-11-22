@@ -693,6 +693,22 @@ class HTTPJSONClient(_HTTPBase):
         }
 
 
+def _storage_state(path: Any) -> str | None:
+    """A saved browser sign-in file, checked to exist and to be a JSON object."""
+    if not path:
+        return None
+    file = Path(path)
+    if not file.is_file():
+        raise ValueError(f"llm.storage_state {file.name} does not exist")
+    try:
+        data = json.loads(file.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"llm.storage_state {file.name} is not a saved browser session") from exc
+    if not isinstance(data, dict) or not isinstance(data.get("cookies", []), list):
+        raise ValueError(f"llm.storage_state {file.name} is not a saved browser session")
+    return str(file)
+
+
 def build_client(config: dict[str, Any]) -> LLMClient:
     validate_llm_settings(config)
     mode = config.get("mode", "replay")
@@ -732,6 +748,7 @@ def build_client(config: dict[str, Any]) -> LLMClient:
             settle_ms=int(config.get("settle_ms", 1200)),
             headless=bool(config.get("headless", True)),
             sandbox=config.get("browser_sandbox", True) is not False,
+            storage_state=_storage_state(config.get("storage_state")),
         )
     if mode == "http":
         for key in ("url", "body", "response_path"):

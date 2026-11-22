@@ -178,7 +178,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
 
 <header class="top">
   <div>
-    <p class="eyebrow">AI system audit report · PRM-20261021-C5D7DA</p>
+    <p class="eyebrow">AI system audit report · PRM-20261021-7F7F46</p>
     <h1>Nilgiri Finance Personal Loan Pre-Approval Model</h1>
     <div class="meta">
       Version 2.3.0 · Owner Credit Risk Analytics
@@ -230,7 +230,7 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <div class="kpi"><div class="v">4/16</div><div class="l">checks passed</div></div>
   <div class="kpi"><div class="v">7</div><div class="l">open high or critical risks</div></div>
   <div class="kpi"><div class="v">75/151</div><div class="l">applicable controls tested by automation</div></div>
-  <div class="kpi"><div class="v mono" style="font-size:18px">825e2ffbc025</div><div class="l">evidence root hash</div></div>
+  <div class="kpi"><div class="v mono" style="font-size:18px">cf5e8ffc7796</div><div class="l">evidence root hash</div></div>
 </section>
 
 <section class="card" id="risks">
@@ -355,9 +355,9 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
   <details >
     <summary><span class="chip pass">pass</span>Membership-inference risk <span class="note mono">privacy.membership_inference</span></summary>
     <div class="finding-body">
-      <p>Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.5% of training rows (5% FPR: 6.5%).</p>
-<p><span class="tag">NIST:MEASURE-2.10</span><span class="tag">NIST:MEASURE-2.7</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:DPDP-2023</span></p>      <p class="note">attack_auc = <span class="mono">0.5672</span> · membership_advantage = <span class="mono">0.1345</span> · tpr_at_1pct_fpr = <span class="mono">0.0153</span> · tpr_at_5pct_fpr = <span class="mono">0.0645</span></p>
-<p class="note">Evidence SHA-256 <span class="mono hash">298e7abd5ca77d043d8d3bc6b66c088cc22037c888d92b295a4f1b7f28de6cdb</span></p>    </div>
+      <p>Loss-threshold attack (Yeom et al., 2018) on 3660 training and 3660 held-out rows: attack AUC 0.567 (limit 0.6), membership advantage 0.134. Mean loss 0.307 on training rows vs 0.493 on held-out rows. At a 1% false-positive rate the attack identifies 1.5% of training rows (5% FPR: 6.5%). The likelihood-ratio attack (offline LiRA, Carlini et al., 2022) with 8 shadow models on 2000 rows of each kind: AUC 0.594, identifying 5.2% of training rows at a 1% false-positive rate. The status uses the stronger of the two attacks.</p>
+<p><span class="tag">NIST:MEASURE-2.10</span><span class="tag">NIST:MEASURE-2.7</span><span class="tag">ISO42001:A.6.2.4</span><span class="tag">EUAIA:Art-15</span><span class="tag">INDIA:DPDP-2023</span></p>      <p class="note">attack_auc = <span class="mono">0.5672</span> · membership_advantage = <span class="mono">0.1345</span> · tpr_at_1pct_fpr = <span class="mono">0.0153</span> · tpr_at_5pct_fpr = <span class="mono">0.0645</span> · lira_auc = <span class="mono">0.5944</span> · lira_tpr_at_1pct_fpr = <span class="mono">0.052</span> · lira_tpr_at_0_1pct_fpr = <span class="mono">0.0175</span> · lira_shadow_models = <span class="mono">8</span></p>
+<p class="note">Evidence SHA-256 <span class="mono hash">65279477efe7a2eca3b4c427bb6906137c6a348e403094eb86f705068992d4cd</span></p>    </div>
   </details>
   <details open>
     <summary><span class="chip fail">fail</span>Documentation and claims <span class="note mono">documentation.model_card</span></summary>
@@ -851,14 +851,14 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 28px; }
     </table></div>
   </details>
   <h3>Verifying this pack</h3>
-  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">825e2ffbc025701d082d34a4631405a38dcb697a481af88e3808ab586100fb84</span>.</p>
+  <p>Run <code>pramana verify &lt;pack-folder&gt;</code>. It recomputes every evidence hash and the ledger chain. Evidence for stages 1 to 5 is sealed under root hash <span class="mono hash">cf5e8ffc7796e4a171bc914cfa98dd033a4fbf5390fc82df400bec9c686c5ef1</span>.</p>
   <h3>Limitations</h3>
   <p class="note">Automated tests evidence technical controls only. Controls marked "not tested" need organisational evidence. Statistical tests depend on the representativeness of the data supplied. LLM probes are a sample of behaviour, not proof of safety. The classification is an assessment to support legal review, not legal advice. See docs/limitations.md in the Pramana repository.</p>
 </section>
 
 <footer>
   <p><strong>Notice.</strong> Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md</p>
-  Generated by Pramana 0.10.0 · Python 3.13.18 · audit PRM-20261021-C5D7DA · started 2026-11-22T20:56:00+00:00
+  Generated by Pramana 0.11.0 · Python 3.13.18 · audit PRM-20261021-7F7F46 · started 2026-11-22T21:13:29+00:00
 </footer>
 </div>
 </body>

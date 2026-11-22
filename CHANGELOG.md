@@ -1,5 +1,34 @@
 # Changelog
 
+## 0.11.0 — 2026-11-23
+
+Four more gaps from the limitations list: a stronger privacy attack, small groups,
+very large agent logs, and chats behind a sign-in.
+
+- **Likelihood-ratio membership inference (offline LiRA, Carlini et al., IEEE S&P
+  2022).** `privacy.membership_inference` now also trains shadow copies of the audited
+  model (8 by default, `checks.options: {privacy.membership_inference: {shadow_models:
+  N}}`, 0 to turn off) and scores each row by how far the model's confidence on it sits
+  above what models that never saw it give. Measured: on a random forest that memorises
+  its training rows it identifies 42% of them at a 1% false-positive rate, against 12%
+  for the loss-threshold attack; on a model that does not memorise it stays at chance
+  (AUC 0.51). On the credit-scoring example it finds 5.2% at 1% (the loss attack 1.5%),
+  still within the limit. The status uses the stronger attack.
+- **Small groups are compared exactly.** Groups below the minimum size used to be shown
+  but never compared. Each is now compared with every other record by Fisher's exact
+  test, Holm-corrected across groups; a group significantly less favoured, by less than
+  the four-fifths ratio, is named and sent for review, and the check cannot PASS. It is
+  never a failure, because the sample is small. In a test of 30 runs of 20 small groups
+  drawn at the same rate as everyone else, the correction kept chance findings out.
+- **`pramana split-trace`.** Streams an agent log of any size once and writes files of
+  whole sessions (never one session across two files), holding only the session-to-file
+  map in memory, so a very large log is audited in batches.
+- **Chats behind a sign-in.** `pramana browser-login URL --out FILE` opens a browser, you
+  sign in yourself, and the session is saved (owner-readable only); `llm.storage_state`
+  makes browser-mode audits open the chat signed in. The session file is a credential:
+  it is only sent to https pages or this computer, and never copied into a pack.
+  Pramana does not type passwords or get past CAPTCHAs or bot checks.
+
 ## 0.10.0 — 2026-11-23
 
 Attacks that adapt, and three gaps from the limitations list closed. Grounded in

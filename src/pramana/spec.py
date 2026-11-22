@@ -74,6 +74,7 @@ THRESHOLD_RULES: dict[str, tuple[str, float, float]] = {
 #: Options each check accepts under ``checks.options``, with the type each must have.
 CHECK_OPTIONS: dict[str, dict[str, type]] = {
     "privacy.pii_exposure": {"allowed_columns": list},
+    "privacy.membership_inference": {"shadow_models": int},
     "fairness.proxy_features": {"allow_sensitive_inputs": bool},
     "robustness.perturbation": {"monotone_increasing": list, "monotone_decreasing": list},
 }
@@ -305,6 +306,15 @@ def _check_checks(raw: Any) -> dict[str, Any]:
                     if not isinstance(value, list) or not all(isinstance(v, str) for v in value):
                         raise SpecError(
                             f"checks.options.{check_id}.{name} must be a list of column names"
+                        )
+                elif kind is int:
+                    if (
+                        isinstance(value, bool)
+                        or not isinstance(value, int)
+                        or not 0 <= value <= 64
+                    ):
+                        raise SpecError(
+                            f"checks.options.{check_id}.{name} must be a whole number from 0 to 64"
                         )
                 elif not isinstance(value, kind):
                     raise SpecError(f"checks.options.{check_id}.{name} must be true or false")
@@ -615,7 +625,7 @@ def load_spec(path: str | Path) -> AuditSpec:
             raise SpecError(
                 f"llm.mutations must be 'all' or a list drawn from {', '.join(MUTATORS)}"
             )
-    for key in ("probes", "replay", "knowledge_base"):
+    for key in ("probes", "replay", "knowledge_base", "storage_state"):
         if key in llm:
             llm[key] = _resolve(base, llm[key])
 

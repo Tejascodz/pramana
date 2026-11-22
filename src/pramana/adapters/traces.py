@@ -353,3 +353,54 @@ def stream_events(path: str | Path, fmt: str = "native") -> Iterator[dict[str, A
     for record in _iter_raw_records(Path(path)):
         # Feed one raw record at a time; converters are generators over an iterable.
         yield from converter([record])
+
+
+def split_trace(
+    path: str | Path, out_dir: str | Path, fmt: str = "native", sessions_per_file: int = 5000
+) -> dict[str, Any]:
+    """Split a trace into files of whole sessions, in one streaming pass.
+
+    The full audit holds a trace in memory, so a very large log is audited in batches of
+    sessions. A session is never cut across files: each session goes to the batch that
+    was open when it first appeared, and every later event of it follows. Only the map of
+    session to batch is kept in memory, never the events. Events with no session id go to
+    ``no_session.jsonl``. Output is Pramana's native JSON Lines, so each file is audited
+    with ``agent.trace`` and the default format.
+    """
+    if sessions_per_file < 1:
+        raise ValueError("sessions_per_file must be at least 1")
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    if any(out.glob("batch_*.jsonl")) or (out / "no_session.jsonl").exists():
+        raise ValueError(f"{out} already holds split files; choose an empty folder")
+    batch_of: dict[str, int] = {}
+    counts: dict[str, int] = {}
+    handles: dict[str, Any] = {}
+
+    def write(name: str, event: dict[str, Any]) -> None:
+        handle = handles.get(name)
+        if handle is None:
+            if len(handles) >= 32:  # keep few files open; reopen in append mode when needed
+                handles.pop(next(iter(handles))).close()
+            handle = handles[name] = open(out / name, "a", encoding="utf-8")  # noqa: SIM115
+        handle.write(json.dumps(event, ensure_ascii=False) + "\n")
+        counts[name] = counts.get(name, 0) + 1
+
+    try:
+        for event in stream_events(path, fmt):
+            sid = event.get("session_id")
+            if sid in (None, ""):
+                write("no_session.jsonl", event)
+                continue
+            sid = str(sid)
+            if sid not in batch_of:
+                batch_of[sid] = len(batch_of) // sessions_per_file
+            write(f"batch_{batch_of[sid] + 1:04d}.jsonl", event)
+    finally:
+        for handle in handles.values():
+            handle.close()
+    return {
+        "sessions": len(batch_of),
+        "files": {name: counts[name] for name in sorted(counts)},
+        "sessions_per_file": sessions_per_file,
+    }

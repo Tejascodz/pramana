@@ -19,6 +19,7 @@ from pramana.metrics import (
     safe_auc,
     true_positive_rate,
     two_proportion_pvalue,
+    wilson_interval,
 )
 from pramana.registry import register
 from pramana.types import CheckResult, Severity, Status
@@ -53,6 +54,70 @@ def group_table(
             }
         )
     return rows
+
+
+SMALL_GROUP_ALPHA = 0.05
+
+
+def compare_small_groups(rows: list[dict[str, Any]], di_min: float) -> list[dict[str, Any]]:
+    """Compare each group too small for the ratios with every other record, exactly.
+
+    A group below the minimum size is not compared by disparate impact (its rate is too
+    noisy), but a real disparity in a small group should not go unmentioned. Fisher's exact
+    test is valid at any size; with several small groups the Holm correction keeps the
+    chance of a false alarm across all of them at 5%. A group is flagged only if, after
+    correction, its favourable rate is significantly below the other records' and below
+    ``di_min`` of it. Flags send the result for review; they never fail the check, because
+    the sample is still small. Rows are annotated in place; the flagged rows are returned.
+    """
+    from scipy.stats import fisher_exact
+
+    total_n = sum(r["n"] for r in rows if not r.get("missing_attribute"))
+    total_fav = sum(r["favourable"] for r in rows if not r.get("missing_attribute"))
+    tested = []
+    for r in rows:
+        if r["adequate_sample"] or r.get("missing_attribute") or not r["n"]:
+            continue
+        rest_n, rest_fav = total_n - r["n"], total_fav - r["favourable"]
+        if not rest_n:
+            continue
+        table = [[r["favourable"], r["n"] - r["favourable"]], [rest_fav, rest_n - rest_fav]]
+        _, p = fisher_exact(table, alternative="less")
+        lo, hi = wilson_interval(r["favourable"], r["n"])
+        rest_rate = rest_fav / rest_n
+        r["small_group_test"] = {
+            "rate_ci": [round(lo, 4), round(hi, 4)],
+            "others_rate": round(rest_rate, 4),
+            "ratio_to_others": round(r["selection_rate"] / rest_rate, 4) if rest_rate else None,
+            "p_value": round(float(p), 6),
+        }
+        tested.append(r)
+    # Holm: the k-th smallest p-value is compared with alpha / (m - k + 1), stopping at the
+    # first that is not significant.
+    flagged = []
+    for k, r in enumerate(sorted(tested, key=lambda r: r["small_group_test"]["p_value"])):
+        test = r["small_group_test"]
+        if test["p_value"] > SMALL_GROUP_ALPHA / (len(tested) - k):
+            break
+        if test["ratio_to_others"] is not None and test["ratio_to_others"] < di_min:
+            test["significant_after_correction"] = True
+            flagged.append(r)
+    return flagged
+
+
+def _small_group_note(flagged: list[dict[str, Any]]) -> str:
+    if not flagged:
+        return ""
+    return (
+        " Too small to compare by ratio, but significantly less favoured than all other "
+        "records by an exact test (Holm-corrected), so a person should review: "
+        + "; ".join(
+            f"'{r['group']}' (n={r['n']}, {r['selection_rate']:.0%} vs "
+            f"{r['small_group_test']['others_rate']:.0%}, p={r['small_group_test']['p_value']:.2g})"
+            for r in flagged[:4]
+        )
+        + "."
+    )
 
 
 def parity_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -142,10 +207,14 @@ def group_parity(ctx: AuditContext) -> CheckResult:
     per_attr: dict[str, Any] = {}
     grades = []
     lines = []
+    small_flags: list[dict[str, Any]] = []
     for attr in attrs:
         rows = group_table(ctx.eval_df[attr], ctx.eval_y, ctx.eval_pred, ctx.eval_scores, min_n)
         summary = parity_summary(rows)
         status, severity = _grade(summary, di_min, eo_max)
+        small_flags += [
+            {**r, "group": f"{attr}={r['group']}"} for r in compare_small_groups(rows, di_min)
+        ]
         grades.append((status, severity))
         per_attr[attr] = {"groups": rows, "summary": summary, "status": status.value}
         if not assessable(summary):
@@ -180,6 +249,8 @@ def group_parity(ctx: AuditContext) -> CheckResult:
                 )
             )
     status, severity = _worst(grades)
+    if small_flags and status == Status.PASS:
+        status, severity = Status.WARN, Severity.MEDIUM
     failing = [a for a in attrs if per_attr[a]["status"] != Status.PASS.value]
 
     unassessed = [a for a in attrs if not assessable(per_attr[a]["summary"])]
@@ -236,6 +307,7 @@ def group_parity(ctx: AuditContext) -> CheckResult:
         status=status,
         severity=severity,
         summary="; ".join(lines)
+        + _small_group_note(small_flags)
         + f". Thresholds: DI >= {di_min}, equalized-odds difference <= {eo_max}.",
         plain_summary=plain,
         recommendation=(
@@ -253,7 +325,9 @@ def group_parity(ctx: AuditContext) -> CheckResult:
             if unassessed
             else "Re-run on each release and on production samples."
         ),
-        metrics=metrics | {"unassessed_attributes": unassessed},
+        metrics=metrics
+        | {"unassessed_attributes": unassessed}
+        | ({"small_groups_flagged": len(small_flags)} if small_flags else {}),
         details={"attributes": per_attr},
     )
 
@@ -274,6 +348,7 @@ def intersectional(ctx: AuditContext) -> CheckResult:
 
     df = ctx.eval_df
     pairs = {}
+    small_flags: list[dict[str, Any]] = []
     worst_pair, worst_di = None, float("inf")
     for a, b in combinations(attrs, 2):
         combo = df[a].astype(str) + " × " + df[b].astype(str)
@@ -290,6 +365,7 @@ def intersectional(ctx: AuditContext) -> CheckResult:
             "summary": summary,
             "small_subgroups": [r["group"] for r in rows if not r["adequate_sample"]],
         }
+        small_flags += compare_small_groups(rows, di_min)
         # Only pairs with two or more adequate subgroups count; others were not tested.
         if assessable(summary) and summary["disparate_impact_ratio"] < worst_di:
             worst_pair, worst_di = f"{a} × {b}", summary["disparate_impact_ratio"]
@@ -332,13 +408,15 @@ def intersectional(ctx: AuditContext) -> CheckResult:
             else "No intersectional subgroup falls below the four-fifths benchmark."
         )
 
+    if small_flags and status == Status.PASS:
+        status, severity = Status.WARN, Severity.MEDIUM
     return CheckResult(
         check_id="fairness.intersectional",
         title="Intersectional fairness",
         category="Fairness",
         status=status,
         severity=severity,
-        summary=summary_text,
+        summary=summary_text + _small_group_note(small_flags),
         plain_summary=plain,
         recommendation=(
             "Report subgroup metrics alongside single-attribute metrics and set an explicit subgroup "
@@ -347,6 +425,7 @@ def intersectional(ctx: AuditContext) -> CheckResult:
         metrics={
             "worst_pair": worst_pair,
             "worst_intersectional_di": round(worst_di, 4) if worst_pair else None,
+            **({"small_subgroups_flagged": len(small_flags)} if small_flags else {}),
         },
         details={"pairs": pairs},
     )

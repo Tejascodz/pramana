@@ -1,6 +1,6 @@
 # Model card: Fee Refund Agent
 
-Audit PRM-20261021-293E3D · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
+Audit PRM-20261021-B11CC3 · 2026-10-21 · release gate **BLOCK** · opinion **Ineffective**
 
 ## Model details
 - **Version:** 0.9.2
@@ -40,6 +40,6 @@ _Not documented. Flagged in the audit._
 - **R-03 (medium):** The deployment is missing safeguards the agent-safety literature expects: interrupt conditions, action monitor.
 - **R-04 (medium):** Many of the agent's actions have no recorded reasoning, so a monitor could not review why it acted.
 
-_Evidence root hash: `3b4a30251f83807d36e7b684901d5b82f0037fc00d4bb31741404c759255cbbb`_
+_Evidence root hash: `cf49fec14eb91e7496fb1a27663e3c4cebdc77cc11a7a3076a0a80f31ace6ba6`_
 
 _Automated test evidence for a qualified reviewer, not a certification, legal opinion or regulatory approval. A pass covers only the checks that ran, on the inputs and samples recorded in this pack. See https://github.com/Tejascodz/pramana/blob/main/DISCLAIMER.md_
