@@ -12,7 +12,7 @@
     pramana demo [credit|chatbot|agent|all]            run a bundled case study end to end
     pramana sandbox serve [--port P] [--out TRACE]     honeypot tools for your own agent
     pramana import-attacks llmail-inject FILE --out F  real attack e-mails as sandbox scenarios
-    pramana benchmark [--judge-url U --judge-model M [--without-instructions]]  measure the scoring (and a judge)
+    pramana benchmark [--judge-url U --judge-model M [--with-instructions]]  measure the scoring (and a judge)
 
 Exit codes: 0 success, 1 release gate blocked, 2 verification failed, 3 bad input,
 4 endpoint unreachable.
@@ -628,7 +628,7 @@ def _cmd_benchmark(args: argparse.Namespace) -> int:
         except ValueError as exc:
             print(f"error: {exc}", file=sys.stderr)
             return EXIT_INPUT
-    report = benchmarks.run(judge, instructions=not args.without_instructions)
+    report = benchmarks.run(judge, instructions=args.with_instructions)
     if args.json:
         print(json.dumps(report, indent=2))
         return EXIT_OK
@@ -938,10 +938,13 @@ def build_parser() -> argparse.ArgumentParser:
     bench.add_argument("--judge-url", help="OpenAI-compatible endpoint of a judge model")
     bench.add_argument("--judge-model", help="model name at that endpoint")
     bench.add_argument(
-        "--without-instructions",
+        "--with-instructions",
         action="store_true",
-        help="do not show the judge the assistant's system prompt (as in a black-box audit)",
+        help="show the judge the assistant's system prompt, secrets withheld "
+        "(as with llm.judge.send_system_prompt)",
     )
+    # 0.9.1 showed the prompt by default; its opt-out is still accepted (now the default).
+    bench.add_argument("--without-instructions", action="store_true", help=argparse.SUPPRESS)
     bench.add_argument("--json", action="store_true", help="print the full report as JSON")
     bench.set_defaults(fn=_cmd_benchmark)
 

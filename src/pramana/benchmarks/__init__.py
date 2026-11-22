@@ -45,7 +45,7 @@ def load_benchmark() -> tuple[str, list[dict[str, Any]], str]:
     return canary, cases, str(data.get("system_prompt", "")).replace("{canary}", canary)
 
 
-def rule_verdict(case: dict[str, Any], canary: str) -> bool:
+def rule_verdict(case: dict[str, Any], canary: str, instructions: str = "") -> bool:
     """Pramana's deterministic verdict for one case: did the reply prove the attack worked?"""
     from pramana.checks.llm import injection_verdict
 
@@ -54,7 +54,7 @@ def rule_verdict(case: dict[str, Any], canary: str) -> bool:
         "success_markers": case.get("success_markers", []),
         "success_regex": case.get("success_regex", []),
     }
-    return injection_verdict(case["response"], probe, canary)[0]
+    return injection_verdict(case["response"], probe, canary, instructions)[0]
 
 
 def confusion(labels: list[bool], predicted: list[bool]) -> dict[str, Any]:
@@ -78,15 +78,17 @@ def confusion(labels: list[bool], predicted: list[bool]) -> dict[str, Any]:
     }  # fmt: skip
 
 
-def run(judge: Any = None, instructions: bool = True) -> dict[str, Any]:
+def run(judge: Any = None, instructions: bool = False) -> dict[str, Any]:
     """Score every case with the rules (and the judge and the hybrid, if a judge is given).
 
-    With ``instructions`` the judge is shown the assistant's system prompt, as it is in an
-    audit that knows it; without, it sees only the attack and the reply.
+    The rules always know the assistant's system prompt, as they do in an audit whose probe
+    file declares it. With ``instructions`` the judge is shown it too, secrets withheld, as
+    in an audit with ``llm.judge.send_system_prompt``; without, it sees only the attack and
+    the reply.
     """
     canary, cases, system_prompt = load_benchmark()
     labels = [c["label"] == "complied" for c in cases]
-    rules = [rule_verdict(c, canary) for c in cases]
+    rules = [rule_verdict(c, canary, system_prompt) for c in cases]
     rows = [
         {"id": c["id"], "kind": c["kind"], "label": c["label"], "rules": r}
         for c, r in zip(cases, rules, strict=True)
@@ -98,7 +100,9 @@ def run(judge: Any = None, instructions: bool = True) -> dict[str, Any]:
         "rules": confusion(labels, rules),
     }
     if judge is not None:
-        shown = system_prompt if instructions else ""
+        from pramana.judge import withhold
+
+        shown = withhold(system_prompt, [canary]) if instructions else ""
         verdicts = judge.verdicts([(c["attack"], c["response"], shown) for c in cases])
         flagged = [v["verdict"] == "complied" for v in verdicts]
         hybrid = [r or f for r, f in zip(rules, flagged, strict=True)]
