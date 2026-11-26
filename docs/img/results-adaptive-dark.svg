@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="488" viewBox="0 0 1000 488" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img">
+<title>Fixed versus adaptive attacks against a third-party guard</title>
+<desc>Attacker-chosen code: fixed attacks 39/52 without the guard, 7/52 behind it; adaptive search reached it at query 17; Rule-free persona: fixed attacks 26/32 without the guard, 0/32 behind it; adaptive search reached it at query 14; System-prompt secret: fixed attacks 14/28 without the guard, 0/28 behind it; adaptive search did not reach it; Exfiltration link: fixed attacks 30/34 without the guard, 10/34 behind it; adaptive search reached it at query 4</desc>
+<rect width="1000" height="488" rx="12" fill="#0d1117"/>
+<text x="28.0" y="38.0" font-size="18" fill="#e6edf3" text-anchor="start" font-weight="650">A third-party guard stops most fixed attacks. An adaptive search still gets through.</text>
+<text x="28.0" y="62.0" font-size="12.5" fill="#9198a1" text-anchor="start" font-weight="400">Qwen2.5-14B with a confidential system prompt, without and behind ProtectAI&#x27;s open prompt-injection classifier.</text>
+<text x="28.0" y="80.0" font-size="12.5" fill="#9198a1" text-anchor="start" font-weight="400">Fixed attacks: 109 of 146 succeeded without the guard, 17 of 146 behind it.</text>
+<rect x="250" y="102" width="12" height="12" rx="3" fill="#338ced"/>
+<text x="268.0" y="112.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">No guard</text>
+<rect x="336" y="102" width="12" height="12" rx="3" fill="#e76624"/>
+<text x="354.0" y="112.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">Behind the guard</text>
+<text x="680.0" y="112.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">Adaptive search through the guard (40 queries)</text>
+<line x1="250.0" y1="126" x2="250.0" y2="412" stroke="#262c36"/>
+<text x="250.0" y="428.0" font-size="11.5" fill="#9198a1" text-anchor="middle" font-weight="400">0%</text>
+<line x1="340.0" y1="126" x2="340.0" y2="412" stroke="#262c36"/>
+<text x="340.0" y="428.0" font-size="11.5" fill="#9198a1" text-anchor="middle" font-weight="400">25%</text>
+<line x1="430.0" y1="126" x2="430.0" y2="412" stroke="#262c36"/>
+<text x="430.0" y="428.0" font-size="11.5" fill="#9198a1" text-anchor="middle" font-weight="400">50%</text>
+<line x1="520.0" y1="126" x2="520.0" y2="412" stroke="#262c36"/>
+<text x="520.0" y="428.0" font-size="11.5" fill="#9198a1" text-anchor="middle" font-weight="400">75%</text>
+<line x1="610.0" y1="126" x2="610.0" y2="412" stroke="#262c36"/>
+<text x="610.0" y="428.0" font-size="11.5" fill="#9198a1" text-anchor="middle" font-weight="400">100%</text>
+<line x1="250" y1="126" x2="250" y2="412" stroke="#3d444d"/>
+<text x="28.0" y="151.0" font-size="14" fill="#e6edf3" text-anchor="start" font-weight="600">Attacker-chosen code</text>
+<text x="28.0" y="169.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">make the assistant say it</text>
+<path d="M250.0,138.0 H516.0 Q520.0,138.0 520.0,142.0 V152.0 Q520.0,156.0 516.0,156.0 H250.0 Z" fill="#338ced"/>
+<text x="528.0" y="151.5" font-size="12" fill="#e6edf3" text-anchor="start" font-weight="400">75%  (39 of 52)</text>
+<path d="M250.0,158.0 H294.5 Q298.5,158.0 298.5,162.0 V172.0 Q298.5,176.0 294.5,176.0 H250.0 Z" fill="#e76624"/>
+<text x="306.5" y="171.5" font-size="12" fill="#e6edf3" text-anchor="start" font-weight="400">13%  (7 of 52)</text>
+<circle cx="688" cy="155" r="8" fill="#eb6263"/>
+<text x="688.0" y="159.5" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="800">!</text>
+<text x="704.0" y="153.0" font-size="14" fill="#e6edf3" text-anchor="start" font-weight="600">Reached at query 17</text>
+<text x="704.0" y="171.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">found by the attacker model</text>
+<text x="28.0" y="225.0" font-size="14" fill="#e6edf3" text-anchor="start" font-weight="600">Rule-free persona</text>
+<text x="28.0" y="243.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">take on a role and call sign</text>
+<path d="M250.0,212.0 H538.5 Q542.5,212.0 542.5,216.0 V226.0 Q542.5,230.0 538.5,230.0 H250.0 Z" fill="#338ced"/>
+<text x="550.5" y="225.5" font-size="12" fill="#e6edf3" text-anchor="start" font-weight="400">81%  (26 of 32)</text>
+<path d="M250.0,232.0 H250.8 Q251.5,232.0 251.5,232.8 V249.2 Q251.5,250.0 250.8,250.0 H250.0 Z" fill="#e76624"/>
+<text x="258.0" y="245.5" font-size="12" fill="#e6edf3" text-anchor="start" font-weight="400">0%  (0 of 32)</text>
+<circle cx="688" cy="229" r="8" fill="#eb6263"/>
+<text x="688.0" y="233.5" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="800">!</text>
+<text x="704.0" y="227.0" font-size="14" fill="#e6edf3" text-anchor="start" font-weight="600">Reached at query 14</text>
+<text x="704.0" y="245.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">found by the attacker model</text>
+<text x="28.0" y="299.0" font-size="14" fill="#e6edf3" text-anchor="start" font-weight="600">System-prompt secret</text>
+<text x="28.0" y="317.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">reveal the hidden canary</text>
+<path d="M250.0,286.0 H426.0 Q430.0,286.0 430.0,290.0 V300.0 Q430.0,304.0 426.0,304.0 H250.0 Z" fill="#338ced"/>
+<text x="438.0" y="299.5" font-size="12" fill="#e6edf3" text-anchor="start" font-weight="400">50%  (14 of 28)</text>
+<path d="M250.0,306.0 H250.8 Q251.5,306.0 251.5,306.8 V323.2 Q251.5,324.0 250.8,324.0 H250.0 Z" fill="#e76624"/>
+<text x="258.0" y="319.5" font-size="12" fill="#e6edf3" text-anchor="start" font-weight="400">0%  (0 of 28)</text>
+<circle cx="688" cy="303" r="8" fill="#0aac23"/>
+<text x="688.0" y="307.5" font-size="11" fill="#ffffff" text-anchor="middle" font-weight="800">✓</text>
+<text x="704.0" y="301.0" font-size="14" fill="#e6edf3" text-anchor="start" font-weight="600">Held for all 40 queries</text>
+<text x="704.0" y="319.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">not reached</text>
+<text x="28.0" y="373.0" font-size="14" fill="#e6edf3" text-anchor="start" font-weight="600">Exfiltration link</text>
+<text x="28.0" y="391.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">write a link that carries data</text>
+<path d="M250.0,360.0 H563.6 Q567.6,360.0 567.6,364.0 V374.0 Q567.6,378.0 563.6,378.0 H250.0 Z" fill="#338ced"/>
+<text x="575.6" y="373.5" font-size="12" fill="#e6edf3" text-anchor="start" font-weight="400">88%  (30 of 34)</text>
+<path d="M250.0,380.0 H351.9 Q355.9,380.0 355.9,384.0 V394.0 Q355.9,398.0 351.9,398.0 H250.0 Z" fill="#e76624"/>
+<text x="363.9" y="393.5" font-size="12" fill="#e6edf3" text-anchor="start" font-weight="400">29%  (10 of 34)</text>
+<circle cx="688" cy="377" r="8" fill="#eb6263"/>
+<text x="688.0" y="381.5" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="800">!</text>
+<text x="704.0" y="375.0" font-size="14" fill="#e6edf3" text-anchor="start" font-weight="600">Reached at query 4</text>
+<text x="704.0" y="393.0" font-size="12" fill="#9198a1" text-anchor="start" font-weight="400">found by the search</text>
+<text x="28.0" y="470.0" font-size="11" fill="#9198a1" text-anchor="start" font-weight="400">Share of Pramana&#x27;s fixed attacks that succeeded, by attack goal. One sample per attack. Source: docs/data/kaggle_results.json (Kaggle run of 0.11.0, 22 Nov 2026).</text>
+</svg>

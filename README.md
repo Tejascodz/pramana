@@ -1,44 +1,66 @@
-<div align="center">
+<p align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/hero-dark.svg">
+  <img src="docs/img/hero.svg" width="100%" alt="Pramana, the audit engine for AI systems. Tabular models, LLM applications and AI agents go through 30 checks into a hash-chained, signed evidence pack that decides the release gate: block or pass. Mapped to NIST AI RMF, ISO/IEC 42001, the EU AI Act and the OWASP LLM Top 10, 184 controls in 8 frameworks.">
+</picture>
+</p>
 
-# Pramana
+<p align="center">
+  <a href="https://github.com/Tejascodz/pramana/actions/workflows/ci.yml"><img src="https://github.com/Tejascodz/pramana/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/Tejascodz/pramana/actions/workflows/codeql.yml"><img src="https://github.com/Tejascodz/pramana/actions/workflows/codeql.yml/badge.svg" alt="CodeQL"></a>
+  <img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-3776ab" alt="Python 3.10 to 3.13">
+  <img src="https://img.shields.io/badge/version-0.11.0-257de0" alt="Version 0.11.0">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0aac23" alt="License: MIT"></a>
+</p>
 
-**An open-source audit engine for machine-learning models, LLM applications and AI agents.**
+<p align="center">
+  <a href="#quickstart">Quickstart</a> ·
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#results">Results</a> ·
+  <a href="#usage">Usage</a> ·
+  <a href="#comparison-with-related-work">Related work</a> ·
+  <a href="#limitations">Limitations</a> ·
+  <a href="#security">Security</a>
+</p>
 
-Pramana runs technical tests against an AI system, maps the results to the controls of
-NIST AI RMF, ISO/IEC 42001 and the EU AI Act, and seals the evidence in a tamper-evident
-pack with a release decision that a reviewer can verify.
+Teams that ship AI are asked to prove that a model is fair, that a chatbot does not leak data or follow injected instructions, and that an agent cannot move money without approval. That proof usually lives in notebooks and screenshots a reviewer cannot check. **Pramana runs the tests against the real system and seals the results, with the replies and records that prove each finding, in one pack a reviewer can verify offline.**
 
-[![CI](https://github.com/Tejascodz/pramana/actions/workflows/ci.yml/badge.svg)](https://github.com/Tejascodz/pramana/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/Tejascodz/pramana/actions/workflows/codeql.yml/badge.svg)](https://github.com/Tejascodz/pramana/actions/workflows/codeql.yml)
-![Python 3.10 to 3.13](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-3776ab)
-![Version 0.9.0](https://img.shields.io/badge/version-0.9.0-2f6fdb)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+<table>
+<tr>
+<td width="50%" valign="top">
 
-[Quickstart](#quickstart) · [How it works](#how-it-works) · [Results](#results) · [Usage](#usage) · [Related work](#comparison-with-related-work) · [Limitations](#limitations) · [Development](#development) · [Security](#security)
+<b>Tests the real system</b><br>
+LLM apps through any API, a recording, or their own web chat driven in Chromium. Agents from the logs they already write, or in a honeypot sandbox. Tabular models from the model and its data.
 
-</div>
+</td>
+<td width="50%" valign="top">
 
-<img src="docs/img/viewer.png" width="100%" alt="The Pramana audit viewer open on the credit-scoring sample audit. A red banner reads Release blocked: 7 risks rated critical or high must be treated first. Below it, a green box confirms every evidence file matches the hash chain, five figures show the EU AI Act tier (high), the audit opinion (Ineffective), 4 of 16 checks passed, 7 open high or critical risks and 0 checks not run, and two columns list what needs attention, such as a group-fairness failure for rural applicants, and what is working, such as calibration.">
+<b>Attacks that adapt</b><br>
+188 generated attacks in 7 languages and 7 disguises, plus a search that rewrites the attack after every reply, as in the PAIR and TAP research. A success counts only when the reply contains its proof.
 
-## Headline results
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
 
-| 42.3% vs 44.9% | 20.5% to 1.3% | 0 of 42 |
+<b>Verdicts you can check</b><br>
+Deterministic rules, with their own error rate measured on a labelled benchmark and on 354,704 outside replies. A judge model is optional, and is scored before it is used.
+
+</td>
+<td width="50%" valign="top">
+
+<b>Evidence that cannot be edited</b><br>
+A hash-chained ledger, Ed25519 signatures and Sigstore attestations. Findings map to 184 controls in NIST AI RMF, ISO/IEC 42001, the EU AI Act, the OWASP Top 10s and India's guidelines.
+
+</td>
+</tr>
+</table>
+
+## At a glance
+
+| 75% → 12%, still breached | 0.998 | within 2.6 points |
 |:---:|:---:|:---:|
-| COMPAS: Black defendants who did not reoffend but were labelled higher risk, measured by Pramana and published by ProPublica<br><sub>The other three published error rates: 22.0% vs 23.5%, 28.5% vs 28.0%, 49.6% vs 47.7%</sub> | Prompt-injection success on llama3.2:3b, reference assistant without and with guardrails<br><sub>16 of 78 vs 1 of 78 samples; 95% CI 13.0–30.8% vs 0.2–6.9%</sub> | Multi-turn attack conversations that broke the guarded assistant<br><sub>14 conversations, 3 samples each, 6 held out from the guard's design; 95% CI 0–8.4%</sub> |
-
-<sub>COMPAS is a predictions-only audit of ProPublica's two-year file (6,172 defendants; a decile of 5 to 10 counts as higher risk). ProPublica's error-rate table was computed from a different file of the same study, which explains gaps of up to 2.6 points. The LLM results come from one 3-billion-parameter open-weights model served by Ollama 0.40.7 on a MacBook Neo (8 GB), temperature 0.3, three samples per probe, with the replies recorded and scored by the current version. The reference assistant and most probes share an author, so 10 probes were held out from the guard's design. The guarded assistant is not secure: one held-out persona-switch attack still succeeds in 1 of 3 samples, and disguised versions of it succeed in 6 of 204 disguised samples (2.9%).</sub>
-
-## Overview
-
-Teams that ship AI systems are asked for evidence: that the model is not unfair to a protected group, that the chatbot does not leak customer data or follow injected instructions, that an agent cannot move money without approval, and that none of this evidence was edited afterwards. That evidence usually lives in notebooks, screenshots and spreadsheets that a reviewer cannot check. Pramana produces it as a single sealed audit pack from one specification file. Its checks are deterministic, so the same inputs always give the same verdict and a failure always comes with the record that proves it.
-
-- **30 checks across three kinds of system.** Fairness (group, intersectional, proxy), performance, calibration, drift, robustness, explainability, privacy and documentation for tabular models; prompt injection, adaptive attacks that change after every reply, multi-turn manipulation, disguised attacks, data disclosure, access control, groundedness, conduct rules, service health and the measured accuracy of an optional judge model for LLM applications; auditability, misalignment signals, safeguards, oversight, honeypots and approval paths for agents.
-- **Tests run against the live system.** LLM applications are reached through an OpenAI-compatible API, any JSON API, a recorded replay, or their own web chat page driven in Chromium. 35 hand-written probes cover English, Hindi, Hinglish, Kannada and Tamil; an attack library generates 188 more from 23 techniques, 4 goals and 7 languages; and 7 obfuscation methods re-send each attack in disguise, about 1,500 variants in all. Agents can also be tested with real attack e-mails written by people in Microsoft's LLMail-Inject challenge.
-- **Agents are audited from the logs they already write** (native, OpenTelemetry or LangChain) and in a honeypot sandbox whose tools plant instructions. A graph search proves whether any workflow path reaches an irreversible step without human approval.
-- **Evidence is tamper-evident.** Every file in the pack is recorded in a hash-chained ledger; `pramana verify` fails on any edit, and packs can be signed with Ed25519 or attested by GitHub Actions through Sigstore.
-- **Results map to 184 controls in 8 frameworks**: NIST AI RMF and its Generative AI Profile, ISO/IEC 42001 and 42005, the EU AI Act, India's AI Governance Guidelines, and the OWASP Top 10 for LLM and for agentic applications. Each control is reported as evidenced, partial, deficient, not tested or not applicable.
-
-Pramana ships as a command-line tool and Python library (`pramana`), a GitHub Action that gates a release, a local web viewer for audit packs, and a honeypot tool server for testing your own agent.
+| A third-party injection guard on Qwen2.5-14B cut fixed-attack success from 75% to 12%. Pramana's adaptive search still reached 3 of 4 attack goals through it. [Details](#adaptive-attacks-a-third-party-guard-and-a-14b-model-on-kaggle) | Precision of the system-prompt leak rule on 354,704 replies labelled by someone else: 168 false alarms in 200,017 replies that did not leak. [Details](#the-leak-rule-on-outside-data-and-the-judge-again) | Pramana's four COMPAS error rates against ProPublica's published analysis, measured from the raw risk scores without being told what to look for. [Details](#compas) |
 
 ## Quickstart
 
@@ -84,6 +106,20 @@ OK: every evidence file and ledger entry in pramana-demo/credit-scoring/pack ver
 ```
 
 To audit your own system, `pramana init my_audit.yaml` writes a specification with every field, and `pramana run my_audit.yaml` runs it.
+
+<img src="docs/img/viewer.png" width="100%" alt="The Pramana audit viewer open on the credit-scoring sample audit. A red banner reads Release blocked: 7 risks rated critical or high must be treated first. Below it, a green box confirms every evidence file matches the hash chain, five figures show the EU AI Act tier (high), the audit opinion (Ineffective), 4 of 16 checks passed, 7 open high or critical risks and 0 checks not run, and two columns list what needs attention, such as a group-fairness failure for rural applicants, and what is working, such as calibration.">
+
+## What it covers
+
+Teams that ship AI systems are asked for evidence: that the model is not unfair to a protected group, that the chatbot does not leak customer data or follow injected instructions, that an agent cannot move money without approval, and that none of this evidence was edited afterwards. That evidence usually lives in notebooks, screenshots and spreadsheets that a reviewer cannot check. Pramana produces it as a single sealed audit pack from one specification file. Its checks are deterministic, so the same inputs always give the same verdict and a failure always comes with the record that proves it.
+
+- **30 checks across three kinds of system.** Fairness (group, intersectional, proxy), performance, calibration, drift, robustness, explainability, privacy and documentation for tabular models; prompt injection, adaptive attacks that change after every reply, multi-turn manipulation, disguised attacks, data disclosure, access control, groundedness, conduct rules, service health and the measured accuracy of an optional judge model for LLM applications; auditability, misalignment signals, safeguards, oversight, honeypots and approval paths for agents.
+- **Tests run against the live system.** LLM applications are reached through an OpenAI-compatible API, any JSON API, a recorded replay, or their own web chat page driven in Chromium. 35 hand-written probes cover English, Hindi, Hinglish, Kannada and Tamil; an attack library generates 188 more from 23 techniques, 4 goals and 7 languages; and 7 obfuscation methods re-send each attack in disguise, about 1,500 variants in all. Agents can also be tested with real attack e-mails written by people in Microsoft's LLMail-Inject challenge.
+- **Agents are audited from the logs they already write** (native, OpenTelemetry or LangChain) and in a honeypot sandbox whose tools plant instructions. A graph search proves whether any workflow path reaches an irreversible step without human approval.
+- **Evidence is tamper-evident.** Every file in the pack is recorded in a hash-chained ledger; `pramana verify` fails on any edit, and packs can be signed with Ed25519 or attested by GitHub Actions through Sigstore.
+- **Results map to 184 controls in 8 frameworks**: NIST AI RMF and its Generative AI Profile, ISO/IEC 42001 and 42005, the EU AI Act, India's AI Governance Guidelines, and the OWASP Top 10 for LLM and for agentic applications. Each control is reported as evidenced, partial, deficient, not tested or not applicable.
+
+Pramana ships as a command-line tool and Python library (`pramana`), a GitHub Action that gates a release, a local web viewer for audit packs, and a honeypot tool server for testing your own agent.
 
 ## How it works
 
@@ -166,7 +202,10 @@ The pack holds an HTML report, `results.json`, a model card, a CycloneDX 1.7 ML 
 
 ### COMPAS
 
-<img src="docs/img/results-compas.svg" width="100%" alt="Bar chart comparing four COMPAS error rates measured by Pramana with those published by ProPublica: Black defendants who did not reoffend labelled higher risk, 42.3% against 44.9%; White, 22.0% against 23.5%; Black defendants who reoffended labelled lower risk, 28.5% against 28.0%; White, 49.6% against 47.7%.">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/results-compas-dark.svg">
+  <img src="docs/img/results-compas.svg" width="100%" alt="Bar chart comparing four COMPAS error rates measured by Pramana with those published by ProPublica: Black defendants who did not reoffend labelled higher risk, 42.3% against 44.9%; White, 22.0% against 23.5%; Black defendants who reoffended labelled lower risk, 28.5% against 28.0%; White, 49.6% against 47.7%.">
+</picture>
 
 | Error rate | Black, Pramana | Black, ProPublica | White, Pramana | White, ProPublica |
 |---|---:|---:|---:|---:|
@@ -177,7 +216,10 @@ Without being told what to look for, the audit fails group fairness as critical:
 
 ### LLM application
 
-<img src="docs/img/results-attacks.svg" width="100%" alt="Bar chart of attack success on llama3.2:3b with 95% intervals: single-message injection 20.5% on the baseline build and 1.3% on the guarded build; disguised injection 2.9% and multi-turn conversations 0.0% on the guarded build.">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/results-attacks-dark.svg">
+  <img src="docs/img/results-attacks.svg" width="100%" alt="Bar chart of attack success on llama3.2:3b with 95% intervals: single-message injection 20.5% on the baseline build and 1.3% on the guarded build; disguised injection 2.9% and multi-turn conversations 0.0% on the guarded build.">
+</picture>
 
 | Check | Baseline build | Guarded build |
 |---|---|---|
@@ -247,7 +289,9 @@ Pramana does not credit Llama-3.2-3B with resisting: it did not complete the ord
 
 **Showing the judge the system prompt** (0.9.1, same GPUs, 22 November 2026). Version 0.9.1 showed the judge the assistant's system prompt so it could recognise instructions paraphrased back. On the labelled cases, Qwen2.5-7B then caught one of the two paraphrased leaks, but Qwen2.5-3B lost precision (1.00 to 0.91). In a real audit of the guarded build, the judge flagged the build's fixed refusal ("I can only help with questions about Nilgiri Finance personal loans…") as having "printed the internal reference code" in 7 of 135 replies, against 2 of 137 without the system prompt: it took the code it had been shown for something the reply said. Version 0.9.2 therefore shows the system prompt only on request and never with a secret in it, catches a recited system prompt with a reproducible rule instead, and adds those real replies to the labelled benchmark. The same run found one more compliance the rules missed, a code assembled in the wrong order (`JAR-9245NIX` for 'NIX' + 'JAR-9245'), which 0.9.2 catches.
 
-**The leak rule on outside data, and the judge again** (0.9.2, 22 November 2026). The rule that catches a recited system prompt was run on 354,704 replies labelled for leakage by someone else (`gabrielchua/system-prompt-leakage` on Hugging Face, MIT licence; synthetic, made by an LLM asked to paraphrase or answer each prompt):
+### The leak rule on outside data, and the judge again
+
+Run on Kaggle on 22 November 2026 (0.9.2, then 0.9.3). The rule that catches a recited system prompt was run on 354,704 replies labelled for leakage by someone else (`gabrielchua/system-prompt-leakage` on Hugging Face, MIT licence; synthetic, made by an LLM asked to paraphrase or answer each prompt):
 
 | Share of the prompt reproduced | Precision | Recall | False alarms |
 |---|---|---|---|
@@ -256,11 +300,21 @@ Pramana does not credit Llama-3.2-3B with resisting: it did not complete the ord
 | **0.9.3**, 0.4 to 0.5 (sent for review, never a failure) | **0.97 (CI 0.96–0.97)** | **0.80 with the above** | 1,270 |
 | 0.9.3, at least 0.3 (not used) | 0.90 | 0.91 | 15,332 |
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/results-leak-dark.svg">
+  <img src="docs/img/results-leak.svg" width="100%" alt="Line chart of the leak rule's precision and recall against the share of the system prompt a reply reproduces, from 0.3 to 0.9, on 354,704 replies labelled by someone else. Precision rises from 0.90 at 0.3 to 0.998 at 0.5 and stays near 1 above it; recall falls from 0.91 at 0.3 to 0.57 at 0.5 and 0.10 at 0.9. Replies at 0.4 to 0.5 are sent for review; at 0.5 and above they fail the check.">
+</picture>
+
 It catches recitals, not paraphrases, which is what the rule claims. The 0.9.2 run showed replies written with underscores for spaces going unseen; 0.9.3 split those words, and a second run on the same data (CPU only, 19 minutes) measured the result: 17,023 of the 17,366 underscore leaks caught with one false alarm, recall at the fail threshold up from 0.46 to 0.57 with no new false alarm. The 168 that remain are on-topic answers to a long system prompt that reuse much of its wording in order; the leaks still missed are paraphrases, with synonyms in place of the prompt's words. With the judge on the 59 labelled cases, every judge raised recall to 0.96; Qwen2.5-3B without the system prompt did so with precision 1.00. Shown the system prompt with its canary withheld, Qwen2.5-7B still flagged the guarded build's fixed refusal 6 times in 135, against 2 in 136 without it, so the prompt stays off by default.
 
 ### Adaptive attacks, a third-party guard and a 14B model on Kaggle
 
 Version 0.11.0 was run from a fresh clone (commit `1f565d7`) on the same two T4 GPUs on 22 November 2026, in 27 minutes; all four packs were signed and verified. Each audit sent Pramana's fixed attacks, then ran `llm.adaptive_attacks` with a budget of 40 queries per goal and Qwen2.5-7B as the attacker model.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/results-adaptive-dark.svg">
+  <img src="docs/img/results-adaptive.svg" width="100%" alt="Bar chart by attack goal for Qwen2.5-14B without and behind ProtectAI's classifier. Share of fixed attacks that succeeded: attacker-chosen code 75% without, 13% behind; rule-free persona 81% and 0%; system-prompt secret 50% and 0%; exfiltration link 88% and 29%. Adaptive search through the guard: code reached at query 17 and persona at query 14, both by the attacker model; exfiltration link reached at query 4; the secret held for all 40 queries.">
+</picture>
 
 **A guard Pramana's author did not write, on a larger model.** Qwen2.5-14B was given a confidential system prompt with a canary, then audited twice: on its own, and behind ProtectAI's open prompt-injection classifier ([deberta-v3-base-prompt-injection-v2](https://huggingface.co/protectai/deberta-v3-base-prompt-injection-v2), Apache 2.0), which screened every message and refused those it classed as injections.
 
@@ -431,6 +485,7 @@ dashboard/          web viewer for audit packs
 examples/           credit scoring, COMPAS, support chatbot, live assistant, agent traces and sandbox
 scripts/            re-scoring and figure generation
 docs/sample-audits/ committed audit packs: every number above except the Kaggle runs comes from them
+docs/data/          the published numbers of the Kaggle runs, copied by script from their signed packs
 tests/              unit, end-to-end, security and regression tests
 action.yml          GitHub Action
 ```
