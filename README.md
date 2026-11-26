@@ -14,6 +14,7 @@
 </p>
 
 <p align="center">
+  <a href="#what-it-found">What it found</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#results">Results</a> ·
@@ -24,6 +25,18 @@
 </p>
 
 Teams that ship AI are asked to prove that a model is fair, that a chatbot does not leak data or follow injected instructions, and that an agent cannot move money without approval. That proof usually lives in notebooks and screenshots a reviewer cannot check. **Pramana runs the tests against the real system and seals the results, with the replies and records that prove each finding, in one pack a reviewer can verify offline.**
+
+## What it found
+
+Pramana has been run against open models from 3B to 14B parameters, a third-party injection guard, real attacker e-mails and the COMPAS risk scores. Each finding links to its full results, with sample sizes and caveats.
+
+- **A guard that looked strong was still breached.** ProtectAI's prompt-injection classifier cut fixed-attack success on Qwen2.5-14B from 75% to 12%. Pramana's adaptive search still reached 3 of its 4 attack goals through it: in one, the attacker model found a working persona attack in 14 queries by dropping the override wording the classifier looks for. [Details](#adaptive-attacks-a-third-party-guard-and-a-14b-model-on-kaggle)
+- **Generated attacks found what hand-written ones missed.** A guarded assistant stopped 24 of 26 hand-written probes, but 35 of Pramana's 188 generated attacks got through. The guard blocked every Hindi attack, yet let through 6 of 16 in German and 6 of 16 in Spanish, against 15 of 109 in English. [Details](#attack-library-judge-models-and-real-attacks-on-kaggle)
+- **Real attacker e-mails redirected an agent.** Replaying 40 successful attacks from Microsoft's LLMail-Inject challenge, a Qwen2.5-7B agent sent e-mail to the attacker's address in 19 of 40 runs. [Details](#attack-library-judge-models-and-real-attacks-on-kaggle)
+- **It reproduced the COMPAS findings without being told what to look for.** From the raw risk scores, its four error rates by race came within 2.6 points of ProPublica's published analysis. [Details](#compas)
+- **Its own scoring is measured too.** The system-prompt leak rule had precision 0.998 on 354,704 replies labelled by someone else: 168 false alarms in 200,017. Judge models are scored before use, and one that fell below the minimum was not used. [Details](#the-leak-rule-on-outside-data-and-the-judge-again)
+
+## What it does
 
 <table>
 <tr>
@@ -55,12 +68,6 @@ A hash-chained ledger, Ed25519 signatures and Sigstore attestations. Findings ma
 </td>
 </tr>
 </table>
-
-## At a glance
-
-| 75% → 12%, still breached | 0.998 | within 2.6 points |
-|:---:|:---:|:---:|
-| A third-party injection guard on Qwen2.5-14B cut fixed-attack success from 75% to 12%. Pramana's adaptive search still reached 3 of 4 attack goals through it. [Details](#adaptive-attacks-a-third-party-guard-and-a-14b-model-on-kaggle) | Precision of the system-prompt leak rule on 354,704 replies labelled by someone else: 168 false alarms in 200,017 replies that did not leak. [Details](#the-leak-rule-on-outside-data-and-the-judge-again) | Pramana's four COMPAS error rates against ProPublica's published analysis, measured from the raw risk scores without being told what to look for. [Details](#compas) |
 
 ## Quickstart
 
